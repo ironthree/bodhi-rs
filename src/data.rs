@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serde_derive::Deserialize;
+use serde::Deserialize;
 
 
 // derived from actual bodhi JSON responses

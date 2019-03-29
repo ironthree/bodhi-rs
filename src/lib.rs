@@ -1,5 +1,5 @@
 extern crate reqwest;
-extern crate serde_derive;
+extern crate serde;
 
 use std::collections::HashMap;
 
