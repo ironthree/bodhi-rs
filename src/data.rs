@@ -8,7 +8,7 @@ use serde::Deserialize;
 #[derive(Deserialize, Debug)]
 pub struct Build {
     ci_url: Option<String>,
-    epoch: i32,
+    epoch: Option<i32>,
     nvr: String,
     release_id: i32,
     signed: bool,
@@ -58,7 +58,7 @@ struct BugFeedback {
 #[derive(Deserialize, Debug)]
 struct Bug {
     bug_id: i32,
-    // feedback: Option<Vec<BugFeedback>>, ?? occurs in Update, but not in BugFeedBack (circular dependency?)
+    feedback: Option<Vec<BugFeedback>>,
     parent: bool,
     security: bool,
     title: String,
@@ -104,13 +104,18 @@ pub struct CommentListPage {
 
 
 #[derive(Deserialize, Debug)]
+pub struct CommentPage {
+    pub comment: Comment,
+}
+
+
+#[derive(Deserialize, Debug)]
 struct Compose {
-    checkpoints: HashMap<String, String>,
     content_type: String,
     date_created: String,
     error_message: String,
-    release: Release,
-    release_id: i32,
+    release: Option<Release>,
+    release_id: Option<i32>,
     request: String,
     security: bool,
     state: String,
@@ -228,18 +233,18 @@ struct Update {
     bugs: Vec<Bug>,
     builds: Vec<Build>,
     close_bugs: bool,
-    comments: Vec<Comment>,
+    comments: Option<Vec<Comment>>,
     compose: Option<Compose>,
-    content_type: String,
+    content_type: Option<String>,
     critpath: bool,
     date_approved: Option<String>,
     date_modified: Option<String>,
     date_pushed: Option<String>,
     date_stable: Option<String>,
-    date_submitted: String,
+    date_submitted: Option<String>,
     date_testing: Option<String>,
     display_name: String,
-    greenwave_summary_string: String,
+    greenwave_summary_string: Option<String>,
     // greenwave_unsatisfied_requirements: Option<?>,
     karma: i32,
     locked: bool,
@@ -251,18 +256,18 @@ struct Update {
     request: Option<String>,
     require_bugs: bool,
     require_testcases: bool,
-    requirements: String,
+    requirements: Option<String>,
     severity: String,
-    stable_karma: i32,
+    stable_karma: Option<i32>,
     status: String,
-    submitter: String,
+    submitter: Option<String>,
     suggest: String,
-    test_cases: Vec<TestCase>,
-    test_gating_status: String,
+    test_cases: Option<Vec<TestCase>>,
+    test_gating_status: Option<String>,
     title: String,
     r#type: String,
-    unstable_karma: i32,
-    updateid: String,
+    unstable_karma: Option<i32>,
+    updateid: Option<i32>,
     url: String,
     user: User,
 }
