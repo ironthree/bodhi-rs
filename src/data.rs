@@ -10,20 +10,19 @@ pub struct Build {
     ci_url: Option<String>,
     epoch: Option<i32>,
     nvr: String,
-    release_id: i32,
+    release_id: Option<i32>,
     signed: bool,
     r#type: String,
 }
 
 
-// TODO: make private again
 #[derive(Deserialize, Debug)]
-pub struct BuildListPage {
-    builds: Vec<Build>,
-    page: i32,
-    pages: i32,
-    rows_per_page: i32,
-    total: i32,
+pub(crate) struct BuildListPage {
+    pub builds: Vec<Build>,
+    pub page: i32,
+    pub pages: i32,
+    pub rows_per_page: i32,
+    pub total: i32,
 }
 
 
@@ -92,7 +91,7 @@ struct Package {
 }
 
 
-// TODO: make private again
+// TODO: make pub(crate) again
 #[derive(Deserialize, Debug)]
 pub struct CommentListPage {
     comments: Vec<Comment>,
@@ -182,9 +181,8 @@ struct OverrideListPage {
 }
 
 
-// TODO: make private again
 #[derive(Deserialize, Debug)]
-pub struct PackageListPage {
+pub(crate) struct PackageListPage {
     packages: Vec<Package>,
     page: i32,
     pages: i32,
@@ -299,7 +297,7 @@ struct UserDetails {
 
 
 #[derive(Deserialize, Debug)]
-struct UserListPage {
+pub(crate) struct UserListPage {
     page: i32,
     pages: i32,
     rows_per_page: i32,

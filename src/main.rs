@@ -1,13 +1,13 @@
-extern crate bodhi;
-
 use bodhi::*;
 
+// TODO: make this configurable
 const SERVER_URL: &str = "https://bodhi.fedoraproject.org";
 
 
 fn main() {
     let bodhi = BodhiService::new(String::from(SERVER_URL));
 
+    /*
     let build = BuildQuery::new()
         .nvr(String::from("rubygem-jekyll-watch-2.2.1-1.fc28"))
         .query(&bodhi);
@@ -16,8 +16,10 @@ fn main() {
         Ok(build) => println!("Build: {:#?}", build),
         Err(error) => println!("Error: {:#?}", error),
     }
+    */
 
     let builds = BuildQuery::new()
+        .release(String::from("F29"))
         .query(&bodhi);
 
     match builds {
@@ -25,6 +27,7 @@ fn main() {
         Err(error) => println!("Error: {:#?}", error),
     }
 
+    /*
     let comment = CommentIDQuery::new(19999)
         .query(&bodhi);
 
@@ -41,4 +44,5 @@ fn main() {
         Ok(comment) => println!("Comment: {:#?}", comment),
         Err(error) => println!("Error: {:#?}", error),
     }
+    */
 }

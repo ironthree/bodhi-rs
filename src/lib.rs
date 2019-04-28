@@ -1,6 +1,3 @@
-extern crate reqwest;
-extern crate serde;
-
 pub mod data;
 pub mod service;
 pub mod query;
