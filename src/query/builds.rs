@@ -8,7 +8,7 @@ use crate::service::BodhiService;
 const DEFAULT_PAGE: i32 = 1;
 const DEFAULT_ROWS: i32 = 50;
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct BuildNVRQuery {
     nvr: String,
 }
@@ -32,7 +32,7 @@ impl BuildNVRQuery {
                 }
             };
 
-            return Ok(build);
+            Ok(build)
         } else {
             let error: BodhiError = match response.json() {
                 Ok(value) => value,
@@ -41,7 +41,7 @@ impl BuildNVRQuery {
                 }
             };
 
-            return Err(format!("{:?}", error));
+            Err(format!("{:?}", error))
         }
     }
 }
@@ -139,7 +139,7 @@ impl BuildQuery {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 struct BuildPageQuery {
     pub nvr: Option<String>,
     pub packages: Option<Vec<String>>,
@@ -149,7 +149,7 @@ struct BuildPageQuery {
     pub rows_per_page: i32,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug, Deserialize)]
 struct BuildListPage {
     builds: Vec<Build>,
     page: i32,
@@ -251,7 +251,7 @@ impl BuildPageQuery {
                 }
             };
 
-            return Ok(builds);
+            Ok(builds)
         } else {
             let error: BodhiError = match response.json() {
                 Ok(value) => value,
@@ -260,7 +260,7 @@ impl BuildPageQuery {
                 }
             };
 
-            return Err(format!("{:?}", error));
+            Err(format!("{:?}", error))
         }
     }
 }
