@@ -8,31 +8,43 @@ use crate::service::BodhiService;
 const DEFAULT_PAGE: i32 = 1;
 const DEFAULT_ROWS: i32 = 50;
 
-#[derive(Deserialize, Debug)]
-struct BuildListPage {
-    builds: Vec<Build>,
-    page: i32,
-    pages: i32,
-    rows_per_page: i32,
-    total: i32,
-}
-
 #[derive(Debug, Default)]
 pub struct BuildNVRQuery {
     nvr: String,
 }
 
-/* TODO
 impl BuildNVRQuery {
     pub fn new(nvr: String) -> BuildNVRQuery {
         BuildNVRQuery { nvr }
     }
 
-    pub fn query(bodhi: &BodhiService) -> Result<Build, String> {
-        unimplemented!()
+    pub fn query(self, bodhi: &BodhiService) -> Result<Build, String> {
+        let path = format!("/builds/{}", self.nvr);
+
+        let mut response = bodhi.request(&path, None)?;
+        let status = response.status();
+
+        if status.is_success() {
+            let build: Build = match response.json() {
+                Ok(value) => value,
+                Err(error) => {
+                    return Err(format!("{:?}", error));
+                }
+            };
+
+            return Ok(build);
+        } else {
+            let error: BodhiError = match response.json() {
+                Ok(value) => value,
+                Err(error) => {
+                    return Err(format!("Unexpected error message: {:?}", error));
+                }
+            };
+
+            return Err(format!("{:?}", error));
+        }
     }
 }
-*/
 
 #[derive(Debug, Default)]
 pub struct BuildQuery {
@@ -135,6 +147,15 @@ struct BuildPageQuery {
     pub updates: Option<Vec<String>>,
     pub page: i32,
     pub rows_per_page: i32,
+}
+
+#[derive(Deserialize, Debug)]
+struct BuildListPage {
+    builds: Vec<Build>,
+    page: i32,
+    pages: i32,
+    rows_per_page: i32,
+    total: i32,
 }
 
 impl BuildPageQuery {

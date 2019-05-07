@@ -19,10 +19,7 @@ impl BodhiService {
         path: &str,
         args: Option<HashMap<&str, String>>,
     ) -> Result<Response, String> {
-        let client = match reqwest::Client::builder()
-            .timeout(REQUEST_TIMEOUT)
-            .build()
-        {
+        let client = match reqwest::Client::builder().timeout(REQUEST_TIMEOUT).build() {
             Ok(client) => client,
             Err(error) => {
                 return Err(format!("TLS backend could not be initialized: {:?}", error));

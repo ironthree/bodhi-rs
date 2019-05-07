@@ -1,5 +1,5 @@
 /// This is just a small test program that won't be part of any official releases.
-use bodhi::{BodhiService, BuildQuery};
+use bodhi::{BodhiService, BuildNVRQuery, BuildQuery};
 
 // TODO: make this configurable
 const SERVER_URL: &str = "https://bodhi.fedoraproject.org";
@@ -7,12 +7,19 @@ const SERVER_URL: &str = "https://bodhi.fedoraproject.org";
 fn main() {
     let bodhi = BodhiService::new(String::from(SERVER_URL));
 
+    let build = BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29")).query(&bodhi);
+
+    match build {
+        Ok(build) => println!("Build: {:#?}", build),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
     let builds = BuildQuery::new()
         .nvr(String::from("rust-1.34.1-1.fc29"))
         .query(&bodhi);
 
     match builds {
-        Ok(builds) => println!("Build: {:#?}", builds),
+        Ok(builds) => println!("Builds: {:#?}", builds),
         Err(error) => println!("Error: {:#?}", error),
     }
 
@@ -22,7 +29,7 @@ fn main() {
         .query(&bodhi);
 
     match builds {
-        Ok(builds) => println!("Build: {:#?}", builds),
+        Ok(builds) => println!("Builds: {:#?}", builds),
         Err(error) => println!("Error: {:#?}", error),
     }
 
