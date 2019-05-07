@@ -1,5 +1,5 @@
 /// This is just a small test program that won't be part of any official releases.
-use bodhi::{BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery};
+use bodhi::{BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery};
 
 // TODO: make this configurable
 const SERVER_URL: &str = "https://bodhi.fedoraproject.org";
@@ -40,13 +40,13 @@ fn main() {
         Err(error) => println!("Error: {:#?}", error),
     }
 
-    /*
     let comments = CommentQuery::new()
+        .user(String::from("decathorpe"))
+        .package(String::from("kernel"))
         .query(&bodhi);
 
     match comments {
         Ok(comment) => println!("Comment: {:#?}", comment),
         Err(error) => println!("Error: {:#?}", error),
     }
-    */
 }

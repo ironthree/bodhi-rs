@@ -17,12 +17,12 @@ pub struct Bug {
     feedback: Option<Vec<BugFeedback>>,
     parent: bool,
     security: bool,
-    title: String,
+    title: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct BugFeedback {
-    bug: Bug,
+    bug: Option<Bug>,
     bug_id: i32,
     comment_id: i32,
     karma: i32,
@@ -172,7 +172,7 @@ pub struct Update {
     date_testing: Option<String>,
     display_name: String,
     greenwave_summary_string: Option<String>,
-    // greenwave_unsatisfied_requirements: Option<?>,
+    // TODO: greenwave_unsatisfied_requirements: Option<?>,
     karma: i32,
     locked: bool,
     meets_testing_requirements: bool,

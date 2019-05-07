@@ -1,10 +1,12 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
 
 use crate::data::{BodhiError, Comment};
 use crate::service::BodhiService;
 
-//const DEFAULT_PAGE: i32 = 1;
-//const DEFAULT_ROWS: i32 = 50;
+const DEFAULT_PAGE: i32 = 1;
+const DEFAULT_ROWS: i32 = 50;
 
 #[derive(Debug)]
 pub struct CommentIDQuery {
@@ -49,23 +51,49 @@ impl CommentIDQuery {
     }
 }
 
-/*
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CommentQuery {
-    // TODO
+    anonymous: Option<bool>,
+    ignore_user: Option<Vec<String>>,
+    like: Option<String>,
+    packages: Option<Vec<String>>,
+    search: Option<String>,
+    // TODO: since: Option<DateTimeString>,
+    update_owner: Option<Vec<String>>,
+    updates: Option<Vec<String>>,
+    user: Option<Vec<String>>,
 }
 
 impl CommentQuery {
     pub fn new() -> CommentQuery {
         CommentQuery {
-            // TODO
+            anonymous: None,
+            ignore_user: None,
+            like: None,
+            packages: None,
+            search: None,
+            update_owner: None,
+            updates: None,
+            user: None,
         }
     }
 
-    // TODO: query modifiers
+    pub fn anonymous(mut self, anonymous: bool) -> CommentQuery {
+        self.anonymous = Some(anonymous);
+        self
+    }
 
-    pub fn nvr(mut self, nvr: String) -> CommentQuery {
-        self.nvr = Some(nvr);
+    pub fn ignore_user(mut self, ignore_user: String) -> CommentQuery {
+        match &mut self.ignore_user {
+            Some(ignore_users) => ignore_users.push(ignore_user),
+            None => self.ignore_user = Some(vec![ignore_user]),
+        }
+
+        self
+    }
+
+    pub fn like(mut self, like: String) -> CommentQuery {
+        self.like = Some(like);
         self
     }
 
@@ -78,13 +106,85 @@ impl CommentQuery {
         self
     }
 
+    pub fn search(mut self, search: String) -> CommentQuery {
+        self.search = Some(search);
+        self
+    }
+
+    pub fn update_owner(mut self, update_owner: String) -> CommentQuery {
+        match &mut self.update_owner {
+            Some(update_owners) => update_owners.push(update_owner),
+            None => self.update_owner = Some(vec![update_owner]),
+        }
+
+        self
+    }
+
+    pub fn update(mut self, update: String) -> CommentQuery {
+        match &mut self.updates {
+            Some(updates) => updates.push(update),
+            None => self.updates = Some(vec![update]),
+        }
+
+        self
+    }
+
+    pub fn user(mut self, user: String) -> CommentQuery {
+        match &mut self.user {
+            Some(users) => users.push(user),
+            None => self.user = Some(vec![user]),
+        }
+
+        self
+    }
+
     pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Comment>, String> {
         let mut comments: Vec<Comment> = Vec::new();
         let mut page = 1;
 
         loop {
-            let query = CommentPageQuery {
-                // TODO
+            let mut query = CommentPageQuery::new().page(page);
+
+            if let Some(anonymous) = self.anonymous {
+                query = query.anonymous(anonymous);
+            };
+
+            if let Some(ignore_users) = self.ignore_user.clone() {
+                for ignore_user in ignore_users {
+                    query = query.ignore_user(ignore_user);
+                }
+            };
+
+            if let Some(like) = self.like.clone() {
+                query = query.like(like);
+            };
+
+            if let Some(packages) = self.packages.clone() {
+                for package in packages {
+                    query = query.package(package);
+                }
+            };
+
+            if let Some(search) = self.search.clone() {
+                query = query.search(search);
+            };
+
+            if let Some(update_owners) = self.update_owner.clone() {
+                for update_owner in update_owners {
+                    query = query.update_owner(update_owner);
+                }
+            };
+
+            if let Some(updates) = self.updates.clone() {
+                for update in updates {
+                    query = query.update(update);
+                }
+            };
+
+            if let Some(users) = self.user.clone() {
+                for user in users {
+                    query = query.user(user);
+                }
             };
 
             let result = query.query(bodhi)?;
@@ -112,34 +212,60 @@ struct CommentListPage {
 
 #[derive(Debug)]
 struct CommentPageQuery {
-    pub like: Option<String>,
-    pub search: Option<String>,
-    pub updates: Option<Vec<String>>,
-    pub packages: Option<Vec<String>>,
-    pub users: Option<Vec<String>>,
-    pub owners: Option<Vec<String>>,
-    pub ignore_users: Option<Vec<String>>,
-    pub anonymous: bool,
-    pub since: Option<String>,
+    anonymous: Option<bool>,
+    ignore_user: Option<Vec<String>>,
+    like: Option<String>,
+    packages: Option<Vec<String>>,
+    page: i32,
+    rows_per_page: i32,
+    search: Option<String>,
+    // TODO: since: Option<DateTimeString>,
+    update_owner: Option<Vec<String>>,
+    updates: Option<Vec<String>>,
+    user: Option<Vec<String>>,
 }
 
 impl CommentPageQuery {
     fn new() -> CommentPageQuery {
         CommentPageQuery {
+            anonymous: None,
+            ignore_user: None,
             like: None,
-            search: None,
-            updates: None,
             packages: None,
-            users: None,
-            owners: None,
-            ignore_users: None,
-            anonymous: false,
-            since: None,
+            page: DEFAULT_PAGE,
+            rows_per_page: DEFAULT_ROWS,
+            search: None,
+            update_owner: None,
+            updates: None,
+            user: None,
         }
+    }
+
+    fn anonymous(mut self, anonymous: bool) -> CommentPageQuery {
+        self.anonymous = Some(anonymous);
+        self
+    }
+
+    fn ignore_user(mut self, ignore_user: String) -> CommentPageQuery {
+        match &mut self.ignore_user {
+            Some(ignore_users) => ignore_users.push(ignore_user),
+            None => self.ignore_user = Some(vec![ignore_user]),
+        }
+
+        self
     }
 
     fn like(mut self, like: String) -> CommentPageQuery {
         self.like = Some(like);
+        self
+    }
+
+    fn package(mut self, package: String) -> CommentPageQuery {
+        match &mut self.packages {
+            Some(packages) => packages.push(package),
+            None => self.packages = Some(vec![package]),
+        }
+
         self
     }
 
@@ -148,119 +274,106 @@ impl CommentPageQuery {
         self
     }
 
-    fn update(mut self, update: String) -> CommentPageQuery {
-        match &mut self.updates {
-            Some(updates) => updates.push(update),
-            None => self.updates = Some(vec!(update)),
+    fn update_owner(mut self, update_owner: String) -> CommentPageQuery {
+        match &mut self.update_owner {
+            Some(update_owners) => update_owners.push(update_owner),
+            None => self.update_owner = Some(vec![update_owner]),
         }
 
         self
     }
 
-    fn package(mut self, package: String) -> CommentPageQuery {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec!(package)),
+    fn update(mut self, update: String) -> CommentPageQuery {
+        match &mut self.updates {
+            Some(updates) => updates.push(update),
+            None => self.updates = Some(vec![update]),
         }
 
         self
     }
 
     fn user(mut self, user: String) -> CommentPageQuery {
-        match &mut self.users {
+        match &mut self.user {
             Some(users) => users.push(user),
-            None => self.users = Some(vec!(user)),
+            None => self.user = Some(vec![user]),
         }
 
         self
     }
 
-    fn owner(mut self, owner: String) -> CommentPageQuery {
-        match &mut self.owners {
-            Some(owners) => owners.push(owner),
-            None => self.owners = Some(vec!(owner)),
-        }
-
+    fn page(mut self, page: i32) -> CommentPageQuery {
+        self.page = page;
         self
     }
 
-    fn ignore_user(mut self, owner: String) -> CommentPageQuery {
-        match &mut self.ignore_users {
-            Some(ignored) => ignored.push(owner),
-            None => self.ignore_users = Some(vec!(owner)),
-        }
-
+    /*
+    fn rows_per_page(mut self, rows_per_page: i32) -> CommentPageQuery {
+        self.rows_per_page = rows_per_page;
         self
     }
+    */
 
-    fn anonymous(mut self, anonymous: bool) -> CommentPageQuery {
-        self.anonymous = anonymous;
-        self
-    }
-
-    fn since(mut self, since: String) -> CommentPageQuery {
-        self.since = Some(since);
-        self
-    }
-
-    // TODO: query all pages and return the union
-    // TODO: right now, only the first page (20 items) is returned
     fn query(self, bodhi: &BodhiService) -> Result<CommentListPage, String> {
         let path = String::from("/comments/");
 
         let mut args: HashMap<&str, String> = HashMap::new();
 
+        if let Some(anonymous) = self.anonymous {
+            args.insert("anonymous", anonymous.to_string());
+        }
+
+        if let Some(ignore_users) = self.ignore_user {
+            args.insert("ignore_user", ignore_users.join(","));
+        }
+
         if let Some(like) = self.like {
             args.insert("like", like);
-        }
-
-        if let Some(search) = self.search {
-            args.insert("search", search);
-        }
-
-        // TODO: first check the number of items and then retrieve all of them
-        if let Some(page) = page {
-            args.insert("page", format!("{}", page));
-        }
-
-        if let Some(rpp) = rows_per_page {
-            args.insert("rows_per_page", format!("{}", rpp));
-        }
-
-        if let Some(updates) = self.updates {
-            args.insert("updates", updates.join(","));
         }
 
         if let Some(packages) = self.packages {
             args.insert("packages", packages.join(","));
         }
 
-        if let Some(user) = self.users {
-            args.insert("releases", user.join(","));
+        if let Some(search) = self.search {
+            args.insert("search", search);
         }
 
-        if let Some(owner) = self.owners {
-            args.insert("update_owner", owner.join(","));
+        if let Some(update_owners) = self.update_owner {
+            args.insert("update_owner", update_owners.join(","));
         }
 
-        if let Some(ignored) = self.ignore_users {
-            args.insert("ignore_user", ignored.join(","));
+        if let Some(updates) = self.updates {
+            args.insert("updates", updates.join(","));
         }
 
-        args.insert("anonymous", format!("{}", self.anonymous));
-
-        if let Some(date) = self.since {
-            args.insert("since", date);
+        if let Some(users) = self.user {
+            args.insert("user", users.join(","));
         }
+
+        args.insert("page", format!("{}", self.page));
+        args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
         let mut response = bodhi.request(&path, Some(args))?;
+        let status = response.status();
 
-        let comments: CommentListPage = match response.json() {
-            Ok(value) => value,
-            Err(error) => { return Err(format!("{:?}", error)); }
-        };
+        if status.is_success() {
+            let comments: CommentListPage = match response.json() {
+                Ok(value) => value,
+                Err(error) => {
+                    return Err(format!("{:?}", error));
+                }
+            };
 
-        Ok(comments)
+            Ok(comments)
+        } else {
+            let error: BodhiError = match response.json() {
+                Ok(value) => value,
+                Err(error) => {
+                    return Err(format!("Unexpected error message: {:?}", error));
+                }
+            };
+
+            Err(format!("{:?}", error))
+        }
     }
 }
-*/

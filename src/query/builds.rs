@@ -139,6 +139,15 @@ impl BuildQuery {
     }
 }
 
+#[derive(Debug, Deserialize)]
+struct BuildListPage {
+    builds: Vec<Build>,
+    page: i32,
+    pages: i32,
+    rows_per_page: i32,
+    total: i32,
+}
+
 #[derive(Debug)]
 struct BuildPageQuery {
     pub nvr: Option<String>,
@@ -147,15 +156,6 @@ struct BuildPageQuery {
     pub updates: Option<Vec<String>>,
     pub page: i32,
     pub rows_per_page: i32,
-}
-
-#[derive(Debug, Deserialize)]
-struct BuildListPage {
-    builds: Vec<Build>,
-    page: i32,
-    pages: i32,
-    rows_per_page: i32,
-    total: i32,
 }
 
 impl BuildPageQuery {
@@ -211,7 +211,6 @@ impl BuildPageQuery {
     /*
     fn rows_per_page(mut self, rows_per_page: i32) -> BuildPageQuery {
         self.rows_per_page = rows_per_page;
-
         self
     }
     */
