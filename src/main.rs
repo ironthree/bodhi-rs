@@ -1,29 +1,28 @@
-use bodhi::*;
+/// This is just a small test program that won't be part of any official releases.
+use bodhi::{BodhiService, BuildQuery};
 
 // TODO: make this configurable
 const SERVER_URL: &str = "https://bodhi.fedoraproject.org";
 
-
 fn main() {
     let bodhi = BodhiService::new(String::from(SERVER_URL));
 
-    /*
-    let build = BuildQuery::new()
-        .nvr(String::from("rubygem-jekyll-watch-2.2.1-1.fc28"))
+    let builds = BuildQuery::new()
+        .nvr(String::from("rust-1.34.1-1.fc29"))
         .query(&bodhi);
 
-    match build {
-        Ok(build) => println!("Build: {:#?}", build),
+    match builds {
+        Ok(builds) => println!("Build: {:#?}", builds),
         Err(error) => println!("Error: {:#?}", error),
     }
-    */
 
     let builds = BuildQuery::new()
+        .package(String::from("rust"))
         .release(String::from("F29"))
         .query(&bodhi);
 
     match builds {
-        Ok(build) => println!("Build: {:#?}", build),
+        Ok(builds) => println!("Build: {:#?}", builds),
         Err(error) => println!("Error: {:#?}", error),
     }
 

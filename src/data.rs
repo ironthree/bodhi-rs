@@ -2,8 +2,14 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
+// derived from actual bodhi JSON responses,
+// verified to successfully deserialize all data returned by the fedora bodhi instance
 
-// derived from actual bodhi JSON responses
+#[derive(Debug, Deserialize)]
+pub struct BodhiError {
+    pub errors: Vec<HashMap<String, String>>,
+    pub status: String,
+}
 
 #[derive(Deserialize, Debug)]
 pub struct Build {
@@ -15,17 +21,7 @@ pub struct Build {
     r#type: String,
 }
 
-
-#[derive(Deserialize, Debug)]
-pub(crate) struct BuildListPage {
-    pub builds: Vec<Build>,
-    pub page: i32,
-    pub pages: i32,
-    pub rows_per_page: i32,
-    pub total: i32,
-}
-
-
+/*
 #[derive(Deserialize, Debug)]
 pub struct Comment {
     anonymous: bool,
@@ -94,11 +90,11 @@ struct Package {
 // TODO: make pub(crate) again
 #[derive(Deserialize, Debug)]
 pub struct CommentListPage {
-    comments: Vec<Comment>,
-    page: i32,
-    pages: i32,
-    rows_per_page: i32,
-    total: i32,
+    pub comments: Vec<Comment>,
+    pub page: i32,
+    pub pages: i32,
+    pub rows_per_page: i32,
+    pub total: i32,
 }
 
 
@@ -201,7 +197,6 @@ struct ReleaseListPage {
 }
 
 
-/*
 #[derive(Deserialize, Debug)]
 struct Stack {
     description: String,
@@ -221,7 +216,6 @@ struct StackListPage {
     stacks: Vec<Stack>,
     total: i32,
 }
-*/
 
 
 #[derive(Deserialize, Debug)]
@@ -304,3 +298,4 @@ pub(crate) struct UserListPage {
     total: i32,
     users: Vec<User>,
 }
+*/

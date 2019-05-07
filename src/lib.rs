@@ -1,11 +1,10 @@
 pub mod data;
-pub mod service;
 pub mod query;
+pub mod service;
 
 pub use data::*;
-pub use service::*;
 pub use query::*;
-
+pub use service::*;
 
 #[cfg(test)]
 mod tests {
