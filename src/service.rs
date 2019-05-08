@@ -3,6 +3,9 @@ use std::collections::HashMap;
 use reqwest::Response;
 use std::time::Duration;
 
+pub const DEFAULT_PAGE: i32 = 1;
+pub const DEFAULT_ROWS: i32 = 50;
+
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
 
 pub struct BodhiService {

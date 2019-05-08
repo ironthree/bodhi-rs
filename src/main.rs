@@ -1,6 +1,9 @@
 /// This is just a small test program that won't be part of any official releases.
 use bodhi::{
-    BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery, OverrideNVRQuery,
+    BodhiService,
+    BuildNVRQuery, BuildQuery,
+    CommentIDQuery, CommentQuery,
+    OverrideNVRQuery, OverrideQuery,
 };
 
 // TODO: make this configurable
@@ -56,6 +59,15 @@ fn main() {
 
     match r#override {
         Ok(r#override) => println!("Override: {:#?}", r#override),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
+    let overrides = OverrideQuery::new()
+        .user(String::from("decathorpe"))
+        .query(&bodhi);
+
+    match overrides {
+        Ok(overrides) => println!("Overrides: {:#?}", overrides),
         Err(error) => println!("Error: {:#?}", error),
     }
 }

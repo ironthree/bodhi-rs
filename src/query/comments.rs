@@ -3,10 +3,7 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::{BodhiError, Comment};
-use crate::service::BodhiService;
-
-const DEFAULT_PAGE: i32 = 1;
-const DEFAULT_ROWS: i32 = 50;
+use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 #[derive(Debug)]
 pub struct CommentIDQuery {
