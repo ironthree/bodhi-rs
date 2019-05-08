@@ -1,5 +1,7 @@
 /// This is just a small test program that won't be part of any official releases.
-use bodhi::{BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery};
+use bodhi::{
+    BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery, OverrideNVRQuery,
+};
 
 // TODO: make this configurable
 const SERVER_URL: &str = "https://bodhi.fedoraproject.org";
@@ -47,6 +49,13 @@ fn main() {
 
     match comments {
         Ok(comment) => println!("Comment: {:#?}", comment),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
+    let r#override = OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28")).query(&bodhi);
+
+    match r#override {
+        Ok(r#override) => println!("Override: {:#?}", r#override),
         Err(error) => println!("Error: {:#?}", error),
     }
 }
