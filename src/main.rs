@@ -6,6 +6,7 @@ use bodhi::{
     CommentIDQuery, CommentQuery,
     OverrideNVRQuery, OverrideQuery,
     PackageQuery,
+    ReleaseNameQuery,
 };
 
 // TODO: make this configurable
@@ -14,6 +15,7 @@ const SERVER_URL: &str = "https://bodhi.fedoraproject.org";
 fn main() {
     let bodhi = BodhiService::new(String::from(SERVER_URL));
 
+    /*
     let build = BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29")).query(&bodhi);
 
     match build {
@@ -77,6 +79,14 @@ fn main() {
 
     match packages {
         Ok(packages) => println!("Packages: {:#?}", packages),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+    */
+
+    let release = ReleaseNameQuery::new(String::from("F30")).query(&bodhi);
+
+    match release {
+        Ok(release) => println!("Release: {:#?}", release),
         Err(error) => println!("Error: {:#?}", error),
     }
 }
