@@ -1,9 +1,11 @@
 /// This is just a small test program that won't be part of any official releases.
+
 use bodhi::{
     BodhiService,
     BuildNVRQuery, BuildQuery,
     CommentIDQuery, CommentQuery,
     OverrideNVRQuery, OverrideQuery,
+    PackageQuery,
 };
 
 // TODO: make this configurable
@@ -68,6 +70,13 @@ fn main() {
 
     match overrides {
         Ok(overrides) => println!("Overrides: {:#?}", overrides),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
+    let packages = PackageQuery::new().name(String::from("rust")).query(&bodhi);
+
+    match packages {
+        Ok(packages) => println!("Packages: {:#?}", packages),
         Err(error) => println!("Error: {:#?}", error),
     }
 }
