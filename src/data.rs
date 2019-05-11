@@ -41,7 +41,7 @@ pub struct Build {
 #[derive(Debug, Deserialize)]
 pub struct Comment {
     anonymous: bool,
-    author: String,
+    author: Option<String>,
     bug_feedback: Vec<BugFeedback>,
     id: i32,
     karma: i32,
@@ -49,9 +49,9 @@ pub struct Comment {
     testcase_feedback: Vec<TestCaseFeedback>,
     text: String,
     timestamp: String,
-    update: Update,
+    update: Option<Update>,
     update_id: i32,
-    update_title: String,
+    update_title: Option<String>,
     user: User,
     user_id: i32,
 }
@@ -141,7 +141,7 @@ pub struct Stack {
 #[derive(Debug, Deserialize)]
 pub struct TestCase {
     name: String,
-    package: Package,
+    package: Option<Package>,
     package_id: i32,
 }
 
@@ -177,7 +177,7 @@ pub struct Update {
     locked: bool,
     meets_testing_requirements: bool,
     notes: String,
-    old_updateid: Option<String>,
+    // FIXME: old_updateid: Option<String>, or Option<i32>?
     pushed: bool,
     release: Release,
     request: Option<String>,
@@ -194,7 +194,7 @@ pub struct Update {
     title: String,
     r#type: String,
     unstable_karma: Option<i32>,
-    updateid: Option<i32>,
+    // FIXME updateid: String, or i32?
     url: String,
     user: User,
 }

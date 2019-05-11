@@ -2,6 +2,7 @@
 use bodhi::{
     BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery, OverrideNVRQuery,
     OverrideQuery, PackageQuery, ReleaseNameQuery, ReleaseQuery, StackNameQuery, StackQuery,
+    UpdateIDQuery,
 };
 
 // TODO: make this configurable
@@ -101,6 +102,13 @@ fn main() {
 
     match stacks {
         Ok(stacks) => println!("Stacks: {:#?}", stacks),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
+    let update = UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e")).query(&bodhi);
+
+    match update {
+        Ok(update) => println!("Update: {:#?}", update),
         Err(error) => println!("Error: {:#?}", error),
     }
 }
