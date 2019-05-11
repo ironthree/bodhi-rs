@@ -43,8 +43,6 @@ impl ReleaseNameQuery {
     }
 }
 
-// =================================================================================================
-
 #[derive(Debug, Default)]
 pub struct ReleaseQuery {
     exclude_archived: Option<bool>,
@@ -134,8 +132,6 @@ impl ReleaseQuery {
                     query = query.update(update);
                 }
             };
-
-            // =====================================================================================
 
             let result = query.query(bodhi)?;
             overrides.extend(result.releases);

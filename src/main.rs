@@ -1,12 +1,7 @@
 /// This is just a small test program that won't be part of any official releases.
-
 use bodhi::{
-    BodhiService,
-    BuildNVRQuery, BuildQuery,
-    CommentIDQuery, CommentQuery,
-    OverrideNVRQuery, OverrideQuery,
-    PackageQuery,
-    ReleaseNameQuery, ReleaseQuery,
+    BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery, OverrideNVRQuery,
+    OverrideQuery, PackageQuery, ReleaseNameQuery, ReleaseQuery, StackNameQuery, StackQuery,
 };
 
 // TODO: make this configurable
@@ -88,12 +83,24 @@ fn main() {
         Err(error) => println!("Error: {:#?}", error),
     }
 
-    let releases = ReleaseQuery::new()
-        .exclude_archived(true)
-        .query(&bodhi);
+    let releases = ReleaseQuery::new().exclude_archived(true).query(&bodhi);
 
     match releases {
         Ok(releases) => println!("Releases: {:#?}", releases),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
+    let stack = StackNameQuery::new(String::from("SomeStack")).query(&bodhi);
+
+    match stack {
+        Ok(stack) => println!("Stack: {:#?}", stack),
+        Err(error) => println!("Error: {:#?}", error), // FIXME
+    }
+
+    let stacks = StackQuery::new().query(&bodhi);
+
+    match stacks {
+        Ok(stacks) => println!("Stacks: {:#?}", stacks),
         Err(error) => println!("Error: {:#?}", error),
     }
 }

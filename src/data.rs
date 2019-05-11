@@ -129,7 +129,7 @@ pub struct Release {
 }
 
 #[derive(Debug, Deserialize)]
-struct Stack {
+pub struct Stack {
     description: String,
     // groups: Vec<?>,
     name: String,
