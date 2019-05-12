@@ -2,7 +2,7 @@
 use bodhi::{
     BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery, OverrideNVRQuery,
     OverrideQuery, PackageQuery, ReleaseNameQuery, ReleaseQuery, StackNameQuery, StackQuery,
-    UpdateIDQuery,
+    UpdateIDQuery, UpdateQuery,
 };
 
 // TODO: make this configurable
@@ -109,6 +109,16 @@ fn main() {
 
     match update {
         Ok(update) => println!("Update: {:#?}", update),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
+    let updates = UpdateQuery::new()
+        .users(String::from("decathorpe"))
+        .releases(String::from("F30"))
+        .query(&bodhi);
+
+    match updates {
+        Ok(updates) => println!("Updates: {:#?}", updates),
         Err(error) => println!("Error: {:#?}", error),
     }
 }

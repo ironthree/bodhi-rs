@@ -160,17 +160,17 @@ impl StackPageQuery {
         }
     }
 
-    pub fn like(mut self, like: String) -> StackPageQuery {
+    fn like(mut self, like: String) -> StackPageQuery {
         self.like = Some(like);
         self
     }
 
-    pub fn name(mut self, name: String) -> StackPageQuery {
+    fn name(mut self, name: String) -> StackPageQuery {
         self.name = Some(name);
         self
     }
 
-    pub fn package(mut self, package: String) -> StackPageQuery {
+    fn package(mut self, package: String) -> StackPageQuery {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -179,7 +179,7 @@ impl StackPageQuery {
         self
     }
 
-    pub fn search(mut self, search: String) -> StackPageQuery {
+    fn search(mut self, search: String) -> StackPageQuery {
         self.search = Some(search);
         self
     }
