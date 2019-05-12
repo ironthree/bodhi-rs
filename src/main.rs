@@ -2,7 +2,7 @@
 use bodhi::{
     BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery, OverrideNVRQuery,
     OverrideQuery, PackageQuery, ReleaseNameQuery, ReleaseQuery, StackNameQuery, StackQuery,
-    UpdateIDQuery, UpdateQuery, UserNameQuery,
+    UpdateIDQuery, UpdateQuery, UserNameQuery, UserQuery,
 };
 
 // TODO: make this configurable
@@ -126,6 +126,15 @@ fn main() {
 
     match user {
         Ok(user) => println!("User: {:#?}", user),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
+    let users = UserQuery::new()
+        .groups(String::from("provenpackager"))
+        .query(&bodhi);
+
+    match users {
+        Ok(users) => println!("Users: {:#?}", users),
         Err(error) => println!("Error: {:#?}", error),
     }
 }
