@@ -2,7 +2,7 @@
 use bodhi::{
     BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery, OverrideNVRQuery,
     OverrideQuery, PackageQuery, ReleaseNameQuery, ReleaseQuery, StackNameQuery, StackQuery,
-    UpdateIDQuery, UpdateQuery,
+    UpdateIDQuery, UpdateQuery, UserNameQuery,
 };
 
 // TODO: make this configurable
@@ -95,7 +95,7 @@ fn main() {
 
     match stack {
         Ok(stack) => println!("Stack: {:#?}", stack),
-        Err(error) => println!("Error: {:#?}", error), // FIXME
+        Err(error) => println!("Error: {:#?}", error),
     }
 
     let stacks = StackQuery::new().query(&bodhi);
@@ -119,6 +119,13 @@ fn main() {
 
     match updates {
         Ok(updates) => println!("Updates: {:#?}", updates),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
+    let user = UserNameQuery::new(String::from("decathorpe")).query(&bodhi);
+
+    match user {
+        Ok(user) => println!("User: {:#?}", user),
         Err(error) => println!("Error: {:#?}", error),
     }
 }

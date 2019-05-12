@@ -209,9 +209,3 @@ pub struct User {
     openid: String,
     show_popups: bool,
 }
-
-#[derive(Debug, Deserialize)]
-struct UserDetails {
-    urls: HashMap<String, String>,
-    user: User,
-}

@@ -18,3 +18,6 @@ pub use stacks::*;
 
 pub mod updates;
 pub use updates::*;
+
+pub mod users;
+pub use users::*;
