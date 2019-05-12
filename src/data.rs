@@ -13,199 +13,194 @@ pub struct BodhiError {
 
 #[derive(Debug, Deserialize)]
 pub struct Bug {
-    bug_id: i32,
-    feedback: Option<Vec<BugFeedback>>,
-    parent: bool,
-    security: bool,
-    title: Option<String>,
+    pub bug_id: i32,
+    pub feedback: Option<Vec<BugFeedback>>,
+    pub parent: bool,
+    pub security: bool,
+    pub title: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct BugFeedback {
-    bug: Option<Bug>,
-    bug_id: i32,
-    comment_id: i32,
-    karma: i32,
+    pub bug: Option<Bug>,
+    pub bug_id: i32,
+    pub comment_id: i32,
+    pub karma: i32,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Build {
-    ci_url: Option<String>,
-    epoch: Option<i32>,
-    nvr: String,
-    release_id: Option<i32>,
-    signed: bool,
-    r#type: String,
+    pub ci_url: Option<String>,
+    pub epoch: Option<i32>,
+    pub nvr: String,
+    pub release_id: Option<i32>,
+    pub signed: bool,
+    pub r#type: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Comment {
-    anonymous: bool,
-    author: Option<String>,
-    bug_feedback: Vec<BugFeedback>,
-    id: i32,
-    karma: i32,
-    karma_critpath: i32,
-    testcase_feedback: Vec<TestCaseFeedback>,
-    text: String,
-    timestamp: String,
-    update: Option<Update>,
-    update_id: i32,
-    update_title: Option<String>,
-    user: User,
-    user_id: i32,
+    pub anonymous: bool,
+    pub author: Option<String>,
+    pub bug_feedback: Vec<BugFeedback>,
+    pub id: i32,
+    pub karma: i32,
+    pub karma_critpath: i32,
+    pub testcase_feedback: Vec<TestCaseFeedback>,
+    pub text: String,
+    pub timestamp: String,
+    pub update: Option<Update>,
+    pub update_id: i32,
+    pub update_title: Option<String>,
+    pub user: User,
+    pub user_id: i32,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Compose {
-    content_type: String,
-    date_created: String,
-    error_message: String,
-    release: Option<Release>,
-    release_id: Option<i32>,
-    request: String,
-    security: bool,
-    state: String,
-    state_date: String,
-    update_summary: Vec<HashMap<String, String>>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CSRF {
-    csrf_token: String,
+    pub content_type: String,
+    pub date_created: String,
+    pub error_message: String,
+    pub release: Option<Release>,
+    pub release_id: Option<i32>,
+    pub request: String,
+    pub security: bool,
+    pub state: String,
+    pub state_date: String,
+    pub update_summary: Vec<HashMap<String, String>>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Group {
-    name: String,
+    pub name: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Markdown {
-    html: String,
+    pub html: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Override {
-    build: Build,
-    build_id: i32,
-    expiration_date: String,
-    expired_date: Option<String>,
-    notes: String,
-    nvr: String,
-    submission_date: String,
-    submitter: User,
-    submitter_id: i32,
+    pub build: Build,
+    pub build_id: i32,
+    pub expiration_date: String,
+    pub expired_date: Option<String>,
+    pub notes: String,
+    pub nvr: String,
+    pub submission_date: String,
+    pub submitter: User,
+    pub submitter_id: i32,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Package {
-    name: String,
-    // requirements: Option<?>,
-    // stack: Option<?>,
-    // stack_id: Option<i32>,
-    r#type: String,
+    pub name: String,
+    pub requirements: Option<String>,
+    pub stack: Option<Stack>,
+    pub stack_id: Option<i32>,
+    pub r#type: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Release {
-    branch: String,
-    candidate_tag: String,
-    composes: Vec<Compose>,
-    composed_by_bodhi: bool,
-    dist_tag: String,
-    id_prefix: String,
-    long_name: String,
-    mail_template: String,
-    name: String,
-    override_tag: String,
-    pending_signing_tag: String,
-    pending_stable_tag: String,
-    pending_testing_tag: String,
-    stable_tag: String,
-    state: String,
-    testing_tag: String,
-    version: String,
+    pub branch: String,
+    pub candidate_tag: String,
+    pub composes: Vec<Compose>,
+    pub composed_by_bodhi: bool,
+    pub dist_tag: String,
+    pub id_prefix: String,
+    pub long_name: String,
+    pub mail_template: String,
+    pub name: String,
+    pub override_tag: String,
+    pub pending_signing_tag: String,
+    pub pending_stable_tag: String,
+    pub pending_testing_tag: String,
+    pub stable_tag: String,
+    pub state: String,
+    pub testing_tag: String,
+    pub version: String,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Stack {
-    description: String,
-    // groups: Vec<?>,
-    name: String,
-    // packages: Vec<?>,
-    requirements: String,
-    users: Vec<User>,
+    pub description: String,
+    pub groups: Option<Vec<Group>>,
+    pub name: String,
+    pub packages: Option<Vec<Package>>,
+    pub requirements: String,
+    pub users: Vec<User>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct TestCase {
-    name: String,
-    package: Option<Package>,
-    package_id: i32,
+    pub name: String,
+    pub package: Option<Package>,
+    pub package_id: i32,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct TestCaseFeedback {
-    comment_id: i32,
-    karma: i32,
-    testcase: TestCase,
-    testcase_id: i32,
+    pub comment_id: i32,
+    pub karma: i32,
+    pub testcase: TestCase,
+    pub testcase_id: i32,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Update {
-    alias: String,
-    autokarma: bool,
-    bugs: Vec<Bug>,
-    builds: Vec<Build>,
-    close_bugs: bool,
-    comments: Option<Vec<Comment>>,
-    compose: Option<Compose>,
-    content_type: Option<String>,
-    critpath: bool,
-    date_approved: Option<String>,
-    date_modified: Option<String>,
-    date_pushed: Option<String>,
-    date_stable: Option<String>,
-    date_submitted: Option<String>,
-    date_testing: Option<String>,
-    display_name: String,
-    greenwave_summary_string: Option<String>,
-    // TODO: greenwave_unsatisfied_requirements: Option<?>,
-    karma: i32,
-    locked: bool,
-    meets_testing_requirements: bool,
-    notes: String,
+    pub alias: String,
+    pub autokarma: bool,
+    pub bugs: Vec<Bug>,
+    pub builds: Vec<Build>,
+    pub close_bugs: bool,
+    pub comments: Option<Vec<Comment>>,
+    pub compose: Option<Compose>,
+    pub content_type: Option<String>,
+    pub critpath: bool,
+    pub date_approved: Option<String>,
+    pub date_modified: Option<String>,
+    pub date_pushed: Option<String>,
+    pub date_stable: Option<String>,
+    pub date_submitted: Option<String>,
+    pub date_testing: Option<String>,
+    pub display_name: String,
+    pub greenwave_summary_string: Option<String>,
+    pub greenwave_unsatisfied_requirements: Option<String>,
+    pub karma: i32,
+    pub locked: bool,
+    pub meets_testing_requirements: bool,
+    pub notes: String,
     // FIXME: old_updateid: Option<String>, or Option<i32>?
-    pushed: bool,
-    release: Release,
-    request: Option<String>,
-    require_bugs: bool,
-    require_testcases: bool,
-    requirements: Option<String>,
-    severity: String,
-    stable_karma: Option<i32>,
-    status: String,
-    submitter: Option<String>,
-    suggest: String,
-    test_cases: Option<Vec<TestCase>>,
-    test_gating_status: Option<String>,
-    title: String,
-    r#type: String,
-    unstable_karma: Option<i32>,
+    pub pushed: bool,
+    pub release: Release,
+    pub request: Option<String>,
+    pub require_bugs: bool,
+    pub require_testcases: bool,
+    pub requirements: Option<String>,
+    pub severity: String,
+    pub stable_karma: Option<i32>,
+    pub status: String,
+    pub submitter: Option<String>,
+    pub suggest: String,
+    pub test_cases: Option<Vec<TestCase>>,
+    pub test_gating_status: Option<String>,
+    pub title: String,
+    pub r#type: String,
+    pub unstable_karma: Option<i32>,
     // FIXME updateid: String, or i32?
-    url: String,
-    user: User,
+    pub url: String,
+    pub user: User,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct User {
-    avatar: String,
-    email: Option<String>,
-    groups: Vec<Group>,
-    id: i32,
-    name: String,
-    openid: String,
-    show_popups: bool,
+    pub avatar: String,
+    pub email: Option<String>,
+    pub groups: Vec<Group>,
+    pub id: i32,
+    pub name: String,
+    pub openid: String,
+    pub show_popups: bool,
 }
