@@ -28,8 +28,8 @@ fn main() {
     }
 
     let builds = BuildQuery::new()
-        .package(String::from("rust"))
-        .release(String::from("F29"))
+        .packages(String::from("rust"))
+        .releases(String::from("F29"))
         .query(&bodhi);
 
     match builds {
@@ -45,8 +45,8 @@ fn main() {
     }
 
     let comments = CommentQuery::new()
-        .user(String::from("decathorpe"))
-        .package(String::from("kernel"))
+        .users(String::from("decathorpe"))
+        .packages(String::from("kernel"))
         .query(&bodhi);
 
     match comments {
@@ -62,7 +62,7 @@ fn main() {
     }
 
     let overrides = OverrideQuery::new()
-        .user(String::from("decathorpe"))
+        .users(String::from("decathorpe"))
         .query(&bodhi);
 
     match overrides {

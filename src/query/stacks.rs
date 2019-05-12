@@ -12,7 +12,7 @@ pub struct StackNameQuery {
 
 #[derive(Debug, Deserialize)]
 struct StackPage {
-    pub stack: Stack,
+    stack: Stack,
 }
 
 impl StackNameQuery {
@@ -76,7 +76,7 @@ impl StackQuery {
         self
     }
 
-    pub fn package(mut self, package: String) -> StackQuery {
+    pub fn packages(mut self, package: String) -> StackQuery {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -95,25 +95,13 @@ impl StackQuery {
         let mut page = 1;
 
         loop {
-            let mut query = StackPageQuery::new().page(page);
+            let mut query = StackPageQuery::new();
+            query.page = page;
 
-            if let Some(like) = self.like.clone() {
-                query = query.like(like);
-            };
-
-            if let Some(name) = self.name.clone() {
-                query = query.name(name);
-            }
-
-            if let Some(search) = self.search.clone() {
-                query = query.search(search);
-            }
-
-            if let Some(packages) = self.packages.clone() {
-                for package in packages {
-                    query = query.package(package);
-                }
-            };
+            query.like = self.like.clone();
+            query.name = self.name.clone();
+            query.search = self.search.clone();
+            query.packages = self.packages.clone();
 
             let result = query.query(bodhi)?;
             stacks.extend(result.stacks);
@@ -144,6 +132,7 @@ struct StackPageQuery {
     name: Option<String>,
     packages: Option<Vec<String>>,
     search: Option<String>,
+
     page: i32,
     rows_per_page: i32,
 }
@@ -159,42 +148,6 @@ impl StackPageQuery {
             rows_per_page: DEFAULT_ROWS,
         }
     }
-
-    fn like(mut self, like: String) -> StackPageQuery {
-        self.like = Some(like);
-        self
-    }
-
-    fn name(mut self, name: String) -> StackPageQuery {
-        self.name = Some(name);
-        self
-    }
-
-    fn package(mut self, package: String) -> StackPageQuery {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
-        self
-    }
-
-    fn search(mut self, search: String) -> StackPageQuery {
-        self.search = Some(search);
-        self
-    }
-
-    fn page(mut self, page: i32) -> StackPageQuery {
-        self.page = page;
-        self
-    }
-
-    /*
-    fn rows_per_page(mut self, rows_per_page: i32) -> StackPageQuery {
-        self.rows_per_page = rows_per_page;
-        self
-    }
-    */
 
     fn query(self, bodhi: &BodhiService) -> Result<StackListPage, String> {
         let path = String::from("/stacks/");

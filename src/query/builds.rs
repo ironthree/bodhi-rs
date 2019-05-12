@@ -66,7 +66,7 @@ impl BuildQuery {
         self
     }
 
-    pub fn package(mut self, package: String) -> BuildQuery {
+    pub fn packages(mut self, package: String) -> BuildQuery {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -75,7 +75,7 @@ impl BuildQuery {
         self
     }
 
-    pub fn release(mut self, release: String) -> BuildQuery {
+    pub fn releases(mut self, release: String) -> BuildQuery {
         match &mut self.releases {
             Some(releases) => releases.push(release),
             None => self.releases = Some(vec![release]),
@@ -84,7 +84,7 @@ impl BuildQuery {
         self
     }
 
-    pub fn update(mut self, update: String) -> BuildQuery {
+    pub fn updates(mut self, update: String) -> BuildQuery {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -98,29 +98,13 @@ impl BuildQuery {
         let mut page = 1;
 
         loop {
-            let mut query = BuildPageQuery::new().page(page);
+            let mut query = BuildPageQuery::new();
+            query.page = page;
 
-            if let Some(nvr) = self.nvr.clone() {
-                query = query.nvr(nvr);
-            };
-
-            if let Some(packages) = self.packages.clone() {
-                for package in packages {
-                    query = query.package(package);
-                }
-            };
-
-            if let Some(releases) = self.releases.clone() {
-                for release in releases {
-                    query = query.release(release);
-                }
-            };
-
-            if let Some(updates) = self.updates.clone() {
-                for update in updates {
-                    query = query.update(update);
-                }
-            };
+            query.nvr = self.nvr.clone();
+            query.packages = self.packages.clone();
+            query.releases = self.releases.clone();
+            query.updates = self.updates.clone();
 
             let result = query.query(bodhi)?;
             builds.extend(result.builds);
@@ -147,12 +131,13 @@ struct BuildListPage {
 
 #[derive(Debug)]
 struct BuildPageQuery {
-    pub nvr: Option<String>,
-    pub packages: Option<Vec<String>>,
-    pub releases: Option<Vec<String>>,
-    pub updates: Option<Vec<String>>,
-    pub page: i32,
-    pub rows_per_page: i32,
+    nvr: Option<String>,
+    packages: Option<Vec<String>>,
+    releases: Option<Vec<String>>,
+    updates: Option<Vec<String>>,
+
+    page: i32,
+    rows_per_page: i32,
 }
 
 impl BuildPageQuery {
@@ -166,51 +151,6 @@ impl BuildPageQuery {
             rows_per_page: DEFAULT_ROWS,
         }
     }
-
-    fn nvr(mut self, nvr: String) -> BuildPageQuery {
-        self.nvr = Some(nvr);
-        self
-    }
-
-    fn package(mut self, package: String) -> BuildPageQuery {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
-        self
-    }
-
-    fn release(mut self, release: String) -> BuildPageQuery {
-        match &mut self.releases {
-            Some(releases) => releases.push(release),
-            None => self.releases = Some(vec![release]),
-        }
-
-        self
-    }
-
-    fn update(mut self, update: String) -> BuildPageQuery {
-        match &mut self.updates {
-            Some(updates) => updates.push(update),
-            None => self.updates = Some(vec![update]),
-        }
-
-        self
-    }
-
-    fn page(mut self, page: i32) -> BuildPageQuery {
-        self.page = page;
-
-        self
-    }
-
-    /*
-    fn rows_per_page(mut self, rows_per_page: i32) -> BuildPageQuery {
-        self.rows_per_page = rows_per_page;
-        self
-    }
-    */
 
     fn query(self, bodhi: &BodhiService) -> Result<BuildListPage, String> {
         let path = String::from("/builds/");

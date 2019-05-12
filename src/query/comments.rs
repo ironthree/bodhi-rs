@@ -12,7 +12,7 @@ pub struct CommentIDQuery {
 
 #[derive(Debug, Deserialize)]
 struct CommentPage {
-    pub comment: Comment,
+    comment: Comment,
 }
 
 impl CommentIDQuery {
@@ -51,27 +51,28 @@ impl CommentIDQuery {
 #[derive(Debug, Default)]
 pub struct CommentQuery {
     anonymous: Option<bool>,
-    ignore_user: Option<Vec<String>>,
+    ignore_users: Option<Vec<String>>,
     like: Option<String>,
     packages: Option<Vec<String>>,
     search: Option<String>,
-    // TODO: since: Option<DateTimeString>,
-    update_owner: Option<Vec<String>>,
+    since: Option<String>,
+    update_owners: Option<Vec<String>>,
     updates: Option<Vec<String>>,
-    user: Option<Vec<String>>,
+    users: Option<Vec<String>>,
 }
 
 impl CommentQuery {
     pub fn new() -> CommentQuery {
         CommentQuery {
             anonymous: None,
-            ignore_user: None,
+            ignore_users: None,
             like: None,
             packages: None,
             search: None,
-            update_owner: None,
+            since: None,
+            update_owners: None,
             updates: None,
-            user: None,
+            users: None,
         }
     }
 
@@ -80,10 +81,10 @@ impl CommentQuery {
         self
     }
 
-    pub fn ignore_user(mut self, ignore_user: String) -> CommentQuery {
-        match &mut self.ignore_user {
+    pub fn ignore_users(mut self, ignore_user: String) -> CommentQuery {
+        match &mut self.ignore_users {
             Some(ignore_users) => ignore_users.push(ignore_user),
-            None => self.ignore_user = Some(vec![ignore_user]),
+            None => self.ignore_users = Some(vec![ignore_user]),
         }
 
         self
@@ -94,7 +95,7 @@ impl CommentQuery {
         self
     }
 
-    pub fn package(mut self, package: String) -> CommentQuery {
+    pub fn packages(mut self, package: String) -> CommentQuery {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -108,16 +109,21 @@ impl CommentQuery {
         self
     }
 
-    pub fn update_owner(mut self, update_owner: String) -> CommentQuery {
-        match &mut self.update_owner {
+    pub fn since(mut self, since: String) -> CommentQuery {
+        self.since = Some(since);
+        self
+    }
+
+    pub fn update_owners(mut self, update_owner: String) -> CommentQuery {
+        match &mut self.update_owners {
             Some(update_owners) => update_owners.push(update_owner),
-            None => self.update_owner = Some(vec![update_owner]),
+            None => self.update_owners = Some(vec![update_owner]),
         }
 
         self
     }
 
-    pub fn update(mut self, update: String) -> CommentQuery {
+    pub fn updates(mut self, update: String) -> CommentQuery {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -126,10 +132,10 @@ impl CommentQuery {
         self
     }
 
-    pub fn user(mut self, user: String) -> CommentQuery {
-        match &mut self.user {
+    pub fn users(mut self, user: String) -> CommentQuery {
+        match &mut self.users {
             Some(users) => users.push(user),
-            None => self.user = Some(vec![user]),
+            None => self.users = Some(vec![user]),
         }
 
         self
@@ -140,49 +146,17 @@ impl CommentQuery {
         let mut page = 1;
 
         loop {
-            let mut query = CommentPageQuery::new().page(page);
+            let mut query = CommentPageQuery::new();
+            query.page = page;
 
-            if let Some(anonymous) = self.anonymous {
-                query = query.anonymous(anonymous);
-            };
-
-            if let Some(ignore_users) = self.ignore_user.clone() {
-                for ignore_user in ignore_users {
-                    query = query.ignore_user(ignore_user);
-                }
-            };
-
-            if let Some(like) = self.like.clone() {
-                query = query.like(like);
-            };
-
-            if let Some(packages) = self.packages.clone() {
-                for package in packages {
-                    query = query.package(package);
-                }
-            };
-
-            if let Some(search) = self.search.clone() {
-                query = query.search(search);
-            };
-
-            if let Some(update_owners) = self.update_owner.clone() {
-                for update_owner in update_owners {
-                    query = query.update_owner(update_owner);
-                }
-            };
-
-            if let Some(updates) = self.updates.clone() {
-                for update in updates {
-                    query = query.update(update);
-                }
-            };
-
-            if let Some(users) = self.user.clone() {
-                for user in users {
-                    query = query.user(user);
-                }
-            };
+            query.anonymous = self.anonymous;
+            query.ignore_users = self.ignore_users.clone();
+            query.like = self.like.clone();
+            query.packages = self.packages.clone();
+            query.search = self.search.clone();
+            query.update_owners = self.update_owners.clone();
+            query.updates = self.updates.clone();
+            query.users = self.users.clone();
 
             let result = query.query(bodhi)?;
             comments.extend(result.comments);
@@ -200,115 +174,45 @@ impl CommentQuery {
 
 #[derive(Debug, Deserialize)]
 struct CommentListPage {
-    pub comments: Vec<Comment>,
-    pub page: i32,
-    pub pages: i32,
-    pub rows_per_page: i32,
-    pub total: i32,
+    comments: Vec<Comment>,
+    page: i32,
+    pages: i32,
+    rows_per_page: i32,
+    total: i32,
 }
 
 #[derive(Debug)]
 struct CommentPageQuery {
     anonymous: Option<bool>,
-    ignore_user: Option<Vec<String>>,
+    ignore_users: Option<Vec<String>>,
     like: Option<String>,
     packages: Option<Vec<String>>,
+    search: Option<String>,
+    since: Option<String>,
+    update_owners: Option<Vec<String>>,
+    updates: Option<Vec<String>>,
+    users: Option<Vec<String>>,
+
     page: i32,
     rows_per_page: i32,
-    search: Option<String>,
-    // TODO: since: Option<DateTimeString>,
-    update_owner: Option<Vec<String>>,
-    updates: Option<Vec<String>>,
-    user: Option<Vec<String>>,
 }
 
 impl CommentPageQuery {
     fn new() -> CommentPageQuery {
         CommentPageQuery {
             anonymous: None,
-            ignore_user: None,
+            ignore_users: None,
             like: None,
             packages: None,
             page: DEFAULT_PAGE,
             rows_per_page: DEFAULT_ROWS,
             search: None,
-            update_owner: None,
+            since: None,
+            update_owners: None,
             updates: None,
-            user: None,
+            users: None,
         }
     }
-
-    fn anonymous(mut self, anonymous: bool) -> CommentPageQuery {
-        self.anonymous = Some(anonymous);
-        self
-    }
-
-    fn ignore_user(mut self, ignore_user: String) -> CommentPageQuery {
-        match &mut self.ignore_user {
-            Some(ignore_users) => ignore_users.push(ignore_user),
-            None => self.ignore_user = Some(vec![ignore_user]),
-        }
-
-        self
-    }
-
-    fn like(mut self, like: String) -> CommentPageQuery {
-        self.like = Some(like);
-        self
-    }
-
-    fn package(mut self, package: String) -> CommentPageQuery {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
-        self
-    }
-
-    fn search(mut self, search: String) -> CommentPageQuery {
-        self.search = Some(search);
-        self
-    }
-
-    fn update_owner(mut self, update_owner: String) -> CommentPageQuery {
-        match &mut self.update_owner {
-            Some(update_owners) => update_owners.push(update_owner),
-            None => self.update_owner = Some(vec![update_owner]),
-        }
-
-        self
-    }
-
-    fn update(mut self, update: String) -> CommentPageQuery {
-        match &mut self.updates {
-            Some(updates) => updates.push(update),
-            None => self.updates = Some(vec![update]),
-        }
-
-        self
-    }
-
-    fn user(mut self, user: String) -> CommentPageQuery {
-        match &mut self.user {
-            Some(users) => users.push(user),
-            None => self.user = Some(vec![user]),
-        }
-
-        self
-    }
-
-    fn page(mut self, page: i32) -> CommentPageQuery {
-        self.page = page;
-        self
-    }
-
-    /*
-    fn rows_per_page(mut self, rows_per_page: i32) -> CommentPageQuery {
-        self.rows_per_page = rows_per_page;
-        self
-    }
-    */
 
     fn query(self, bodhi: &BodhiService) -> Result<CommentListPage, String> {
         let path = String::from("/comments/");
@@ -319,7 +223,7 @@ impl CommentPageQuery {
             args.insert("anonymous", anonymous.to_string());
         }
 
-        if let Some(ignore_users) = self.ignore_user {
+        if let Some(ignore_users) = self.ignore_users {
             args.insert("ignore_user", ignore_users.join(","));
         }
 
@@ -335,7 +239,7 @@ impl CommentPageQuery {
             args.insert("search", search);
         }
 
-        if let Some(update_owners) = self.update_owner {
+        if let Some(update_owners) = self.update_owners {
             args.insert("update_owner", update_owners.join(","));
         }
 
@@ -343,7 +247,7 @@ impl CommentPageQuery {
             args.insert("updates", updates.join(","));
         }
 
-        if let Some(users) = self.user {
+        if let Some(users) = self.users {
             args.insert("user", users.join(","));
         }
 

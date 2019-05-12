@@ -12,8 +12,8 @@ pub struct UpdateIDQuery {
 
 #[derive(Debug, Deserialize)]
 struct UpdatePage {
-    pub update: Update,
-    pub can_edit: bool,
+    update: Update,
+    can_edit: bool,
 }
 
 impl UpdateIDQuery {
@@ -52,7 +52,7 @@ impl UpdateIDQuery {
 #[derive(Debug, Default)]
 pub struct UpdateQuery {
     active_releases: Option<bool>,
-    alias: Option<Vec<String>>,
+    aliases: Option<Vec<String>>,
     approved_before: Option<String>,
     approved_since: Option<String>,
     bugs: Option<Vec<String>>,
@@ -85,7 +85,7 @@ impl UpdateQuery {
     pub fn new() -> UpdateQuery {
         UpdateQuery {
             active_releases: None,
-            alias: None,
+            aliases: None,
             approved_before: None,
             approved_since: None,
             bugs: None,
@@ -120,10 +120,10 @@ impl UpdateQuery {
         self
     }
 
-    pub fn alias(mut self, alias: String) -> UpdateQuery {
-        match &mut self.alias {
+    pub fn aliases(mut self, alias: String) -> UpdateQuery {
+        match &mut self.aliases {
             Some(aliases) => aliases.push(alias),
-            None => self.alias = Some(vec![alias]),
+            None => self.aliases = Some(vec![alias]),
         }
 
         self
@@ -296,7 +296,7 @@ impl UpdateQuery {
             query.page = page;
 
             query.active_releases = self.active_releases;
-            query.alias = self.alias.clone();
+            query.aliases = self.aliases.clone();
             query.approved_before = self.approved_before.clone();
             query.approved_since = self.approved_since.clone();
             query.bugs = self.bugs.clone();
@@ -350,7 +350,7 @@ struct UpdateListPage {
 #[derive(Debug)]
 struct UpdatePageQuery {
     active_releases: Option<bool>,
-    alias: Option<Vec<String>>,
+    aliases: Option<Vec<String>>,
     approved_before: Option<String>,
     approved_since: Option<String>,
     bugs: Option<Vec<String>>,
@@ -386,7 +386,7 @@ impl UpdatePageQuery {
     fn new() -> UpdatePageQuery {
         UpdatePageQuery {
             active_releases: None,
-            alias: None,
+            aliases: None,
             approved_before: None,
             approved_since: None,
             bugs: None,
@@ -427,8 +427,8 @@ impl UpdatePageQuery {
             args.insert("active_releases", active_releases.to_string());
         };
 
-        if let Some(alias) = self.alias {
-            args.insert("alias", alias.join(","));
+        if let Some(aliases) = self.aliases {
+            args.insert("alias", aliases.join(","));
         };
 
         if let Some(approved_before) = self.approved_before {

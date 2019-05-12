@@ -68,7 +68,7 @@ impl ReleaseQuery {
         self
     }
 
-    pub fn id(mut self, id: String) -> ReleaseQuery {
+    pub fn ids(mut self, id: String) -> ReleaseQuery {
         match &mut self.ids {
             Some(ids) => ids.push(id),
             None => self.ids = Some(vec![id]),
@@ -82,7 +82,7 @@ impl ReleaseQuery {
         self
     }
 
-    pub fn package(mut self, package: String) -> ReleaseQuery {
+    pub fn packages(mut self, package: String) -> ReleaseQuery {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -91,7 +91,7 @@ impl ReleaseQuery {
         self
     }
 
-    pub fn update(mut self, update: String) -> ReleaseQuery {
+    pub fn updates(mut self, update: String) -> ReleaseQuery {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -105,33 +105,14 @@ impl ReleaseQuery {
         let mut page = 1;
 
         loop {
-            let mut query = ReleasePageQuery::new().page(page);
+            let mut query = ReleasePageQuery::new();
+            query.page = page;
 
-            if let Some(exclude_archived) = self.exclude_archived {
-                query = query.exclude_archived(exclude_archived);
-            };
-
-            if let Some(ids) = self.ids.clone() {
-                for id in ids {
-                    query = query.id(id);
-                }
-            };
-
-            if let Some(name) = self.name.clone() {
-                query = query.name(name);
-            }
-
-            if let Some(packages) = self.packages.clone() {
-                for package in packages {
-                    query = query.package(package);
-                }
-            };
-
-            if let Some(updates) = self.updates.clone() {
-                for update in updates {
-                    query = query.update(update);
-                }
-            };
+            query.exclude_archived = self.exclude_archived;
+            query.ids = self.ids.clone();
+            query.name = self.name.clone();
+            query.packages = self.packages.clone();
+            query.updates = self.updates.clone();
 
             let result = query.query(bodhi)?;
             overrides.extend(result.releases);
@@ -162,9 +143,10 @@ struct ReleasePageQuery {
     ids: Option<Vec<String>>,
     name: Option<String>,
     packages: Option<Vec<String>>,
+    updates: Option<Vec<String>>,
+
     page: i32,
     rows_per_page: i32,
-    updates: Option<Vec<String>>,
 }
 
 impl ReleasePageQuery {
@@ -174,60 +156,11 @@ impl ReleasePageQuery {
             ids: None,
             name: None,
             packages: None,
+            updates: None,
             page: DEFAULT_PAGE,
             rows_per_page: DEFAULT_ROWS,
-            updates: None,
         }
     }
-
-    pub fn exclude_archived(mut self, exclude_archived: bool) -> ReleasePageQuery {
-        self.exclude_archived = Some(exclude_archived);
-        self
-    }
-
-    pub fn id(mut self, id: String) -> ReleasePageQuery {
-        match &mut self.ids {
-            Some(ids) => ids.push(id),
-            None => self.ids = Some(vec![id]),
-        }
-
-        self
-    }
-
-    pub fn name(mut self, name: String) -> ReleasePageQuery {
-        self.name = Some(name);
-        self
-    }
-
-    pub fn package(mut self, package: String) -> ReleasePageQuery {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
-        self
-    }
-
-    pub fn update(mut self, update: String) -> ReleasePageQuery {
-        match &mut self.updates {
-            Some(updates) => updates.push(update),
-            None => self.updates = Some(vec![update]),
-        }
-
-        self
-    }
-
-    fn page(mut self, page: i32) -> ReleasePageQuery {
-        self.page = page;
-        self
-    }
-
-    /*
-    fn rows_per_page(mut self, rows_per_page: i32) -> ReleasePageQuery {
-        self.rows_per_page = rows_per_page;
-        self
-    }
-    */
 
     fn query(self, bodhi: &BodhiService) -> Result<ReleaseListPage, String> {
         let path = String::from("/releases/");

@@ -12,7 +12,7 @@ pub struct OverrideNVRQuery {
 
 #[derive(Debug, Deserialize)]
 struct OverridePage {
-    pub r#override: Override,
+    r#override: Override,
 }
 
 impl OverrideNVRQuery {
@@ -56,7 +56,7 @@ pub struct OverrideQuery {
     packages: Option<Vec<String>>,
     releases: Option<Vec<String>>,
     search: Option<String>,
-    user: Option<Vec<String>>,
+    users: Option<Vec<String>>,
 }
 
 impl OverrideQuery {
@@ -68,7 +68,7 @@ impl OverrideQuery {
             packages: None,
             releases: None,
             search: None,
-            user: None,
+            users: None,
         }
     }
 
@@ -114,10 +114,10 @@ impl OverrideQuery {
         self
     }
 
-    pub fn user(mut self, user: String) -> OverrideQuery {
-        match &mut self.user {
+    pub fn users(mut self, user: String) -> OverrideQuery {
+        match &mut self.users {
             Some(users) => users.push(user),
-            None => self.user = Some(vec![user]),
+            None => self.users = Some(vec![user]),
         }
 
         self
@@ -128,43 +128,16 @@ impl OverrideQuery {
         let mut page = 1;
 
         loop {
-            let mut query = OverridePageQuery::new().page(page);
+            let mut query = OverridePageQuery::new();
+            query.page = page;
 
-            if let Some(builds) = self.builds.clone() {
-                for build in builds {
-                    query = query.build(build);
-                }
-            };
-
-            if let Some(expired) = self.expired {
-                query = query.expired(expired);
-            };
-
-            if let Some(like) = self.like.clone() {
-                query = query.like(like);
-            };
-
-            if let Some(packages) = self.packages.clone() {
-                for package in packages {
-                    query = query.package(package);
-                }
-            };
-
-            if let Some(releases) = self.releases.clone() {
-                for release in releases {
-                    query = query.release(release);
-                }
-            };
-
-            if let Some(search) = self.search.clone() {
-                query = query.search(search);
-            };
-
-            if let Some(users) = self.user.clone() {
-                for user in users {
-                    query = query.user(user);
-                }
-            };
+            query.builds = self.builds.clone();
+            query.expired = self.expired.clone();
+            query.like = self.like.clone();
+            query.packages = self.packages.clone();
+            query.releases = self.releases.clone();
+            query.search = self.search.clone();
+            query.users = self.users.clone();
 
             let result = query.query(bodhi)?;
             overrides.extend(result.r#overrides);
@@ -195,11 +168,12 @@ struct OverridePageQuery {
     expired: Option<bool>,
     like: Option<String>,
     packages: Option<Vec<String>>,
-    page: i32,
     releases: Option<Vec<String>>,
-    rows_per_page: i32,
     search: Option<String>,
-    user: Option<Vec<String>>,
+    users: Option<Vec<String>>,
+
+    page: i32,
+    rows_per_page: i32,
 }
 
 impl OverridePageQuery {
@@ -209,75 +183,12 @@ impl OverridePageQuery {
             expired: None,
             like: None,
             packages: None,
-            page: DEFAULT_PAGE,
             releases: None,
-            rows_per_page: DEFAULT_ROWS,
             search: None,
-            user: None,
+            users: None,
+            page: DEFAULT_PAGE,
+            rows_per_page: DEFAULT_ROWS,
         }
-    }
-
-    fn build(mut self, build: String) -> OverridePageQuery {
-        match &mut self.builds {
-            Some(builds) => builds.push(build),
-            None => self.builds = Some(vec![build]),
-        }
-
-        self
-    }
-
-    fn expired(mut self, expired: bool) -> OverridePageQuery {
-        self.expired = Some(expired);
-        self
-    }
-
-    fn like(mut self, like: String) -> OverridePageQuery {
-        self.like = Some(like);
-        self
-    }
-
-    fn package(mut self, package: String) -> OverridePageQuery {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
-        self
-    }
-
-    fn page(mut self, page: i32) -> OverridePageQuery {
-        self.page = page;
-        self
-    }
-
-    fn release(mut self, release: String) -> OverridePageQuery {
-        match &mut self.releases {
-            Some(releases) => releases.push(release),
-            None => self.releases = Some(vec![release]),
-        }
-
-        self
-    }
-
-    /*
-    fn rows_per_page(mut self, rows_per_page: i32) -> OverridePageQuery {
-        self.rows_per_page = rows_per_page;
-        self
-    }
-    */
-
-    fn search(mut self, search: String) -> OverridePageQuery {
-        self.search = Some(search);
-        self
-    }
-
-    fn user(mut self, user: String) -> OverridePageQuery {
-        match &mut self.user {
-            Some(users) => users.push(user),
-            None => self.user = Some(vec![user]),
-        }
-
-        self
     }
 
     fn query(self, bodhi: &BodhiService) -> Result<OverrideListPage, String> {
@@ -309,7 +220,7 @@ impl OverridePageQuery {
             args.insert("search", search);
         }
 
-        if let Some(users) = self.user {
+        if let Some(users) = self.users {
             args.insert("user", users.join(","));
         }
 

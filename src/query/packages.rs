@@ -41,19 +41,12 @@ impl PackageQuery {
         let mut page = 1;
 
         loop {
-            let mut query = PackagePageQuery::new().page(page);
+            let mut query = PackagePageQuery::new();
+            query.page = page;
 
-            if let Some(like) = self.like.clone() {
-                query = query.like(like);
-            }
-
-            if let Some(name) = self.name.clone() {
-                query = query.name(name);
-            }
-
-            if let Some(search) = self.search.clone() {
-                query = query.search(search);
-            }
+            query.like = self.like.clone();
+            query.name = self.name.clone();
+            query.search = self.search.clone();
 
             let result = query.query(bodhi)?;
             packages.extend(result.packages);
@@ -70,7 +63,7 @@ impl PackageQuery {
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct PackageListPage {
+struct PackageListPage {
     packages: Vec<Package>,
     page: i32,
     pages: i32,
@@ -83,8 +76,9 @@ struct PackagePageQuery {
     like: Option<String>,
     name: Option<String>,
     search: Option<String>,
-    pub page: i32,
-    pub rows_per_page: i32,
+
+    page: i32,
+    rows_per_page: i32,
 }
 
 impl PackagePageQuery {
@@ -97,33 +91,6 @@ impl PackagePageQuery {
             rows_per_page: DEFAULT_ROWS,
         }
     }
-
-    fn like(mut self, like: String) -> PackagePageQuery {
-        self.like = Some(like);
-        self
-    }
-
-    fn name(mut self, name: String) -> PackagePageQuery {
-        self.name = Some(name);
-        self
-    }
-
-    fn search(mut self, search: String) -> PackagePageQuery {
-        self.search = Some(search);
-        self
-    }
-
-    fn page(mut self, page: i32) -> PackagePageQuery {
-        self.page = page;
-        self
-    }
-
-    /*
-    fn rows_per_page(mut self, rows_per_page: i32) -> PackagePageQuery {
-        self.rows_per_page = rows_per_page;
-        self
-    }
-    */
 
     fn query(self, bodhi: &BodhiService) -> Result<PackageListPage, String> {
         let path = String::from("/packages/");
