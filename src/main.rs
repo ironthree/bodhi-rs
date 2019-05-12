@@ -1,8 +1,8 @@
 /// This is just a small test program that won't be part of any official releases.
 use bodhi::{
-    BodhiService, BuildNVRQuery, BuildQuery, CommentIDQuery, CommentQuery, OverrideNVRQuery,
-    OverrideQuery, PackageQuery, ReleaseNameQuery, ReleaseQuery, StackNameQuery, StackQuery,
-    UpdateIDQuery, UpdateQuery, UserNameQuery, UserQuery,
+    BodhiService, BuildNVRQuery, BuildQuery, CSRFQuery, CommentIDQuery, CommentQuery,
+    OverrideNVRQuery, OverrideQuery, PackageQuery, ReleaseNameQuery, ReleaseQuery, StackNameQuery,
+    StackQuery, UpdateIDQuery, UpdateQuery, UserNameQuery, UserQuery,
 };
 
 // TODO: make this configurable
@@ -51,6 +51,13 @@ fn main() {
 
     match comments {
         Ok(comment) => println!("Comment: {:#?}", comment),
+        Err(error) => println!("Error: {:#?}", error),
+    }
+
+    let csrf = CSRFQuery::new().query(&bodhi);
+
+    match csrf {
+        Ok(csrf) => println!("CSRF: {}", csrf),
         Err(error) => println!("Error: {:#?}", error),
     }
 
