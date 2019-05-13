@@ -21,14 +21,22 @@ const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
 /// ```
 /// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
 /// ```
+#[derive(Debug)]
 pub struct BodhiService {
     url: String,
+    timeout: Duration,
 }
 
 impl BodhiService {
     /// This method constructs a new `BodhiService` instance.
     pub fn new(url: String) -> BodhiService {
-        BodhiService { url }
+        BodhiService { url, timeout: REQUEST_TIMEOUT }
+    }
+
+    /// This method allows to override the default timeout value (60 seconds).
+    pub fn timeout(mut self, timeout: Duration) -> BodhiService {
+        self.timeout = timeout;
+        self
     }
 
     /// This method constructs and executes a request at the specified bodhi instance.
@@ -37,7 +45,7 @@ impl BodhiService {
         path: &str,
         args: Option<HashMap<&str, String>>,
     ) -> Result<Response, String> {
-        let client = match reqwest::Client::builder().timeout(REQUEST_TIMEOUT).build() {
+        let client = match reqwest::Client::builder().timeout(self.timeout).build() {
             Ok(client) => client,
             Err(error) => {
                 return Err(format!("TLS backend could not be initialized: {:?}", error));
