@@ -5,6 +5,13 @@ use serde::Deserialize;
 use crate::data::{BodhiError, Comment};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
+/// Use this for querying bodhi for a specific comment by its ID.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let comment = bodhi::CommentIDQuery::new(19999).query(&bodhi).unwrap();
+/// ```
 #[derive(Debug)]
 pub struct CommentIDQuery {
     id: i32,
@@ -16,10 +23,16 @@ struct CommentPage {
 }
 
 impl CommentIDQuery {
+    /// This method is the only way to create a new `CommentIDQuery` instance.
     pub fn new(id: i32) -> CommentIDQuery {
         CommentIDQuery { id }
     }
 
+    /// This method will query the remote bodhi instance for the requested comment by ID,
+    /// and will either return an `Ok(Comment)` matching the specified ID,
+    /// or return an `Err(String)` if it doesn't exist, or if another error occurred.
+    ///
+    /// TODO: return `Result<Option<Comment>, String>>` to distinguish "not found" from errors
     pub fn query(self, bodhi: &BodhiService) -> Result<Comment, String> {
         let path = format!("/comments/{}", self.id);
 
@@ -48,6 +61,20 @@ impl CommentIDQuery {
     }
 }
 
+/// Use this for querying bodhi about a set of comments with the given properties,
+/// which can be specified with the builder pattern. Note that some options can be
+/// specified multiple times, and comments will be returned if any criteria match.
+/// This is consistent with both the web interface and REST API behavior.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let comments = bodhi::CommentQuery::new()
+///     .anonymous(true)
+///     .users(String::from("decathorpe"))
+///     .packages(String::from("rust"))
+///     .query(&bodhi).unwrap();
+/// ```
 #[derive(Debug, Default)]
 pub struct CommentQuery {
     anonymous: Option<bool>,
@@ -62,6 +89,7 @@ pub struct CommentQuery {
 }
 
 impl CommentQuery {
+    /// This method returns a new `CommentQuery` with *no* filters set.
     pub fn new() -> CommentQuery {
         CommentQuery {
             anonymous: None,
@@ -76,11 +104,14 @@ impl CommentQuery {
         }
     }
 
+    /// Restrict the returned results to (not) anonymous comments.
     pub fn anonymous(mut self, anonymous: bool) -> CommentQuery {
         self.anonymous = Some(anonymous);
         self
     }
 
+    /// Restrict results to ignore comments by certain users.
+    /// Can be specified multiple times.
     pub fn ignore_users(mut self, ignore_user: String) -> CommentQuery {
         match &mut self.ignore_users {
             Some(ignore_users) => ignore_users.push(ignore_user),
@@ -90,11 +121,14 @@ impl CommentQuery {
         self
     }
 
+    /// Restrict search to comments *like* the given argument (in the SQL sense).
     pub fn like(mut self, like: String) -> CommentQuery {
         self.like = Some(like);
         self
     }
 
+    /// Restrict the returned results to comments filed against updates for the
+    /// given package(s). Can be specified multiple times.
     pub fn packages(mut self, package: String) -> CommentQuery {
         match &mut self.packages {
             Some(packages) => packages.push(package),
@@ -104,16 +138,20 @@ impl CommentQuery {
         self
     }
 
+    /// Restrict search to comments containing the given argument.
     pub fn search(mut self, search: String) -> CommentQuery {
         self.search = Some(search);
         self
     }
 
+    /// Restrict the returned results to comments filed since the given date and time.
     pub fn since(mut self, since: String) -> CommentQuery {
         self.since = Some(since);
         self
     }
 
+    /// Restrict the returned results to comments filed against updates
+    /// created by the specified user(s). Can be specified multiple times.
     pub fn update_owners(mut self, update_owner: String) -> CommentQuery {
         match &mut self.update_owners {
             Some(update_owners) => update_owners.push(update_owner),
@@ -123,6 +161,8 @@ impl CommentQuery {
         self
     }
 
+    /// Restrict the returned results to comments filed against the given update(s).
+    /// Can be specified multiple times.
     pub fn updates(mut self, update: String) -> CommentQuery {
         match &mut self.updates {
             Some(updates) => updates.push(update),
@@ -132,6 +172,8 @@ impl CommentQuery {
         self
     }
 
+    /// Restrict the returned results to comments filed by the given user(s).
+    /// Can be specified multiple times.
     pub fn users(mut self, user: String) -> CommentQuery {
         match &mut self.users {
             Some(users) => users.push(user),
@@ -141,6 +183,7 @@ impl CommentQuery {
         self
     }
 
+    /// Query the remote bodhi instance with the given parameters.
     pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Comment>, String> {
         let mut comments: Vec<Comment> = Vec::new();
         let mut page = 1;

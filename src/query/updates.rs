@@ -5,6 +5,14 @@ use serde::Deserialize;
 use crate::data::{BodhiError, Update};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
+/// Use this for querying bodhi for a specific update by its ID, title, or alias.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let update = bodhi::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
+///     .query(&bodhi).unwrap();
+/// ```
 #[derive(Debug)]
 pub struct UpdateIDQuery {
     id: String,
@@ -17,10 +25,17 @@ struct UpdatePage {
 }
 
 impl UpdateIDQuery {
+    /// This method is the only way to create a new `UpdateIDQuery` instance.
     pub fn new(id: String) -> UpdateIDQuery {
         UpdateIDQuery { id }
     }
 
+    /// This method will query the remote bodhi instance for the requested update by ID,
+    /// title, or alias, and will either return an `Ok(Update)` matching the specified ID,
+    /// title, or alias, or return an `Err(String)` if it doesn't exist,
+    /// or if another error occurred.
+    ///
+    /// TODO: return `Result<Option<Update>, String>>` to distinguish "not found" from errors
     pub fn query(self, bodhi: &BodhiService) -> Result<Update, String> {
         let path = format!("/updates/{}", self.id);
 
@@ -49,6 +64,20 @@ impl UpdateIDQuery {
     }
 }
 
+/// Use this for querying bodhi about a set of updates with the given properties,
+/// which can be specified with the builder pattern. Note that some options can be
+/// specified multiple times, and updates will be returned if any criteria match.
+/// This is consistent with both the web interface and REST API behavior.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let updates = bodhi::UpdateQuery::new()
+///     .users(String::from("decathorpe"))
+///     .releases(String::from("F30"))
+///     .status(String::from("testing"))
+///     .query(&bodhi).unwrap();
+/// ```
 #[derive(Debug, Default)]
 pub struct UpdateQuery {
     active_releases: Option<bool>,
@@ -82,6 +111,7 @@ pub struct UpdateQuery {
 }
 
 impl UpdateQuery {
+    /// This method returns a new `UpdateQuery` with *no* filters set.
     pub fn new() -> UpdateQuery {
         UpdateQuery {
             active_releases: None,
@@ -115,11 +145,14 @@ impl UpdateQuery {
         }
     }
 
+    /// Restrict the returned results to (not) active releases.
     pub fn active_releases(mut self, active_releases: bool) -> UpdateQuery {
         self.active_releases = Some(active_releases);
         self
     }
 
+    /// Restrict results to updates matching the given alias(es).
+    /// Can be specified multiple times.
     pub fn aliases(mut self, alias: String) -> UpdateQuery {
         match &mut self.aliases {
             Some(aliases) => aliases.push(alias),
@@ -129,16 +162,22 @@ impl UpdateQuery {
         self
     }
 
+    /// Restrict the returned results to updates which were approved
+    /// before the given date and time.
     pub fn approved_before(mut self, approved_before: String) -> UpdateQuery {
         self.approved_before = Some(approved_before);
         self
     }
 
+    /// Restrict the returned results to updates which were approved
+    /// since the given date and time.
     pub fn approved_since(mut self, approved_since: String) -> UpdateQuery {
         self.approved_since = Some(approved_since);
         self
     }
 
+    /// Restrict results to updates associated with the given bug(s).
+    /// Can be specified multiple times.
     pub fn bugs(mut self, bug: String) -> UpdateQuery {
         match &mut self.bugs {
             Some(bugs) => bugs.push(bug),
@@ -148,6 +187,8 @@ impl UpdateQuery {
         self
     }
 
+    /// Restrict results to updates associated with the given build(s).
+    /// Can be specified multiple times.
     pub fn builds(mut self, build: String) -> UpdateQuery {
         match &mut self.builds {
             Some(builds) => builds.push(build),
@@ -157,16 +198,21 @@ impl UpdateQuery {
         self
     }
 
+    /// Restrict the returned results to the given content type.
+    /// Valid arguments are: "base", "rpm", "module", "container", "flatpak"
     pub fn content_type(mut self, content_type: String) -> UpdateQuery {
         self.content_type = Some(content_type);
         self
     }
 
+    /// Restrict the returned results to updates (not) marked with critpath.
     pub fn critpath(mut self, critpath: bool) -> UpdateQuery {
         self.critpath = Some(critpath);
         self
     }
 
+    /// Restrict results to updates associated with the given CVE(s).
+    /// Can be specified multiple times.
     pub fn cves(mut self, cve: String) -> UpdateQuery {
         match &mut self.cves {
             Some(cves) => cves.push(cve),
@@ -176,26 +222,34 @@ impl UpdateQuery {
         self
     }
 
+    /// Restrict search to updates *like* the given argument (in the SQL sense).
     pub fn like(mut self, like: String) -> UpdateQuery {
         self.like = Some(like);
         self
     }
 
+    /// Restrict the returned results to (not) locked updates.
     pub fn locked(mut self, locked: bool) -> UpdateQuery {
         self.locked = Some(locked);
         self
     }
 
+    /// Restrict the returned results to updates which were modified
+    /// before the given date and time.
     pub fn modified_before(mut self, modified_before: String) -> UpdateQuery {
         self.modified_before = Some(modified_before);
         self
     }
 
+    /// Restrict the returned results to updates which were modified
+    /// since the given date and time.
     pub fn modified_since(mut self, modified_since: String) -> UpdateQuery {
         self.modified_since = Some(modified_since);
         self
     }
 
+    /// Restrict results to updates associated for the given package(s).
+    /// Can be specified multiple times.
     pub fn packages(mut self, package: String) -> UpdateQuery {
         match &mut self.packages {
             Some(packages) => packages.push(package),
@@ -205,21 +259,28 @@ impl UpdateQuery {
         self
     }
 
+    /// Restrict the returned results to (not) pushed updates.
     pub fn pushed(mut self, pushed: bool) -> UpdateQuery {
         self.pushed = Some(pushed);
         self
     }
 
+    /// Restrict the returned results to updates which were pushed
+    /// before the given date and time.
     pub fn pushed_before(mut self, pushed_before: String) -> UpdateQuery {
         self.pushed_before = Some(pushed_before);
         self
     }
 
+    /// Restrict the returned results to updates which were pushed
+    /// since the given date and time.
     pub fn pushed_since(mut self, pushed_since: String) -> UpdateQuery {
         self.pushed_since = Some(pushed_since);
         self
     }
 
+    /// Restrict results to updates for the given release(s).
+    /// Can be specified multiple times.
     pub fn releases(mut self, release: String) -> UpdateQuery {
         match &mut self.releases {
             Some(releases) => releases.push(release),
@@ -229,41 +290,58 @@ impl UpdateQuery {
         self
     }
 
+    /// Restrict the returned results to updates with the given request.
+    /// Valid arguments are: "testing", "batched", "obsolete", "unpush",
+    ///                      "revoke", "stable"
     pub fn request(mut self, request: String) -> UpdateQuery {
         self.request = Some(request);
         self
     }
 
+    /// Restrict search to updates containing the given argument.
     pub fn search(mut self, search: String) -> UpdateQuery {
         self.search = Some(search);
         self
     }
 
+    /// Restrict the returned results to updates with the given severity.
+    /// Valid arguments are: "urgent", "high", "medium", "low", "unspecified"
     pub fn severity(mut self, severity: String) -> UpdateQuery {
         self.severity = Some(severity);
         self
     }
 
+    /// Restrict the returned results to updates with the given status.
+    /// Valid arguments are: "pending", "testing", "stable", "unpushed", "obsolete",
+    ///                      "processing", "side_tag_active", "side_tag_expired"
     pub fn status(mut self, status: String) -> UpdateQuery {
         self.status = Some(status);
         self
     }
 
+    /// Restrict the returned results to updates which were submitted
+    /// before the given date and time.
     pub fn submitted_before(mut self, submitted_before: String) -> UpdateQuery {
         self.submitted_before = Some(submitted_before);
         self
     }
 
+    /// Restrict the returned results to updates which were submitted
+    /// since the given date and time.
     pub fn submitted_since(mut self, submitted_since: String) -> UpdateQuery {
         self.submitted_since = Some(submitted_since);
         self
     }
 
+    /// Restrict the returned results to updates with the given "suggest" value.
+    /// Valid arguments are: "reboot", "logout", "unspecified"
     pub fn suggest(mut self, suggest: String) -> UpdateQuery {
         self.suggest = Some(suggest);
         self
     }
 
+    /// Restrict results to updates matching the given update ID(s).
+    /// Can be specified multiple times.
     pub fn update_ids(mut self, update_id: String) -> UpdateQuery {
         match &mut self.update_ids {
             Some(update_ids) => update_ids.push(update_id),
@@ -273,11 +351,15 @@ impl UpdateQuery {
         self
     }
 
+    /// Restrict results to updates matching the given update type.
+    /// Valid arguments are: "bugfix", "security", "newpackage", "enhancement"
     pub fn update_type(mut self, update_type: String) -> UpdateQuery {
         self.update_type = Some(update_type);
         self
     }
 
+    /// Restrict results to updates associated with the given user(s).
+    /// Can be specified multiple times.
     pub fn users(mut self, user: String) -> UpdateQuery {
         match &mut self.users {
             Some(users) => users.push(user),
@@ -287,6 +369,7 @@ impl UpdateQuery {
         self
     }
 
+    /// Query the remote bodhi instance with the given parameters.
     pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Update>, String> {
         let mut updates: Vec<Update> = Vec::new();
         let mut page = 1;

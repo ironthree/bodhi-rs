@@ -2,15 +2,23 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-// derived from actual bodhi JSON responses,
-// verified to successfully deserialize all data returned by the fedora bodhi instance
+// TODO: release (F30, F30M, etc.) enum
+// TODO: update content_type enum
+// TODO: update request enum
+// TODO: update severity enum
+// TODO: update status enum
+// TODO: update suggest enum
+// TODO: update type enum
 
+/// This struct contains error messages that are deserialized from bodhi's error responses.
+/// TODO: make this a proper error
 #[derive(Debug, Deserialize)]
 pub struct BodhiError {
     pub errors: Vec<HashMap<String, String>>,
     pub status: String,
 }
 
+/// This struct represents a specific BugZilla bug that is associated with an update.
 #[derive(Debug, Deserialize)]
 pub struct Bug {
     pub bug_id: i32,
@@ -20,6 +28,7 @@ pub struct Bug {
     pub title: Option<String>,
 }
 
+/// This struct represents an update feedback item associated with a specific bug.
 #[derive(Debug, Deserialize)]
 pub struct BugFeedback {
     pub bug: Option<Bug>,
@@ -28,6 +37,8 @@ pub struct BugFeedback {
     pub karma: i32,
 }
 
+/// This struct represents a specific koji build that bodhi is aware of.
+/// This does not include "rpm" or "module" builds for rawhide (yet).
 #[derive(Debug, Deserialize)]
 pub struct Build {
     pub ci_url: Option<String>,
@@ -38,6 +49,8 @@ pub struct Build {
     pub r#type: String,
 }
 
+/// This struct represents one comment against a specific update,
+/// along with its associated bug and test case feedback.
 #[derive(Debug, Deserialize)]
 pub struct Comment {
     pub anonymous: bool,
@@ -56,11 +69,13 @@ pub struct Comment {
     pub user_id: i32,
 }
 
+/// This struct represents a currently running compose process.
 #[derive(Debug, Deserialize)]
 pub struct Compose {
+    pub checkpoints: String,
     pub content_type: String,
     pub date_created: String,
-    pub error_message: String,
+    pub error_message: Option<String>,
     pub release: Option<Release>,
     pub release_id: Option<i32>,
     pub request: String,
@@ -70,16 +85,13 @@ pub struct Compose {
     pub update_summary: Vec<HashMap<String, String>>,
 }
 
+/// This struct represents a group from the fedora accounts system (FAS).
 #[derive(Debug, Deserialize)]
 pub struct Group {
     pub name: String,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct Markdown {
-    pub html: String,
-}
-
+/// This struct represents a buildroot override, along with the associated build.
 #[derive(Debug, Deserialize)]
 pub struct Override {
     pub build: Build,
@@ -93,6 +105,7 @@ pub struct Override {
     pub submitter_id: i32,
 }
 
+/// This struct represents a specific fedora package.
 #[derive(Debug, Deserialize)]
 pub struct Package {
     pub name: String,
@@ -102,6 +115,9 @@ pub struct Package {
     pub r#type: String,
 }
 
+/// This struct represents a fedora release as present in the bodhi database.
+/// This includes variants (Modular, Container, Flatpak), identified with
+/// the "C", "F", and "M" suffixes.
 #[derive(Debug, Deserialize)]
 pub struct Release {
     pub branch: String,
@@ -123,6 +139,7 @@ pub struct Release {
     pub version: String,
 }
 
+/// This struct represents a specific stack in bodhi. It doesn't seem to be in use yet.
 #[derive(Debug, Deserialize)]
 pub struct Stack {
     pub description: String,
@@ -133,6 +150,8 @@ pub struct Stack {
     pub users: Vec<User>,
 }
 
+/// This struct represents a specific test case as associated with
+/// a given test case feedback and update.
 #[derive(Debug, Deserialize)]
 pub struct TestCase {
     pub name: String,
@@ -140,6 +159,7 @@ pub struct TestCase {
     pub package_id: i32,
 }
 
+/// This struct represents an update feedback item associated with a specific test case.
 #[derive(Debug, Deserialize)]
 pub struct TestCaseFeedback {
     pub comment_id: i32,
@@ -148,6 +168,10 @@ pub struct TestCaseFeedback {
     pub testcase_id: i32,
 }
 
+/// This struct represents a bodhi update, with associated items:
+/// bugs, builds, comments, running composes, release, status, submitter, etc.
+/// FIXME: old_updateid and updateid are either Strings (aliases) or i32s (IDs),
+///        depending on the query
 #[derive(Debug, Deserialize)]
 pub struct Update {
     pub alias: String,
@@ -194,6 +218,7 @@ pub struct Update {
     pub user: User,
 }
 
+/// This struct represents a specific fedora user.
 #[derive(Debug, Deserialize)]
 pub struct User {
     pub avatar: String,

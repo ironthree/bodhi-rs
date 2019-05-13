@@ -5,16 +5,31 @@ use serde::Deserialize;
 use crate::data::{BodhiError, Build};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
+/// Use this for querying bodhi for a specific build,
+/// by its Name-Version-Release string.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let build = bodhi::BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29"))
+///     .query(&bodhi).unwrap();
+/// ```
 #[derive(Debug)]
 pub struct BuildNVRQuery {
     nvr: String,
 }
 
 impl BuildNVRQuery {
+    /// This method is the only way to create a new `BuildNVRQuery` instance.
     pub fn new(nvr: String) -> BuildNVRQuery {
         BuildNVRQuery { nvr }
     }
 
+    /// This method will query the remote bodhi instance for the given NVR,
+    /// and will either return an `Ok(Build)` matching the specified NVR,
+    /// or return an `Err(String)` if it doesn't exist, or if another error occurred.
+    ///
+    /// TODO: return `Result<Option<Build>, String>>` to distinguish "not found" from errors
     pub fn query(self, bodhi: &BodhiService) -> Result<Build, String> {
         let path = format!("/builds/{}", self.nvr);
 
@@ -43,6 +58,20 @@ impl BuildNVRQuery {
     }
 }
 
+/// Use this for querying bodhi about a set of builds with the given properties,
+/// which can be specified with the builder pattern. Note that some options can be
+/// specified multiple times, and builds will be returned if any criteria match.
+/// This is consistent with both the web interface and REST API behavior.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let builds = bodhi::BuildQuery::new()
+///     .releases(String::from("F30"))
+///     .releases(String::from("F29"))
+///     .packages(String::from("rust"))
+///     .query(&bodhi).unwrap();
+/// ```
 #[derive(Debug, Default)]
 pub struct BuildQuery {
     nvr: Option<String>,
@@ -52,6 +81,7 @@ pub struct BuildQuery {
 }
 
 impl BuildQuery {
+    /// This method returns a new `BuildQuery` with *no* filters set.
     pub fn new() -> BuildQuery {
         BuildQuery {
             nvr: None,
@@ -61,11 +91,14 @@ impl BuildQuery {
         }
     }
 
+    /// Restrict the returned results to builds with the given NVR.
     pub fn nvr(mut self, nvr: String) -> BuildQuery {
         self.nvr = Some(nvr);
         self
     }
 
+    /// Restrict the returned results to builds of the given package(s).
+    /// Can be specified multiple times.
     pub fn packages(mut self, package: String) -> BuildQuery {
         match &mut self.packages {
             Some(packages) => packages.push(package),
@@ -75,6 +108,8 @@ impl BuildQuery {
         self
     }
 
+    /// Restrict the returned results to builds for the given release(s).
+    /// Can be specified multiple times.
     pub fn releases(mut self, release: String) -> BuildQuery {
         match &mut self.releases {
             Some(releases) => releases.push(release),
@@ -84,6 +119,8 @@ impl BuildQuery {
         self
     }
 
+    /// Restrict the returned results to builds for the given update(s).
+    /// Can be specified multiple times.
     pub fn updates(mut self, update: String) -> BuildQuery {
         match &mut self.updates {
             Some(updates) => updates.push(update),
@@ -93,6 +130,7 @@ impl BuildQuery {
         self
     }
 
+    /// Query the remote bodhi instance with the given parameters.
     pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Build>, String> {
         let mut builds: Vec<Build> = Vec::new();
         let mut page = 1;

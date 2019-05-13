@@ -3,20 +3,35 @@ use std::collections::HashMap;
 use reqwest::Response;
 use std::time::Duration;
 
+/// Always start with page 1 for multi-page queries.
+/// Everything else would be stupid.
 pub const DEFAULT_PAGE: i32 = 1;
+
+/// This constant defines how many items are queried every time for multi-page queries.
+/// The maximum is 100, the default is 20, and 50 seems a good compromise for speed.
 pub const DEFAULT_ROWS: i32 = 50;
 
+/// Specify a longer timeout duration (60 s) for bodhi requests.
+/// The `reqwest` default value of 30 s is a bit too short for long-running queries.
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
 
+/// This struct represents a specific bodhi service, typically running remotely,
+/// although a local URL could be specified, as well.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// ```
 pub struct BodhiService {
     url: String,
 }
 
 impl BodhiService {
+    /// This method constructs a new `BodhiService` instance.
     pub fn new(url: String) -> BodhiService {
         BodhiService { url }
     }
 
+    /// This method constructs and executes a request at the specified bodhi instance.
     pub fn request(
         &self,
         path: &str,

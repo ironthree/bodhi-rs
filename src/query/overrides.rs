@@ -5,6 +5,15 @@ use serde::Deserialize;
 use crate::data::{BodhiError, Override};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
+/// Use this for querying bodhi for a specific override,
+/// by its Name-Version-Release string.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let over_ride = bodhi::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
+///     .query(&bodhi).unwrap();
+/// ```
 #[derive(Debug)]
 pub struct OverrideNVRQuery {
     nvr: String,
@@ -16,10 +25,16 @@ struct OverridePage {
 }
 
 impl OverrideNVRQuery {
+    /// This method is the only way to create a new `OverrideNVRQuery` instance.
     pub fn new(nvr: String) -> OverrideNVRQuery {
         OverrideNVRQuery { nvr }
     }
 
+    /// This method will query the remote bodhi instance for the given NVR,
+    /// and will return either an `Ok(Override)` matching the specified NVR,
+    /// or return an `Err(String)` if it doesn't exist, or if another error occurred.
+    ///
+    /// TODO: return `Result<Option<Override>, String>` to distinguish "not found" from errors
     pub fn query(self, bodhi: &BodhiService) -> Result<Override, String> {
         let path = format!("/overrides/{}", self.nvr);
 
@@ -48,6 +63,19 @@ impl OverrideNVRQuery {
     }
 }
 
+/// Use this for querying bodhi about a set of overrides with the given properties,
+/// which can be specified with the builder pattern. Note that some options can be
+/// specified multiple times, and overrides will be returned if any criteria match.
+/// This is consistent with both the web interface and REST API behavior.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let overrides = bodhi::OverrideQuery::new()
+///     .releases(String::from("F29"))
+///     .users(String::from("decathorpe"))
+///     .query(&bodhi).unwrap();
+/// ```
 #[derive(Debug, Default)]
 pub struct OverrideQuery {
     builds: Option<Vec<String>>,
@@ -60,6 +88,7 @@ pub struct OverrideQuery {
 }
 
 impl OverrideQuery {
+    /// This method returns a new `OverrideQuery` with *no* filters set.
     pub fn new() -> OverrideQuery {
         OverrideQuery {
             builds: None,
@@ -72,7 +101,9 @@ impl OverrideQuery {
         }
     }
 
-    pub fn build(mut self, build: String) -> OverrideQuery {
+    /// Restrict the returned results to overrides for the given build(s).
+    /// Can be specified multiple times.
+    pub fn builds(mut self, build: String) -> OverrideQuery {
         match &mut self.builds {
             Some(builds) => builds.push(build),
             None => self.builds = Some(vec![build]),
@@ -81,17 +112,21 @@ impl OverrideQuery {
         self
     }
 
+    /// Restrict the returned results to (not) expired overrides.
     pub fn expired(mut self, expired: bool) -> OverrideQuery {
         self.expired = Some(expired);
         self
     }
 
+    /// Restrict search to overrides *like* the given argument (in the SQL sense).
     pub fn like(mut self, like: String) -> OverrideQuery {
         self.like = Some(like);
         self
     }
 
-    pub fn package(mut self, package: String) -> OverrideQuery {
+    /// Restrict the returned results to overrides for the given package(s).
+    /// Can be specified multiple times.
+    pub fn packages(mut self, package: String) -> OverrideQuery {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -100,7 +135,9 @@ impl OverrideQuery {
         self
     }
 
-    pub fn release(mut self, release: String) -> OverrideQuery {
+    /// Restrict the returned results to overrides for the given release(s).
+    /// Can be specified multiple times.
+    pub fn releases(mut self, release: String) -> OverrideQuery {
         match &mut self.releases {
             Some(releases) => releases.push(release),
             None => self.releases = Some(vec![release]),
@@ -109,11 +146,14 @@ impl OverrideQuery {
         self
     }
 
+    /// Restrict search to overrides containing the given argument.
     pub fn search(mut self, search: String) -> OverrideQuery {
         self.search = Some(search);
         self
     }
 
+    /// Restrict the returned results to overrides created by the given user(s).
+    /// Can be specified multiple times.
     pub fn users(mut self, user: String) -> OverrideQuery {
         match &mut self.users {
             Some(users) => users.push(user),
@@ -123,6 +163,7 @@ impl OverrideQuery {
         self
     }
 
+    /// Query the remote bodhi instance with the given parameters.
     pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Override>, String> {
         let mut overrides: Vec<Override> = Vec::new();
         let mut page = 1;

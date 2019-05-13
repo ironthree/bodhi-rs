@@ -3,6 +3,13 @@ use serde::Deserialize;
 use crate::data::BodhiError;
 use crate::service::BodhiService;
 
+/// Use this for querying bodhi for a new CSRF token.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let token = bodhi::CSRFQuery::new().query(&bodhi).unwrap();
+/// ```
 #[derive(Debug)]
 pub struct CSRFQuery {}
 
@@ -12,10 +19,14 @@ struct CSRFPage {
 }
 
 impl CSRFQuery {
+    /// This method creates a new CSRF token query.
     pub fn new() -> CSRFQuery {
         CSRFQuery {}
     }
 
+    /// This method will query the remote bodhi instance for a new CSRF token.
+    /// It will return either an `Ok(String)` with the new token,
+    /// or an `Err(String)` if an error occurred.
     pub fn query(self, bodhi: &BodhiService) -> Result<String, String> {
         let path = String::from("/csrf");
 

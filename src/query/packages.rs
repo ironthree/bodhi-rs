@@ -5,6 +5,18 @@ use serde::Deserialize;
 use crate::data::{BodhiError, Package};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
+/// Use this for querying bodhi about a set of packages with the given properties,
+/// which can be specified with the builder pattern. Note that some options can be
+/// specified multiple times, and packages will be returned if any criteria match.
+/// This is consistent with both the web interface and REST API behavior.
+///
+/// ```
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+///
+/// let packages = bodhi::PackageQuery::new()
+///     .search(String::from("rust*"))
+///     .query(&bodhi).unwrap();
+/// ```
 #[derive(Debug, Default)]
 pub struct PackageQuery {
     like: Option<String>,
@@ -13,6 +25,7 @@ pub struct PackageQuery {
 }
 
 impl PackageQuery {
+    /// This method returns a new `PackageQuery` with *no* filters set.
     pub fn new() -> PackageQuery {
         PackageQuery {
             like: None,
@@ -21,21 +34,25 @@ impl PackageQuery {
         }
     }
 
+    /// Restrict search to packages *like* the given argument (in the SQL sense).
     pub fn like(mut self, like: String) -> PackageQuery {
         self.like = Some(like);
         self
     }
 
+    /// Restrict the returned results to packages matching the given name.
     pub fn name(mut self, name: String) -> PackageQuery {
         self.name = Some(name);
         self
     }
 
+    /// Restrict search to packages containing the given argument.
     pub fn search(mut self, search: String) -> PackageQuery {
         self.search = Some(search);
         self
     }
 
+    /// Query the remote bodhi instance with the given parameters.
     pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Package>, String> {
         let mut packages: Vec<Package> = Vec::new();
         let mut page = 1;
