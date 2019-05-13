@@ -173,7 +173,7 @@ impl OverrideQuery {
             query.page = page;
 
             query.builds = self.builds.clone();
-            query.expired = self.expired.clone();
+            query.expired = self.expired;
             query.like = self.like.clone();
             query.packages = self.packages.clone();
             query.releases = self.releases.clone();

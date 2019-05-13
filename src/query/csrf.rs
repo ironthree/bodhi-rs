@@ -10,7 +10,7 @@ use crate::service::BodhiService;
 ///
 /// let token = bodhi::CSRFQuery::new().query(&bodhi).unwrap();
 /// ```
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CSRFQuery {}
 
 #[derive(Debug, Deserialize)]
