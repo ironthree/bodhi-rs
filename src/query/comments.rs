@@ -14,7 +14,7 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// ```
 #[derive(Debug)]
 pub struct CommentIDQuery {
-    id: i32,
+    id: u32,
 }
 
 #[derive(Debug, Deserialize)]
@@ -24,7 +24,7 @@ struct CommentPage {
 
 impl CommentIDQuery {
     /// This method is the only way to create a new `CommentIDQuery` instance.
-    pub fn new(id: i32) -> CommentIDQuery {
+    pub fn new(id: u32) -> CommentIDQuery {
         CommentIDQuery { id }
     }
 
@@ -218,10 +218,10 @@ impl CommentQuery {
 #[derive(Debug, Deserialize)]
 struct CommentListPage {
     comments: Vec<Comment>,
-    page: i32,
-    pages: i32,
-    rows_per_page: i32,
-    total: i32,
+    page: u32,
+    pages: u32,
+    rows_per_page: u32,
+    total: u32,
 }
 
 #[derive(Debug)]
@@ -236,8 +236,8 @@ struct CommentPageQuery {
     updates: Option<Vec<String>>,
     users: Option<Vec<String>>,
 
-    page: i32,
-    rows_per_page: i32,
+    page: u32,
+    rows_per_page: u32,
 }
 
 impl CommentPageQuery {

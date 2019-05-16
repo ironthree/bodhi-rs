@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::data::{BodhiError, Update};
+use crate::data::*;
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific update by its ID, title, or alias.
@@ -75,7 +75,7 @@ impl UpdateIDQuery {
 /// let updates = bodhi::UpdateQuery::new()
 ///     .users(String::from("decathorpe"))
 ///     .releases(String::from("F30"))
-///     .status(String::from("testing"))
+///     .status(bodhi::UpdateStatus::Testing)
 ///     .query(&bodhi).unwrap();
 /// ```
 #[derive(Debug, Default)]
@@ -199,9 +199,8 @@ impl UpdateQuery {
     }
 
     /// Restrict the returned results to the given content type.
-    /// Valid arguments are: "base", "rpm", "module", "container", "flatpak"
-    pub fn content_type(mut self, content_type: String) -> UpdateQuery {
-        self.content_type = Some(content_type);
+    pub fn content_type(mut self, content_type: ContentType) -> UpdateQuery {
+        self.content_type = Some(content_type.into());
         self
     }
 
@@ -291,10 +290,8 @@ impl UpdateQuery {
     }
 
     /// Restrict the returned results to updates with the given request.
-    /// Valid arguments are: "testing", "batched", "obsolete", "unpush",
-    ///                      "revoke", "stable"
-    pub fn request(mut self, request: String) -> UpdateQuery {
-        self.request = Some(request);
+    pub fn request(mut self, request: UpdateRequest) -> UpdateQuery {
+        self.request = Some(request.into());
         self
     }
 
@@ -305,17 +302,14 @@ impl UpdateQuery {
     }
 
     /// Restrict the returned results to updates with the given severity.
-    /// Valid arguments are: "urgent", "high", "medium", "low", "unspecified"
-    pub fn severity(mut self, severity: String) -> UpdateQuery {
-        self.severity = Some(severity);
+    pub fn severity(mut self, severity: UpdateSeverity) -> UpdateQuery {
+        self.severity = Some(severity.into());
         self
     }
 
     /// Restrict the returned results to updates with the given status.
-    /// Valid arguments are: "pending", "testing", "stable", "unpushed", "obsolete",
-    ///                      "processing", "side_tag_active", "side_tag_expired"
-    pub fn status(mut self, status: String) -> UpdateQuery {
-        self.status = Some(status);
+    pub fn status(mut self, status: UpdateStatus) -> UpdateQuery {
+        self.status = Some(status.into());
         self
     }
 
@@ -334,9 +328,8 @@ impl UpdateQuery {
     }
 
     /// Restrict the returned results to updates with the given "suggest" value.
-    /// Valid arguments are: "reboot", "logout", "unspecified"
-    pub fn suggest(mut self, suggest: String) -> UpdateQuery {
-        self.suggest = Some(suggest);
+    pub fn suggest(mut self, suggest: UpdateSuggestion) -> UpdateQuery {
+        self.suggest = Some(suggest.into());
         self
     }
 
@@ -352,9 +345,8 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates matching the given update type.
-    /// Valid arguments are: "bugfix", "security", "newpackage", "enhancement"
-    pub fn update_type(mut self, update_type: String) -> UpdateQuery {
-        self.update_type = Some(update_type);
+    pub fn update_type(mut self, update_type: UpdateType) -> UpdateQuery {
+        self.update_type = Some(update_type.into());
         self
     }
 
@@ -424,10 +416,10 @@ impl UpdateQuery {
 #[derive(Debug, Deserialize)]
 struct UpdateListPage {
     updates: Vec<Update>,
-    page: i32,
-    pages: i32,
-    rows_per_page: i32,
-    total: i32,
+    page: u32,
+    pages: u32,
+    rows_per_page: u32,
+    total: u32,
 }
 
 #[derive(Debug)]
@@ -461,8 +453,8 @@ struct UpdatePageQuery {
     update_type: Option<String>,
     users: Option<Vec<String>>,
 
-    page: i32,
-    rows_per_page: i32,
+    page: u32,
+    rows_per_page: u32,
 }
 
 impl UpdatePageQuery {

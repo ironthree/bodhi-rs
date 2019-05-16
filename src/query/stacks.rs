@@ -152,10 +152,10 @@ impl StackQuery {
 #[derive(Debug, Deserialize)]
 struct StackListPage {
     stacks: Vec<Stack>,
-    page: i32,
-    pages: i32,
-    rows_per_page: i32,
-    total: i32,
+    page: u32,
+    pages: u32,
+    rows_per_page: u32,
+    total: u32,
 }
 
 #[derive(Debug)]
@@ -165,8 +165,8 @@ struct StackPageQuery {
     packages: Option<Vec<String>>,
     search: Option<String>,
 
-    page: i32,
-    rows_per_page: i32,
+    page: u32,
+    rows_per_page: u32,
 }
 
 impl StackPageQuery {
