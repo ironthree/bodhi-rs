@@ -2,13 +2,133 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-// TODO: release (F30, F30M, etc.) enum
-// TODO: update content_type enum
-// TODO: update request enum
-// TODO: update severity enum
-// TODO: update status enum
-// TODO: update suggest enum
-// TODO: update type enum
+/// This enum represents the content type of a bodhi update.
+pub enum ContentType {
+    Base,
+    Container,
+    Flatpak,
+    Module,
+    RPM,
+}
+
+impl Into<String> for ContentType {
+    fn into(self) -> String {
+        match self {
+            ContentType::Base => String::from("base"),
+            ContentType::Container => String::from("container"),
+            ContentType::Flatpak => String::from("flatpak"),
+            ContentType::Module => String::from("module"),
+            ContentType::RPM => String::from("rpm"),
+        }
+    }
+}
+
+/// This enum represents a requested state change of an update.
+pub enum UpdateRequest {
+    Batched,
+    Obsolete,
+    Revoke,
+    Stable,
+    Testing,
+    Unpush,
+}
+
+impl Into<String> for UpdateRequest {
+    fn into(self) -> String {
+        match self {
+            UpdateRequest::Batched => String::from("batched"),
+            UpdateRequest::Obsolete => String::from("obsolete"),
+            UpdateRequest::Revoke => String::from("revoke"),
+            UpdateRequest::Stable => String::from("stable"),
+            UpdateRequest::Testing => String::from("testing"),
+            UpdateRequest::Unpush => String::from("unpush"),
+        }
+    }
+}
+
+/// This enum represents the associated severity of a bodhi update.
+pub enum UpdateSeverity {
+    High,
+    Low,
+    Medium,
+    Unspecified,
+    Urgent,
+}
+
+impl Into<String> for UpdateSeverity {
+    fn into(self) -> String {
+        match self {
+            UpdateSeverity::High => String::from("high"),
+            UpdateSeverity::Low => String::from("low"),
+            UpdateSeverity::Medium => String::from("medium"),
+            UpdateSeverity::Unspecified => String::from("unspecified"),
+            UpdateSeverity::Urgent => String::from("urgent"),
+        }
+    }
+}
+
+/// This enum represents the current state of a bodhi update.
+pub enum UpdateStatus {
+    Obsolete,
+    Pending,
+    Processing,
+    SideTagActive,
+    SideTagExpired,
+    Stable,
+    Testing,
+    Unpushed,
+}
+
+impl Into<String> for UpdateStatus {
+    fn into(self) -> String {
+        match self {
+            UpdateStatus::Obsolete => String::from("obsolete"),
+            UpdateStatus::Pending => String::from("pending"),
+            UpdateStatus::Processing => String::from("processing"),
+            UpdateStatus::SideTagActive => String::from("side_tag_active"),
+            UpdateStatus::SideTagExpired => String::from("side_tag_expired"),
+            UpdateStatus::Stable => String::from("stable"),
+            UpdateStatus::Testing => String::from("testing"),
+            UpdateStatus::Unpushed => String::from("unpushed"),
+        }
+    }
+}
+
+/// This enum represents the associated suggested action for a bodhi update.
+pub enum UpdateSuggestion {
+    Logout,
+    Reboot,
+    Unspecified,
+}
+
+impl Into<String> for UpdateSuggestion {
+    fn into(self) -> String {
+        match self {
+            UpdateSuggestion::Logout => String::from("logout"),
+            UpdateSuggestion::Reboot => String::from("reboot"),
+            UpdateSuggestion::Unspecified => String::from("unspecified"),
+        }
+    }
+}
+
+/// This enum represents the type of a bodhi update.
+pub enum UpdateType {
+    BugFix,
+    Enhancement,
+    NewPackage,
+    Security,
+}
+
+impl Into<String> for UpdateType {
+    fn into(self) -> String {
+        match self {
+            UpdateType::BugFix => String::from("bugfix"),
+            UpdateType::Enhancement => String::from("security"),
+            UpdateType::NewPackage => String::from("newpackage"),
+            UpdateType::Security => String::from("enhancement"),
+        }
+    }
+}
 
 /// This struct contains error messages that are deserialized from bodhi's error responses.
 /// TODO: make this a proper error
@@ -69,22 +189,6 @@ pub struct Comment {
     pub user_id: i32,
 }
 
-/// This struct represents a currently running compose process.
-#[derive(Debug, Deserialize)]
-pub struct Compose {
-    pub checkpoints: String,
-    pub content_type: String,
-    pub date_created: String,
-    pub error_message: Option<String>,
-    pub release: Option<Release>,
-    pub release_id: Option<i32>,
-    pub request: String,
-    pub security: bool,
-    pub state: String,
-    pub state_date: String,
-    pub update_summary: Vec<HashMap<String, String>>,
-}
-
 /// This struct represents a group from the fedora accounts system (FAS).
 #[derive(Debug, Deserialize)]
 pub struct Group {
@@ -122,7 +226,6 @@ pub struct Package {
 pub struct Release {
     pub branch: String,
     pub candidate_tag: String,
-    pub composes: Vec<Compose>,
     pub composed_by_bodhi: bool,
     pub dist_tag: String,
     pub id_prefix: String,
@@ -169,7 +272,7 @@ pub struct TestCaseFeedback {
 }
 
 /// This struct represents a bodhi update, with associated items:
-/// bugs, builds, comments, running composes, release, status, submitter, etc.
+/// bugs, builds, comments, release, status, submitter, etc.
 /// FIXME: old_updateid and updateid are either Strings (aliases) or i32s (IDs),
 ///        depending on the query
 #[derive(Debug, Deserialize)]
@@ -180,7 +283,6 @@ pub struct Update {
     pub builds: Vec<Build>,
     pub close_bugs: bool,
     pub comments: Option<Vec<Comment>>,
-    pub compose: Option<Compose>,
     pub content_type: Option<String>,
     pub critpath: bool,
     pub date_approved: Option<String>,
@@ -192,11 +294,10 @@ pub struct Update {
     pub display_name: String,
     pub greenwave_summary_string: Option<String>,
     pub greenwave_unsatisfied_requirements: Option<String>,
-    pub karma: i32,
+    pub karma: Option<i32>,
     pub locked: bool,
     pub meets_testing_requirements: bool,
     pub notes: String,
-    // FIXME: old_updateid: Option<String>, or Option<i32>?
     pub pushed: bool,
     pub release: Release,
     pub request: Option<String>,
@@ -213,7 +314,6 @@ pub struct Update {
     pub title: String,
     pub r#type: String,
     pub unstable_karma: Option<i32>,
-    // FIXME updateid: String, or i32?
     pub url: String,
     pub user: User,
 }
