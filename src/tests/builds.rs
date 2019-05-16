@@ -1,12 +1,15 @@
-use std::time::Duration;
-
+use super::{SERVER_URL, TEST_RETRIES, TEST_TIMEOUT};
 use crate::{BodhiService, BuildQuery};
-use super::SERVER_URL;
 
 #[test]
-fn deserialize_all_builds() {
+fn deserialize() {
     let bodhi = BodhiService::new(String::from(SERVER_URL))
-        .timeout(Duration::from_secs(120));
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES);
 
-    BuildQuery::new().query(&bodhi).unwrap();
+    // query only builds for the most recent release
+    BuildQuery::new()
+        .releases(String::from("F30"))
+        .query(&bodhi)
+        .unwrap();
 }

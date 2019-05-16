@@ -92,6 +92,7 @@ impl BuildQuery {
     }
 
     /// Restrict the returned results to builds with the given NVR.
+    /// If this is the only required filter, consider using a `BuildNVRQuery` instead.
     pub fn nvr(mut self, nvr: String) -> BuildQuery {
         self.nvr = Some(nvr);
         self

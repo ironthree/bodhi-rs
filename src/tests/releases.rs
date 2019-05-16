@@ -1,12 +1,14 @@
-use std::time::Duration;
-
+use super::{SERVER_URL, TEST_RETRIES, TEST_TIMEOUT};
 use crate::{BodhiService, ReleaseQuery};
-use super::SERVER_URL;
 
 #[test]
-fn deserialize_all_releases() {
+fn deserialize() {
     let bodhi = BodhiService::new(String::from(SERVER_URL))
-        .timeout(Duration::from_secs(120));
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES);
 
-    ReleaseQuery::new().query(&bodhi).unwrap();
+    ReleaseQuery::new()
+        .exclude_archived(false)
+        .query(&bodhi)
+        .unwrap();
 }

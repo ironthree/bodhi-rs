@@ -1,5 +1,5 @@
-use super::{SERVER_URL, TEST_RETRIES, TEST_TIMEOUT};
-use crate::{BodhiService, PackageQuery};
+use super::{SERVER_URL, TEST_TIMEOUT, TEST_RETRIES};
+use crate::{BodhiService, CSRFQuery};
 
 #[test]
 fn deserialize() {
@@ -7,5 +7,5 @@ fn deserialize() {
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES);
 
-    PackageQuery::new().query(&bodhi).unwrap();
+    CSRFQuery::new().query(&bodhi).unwrap();
 }

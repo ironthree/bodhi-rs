@@ -1,12 +1,19 @@
-use std::time::Duration;
-
+use super::{SERVER_URL, TEST_RETRIES, TEST_TIMEOUT};
 use crate::{BodhiService, OverrideQuery};
-use super::SERVER_URL;
 
 #[test]
-fn deserialize_all_overrides() {
+fn deserialize() {
     let bodhi = BodhiService::new(String::from(SERVER_URL))
-        .timeout(Duration::from_secs(120));
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES);
 
-    OverrideQuery::new().query(&bodhi).unwrap();
+    // query only overrides for currently active releases
+    OverrideQuery::new()
+        .releases(String::from("F30"))
+        .query(&bodhi)
+        .unwrap();
+    OverrideQuery::new()
+        .releases(String::from("F29"))
+        .query(&bodhi)
+        .unwrap();
 }

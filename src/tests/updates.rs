@@ -1,12 +1,22 @@
-use std::time::Duration;
-
-use crate::{BodhiService, UpdateQuery};
-use super::SERVER_URL;
+use super::{SERVER_URL, TEST_RETRIES, TEST_TIMEOUT};
+use crate::{BodhiService, UpdateQuery, UpdateStatus};
 
 #[test]
-fn deserialize_all_updates() {
+fn deserialize() {
     let bodhi = BodhiService::new(String::from(SERVER_URL))
-        .timeout(Duration::from_secs(120));
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES);
 
-    UpdateQuery::new().query(&bodhi).unwrap();
+    // query only some updates from recent releases
+    UpdateQuery::new()
+        .releases(String::from("F30"))
+        .critpath(true)
+        .query(&bodhi)
+        .unwrap();
+
+    UpdateQuery::new()
+        .releases(String::from("F29"))
+        .status(UpdateStatus::Testing)
+        .query(&bodhi)
+        .unwrap();
 }
