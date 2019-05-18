@@ -7,8 +7,6 @@
 //! corresponding query filters accept some of the enum types defined here,
 //! instead of the String arguments directly.
 
-// TODO: also deserialize to enums (or wrap with getter)
-
 use std::collections::HashMap;
 
 use serde::Deserialize;
@@ -20,11 +18,17 @@ pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
 pub const FEDORA_BODHI_STAGING_URL: &str = "https://bodhi.stg.fedoraproject.org";
 
 /// This enum represents the content type of a bodhi update.
+#[derive(Debug, Deserialize)]
 pub enum ContentType {
+    #[serde(rename(deserialize = "base"))]
     Base,
+    #[serde(rename(deserialize = "container"))]
     Container,
+    #[serde(rename(deserialize = "flatpak"))]
     Flatpak,
+    #[serde(rename(deserialize = "module"))]
     Module,
+    #[serde(rename(deserialize = "rpm"))]
     RPM,
 }
 
@@ -41,12 +45,19 @@ impl Into<String> for ContentType {
 }
 
 /// This enum represents a requested state change of an update.
+#[derive(Debug, Deserialize)]
 pub enum UpdateRequest {
+    #[serde(rename(deserialize = "batched"))]
     Batched,
+    #[serde(rename(deserialize = "obsolete"))]
     Obsolete,
+    #[serde(rename(deserialize = "revoke"))]
     Revoke,
+    #[serde(rename(deserialize = "stable"))]
     Stable,
+    #[serde(rename(deserialize = "testing"))]
     Testing,
+    #[serde(rename(deserialize = "unpush"))]
     Unpush,
 }
 
@@ -64,11 +75,17 @@ impl Into<String> for UpdateRequest {
 }
 
 /// This enum represents the associated severity of a bodhi update.
+#[derive(Debug, Deserialize)]
 pub enum UpdateSeverity {
+    #[serde(rename(deserialize = "high"))]
     High,
+    #[serde(rename(deserialize = "low"))]
     Low,
+    #[serde(rename(deserialize = "medium"))]
     Medium,
+    #[serde(rename(deserialize = "unspecified"))]
     Unspecified,
+    #[serde(rename(deserialize = "urgent"))]
     Urgent,
 }
 
@@ -85,14 +102,23 @@ impl Into<String> for UpdateSeverity {
 }
 
 /// This enum represents the current state of a bodhi update.
+#[derive(Debug, Deserialize)]
 pub enum UpdateStatus {
+    #[serde(rename(deserialize = "obsolete"))]
     Obsolete,
+    #[serde(rename(deserialize = "pending"))]
     Pending,
+    #[serde(rename(deserialize = "processing"))]
     Processing,
+    #[serde(rename(deserialize = "side_tag_active"))]
     SideTagActive,
+    #[serde(rename(deserialize = "side_tag_expired"))]
     SideTagExpired,
+    #[serde(rename(deserialize = "stable"))]
     Stable,
+    #[serde(rename(deserialize = "testing"))]
     Testing,
+    #[serde(rename(deserialize = "unpushed"))]
     Unpushed,
 }
 
@@ -112,9 +138,13 @@ impl Into<String> for UpdateStatus {
 }
 
 /// This enum represents the associated suggested action for a bodhi update.
+#[derive(Debug, Deserialize)]
 pub enum UpdateSuggestion {
+    #[serde(rename(deserialize = "logout"))]
     Logout,
+    #[serde(rename(deserialize = "reboot"))]
     Reboot,
+    #[serde(rename(deserialize = "unspecified"))]
     Unspecified,
 }
 
@@ -129,10 +159,15 @@ impl Into<String> for UpdateSuggestion {
 }
 
 /// This enum represents the type of a bodhi update.
+#[derive(Debug, Deserialize)]
 pub enum UpdateType {
+    #[serde(rename(deserialize = "bugfix"))]
     BugFix,
+    #[serde(rename(deserialize = "security"))]
     Enhancement,
+    #[serde(rename(deserialize = "newpackage"))]
     NewPackage,
+    #[serde(rename(deserialize = "enhancement"))]
     Security,
 }
 
@@ -302,7 +337,7 @@ pub struct Update {
     pub builds: Vec<Build>,
     pub close_bugs: bool,
     pub comments: Option<Vec<Comment>>,
-    pub content_type: Option<String>,
+    pub content_type: Option<ContentType>,
     pub critpath: bool,
     pub date_approved: Option<String>,
     pub date_modified: Option<String>,
@@ -319,21 +354,21 @@ pub struct Update {
     pub notes: String,
     pub pushed: bool,
     pub release: Release,
-    pub request: Option<String>,
+    pub request: Option<UpdateRequest>,
     pub require_bugs: bool,
     pub require_testcases: bool,
     pub requirements: Option<String>,
-    pub severity: String,
+    pub severity: UpdateSeverity,
     pub stable_karma: Option<i32>,
-    pub status: String,
+    pub status: UpdateStatus,
     pub submitter: Option<String>,
-    pub suggest: String,
+    pub suggest: UpdateSuggestion,
     pub test_cases: Option<Vec<TestCase>>,
     pub test_gating_status: Option<String>,
     pub title: String,
     pub unstable_karma: Option<i32>,
     #[serde(rename(deserialize = "type"))]
-    pub update_type: String,
+    pub update_type: UpdateType,
     pub url: String,
     pub user: User,
 }

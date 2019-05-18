@@ -21,3 +21,11 @@ It uses the awesome [`reqwest`][reqwest] and [`serde`][serde] packages.
 - `OpenID` authentication is not yet implemented.
 
 Note that the API is not finalized yet, and minor changes will still happen before the `0.1.0` release.
+
+
+## TODO
+
+- inspect errors in `BuildNVRQuery`, `CommenIDQuery`, `OverrideNVRQuery`,
+  `ReleaseNameQuery`, `StackNameQuery`, `UpdateIDQuery`, and `UserNameQuery`,
+  and return `Some(item)` and `None` if it's not found, instead of pushing the
+  "not found" case into an `Err`
