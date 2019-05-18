@@ -8,7 +8,7 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// Use this for querying bodhi for a specific release by its name.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let comment = bodhi::ReleaseNameQuery::new(String::from("F30"))
 ///     .query(&bodhi).unwrap();
@@ -63,7 +63,7 @@ impl ReleaseNameQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let releases = bodhi::ReleaseQuery::new()
 ///     .exclude_archived(true)

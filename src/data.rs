@@ -2,6 +2,12 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
+/// base URL of the fedora bodhi instance
+pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
+
+/// base URL of the fedora bodhi staging instance
+pub const FEDORA_BODHI_STAGING_URL: &str = "https://bodhi.stg.fedoraproject.org";
+
 /// This enum represents the content type of a bodhi update.
 pub enum ContentType {
     Base,

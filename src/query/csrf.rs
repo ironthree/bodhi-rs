@@ -6,7 +6,7 @@ use crate::service::BodhiService;
 /// Use this for querying bodhi for a new CSRF token.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let token = bodhi::CSRFQuery::new().query(&bodhi).unwrap();
 /// ```

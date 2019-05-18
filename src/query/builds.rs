@@ -9,7 +9,7 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// by its Name-Version-Release string.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let build = bodhi::BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29"))
 ///     .query(&bodhi).unwrap();
@@ -64,7 +64,7 @@ impl BuildNVRQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let builds = bodhi::BuildQuery::new()
 ///     .releases(String::from("F30"))

@@ -8,7 +8,7 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// Use this for querying bodhi for a specific update by its ID, title, or alias.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let update = bodhi::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
 ///     .query(&bodhi).unwrap();
@@ -70,7 +70,7 @@ impl UpdateIDQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let updates = bodhi::UpdateQuery::new()
 ///     .users(String::from("decathorpe"))

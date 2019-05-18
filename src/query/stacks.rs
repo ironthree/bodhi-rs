@@ -8,7 +8,7 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// Use this for querying bodhi for a specific stack by its name.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let comment = bodhi::StackNameQuery::new(String::from("SomeStack"))
 ///     .query(&bodhi).unwrap();
@@ -68,7 +68,7 @@ impl StackNameQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let comments = bodhi::StackQuery::new().query(&bodhi).unwrap();
 /// ```

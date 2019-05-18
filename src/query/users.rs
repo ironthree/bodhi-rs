@@ -8,7 +8,7 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// Use this for querying bodhi for a specific user by their name.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let comment = bodhi::UserNameQuery::new(String::from("decathorpe"))
 ///     .query(&bodhi).unwrap();
@@ -68,7 +68,7 @@ impl UserNameQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let users = bodhi::UserQuery::new()
 ///     .groups(String::from("provenpackager"))

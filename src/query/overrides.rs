@@ -9,7 +9,7 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// by its Name-Version-Release string.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let over_ride = bodhi::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
 ///     .query(&bodhi).unwrap();
@@ -69,7 +69,7 @@ impl OverrideNVRQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let overrides = bodhi::OverrideQuery::new()
 ///     .releases(String::from("F29"))
