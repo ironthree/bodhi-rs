@@ -1,3 +1,16 @@
+//! query for buildroot overrides (or *one* override by NVR)
+//!
+//! The contents of this module can be used to query a bodhi instance about
+//! existing buildroot overrides.
+//!
+//! The `OverrideNVRQuery` returns exactly one Override, if and only if a
+//! Override for the build with this NVR exists - otherwise, it will return an
+//! error. FIXME
+//!
+//! The `OverrideQuery` can be used to execute more complex queries, for example
+//! filtering overrides by status, sets of overrides for certain packages, or
+//! overrides filed by a given list of users.
+
 use std::collections::HashMap;
 
 use serde::Deserialize;

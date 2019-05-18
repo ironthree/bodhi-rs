@@ -1,3 +1,15 @@
+//! query for updates (or *one* update by ID, title, or alias)
+//!
+//! The contents of this module can be used to query a bodhi instance about
+//! existing updates.
+//!
+//! The `UpdateIDQuery` returns exactly one Update, if and only if a Update
+//! with this ID, alias, or title exists - otherwise, it will return an error. FIXME
+//!
+//! The `UpdateQuery` can be used to execute more complex queries, for example
+//! filtering updates by release, status, security impact, reboot suggestion,
+//! or for updates that are associated with a given set of packages.
+
 use std::collections::HashMap;
 
 use serde::Deserialize;

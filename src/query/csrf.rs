@@ -1,3 +1,8 @@
+//! request a new CSRF token
+//!
+//! The contents of this module can be used to query a bodhi instance for a
+//! new CSRF token.
+
 use serde::Deserialize;
 
 use crate::data::BodhiError;

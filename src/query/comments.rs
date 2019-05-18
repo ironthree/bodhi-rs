@@ -1,3 +1,17 @@
+//! query comments (or *one* comment by ID)
+//!
+//! The contents of this module can be used to query a bodhi instance about
+//! existing comments.
+//!
+//! The `CommentIDQuery` returns exactly one Comment, if and only if a
+//! Comment with the given integer ID exists - otherwise, it will return an
+//! error. FIXME
+//!
+//! The `CommentQuery` can be used to execute more complex queries, for example
+//! filtering comments that are associated with a set of updates or packages,
+//! or query comments made by certain users, or filed against updates that were
+//! created by specific users.
+
 use std::collections::HashMap;
 
 use serde::Deserialize;

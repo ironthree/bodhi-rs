@@ -1,3 +1,15 @@
+//! query for releases (or *one* release by name)
+//!
+//! The contents of this module can be used to query a bodhi instance about
+//! existing releases.
+//!
+//! The `ReleaseNameQuery` returns exactly one Release, if and only if a Release
+//! with this name exists - otherwise, it will return an error. FIXME
+//!
+//! The `ReleaseQuery` can be used to execute more complex queries, for example
+//! filtering releases by status, or query the releases associated with a
+//! given set of updates or packages.
+
 use std::collections::HashMap;
 
 use serde::Deserialize;

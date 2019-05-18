@@ -1,3 +1,19 @@
+//! query builds (or *one* build by NVR)
+//!
+//! The contents of this module can be used to query a bodhi instance about
+//! existing builds. However, since rawhide builds are not passing through
+//! bodhi (yet), this can only be used to query bodhi about the builds it
+//! knows about: rpm, module, and flatpak builds for stable releases, and
+//! container builds for all releases (including rawhide).
+//!
+//! The `BuildNVRQuery` returns exactly one Build, if and only if a
+//! Build with the given Name-Version-Release triple exists - otherwise, it
+//! will return an error. FIXME
+//!
+//! The `BuildQuery` can be used to execute more complex queries - querying
+//! for builds of certain packages, builds for certain releases, or builds
+//! associated with a given set of updates is possible.
+
 use std::collections::HashMap;
 
 use serde::Deserialize;

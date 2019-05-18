@@ -1,3 +1,14 @@
+//! query for stacks (or *one* stack by name)
+//!
+//! The contents of this module can be used to query a bodhi instance about
+//! existing stacks.
+//!
+//! The `StackNameQuery` returns exactly one Stack, if and only if a Stack
+//! with this name exists - otherwise, it will return an error. FIXME
+//!
+//! The `StackQuery` can be used to execute more complex queries, for example
+//! filtering stacks that are associated with a given set of packages.
+
 use std::collections::HashMap;
 
 use serde::Deserialize;

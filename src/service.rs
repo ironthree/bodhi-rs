@@ -1,3 +1,6 @@
+//! This module contains the structures and methods to interact with a (remote)
+//! bodhi server instance.
+
 use std::collections::HashMap;
 
 use reqwest::Response;
@@ -20,10 +23,13 @@ const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
 const REQUEST_RETRIES: u32 = 3;
 
 /// This struct represents a specific bodhi service, typically running remotely,
-/// although a local URL could be specified, as well.
+/// although a local URL could be specified, as well. This BodhiService instance
+/// is then used by queries to actually submit to, and receive from - the service.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"));
+/// let bodhi = bodhi::BodhiService::new(String::from("https://bodhi.fedoraproject.org"))
+///     .timeout(std::time::Duration::from_secs(45))
+///     .retries(9001);
 /// ```
 #[derive(Debug)]
 pub struct BodhiService {
@@ -55,7 +61,9 @@ impl BodhiService {
     }
 
     /// This method constructs and executes a request at the specified bodhi instance.
-    pub fn request(
+    /// It is called when executing a previously constructed query against this
+    /// `BodhiService` instance.
+    pub(crate) fn request(
         &self,
         path: &str,
         args: Option<HashMap<&str, String>>,

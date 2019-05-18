@@ -1,3 +1,11 @@
+//! query for packages
+//!
+//! The contents of this module can be used to query a bodhi instance about
+//! existing packages.
+//!
+//! The `Package` can be used to execute complex queries, for example query
+//! packages by name, or filter packages matching a certain search string.
+
 use std::collections::HashMap;
 
 use serde::Deserialize;

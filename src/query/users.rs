@@ -1,3 +1,15 @@
+//! query for users (or *one* user by username)
+//!
+//! The contents of this module can be used to query a bodhi instance about
+//! the user accounts it knows.
+//!
+//! The `UserNameQuery` returns exactly one User, if and only if a User with
+//! this username exists - otherwise, it will return an error. FIXME
+//!
+//! The `UserQuery` can be used to execute more complex queries, for example
+//! filtering users by the groups they are members of, or querying for users
+//! that are associated with a given set of updates or packages.
+
 use std::collections::HashMap;
 
 use serde::Deserialize;
