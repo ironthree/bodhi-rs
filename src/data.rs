@@ -167,12 +167,13 @@ pub struct BugFeedback {
 /// This does not include "rpm" or "module" builds for rawhide (yet).
 #[derive(Debug, Deserialize)]
 pub struct Build {
+    #[serde(rename(deserialize = "type"))]
+    pub build_type: String,
     pub ci_url: Option<String>,
     pub epoch: Option<i32>,
     pub nvr: String,
     pub release_id: Option<i32>,
     pub signed: bool,
-    pub r#type: String,
 }
 
 /// This struct represents one comment against a specific update,
@@ -219,10 +220,11 @@ pub struct Override {
 #[derive(Debug, Deserialize)]
 pub struct Package {
     pub name: String,
+    #[serde(rename(deserialize = "type"))]
+    pub package_type: String,
     pub requirements: Option<String>,
     pub stack: Option<Stack>,
     pub stack_id: Option<i32>,
-    pub r#type: String,
 }
 
 /// This struct represents a fedora release as present in the bodhi database.
@@ -318,8 +320,9 @@ pub struct Update {
     pub test_cases: Option<Vec<TestCase>>,
     pub test_gating_status: Option<String>,
     pub title: String,
-    pub r#type: String,
     pub unstable_karma: Option<i32>,
+    #[serde(rename(deserialize = "type"))]
+    pub update_type: String,
     pub url: String,
     pub user: User,
 }
