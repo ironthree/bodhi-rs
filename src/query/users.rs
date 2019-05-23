@@ -4,7 +4,7 @@
 //! the user accounts it knows.
 //!
 //! The `UserNameQuery` returns exactly one User, if and only if a User with
-//! this username exists - otherwise, it will return an error. FIXME
+//! this username exists - otherwise, it will return an error.
 //!
 //! The `UserQuery` can be used to execute more complex queries, for example
 //! filtering users by the groups they are members of, or querying for users
@@ -16,6 +16,9 @@ use serde::Deserialize;
 
 use crate::data::{BodhiError, User};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+const DESCRIPTION: &str = "description";
+const NO_SUCH_USER: &str = "No such user";
 
 /// Use this for querying bodhi for a specific user by their name.
 ///
@@ -43,10 +46,9 @@ impl UserNameQuery {
 
     /// This method will query the remote bodhi instance for the requested user by name,
     /// and will either return an `Ok(User)` matching the specified name,
-    /// or return an `Err(String)` if they don't exist, or if another error occurred.
-    ///
-    /// TODO: return `Result<Option<User>, String>>` to distinguish "not found" from errors
-    pub fn query(self, bodhi: &BodhiService) -> Result<User, String> {
+    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
+    /// if another error occurred.
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<User>, String> {
         let path = format!("/users/{}", self.name);
 
         let mut response = bodhi.request(&path, None)?;
@@ -60,7 +62,7 @@ impl UserNameQuery {
                 }
             };
 
-            Ok(user.user)
+            Ok(Some(user.user))
         } else {
             let error: BodhiError = match response.json() {
                 Ok(value) => value,
@@ -68,6 +70,25 @@ impl UserNameQuery {
                     return Err(format!("Unexpected error message: {:?}", error));
                 }
             };
+
+            // check if bodhi returned a "No such user" error
+            if !error.errors.is_empty() {
+                let message = error
+                    .errors
+                    .get(0)
+                    .expect("Despite a length greater 0, getting the first element failed.");
+
+                if message.contains_key(DESCRIPTION) {
+                    let description = message
+                        .get(DESCRIPTION)
+                        .expect("Despite the hash map containing the key, fetching value failed.");
+
+                    if description == NO_SUCH_USER {
+                        // in this case, the query was successful, but nothing was found
+                        return Ok(None);
+                    }
+                }
+            }
 
             Err(format!("{:?}", error))
         }

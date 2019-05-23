@@ -5,7 +5,7 @@
 //!
 //! The `OverrideNVRQuery` returns exactly one Override, if and only if a
 //! Override for the build with this NVR exists - otherwise, it will return an
-//! error. FIXME
+//! error.
 //!
 //! The `OverrideQuery` can be used to execute more complex queries, for example
 //! filtering overrides by status, sets of overrides for certain packages, or
@@ -17,6 +17,10 @@ use serde::Deserialize;
 
 use crate::data::{BodhiError, Override};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+const DESCRIPTION: &str = "description";
+const NO_SUCH_BUILD: &str = "No such build";
+const NO_SUCH_OVERRIDE: &str = "No buildroot override for this build";
 
 /// Use this for querying bodhi for a specific override,
 /// by its Name-Version-Release string.
@@ -44,11 +48,10 @@ impl OverrideNVRQuery {
     }
 
     /// This method will query the remote bodhi instance for the given NVR,
-    /// and will return either an `Ok(Override)` matching the specified NVR,
-    /// or return an `Err(String)` if it doesn't exist, or if another error occurred.
-    ///
-    /// TODO: return `Result<Option<Override>, String>` to distinguish "not found" from errors
-    pub fn query(self, bodhi: &BodhiService) -> Result<Override, String> {
+    /// and will return either an `Ok(Some(Override))` matching the specified NVR,
+    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
+    /// if another error occurred.
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Override>, String> {
         let path = format!("/overrides/{}", self.nvr);
 
         let mut response = bodhi.request(&path, None)?;
@@ -62,7 +65,7 @@ impl OverrideNVRQuery {
                 }
             };
 
-            Ok(override_page.r#override)
+            Ok(Some(override_page.r#override))
         } else {
             let error: BodhiError = match response.json() {
                 Ok(value) => value,
@@ -70,6 +73,24 @@ impl OverrideNVRQuery {
                     return Err(format!("Unexpected error message: {:?}", error));
                 }
             };
+
+            // check if bodhi returned a "No such build" error
+            if !error.errors.is_empty() {
+                let message = error
+                    .errors
+                    .get(0)
+                    .expect("Despite a length greater 0, getting the first element failed.");
+
+                if message.contains_key(DESCRIPTION) {
+                    let description = message
+                        .get(DESCRIPTION)
+                        .expect("Despite the hash map containing the key, fetching value failed.");
+
+                    if description == NO_SUCH_OVERRIDE || description == NO_SUCH_BUILD {
+                        return Ok(None);
+                    }
+                }
+            }
 
             Err(format!("{:?}", error))
         }

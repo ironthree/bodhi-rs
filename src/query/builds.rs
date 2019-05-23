@@ -8,7 +8,7 @@
 //!
 //! The `BuildNVRQuery` returns exactly one Build, if and only if a
 //! Build with the given Name-Version-Release triple exists - otherwise, it
-//! will return an error. FIXME
+//! will return an error.
 //!
 //! The `BuildQuery` can be used to execute more complex queries - querying
 //! for builds of certain packages, builds for certain releases, or builds
@@ -20,6 +20,9 @@ use serde::Deserialize;
 
 use crate::data::{BodhiError, Build};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+const DESCRIPTION: &str = "description";
+const NO_SUCH_BUILD: &str = "No such build";
 
 /// Use this for querying bodhi for a specific build,
 /// by its Name-Version-Release string.
@@ -42,11 +45,10 @@ impl BuildNVRQuery {
     }
 
     /// This method will query the remote bodhi instance for the given NVR,
-    /// and will either return an `Ok(Build)` matching the specified NVR,
-    /// or return an `Err(String)` if it doesn't exist, or if another error occurred.
-    ///
-    /// TODO: return `Result<Option<Build>, String>>` to distinguish "not found" from errors
-    pub fn query(self, bodhi: &BodhiService) -> Result<Build, String> {
+    /// and will either return an `Ok(Some(Build))` matching the specified NVR,
+    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
+    /// if another error occurred.
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Build>, String> {
         let path = format!("/builds/{}", self.nvr);
 
         let mut response = bodhi.request(&path, None)?;
@@ -60,7 +62,7 @@ impl BuildNVRQuery {
                 }
             };
 
-            Ok(build)
+            Ok(Some(build))
         } else {
             let error: BodhiError = match response.json() {
                 Ok(value) => value,
@@ -68,6 +70,25 @@ impl BuildNVRQuery {
                     return Err(format!("Unexpected error message: {:?}", error));
                 }
             };
+
+            // check if bodhi returned a "No such build" error
+            if !error.errors.is_empty() {
+                let message = error
+                    .errors
+                    .get(0)
+                    .expect("Despite a length greater 0, getting the first element failed.");
+
+                if message.contains_key(DESCRIPTION) {
+                    let description = message
+                        .get(DESCRIPTION)
+                        .expect("Despite the hash map containing the key, fetching value failed.");
+
+                    if description == NO_SUCH_BUILD {
+                        // in this case, the query was successful, but nothing was found
+                        return Ok(None);
+                    }
+                }
+            }
 
             Err(format!("{:?}", error))
         }

@@ -4,7 +4,7 @@
 //! existing updates.
 //!
 //! The `UpdateIDQuery` returns exactly one Update, if and only if a Update
-//! with this ID, alias, or title exists - otherwise, it will return an error. FIXME
+//! with this ID, alias, or title exists - otherwise, it will return an error.
 //!
 //! The `UpdateQuery` can be used to execute more complex queries, for example
 //! filtering updates by release, status, security impact, reboot suggestion,
@@ -16,6 +16,9 @@ use serde::Deserialize;
 
 use crate::data::*;
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+const DESCRIPTION: &str = "description";
+const NO_SUCH_UPDATE: &str = "Invalid update id";
 
 /// Use this for querying bodhi for a specific update by its ID, title, or alias.
 ///
@@ -43,12 +46,10 @@ impl UpdateIDQuery {
     }
 
     /// This method will query the remote bodhi instance for the requested update by ID,
-    /// title, or alias, and will either return an `Ok(Update)` matching the specified ID,
-    /// title, or alias, or return an `Err(String)` if it doesn't exist,
-    /// or if another error occurred.
-    ///
-    /// TODO: return `Result<Option<Update>, String>>` to distinguish "not found" from errors
-    pub fn query(self, bodhi: &BodhiService) -> Result<Update, String> {
+    /// title, or alias, and will either return an `Ok(Some(Update))` matching the specified ID,
+    /// title, or alias, return `Ok(None)` if it doesn't exist, or return an `Err(String)`
+    /// if another error occurred.
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Update>, String> {
         let path = format!("/updates/{}", self.id);
 
         let mut response = bodhi.request(&path, None)?;
@@ -62,7 +63,7 @@ impl UpdateIDQuery {
                 }
             };
 
-            Ok(update.update)
+            Ok(Some(update.update))
         } else {
             let error: BodhiError = match response.json() {
                 Ok(value) => value,
@@ -70,6 +71,25 @@ impl UpdateIDQuery {
                     return Err(format!("Unexpected error message: {:?}", error));
                 }
             };
+
+            // check if bodhi returned a "Invalid update id" error
+            if !error.errors.is_empty() {
+                let message = error
+                    .errors
+                    .get(0)
+                    .expect("Despite a length greater 0, getting the first element failed.");
+
+                if message.contains_key(DESCRIPTION) {
+                    let description = message
+                        .get(DESCRIPTION)
+                        .expect("Despite the hash map containing the key, fetching value failed.");
+
+                    if description == NO_SUCH_UPDATE {
+                        // in this case, the query was successful, but nothing was found
+                        return Ok(None);
+                    }
+                }
+            }
 
             Err(format!("{:?}", error))
         }

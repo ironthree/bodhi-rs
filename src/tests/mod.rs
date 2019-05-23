@@ -7,6 +7,7 @@ const TEST_TIMEOUT: Duration = Duration::from_secs(120);
 const TEST_RETRIES: u32 = 5;
 
 mod builds;
+mod comments;
 mod csrf;
 mod overrides;
 mod packages;

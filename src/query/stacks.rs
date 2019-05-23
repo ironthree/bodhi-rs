@@ -4,7 +4,7 @@
 //! existing stacks.
 //!
 //! The `StackNameQuery` returns exactly one Stack, if and only if a Stack
-//! with this name exists - otherwise, it will return an error. FIXME
+//! with this name exists - otherwise, it will return an error.
 //!
 //! The `StackQuery` can be used to execute more complex queries, for example
 //! filtering stacks that are associated with a given set of packages.
@@ -15,6 +15,9 @@ use serde::Deserialize;
 
 use crate::data::{BodhiError, Stack};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+const DESCRIPTION: &str = "description";
+const NO_SUCH_STACK: &str = "Invalid stack specified:";
 
 /// Use this for querying bodhi for a specific stack by its name.
 ///
@@ -41,11 +44,10 @@ impl StackNameQuery {
     }
 
     /// This method will query the remote bodhi instance for the requested stack by name,
-    /// and will either return an `Ok(Stack)` matching the specified name,
-    /// or return an `Err(String)` if it doesn't exist, or if another error occurred.
-    ///
-    /// TODO: return `Result<Option<Stack>, String>>` to distinguish "not found" from errors
-    pub fn query(self, bodhi: &BodhiService) -> Result<Stack, String> {
+    /// and will either return an `Ok(Some(Stack))` matching the specified name,
+    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
+    /// if another error occurred.
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Stack>, String> {
         let path = format!("/stacks/{}", self.name);
 
         let mut response = bodhi.request(&path, None)?;
@@ -59,7 +61,7 @@ impl StackNameQuery {
                 }
             };
 
-            Ok(stack.stack)
+            Ok(Some(stack.stack))
         } else {
             let error: BodhiError = match response.json() {
                 Ok(value) => value,
@@ -67,6 +69,25 @@ impl StackNameQuery {
                     return Err(format!("Unexpected error message: {:?}", error));
                 }
             };
+
+            // check if bodhi returned a "Invalid stack specified:" error
+            if !error.errors.is_empty() {
+                let message = error
+                    .errors
+                    .get(0)
+                    .expect("Despite a length greater 0, getting the first element failed.");
+
+                if message.contains_key(DESCRIPTION) {
+                    let description = message
+                        .get(DESCRIPTION)
+                        .expect("Despite the hash map containing the key, fetching value failed.");
+
+                    if description.starts_with(NO_SUCH_STACK) {
+                        // in this case, the query was successful, but nothing was found
+                        return Ok(None);
+                    }
+                }
+            }
 
             Err(format!("{:?}", error))
         }

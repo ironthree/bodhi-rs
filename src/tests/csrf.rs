@@ -1,4 +1,4 @@
-use super::{TEST_TIMEOUT, TEST_RETRIES};
+use super::{TEST_RETRIES, TEST_TIMEOUT};
 use crate::{BodhiService, CSRFQuery, FEDORA_BODHI_URL};
 
 #[test]

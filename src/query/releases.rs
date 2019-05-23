@@ -4,7 +4,7 @@
 //! existing releases.
 //!
 //! The `ReleaseNameQuery` returns exactly one Release, if and only if a Release
-//! with this name exists - otherwise, it will return an error. FIXME
+//! with this name exists - otherwise, it will return an error.
 //!
 //! The `ReleaseQuery` can be used to execute more complex queries, for example
 //! filtering releases by status, or query the releases associated with a
@@ -16,6 +16,9 @@ use serde::Deserialize;
 
 use crate::data::{BodhiError, Release};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+const DESCRIPTION: &str = "description";
+const NO_SUCH_RELEASE: &str = "No such release";
 
 /// Use this for querying bodhi for a specific release by its name.
 ///
@@ -37,11 +40,10 @@ impl ReleaseNameQuery {
     }
 
     /// This method will query the remote bodhi instance for the requested release by name,
-    /// and will either return an `Ok(Release)` matching the specified name,
-    /// or return an `Err(String)` if it doesn't exist, or if another error occurred.
-    ///
-    /// TODO: return `Result<Option<Release>, String>>` to distinguish "not found" from errors
-    pub fn query(self, bodhi: &BodhiService) -> Result<Release, String> {
+    /// and will either return an `Ok(Some(Release))` matching the specified name,
+    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
+    /// if another error occurred.
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Release>, String> {
         let path = format!("/releases/{}", self.name);
 
         let mut response = bodhi.request(&path, None)?;
@@ -55,7 +57,7 @@ impl ReleaseNameQuery {
                 }
             };
 
-            Ok(release)
+            Ok(Some(release))
         } else {
             let error: BodhiError = match response.json() {
                 Ok(value) => value,
@@ -63,6 +65,25 @@ impl ReleaseNameQuery {
                     return Err(format!("Unexpected error message: {:?}", error));
                 }
             };
+
+            // check if bodhi returned a "No such release" error
+            if !error.errors.is_empty() {
+                let message = error
+                    .errors
+                    .get(0)
+                    .expect("Despite a length greater 0, getting the first element failed.");
+
+                if message.contains_key(DESCRIPTION) {
+                    let description = message
+                        .get(DESCRIPTION)
+                        .expect("Despite the hash map containing the key, fetching value failed.");
+
+                    if description == NO_SUCH_RELEASE {
+                        // in this case, the query was successful, but nothing was found
+                        return Ok(None);
+                    }
+                }
+            }
 
             Err(format!("{:?}", error))
         }

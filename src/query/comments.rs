@@ -5,7 +5,7 @@
 //!
 //! The `CommentIDQuery` returns exactly one Comment, if and only if a
 //! Comment with the given integer ID exists - otherwise, it will return an
-//! error. FIXME
+//! error.
 //!
 //! The `CommentQuery` can be used to execute more complex queries, for example
 //! filtering comments that are associated with a set of updates or packages,
@@ -18,6 +18,9 @@ use serde::Deserialize;
 
 use crate::data::{BodhiError, Comment};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+const DESCRIPTION: &str = "description";
+const NO_SUCH_COMMENT: &str = "Invalid comment id";
 
 /// Use this for querying bodhi for a specific comment by its ID.
 ///
@@ -43,11 +46,11 @@ impl CommentIDQuery {
     }
 
     /// This method will query the remote bodhi instance for the requested comment by ID,
-    /// and will either return an `Ok(Comment)` matching the specified ID,
+    /// and will either return an `Ok(Some(Comment))` matching the specified ID,
     /// or return an `Err(String)` if it doesn't exist, or if another error occurred.
     ///
     /// TODO: return `Result<Option<Comment>, String>>` to distinguish "not found" from errors
-    pub fn query(self, bodhi: &BodhiService) -> Result<Comment, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Comment>, String> {
         let path = format!("/comments/{}", self.id);
 
         let mut response = bodhi.request(&path, None)?;
@@ -61,7 +64,7 @@ impl CommentIDQuery {
                 }
             };
 
-            Ok(comment.comment)
+            Ok(Some(comment.comment))
         } else {
             let error: BodhiError = match response.json() {
                 Ok(value) => value,
@@ -69,6 +72,25 @@ impl CommentIDQuery {
                     return Err(format!("Unexpected error message: {:?}", error));
                 }
             };
+
+            // check if bodhi returned a "Invalid comment id" error
+            if !error.errors.is_empty() {
+                let message = error
+                    .errors
+                    .get(0)
+                    .expect("Despite a length greater 0, getting the first element failed.");
+
+                if message.contains_key(DESCRIPTION) {
+                    let description = message
+                        .get(DESCRIPTION)
+                        .expect("Despite the hash map containing the key, fetching value failed.");
+
+                    if description == NO_SUCH_COMMENT {
+                        // in this case, the query was successful, but nothing was found
+                        return Ok(None);
+                    }
+                }
+            }
 
             Err(format!("{:?}", error))
         }
