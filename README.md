@@ -25,10 +25,6 @@ Note that the API is not finalized yet, and minor changes will still happen befo
 
 ## TODO
 
-- OpenID authentication, needed for authenticated POST requests
-- report bodhi API issues (`Update.id`, `Update.old_update_id` are either
-  strings or numbers, depending on the query)
-- inspect errors in `BuildNVRQuery`, `CommenIDQuery`, `OverrideNVRQuery`,
-  `ReleaseNameQuery`, `StackNameQuery`, `UpdateIDQuery`, and `UserNameQuery`,
-  and return `Some(item)` and `None` if it's not found, instead of pushing the
-  "not found" case into an `Err`
+- OpenID authentication
+- authenticated POST requests for editing and creating stuff
+

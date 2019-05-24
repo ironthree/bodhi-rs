@@ -325,10 +325,15 @@ pub struct TestCaseFeedback {
     pub testcase_id: i32,
 }
 
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum UpdateID {
+    ID(i32),
+    Alias(String),
+}
+
 /// This struct represents a bodhi update, with associated items:
 /// bugs, builds, comments, release, status, submitter, etc.
-/// FIXME: old_updateid and updateid are either Strings (aliases) or i32s (IDs),
-///        depending on the query
 #[derive(Debug, Deserialize)]
 pub struct Update {
     pub alias: String,
@@ -352,6 +357,8 @@ pub struct Update {
     pub locked: bool,
     pub meets_testing_requirements: bool,
     pub notes: String,
+    #[serde(rename(deserialize = "old_updateid"))]
+    pub old_update_id: Option<UpdateID>,
     pub pushed: bool,
     pub release: Release,
     pub request: Option<UpdateRequest>,
@@ -367,6 +374,8 @@ pub struct Update {
     pub test_gating_status: Option<String>,
     pub title: String,
     pub unstable_karma: Option<i32>,
+    #[serde(rename(deserialize = "updateid"))]
+    pub update_id: Option<UpdateID>,
     #[serde(rename(deserialize = "type"))]
     pub update_type: UpdateType,
     pub url: String,
