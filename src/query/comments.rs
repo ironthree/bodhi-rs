@@ -47,9 +47,8 @@ impl CommentIDQuery {
 
     /// This method will query the remote bodhi instance for the requested comment by ID,
     /// and will either return an `Ok(Some(Comment))` matching the specified ID,
-    /// or return an `Err(String)` if it doesn't exist, or if another error occurred.
-    ///
-    /// TODO: return `Result<Option<Comment>, String>>` to distinguish "not found" from errors
+    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
+    /// if another error occurred.
     pub fn query(self, bodhi: &BodhiService) -> Result<Option<Comment>, String> {
         let path = format!("/comments/{}", self.id);
 
