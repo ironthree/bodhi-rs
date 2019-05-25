@@ -17,9 +17,6 @@ use serde::Deserialize;
 use crate::data::{BodhiError, Release};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
-const DESCRIPTION: &str = "description";
-const NO_SUCH_RELEASE: &str = "No such release";
-
 /// Use this for querying bodhi for a specific release by its name.
 ///
 /// ```
@@ -66,26 +63,12 @@ impl ReleaseNameQuery {
                 }
             };
 
-            // check if bodhi returned a "No such release" error
-            if !error.errors.is_empty() {
-                let message = error
-                    .errors
-                    .get(0)
-                    .expect("Despite a length greater 0, getting the first element failed.");
-
-                if message.contains_key(DESCRIPTION) {
-                    let description = message
-                        .get(DESCRIPTION)
-                        .expect("Despite the hash map containing the key, fetching value failed.");
-
-                    if description == NO_SUCH_RELEASE {
-                        // in this case, the query was successful, but nothing was found
-                        return Ok(None);
-                    }
-                }
+            if status == 404 {
+                // bodhi query successful, but release not found
+                Ok(None)
+            } else {
+                Err(format!("{:?}", error))
             }
-
-            Err(format!("{:?}", error))
         }
     }
 }

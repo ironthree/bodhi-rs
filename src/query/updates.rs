@@ -17,9 +17,6 @@ use serde::Deserialize;
 use crate::data::*;
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
-const DESCRIPTION: &str = "description";
-const NO_SUCH_UPDATE: &str = "Invalid update id";
-
 /// Use this for querying bodhi for a specific update by its ID, title, or alias.
 ///
 /// ```
@@ -72,26 +69,12 @@ impl UpdateIDQuery {
                 }
             };
 
-            // check if bodhi returned a "Invalid update id" error
-            if !error.errors.is_empty() {
-                let message = error
-                    .errors
-                    .get(0)
-                    .expect("Despite a length greater 0, getting the first element failed.");
-
-                if message.contains_key(DESCRIPTION) {
-                    let description = message
-                        .get(DESCRIPTION)
-                        .expect("Despite the hash map containing the key, fetching value failed.");
-
-                    if description == NO_SUCH_UPDATE {
-                        // in this case, the query was successful, but nothing was found
-                        return Ok(None);
-                    }
-                }
+            if status == 404 {
+                // bodhi query successful, but update not found
+                Ok(None)
+            } else {
+                Err(format!("{:?}", error))
             }
-
-            Err(format!("{:?}", error))
         }
     }
 }
