@@ -175,9 +175,9 @@ impl Into<String> for UpdateType {
     fn into(self) -> String {
         match self {
             UpdateType::BugFix => String::from("bugfix"),
-            UpdateType::Enhancement => String::from("security"),
+            UpdateType::Enhancement => String::from("enhancement"),
             UpdateType::NewPackage => String::from("newpackage"),
-            UpdateType::Security => String::from("enhancement"),
+            UpdateType::Security => String::from("security"),
         }
     }
 }
