@@ -11,6 +11,8 @@
 //! that are associated with a given set of updates or packages.
 
 use std::collections::HashMap;
+use std::thread::sleep;
+use std::time::Duration;
 
 use serde::Deserialize;
 
@@ -263,27 +265,55 @@ impl UserPageQuery {
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        let mut response = bodhi.request(&path, Some(args))?;
-        let status = response.status();
+        // retry once and keep track of errors
+        // bodhi returns non-JSON responses in rare circumstances
+        let mut retries = 2;
+        let mut errors: Vec<String> = Vec::new();
 
-        if status.is_success() {
-            let users: UserListPage = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("{:?}", error));
-                }
-            };
+        loop {
+            if retries == 0 {
+                break;
+            }
 
-            Ok(users)
-        } else {
-            let error: BodhiError = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("Unexpected error message: {:?}", error));
-                }
-            };
+            let mut response = bodhi.request(&path, Some(args.clone()))?;
+            let status = response.status();
 
-            Err(format!("{:?}", error))
+            if status.is_success() {
+                let users: UserListPage = match response.json() {
+                    Ok(value) => value,
+                    Err(error) => {
+                        // failed to deserialize response (probably bodhi returned garbage)
+                        retries -= 1;
+                        errors.push(format!("Unexpected response: {:?}", error));
+                        sleep(Duration::from_secs(1));
+                        continue;
+                    }
+                };
+
+                return Ok(users);
+            } else {
+                let error: BodhiError = match response.json() {
+                    Ok(value) => value,
+                    Err(error) => {
+                        // failed to deserialize error response, this is unexpected
+                        retries -= 1;
+                        errors.push(format!("Unexpected error message: {:?}", error));
+                        sleep(Duration::from_secs(1));
+                        continue;
+                    }
+                };
+
+                // bodhi returned an error message
+                retries -= 1;
+                errors.push(format!("{:?}", error));
+                sleep(Duration::from_secs(1));
+                continue;
+            }
         }
+
+        Err(format!(
+            "Query unsuccessful; the following errors occurred: {:?}",
+            errors
+        ))
     }
 }
