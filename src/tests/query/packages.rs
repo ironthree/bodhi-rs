@@ -8,5 +8,5 @@ fn deserialize_all() {
         .retries(TEST_RETRIES);
 
     // query and deserialize all packages
-    assert!(PackageQuery::new().query(&bodhi).is_ok());
+    PackageQuery::new().query(&bodhi).unwrap();
 }

@@ -12,6 +12,5 @@ mod csrf;
 mod overrides;
 mod packages;
 mod releases;
-mod stacks;
 mod updates;
 mod users;

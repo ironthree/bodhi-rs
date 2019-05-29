@@ -24,7 +24,10 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// ```
 /// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
-/// let comment = bodhi::ReleaseNameQuery::new(String::from("F30"))
+/// let release = bodhi::ReleaseNameQuery::new(String::from("F30"))
+///     .query(&bodhi).unwrap();
+///
+/// let release = bodhi::ReleaseNameQuery::new(bodhi::FedoraRelease::F30.into())
 ///     .query(&bodhi).unwrap();
 /// ```
 #[derive(Debug)]

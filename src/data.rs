@@ -17,6 +17,51 @@ pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
 /// base URL of the fedora bodhi staging instance
 pub const FEDORA_BODHI_STAGING_URL: &str = "https://bodhi.stg.fedoraproject.org";
 
+
+/// This enum represents a fedora release.
+#[derive(Debug)]
+pub enum FedoraRelease {
+    F31C,
+    F30,
+    F30C,
+    F30F,
+    F30M,
+    F29,
+    F29C,
+    F29F,
+    F29M,
+    F28,
+    F28C,
+    F28M,
+    F27,
+    F27M,
+    F26,
+    F25,
+}
+
+impl Into<String> for FedoraRelease {
+    fn into(self) -> String {
+        match self {
+            FedoraRelease::F31C => String::from("F31C"),
+            FedoraRelease::F30  => String::from("F30"),
+            FedoraRelease::F30C => String::from("F30C"),
+            FedoraRelease::F30F => String::from("F30F"),
+            FedoraRelease::F30M => String::from("F30M"),
+            FedoraRelease::F29  => String::from("F29"),
+            FedoraRelease::F29C => String::from("F29C"),
+            FedoraRelease::F29F => String::from("F29F"),
+            FedoraRelease::F29M => String::from("F29M"),
+            FedoraRelease::F28  => String::from("F28"),
+            FedoraRelease::F28C => String::from("F28C"),
+            FedoraRelease::F28M => String::from("F28M"),
+            FedoraRelease::F27  => String::from("F27"),
+            FedoraRelease::F27M => String::from("F27M"),
+            FedoraRelease::F26  => String::from("F26"),
+            FedoraRelease::F25  => String::from("F25"),
+        }
+    }
+}
+
 /// This enum represents the content type of a bodhi update.
 #[derive(Debug, Deserialize)]
 pub enum ContentType {
@@ -226,7 +271,6 @@ pub struct Build {
 /// along with its associated bug and test case feedback.
 #[derive(Debug, Deserialize)]
 pub struct Comment {
-    pub anonymous: bool,
     pub author: Option<String>,
     pub bug_feedback: Vec<BugFeedback>,
     pub id: i32,
@@ -269,8 +313,6 @@ pub struct Package {
     #[serde(rename(deserialize = "type"))]
     pub package_type: String,
     pub requirements: Option<String>,
-    pub stack: Option<Stack>,
-    pub stack_id: Option<i32>,
 }
 
 /// This struct represents a fedora release as present in the bodhi database.
@@ -294,17 +336,6 @@ pub struct Release {
     pub state: String,
     pub testing_tag: String,
     pub version: String,
-}
-
-/// This struct represents a specific stack in bodhi. It doesn't seem to be in use yet.
-#[derive(Debug, Deserialize)]
-pub struct Stack {
-    pub description: String,
-    pub groups: Option<Vec<Group>>,
-    pub name: String,
-    pub packages: Option<Vec<Package>>,
-    pub requirements: String,
-    pub users: Vec<User>,
 }
 
 /// This struct represents a specific test case as associated with
@@ -391,5 +422,4 @@ pub struct User {
     pub id: i32,
     pub name: String,
     pub openid: String,
-    pub show_popups: bool,
 }

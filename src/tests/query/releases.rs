@@ -8,10 +8,10 @@ fn deserialize_all() {
         .retries(TEST_RETRIES);
 
     // query and deserialize all releases
-    assert!(ReleaseQuery::new()
+    ReleaseQuery::new()
         .exclude_archived(false)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]

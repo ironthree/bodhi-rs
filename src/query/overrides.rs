@@ -17,7 +17,7 @@ use std::time::Duration;
 
 use serde::Deserialize;
 
-use crate::data::{BodhiError, Override};
+use crate::data::{BodhiError, Override, FedoraRelease};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific override,
@@ -91,7 +91,7 @@ impl OverrideNVRQuery {
 /// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let overrides = bodhi::OverrideQuery::new()
-///     .releases(String::from("F29"))
+///     .releases(bodhi::FedoraRelease::F29)
 ///     .users(String::from("decathorpe"))
 ///     .query(&bodhi).unwrap();
 /// ```
@@ -156,10 +156,10 @@ impl OverrideQuery {
 
     /// Restrict the returned results to overrides for the given release(s).
     /// Can be specified multiple times.
-    pub fn releases(mut self, release: String) -> OverrideQuery {
+    pub fn releases(mut self, release: FedoraRelease) -> OverrideQuery {
         match &mut self.releases {
-            Some(releases) => releases.push(release),
-            None => self.releases = Some(vec![release]),
+            Some(releases) => releases.push(release.into()),
+            None => self.releases = Some(vec![release.into()]),
         }
 
         self

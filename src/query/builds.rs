@@ -20,7 +20,7 @@ use std::time::Duration;
 
 use serde::Deserialize;
 
-use crate::data::{BodhiError, Build};
+use crate::data::{BodhiError, Build, FedoraRelease};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific build,
@@ -90,8 +90,8 @@ impl BuildNVRQuery {
 /// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
 ///
 /// let builds = bodhi::BuildQuery::new()
-///     .releases(String::from("F30"))
-///     .releases(String::from("F29"))
+///     .releases(bodhi::FedoraRelease::F30)
+///     .releases(bodhi::FedoraRelease::F29)
 ///     .packages(String::from("rust"))
 ///     .query(&bodhi).unwrap();
 /// ```
@@ -134,10 +134,10 @@ impl BuildQuery {
 
     /// Restrict the returned results to builds for the given release(s).
     /// Can be specified multiple times.
-    pub fn releases(mut self, release: String) -> BuildQuery {
+    pub fn releases(mut self, release: FedoraRelease) -> BuildQuery {
         match &mut self.releases {
-            Some(releases) => releases.push(release),
-            None => self.releases = Some(vec![release]),
+            Some(releases) => releases.push(release.into()),
+            None => self.releases = Some(vec![release.into()]),
         }
 
         self

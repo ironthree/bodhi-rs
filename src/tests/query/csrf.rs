@@ -8,5 +8,5 @@ fn deserialize() {
         .retries(TEST_RETRIES);
 
     // query and deserialize a new CSRF token
-    assert!(CSRFQuery::new().query(&bodhi).is_ok());
+    CSRFQuery::new().query(&bodhi).unwrap();
 }

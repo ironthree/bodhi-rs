@@ -1,5 +1,6 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
-use crate::{BodhiService, Update, UpdateIDQuery, UpdateQuery, FEDORA_BODHI_URL};
+use crate::{BodhiService, Update, FedoraRelease,
+            UpdateIDQuery, UpdateQuery, FEDORA_BODHI_URL};
 
 #[test]
 fn deserialize_f31c() {
@@ -8,10 +9,10 @@ fn deserialize_f31c() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F31C"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F31C)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -21,10 +22,10 @@ fn deserialize_f30() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F30"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F30)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -34,10 +35,10 @@ fn deserialize_f30c() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F30C"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F30C)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -47,10 +48,10 @@ fn deserialize_f30f() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F30F"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F30F)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -60,10 +61,10 @@ fn deserialize_f30m() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F30M"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F30M)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -73,10 +74,10 @@ fn deserialize_f29() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F29"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F29)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -86,10 +87,10 @@ fn deserialize_f29c() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F29C"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F29C)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -99,10 +100,10 @@ fn deserialize_f29f() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F29F"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F29F)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -112,10 +113,10 @@ fn deserialize_f29m() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F29M"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F29M)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -125,10 +126,10 @@ fn deserialize_f28() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F28"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F28)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -138,10 +139,10 @@ fn deserialize_f28c() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F28C"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F28C)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -151,10 +152,10 @@ fn deserialize_f28m() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F28M"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F28M)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -164,10 +165,10 @@ fn deserialize_f27() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F27"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F27)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -177,10 +178,10 @@ fn deserialize_f27m() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F27M"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F27M)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -190,10 +191,10 @@ fn deserialize_f26() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F26"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F26)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -203,10 +204,10 @@ fn deserialize_f25() {
         .retries(TEST_RETRIES);
 
     // query only updates for one release, and deserialize them
-    assert!(UpdateQuery::new()
-        .releases(String::from("F25"))
+    UpdateQuery::new()
+        .releases(FedoraRelease::F25)
         .query(&bodhi)
-        .is_ok());
+        .unwrap();
 }
 
 #[test]
@@ -215,7 +216,7 @@ fn id_query_some() {
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES);
 
-    let update: Option<Update> = UpdateIDQuery::new(String::from("rust-1.34.2-1.fc30"))
+    let update: Option<Update> = UpdateIDQuery::new(String::from("FEDORA-2019-227c137c3f"))
         .query(&bodhi)
         .unwrap();
 

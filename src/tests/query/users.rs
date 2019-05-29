@@ -8,7 +8,7 @@ fn deserialize_all() {
         .retries(TEST_RETRIES);
 
     // query and deserialize all users
-    assert!(UserQuery::new().query(&bodhi).is_ok());
+    UserQuery::new().query(&bodhi).unwrap();
 }
 
 #[test]

@@ -4,7 +4,7 @@
 //! existing updates.
 //!
 //! The `UpdateIDQuery` returns exactly one Update, if and only if a Update
-//! with this ID, alias, or title exists - otherwise, it will return an error.
+//! with this ID or alias exists - otherwise, it will return an error.
 //!
 //! The `UpdateQuery` can be used to execute more complex queries, for example
 //! filtering updates by release, status, security impact, reboot suggestion,
@@ -19,7 +19,7 @@ use serde::Deserialize;
 use crate::data::*;
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
-/// Use this for querying bodhi for a specific update by its ID, title, or alias.
+/// Use this for querying bodhi for a specific update by its ID or alias.
 ///
 /// ```
 /// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
@@ -45,8 +45,8 @@ impl UpdateIDQuery {
     }
 
     /// This method will query the remote bodhi instance for the requested update by ID,
-    /// title, or alias, and will either return an `Ok(Some(Update))` matching the specified ID,
-    /// title, or alias, return `Ok(None)` if it doesn't exist, or return an `Err(String)`
+    /// or alias, and will either return an `Ok(Some(Update))` matching the specified ID
+    /// or alias, return `Ok(None)` if it doesn't exist, or return an `Err(String)`
     /// if another error occurred.
     pub fn query(self, bodhi: &BodhiService) -> Result<Option<Update>, String> {
         let path = format!("/updates/{}", self.id);
@@ -91,7 +91,7 @@ impl UpdateIDQuery {
 ///
 /// let updates = bodhi::UpdateQuery::new()
 ///     .users(String::from("decathorpe"))
-///     .releases(String::from("F30"))
+///     .releases(bodhi::FedoraRelease::F30.into())
 ///     .status(bodhi::UpdateStatus::Testing)
 ///     .query(&bodhi).unwrap();
 /// ```
@@ -297,10 +297,10 @@ impl UpdateQuery {
 
     /// Restrict results to updates for the given release(s).
     /// Can be specified multiple times.
-    pub fn releases(mut self, release: String) -> UpdateQuery {
+    pub fn releases(mut self, release: FedoraRelease) -> UpdateQuery {
         match &mut self.releases {
-            Some(releases) => releases.push(release),
-            None => self.releases = Some(vec![release]),
+            Some(releases) => releases.push(release.into()),
+            None => self.releases = Some(vec![release.into()]),
         }
 
         self
