@@ -11,20 +11,26 @@
 //! or for updates that are associated with a given set of packages.
 
 use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
 
 use serde::Deserialize;
 
-use crate::data::*;
+use crate::data::{
+    ContentType, FedoraRelease, Update, UpdateRequest, UpdateSeverity, UpdateStatus,
+    UpdateSuggestion, UpdateType,
+};
+
+use crate::error::{BodhiError, QueryError};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+use super::retry_query;
 
 /// Use this for querying bodhi for a specific update by its ID or alias.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let update = bodhi::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
+/// let update = bodhi::query::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
 ///     .query(&bodhi).unwrap();
 /// ```
 #[derive(Debug)]
@@ -40,7 +46,7 @@ struct UpdatePage {
 
 impl UpdateIDQuery {
     /// This method is the only way to create a new `UpdateIDQuery` instance.
-    pub fn new(id: String) -> UpdateIDQuery {
+    pub fn new(id: String) -> Self {
         UpdateIDQuery { id }
     }
 
@@ -48,34 +54,27 @@ impl UpdateIDQuery {
     /// or alias, and will either return an `Ok(Some(Update))` matching the specified ID
     /// or alias, return `Ok(None)` if it doesn't exist, or return an `Err(String)`
     /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Update>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Update>, QueryError> {
         let path = format!("/updates/{}", self.id);
 
-        let mut response = bodhi.request(&path, None)?;
+        let mut response = bodhi.get(&path, None)?;
         let status = response.status();
 
         if status.is_success() {
-            let update: UpdatePage = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("{:?}", error));
-                }
-            };
+            let result = response.text()?;
+            let update: UpdatePage = serde_json::from_str(&result)?;
 
             Ok(Some(update.update))
         } else {
-            let error: BodhiError = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("Unexpected error message: {:?}", error));
-                }
-            };
-
             if status == 404 {
                 // bodhi query successful, but update not found
                 Ok(None)
             } else {
-                Err(format!("{:?}", error))
+                // other server-side error
+                let result = response.text()?;
+                let error: BodhiError = serde_json::from_str(&result)?;
+
+                Err(QueryError::BodhiError { error })
             }
         }
     }
@@ -87,12 +86,13 @@ impl UpdateIDQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let updates = bodhi::UpdateQuery::new()
+/// let updates = bodhi::query::UpdateQuery::new()
 ///     .users(String::from("decathorpe"))
-///     .releases(bodhi::FedoraRelease::F30.into())
-///     .status(bodhi::UpdateStatus::Testing)
+///     .releases(bodhi::data::FedoraRelease::F30)
+///     .status(bodhi::data::UpdateStatus::Testing)
 ///     .query(&bodhi).unwrap();
 /// ```
 #[derive(Debug, Default)]
@@ -129,7 +129,7 @@ pub struct UpdateQuery {
 
 impl UpdateQuery {
     /// This method returns a new `UpdateQuery` with *no* filters set.
-    pub fn new() -> UpdateQuery {
+    pub fn new() -> Self {
         UpdateQuery {
             active_releases: None,
             aliases: None,
@@ -163,14 +163,14 @@ impl UpdateQuery {
     }
 
     /// Restrict the returned results to (not) active releases.
-    pub fn active_releases(mut self, active_releases: bool) -> UpdateQuery {
+    pub fn active_releases(mut self, active_releases: bool) -> Self {
         self.active_releases = Some(active_releases);
         self
     }
 
     /// Restrict results to updates matching the given alias(es).
     /// Can be specified multiple times.
-    pub fn aliases(mut self, alias: String) -> UpdateQuery {
+    pub fn aliases(mut self, alias: String) -> Self {
         match &mut self.aliases {
             Some(aliases) => aliases.push(alias),
             None => self.aliases = Some(vec![alias]),
@@ -181,21 +181,21 @@ impl UpdateQuery {
 
     /// Restrict the returned results to updates which were approved
     /// before the given date and time.
-    pub fn approved_before(mut self, approved_before: String) -> UpdateQuery {
+    pub fn approved_before(mut self, approved_before: String) -> Self {
         self.approved_before = Some(approved_before);
         self
     }
 
     /// Restrict the returned results to updates which were approved
     /// since the given date and time.
-    pub fn approved_since(mut self, approved_since: String) -> UpdateQuery {
+    pub fn approved_since(mut self, approved_since: String) -> Self {
         self.approved_since = Some(approved_since);
         self
     }
 
     /// Restrict results to updates associated with the given bug(s).
     /// Can be specified multiple times.
-    pub fn bugs(mut self, bug: String) -> UpdateQuery {
+    pub fn bugs(mut self, bug: String) -> Self {
         match &mut self.bugs {
             Some(bugs) => bugs.push(bug),
             None => self.bugs = Some(vec![bug]),
@@ -206,7 +206,7 @@ impl UpdateQuery {
 
     /// Restrict results to updates associated with the given build(s).
     /// Can be specified multiple times.
-    pub fn builds(mut self, build: String) -> UpdateQuery {
+    pub fn builds(mut self, build: String) -> Self {
         match &mut self.builds {
             Some(builds) => builds.push(build),
             None => self.builds = Some(vec![build]),
@@ -216,20 +216,20 @@ impl UpdateQuery {
     }
 
     /// Restrict the returned results to the given content type.
-    pub fn content_type(mut self, content_type: ContentType) -> UpdateQuery {
+    pub fn content_type(mut self, content_type: ContentType) -> Self {
         self.content_type = Some(content_type.into());
         self
     }
 
     /// Restrict the returned results to updates (not) marked with critpath.
-    pub fn critpath(mut self, critpath: bool) -> UpdateQuery {
+    pub fn critpath(mut self, critpath: bool) -> Self {
         self.critpath = Some(critpath);
         self
     }
 
     /// Restrict results to updates associated with the given CVE(s).
     /// Can be specified multiple times.
-    pub fn cves(mut self, cve: String) -> UpdateQuery {
+    pub fn cves(mut self, cve: String) -> Self {
         match &mut self.cves {
             Some(cves) => cves.push(cve),
             None => self.cves = Some(vec![cve]),
@@ -239,34 +239,34 @@ impl UpdateQuery {
     }
 
     /// Restrict search to updates *like* the given argument (in the SQL sense).
-    pub fn like(mut self, like: String) -> UpdateQuery {
+    pub fn like(mut self, like: String) -> Self {
         self.like = Some(like);
         self
     }
 
     /// Restrict the returned results to (not) locked updates.
-    pub fn locked(mut self, locked: bool) -> UpdateQuery {
+    pub fn locked(mut self, locked: bool) -> Self {
         self.locked = Some(locked);
         self
     }
 
     /// Restrict the returned results to updates which were modified
     /// before the given date and time.
-    pub fn modified_before(mut self, modified_before: String) -> UpdateQuery {
+    pub fn modified_before(mut self, modified_before: String) -> Self {
         self.modified_before = Some(modified_before);
         self
     }
 
     /// Restrict the returned results to updates which were modified
     /// since the given date and time.
-    pub fn modified_since(mut self, modified_since: String) -> UpdateQuery {
+    pub fn modified_since(mut self, modified_since: String) -> Self {
         self.modified_since = Some(modified_since);
         self
     }
 
     /// Restrict results to updates associated for the given package(s).
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> UpdateQuery {
+    pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -276,28 +276,28 @@ impl UpdateQuery {
     }
 
     /// Restrict the returned results to (not) pushed updates.
-    pub fn pushed(mut self, pushed: bool) -> UpdateQuery {
+    pub fn pushed(mut self, pushed: bool) -> Self {
         self.pushed = Some(pushed);
         self
     }
 
     /// Restrict the returned results to updates which were pushed
     /// before the given date and time.
-    pub fn pushed_before(mut self, pushed_before: String) -> UpdateQuery {
+    pub fn pushed_before(mut self, pushed_before: String) -> Self {
         self.pushed_before = Some(pushed_before);
         self
     }
 
     /// Restrict the returned results to updates which were pushed
     /// since the given date and time.
-    pub fn pushed_since(mut self, pushed_since: String) -> UpdateQuery {
+    pub fn pushed_since(mut self, pushed_since: String) -> Self {
         self.pushed_since = Some(pushed_since);
         self
     }
 
     /// Restrict results to updates for the given release(s).
     /// Can be specified multiple times.
-    pub fn releases(mut self, release: FedoraRelease) -> UpdateQuery {
+    pub fn releases(mut self, release: FedoraRelease) -> Self {
         match &mut self.releases {
             Some(releases) => releases.push(release.into()),
             None => self.releases = Some(vec![release.into()]),
@@ -307,52 +307,52 @@ impl UpdateQuery {
     }
 
     /// Restrict the returned results to updates with the given request.
-    pub fn request(mut self, request: UpdateRequest) -> UpdateQuery {
+    pub fn request(mut self, request: UpdateRequest) -> Self {
         self.request = Some(request.into());
         self
     }
 
     /// Restrict search to updates containing the given argument.
-    pub fn search(mut self, search: String) -> UpdateQuery {
+    pub fn search(mut self, search: String) -> Self {
         self.search = Some(search);
         self
     }
 
     /// Restrict the returned results to updates with the given severity.
-    pub fn severity(mut self, severity: UpdateSeverity) -> UpdateQuery {
+    pub fn severity(mut self, severity: UpdateSeverity) -> Self {
         self.severity = Some(severity.into());
         self
     }
 
     /// Restrict the returned results to updates with the given status.
-    pub fn status(mut self, status: UpdateStatus) -> UpdateQuery {
+    pub fn status(mut self, status: UpdateStatus) -> Self {
         self.status = Some(status.into());
         self
     }
 
     /// Restrict the returned results to updates which were submitted
     /// before the given date and time.
-    pub fn submitted_before(mut self, submitted_before: String) -> UpdateQuery {
+    pub fn submitted_before(mut self, submitted_before: String) -> Self {
         self.submitted_before = Some(submitted_before);
         self
     }
 
     /// Restrict the returned results to updates which were submitted
     /// since the given date and time.
-    pub fn submitted_since(mut self, submitted_since: String) -> UpdateQuery {
+    pub fn submitted_since(mut self, submitted_since: String) -> Self {
         self.submitted_since = Some(submitted_since);
         self
     }
 
     /// Restrict the returned results to updates with the given "suggest" value.
-    pub fn suggest(mut self, suggest: UpdateSuggestion) -> UpdateQuery {
+    pub fn suggest(mut self, suggest: UpdateSuggestion) -> Self {
         self.suggest = Some(suggest.into());
         self
     }
 
     /// Restrict results to updates matching the given update ID(s).
     /// Can be specified multiple times.
-    pub fn update_ids(mut self, update_id: String) -> UpdateQuery {
+    pub fn update_ids(mut self, update_id: String) -> Self {
         match &mut self.update_ids {
             Some(update_ids) => update_ids.push(update_id),
             None => self.update_ids = Some(vec![update_id]),
@@ -362,14 +362,14 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates matching the given update type.
-    pub fn update_type(mut self, update_type: UpdateType) -> UpdateQuery {
+    pub fn update_type(mut self, update_type: UpdateType) -> Self {
         self.update_type = Some(update_type.into());
         self
     }
 
     /// Restrict results to updates associated with the given user(s).
     /// Can be specified multiple times.
-    pub fn users(mut self, user: String) -> UpdateQuery {
+    pub fn users(mut self, user: String) -> Self {
         match &mut self.users {
             Some(users) => users.push(user),
             None => self.users = Some(vec![user]),
@@ -379,7 +379,7 @@ impl UpdateQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Update>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
         let mut updates: Vec<Update> = Vec::new();
         let mut page = 1;
 
@@ -475,7 +475,7 @@ struct UpdatePageQuery {
 }
 
 impl UpdatePageQuery {
-    fn new() -> UpdatePageQuery {
+    fn new() -> Self {
         UpdatePageQuery {
             active_releases: None,
             aliases: None,
@@ -510,7 +510,7 @@ impl UpdatePageQuery {
         }
     }
 
-    fn query(self, bodhi: &BodhiService) -> Result<UpdateListPage, String> {
+    fn query(self, bodhi: &BodhiService) -> Result<UpdateListPage, QueryError> {
         let path = String::from("/updates/");
 
         let mut args: HashMap<&str, String> = HashMap::new();
@@ -630,55 +630,9 @@ impl UpdatePageQuery {
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        // retry once and keep track of errors
-        // bodhi returns non-JSON responses in rare circumstances
-        let mut retries = 2;
-        let mut errors: Vec<String> = Vec::new();
+        let result = retry_query(bodhi, &path, args)?;
+        let updates: UpdateListPage = serde_json::from_str(&result)?;
 
-        loop {
-            if retries == 0 {
-                break;
-            }
-
-            let mut response = bodhi.request(&path, Some(args.clone()))?;
-            let status = response.status();
-
-            if status.is_success() {
-                let updates: UpdateListPage = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize response (probably bodhi returned garbage)
-                        retries -= 1;
-                        errors.push(format!("Unexpected response: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                return Ok(updates);
-            } else {
-                let error: BodhiError = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize error response, this is unexpected
-                        retries -= 1;
-                        errors.push(format!("Unexpected error message: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                // bodhi returned an error message
-                retries -= 1;
-                errors.push(format!("{:?}", error));
-                sleep(Duration::from_secs(1));
-                continue;
-            }
-        }
-
-        Err(format!(
-            "Query unsuccessful; the following errors occurred: {:?}",
-            errors
-        ))
+        Ok(updates)
     }
 }

@@ -1,11 +1,16 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
-use crate::{BodhiService, Build, BuildNVRQuery, BuildQuery, FedoraRelease, FEDORA_BODHI_URL};
+
+use crate::data::*;
+use crate::query::*;
+use crate::service::*;
 
 #[test]
 fn deserialize_f31c() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -16,9 +21,11 @@ fn deserialize_f31c() {
 
 #[test]
 fn deserialize_f30() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -29,9 +36,11 @@ fn deserialize_f30() {
 
 #[test]
 fn deserialize_f30c() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -42,9 +51,11 @@ fn deserialize_f30c() {
 
 #[test]
 fn deserialize_f30f() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -55,9 +66,11 @@ fn deserialize_f30f() {
 
 #[test]
 fn deserialize_f30m() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -68,9 +81,11 @@ fn deserialize_f30m() {
 
 #[test]
 fn deserialize_f29() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -81,9 +96,11 @@ fn deserialize_f29() {
 
 #[test]
 fn deserialize_f29c() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -94,9 +111,11 @@ fn deserialize_f29c() {
 
 #[test]
 fn deserialize_f29f() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -107,9 +126,11 @@ fn deserialize_f29f() {
 
 #[test]
 fn deserialize_f29m() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -120,9 +141,11 @@ fn deserialize_f29m() {
 
 #[test]
 fn deserialize_f28() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -133,9 +156,11 @@ fn deserialize_f28() {
 
 #[test]
 fn deserialize_f28c() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -146,9 +171,11 @@ fn deserialize_f28c() {
 
 #[test]
 fn deserialize_f28m() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -159,9 +186,11 @@ fn deserialize_f28m() {
 
 #[test]
 fn deserialize_f27() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -172,9 +201,11 @@ fn deserialize_f27() {
 
 #[test]
 fn deserialize_f27m() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -185,9 +216,11 @@ fn deserialize_f27m() {
 
 #[test]
 fn deserialize_f26() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -198,9 +231,11 @@ fn deserialize_f26() {
 
 #[test]
 fn deserialize_f25() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query only builds for one release, and deserialize them
     BuildQuery::new()
@@ -211,9 +246,11 @@ fn deserialize_f25() {
 
 #[test]
 fn nvr_query_some() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     let build: Option<Build> = BuildNVRQuery::new(String::from("rust-1.34.2-1.fc30"))
         .query(&bodhi)
@@ -224,9 +261,11 @@ fn nvr_query_some() {
 
 #[test]
 fn nvr_query_none() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     let build: Option<Build> = BuildNVRQuery::new(String::from("this-doesnt-exist-1-1.fc30"))
         .query(&bodhi)

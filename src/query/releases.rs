@@ -11,23 +11,25 @@
 //! given set of updates or packages.
 
 use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
 
 use serde::Deserialize;
 
-use crate::data::{BodhiError, Release};
+use crate::data::Release;
+use crate::error::{BodhiError, QueryError};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+use super::retry_query;
 
 /// Use this for querying bodhi for a specific release by its name.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let release = bodhi::ReleaseNameQuery::new(String::from("F30"))
+/// let release = bodhi::query::ReleaseNameQuery::new(String::from("F30"))
 ///     .query(&bodhi).unwrap();
 ///
-/// let release = bodhi::ReleaseNameQuery::new(bodhi::FedoraRelease::F30.into())
+/// let release = bodhi::query::ReleaseNameQuery::new(bodhi::data::FedoraRelease::F30.into())
 ///     .query(&bodhi).unwrap();
 /// ```
 #[derive(Debug)]
@@ -37,7 +39,7 @@ pub struct ReleaseNameQuery {
 
 impl ReleaseNameQuery {
     /// This method is the only way to create a new `ReleaseNameQuery` instance.
-    pub fn new(name: String) -> ReleaseNameQuery {
+    pub fn new(name: String) -> Self {
         ReleaseNameQuery { name }
     }
 
@@ -45,34 +47,27 @@ impl ReleaseNameQuery {
     /// and will either return an `Ok(Some(Release))` matching the specified name,
     /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
     /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Release>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Release>, QueryError> {
         let path = format!("/releases/{}", self.name);
 
-        let mut response = bodhi.request(&path, None)?;
+        let mut response = bodhi.get(&path, None)?;
         let status = response.status();
 
         if status.is_success() {
-            let release: Release = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("{:?}", error));
-                }
-            };
+            let result = response.text()?;
+            let release: Release = serde_json::from_str(&result)?;
 
             Ok(Some(release))
         } else {
-            let error: BodhiError = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("Unexpected error message: {:?}", error));
-                }
-            };
-
             if status == 404 {
                 // bodhi query successful, but release not found
                 Ok(None)
             } else {
-                Err(format!("{:?}", error))
+                // other server-side error
+                let result = response.text()?;
+                let error: BodhiError = serde_json::from_str(&result)?;
+
+                Err(QueryError::BodhiError { error })
             }
         }
     }
@@ -84,9 +79,10 @@ impl ReleaseNameQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::service::BodhiServiceBuilder::new(String::from(bodhi::data::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let releases = bodhi::ReleaseQuery::new()
+/// let releases = bodhi::query::ReleaseQuery::new()
 ///     .exclude_archived(true)
 ///     .query(&bodhi).unwrap();
 /// ```
@@ -101,7 +97,7 @@ pub struct ReleaseQuery {
 
 impl ReleaseQuery {
     /// This method returns a new `ReleaseQuery` with *no* filters set.
-    pub fn new() -> ReleaseQuery {
+    pub fn new() -> Self {
         ReleaseQuery {
             exclude_archived: None,
             ids: None,
@@ -112,14 +108,14 @@ impl ReleaseQuery {
     }
 
     /// Restrict the returned results to (not) archived releases.
-    pub fn exclude_archived(mut self, exclude_archived: bool) -> ReleaseQuery {
+    pub fn exclude_archived(mut self, exclude_archived: bool) -> Self {
         self.exclude_archived = Some(exclude_archived);
         self
     }
 
     /// Restrict results to releases with the given ID.
     /// Can be specified multiple times.
-    pub fn ids(mut self, id: String) -> ReleaseQuery {
+    pub fn ids(mut self, id: String) -> Self {
         match &mut self.ids {
             Some(ids) => ids.push(id),
             None => self.ids = Some(vec![id]),
@@ -130,14 +126,14 @@ impl ReleaseQuery {
 
     /// Restrict results to releases with the given name.
     /// If this is the only required filter, consider using a `ReleaseNameQuery` instead.
-    pub fn name(mut self, name: String) -> ReleaseQuery {
+    pub fn name(mut self, name: String) -> Self {
         self.name = Some(name);
         self
     }
 
     /// Restrict the returned results to releases containing the given package(s).
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> ReleaseQuery {
+    pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -148,7 +144,7 @@ impl ReleaseQuery {
 
     /// Restrict the returned results to releases matching the given updates(s).
     /// Can be specified multiple times.
-    pub fn updates(mut self, update: String) -> ReleaseQuery {
+    pub fn updates(mut self, update: String) -> Self {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -158,7 +154,7 @@ impl ReleaseQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Release>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
         let mut overrides: Vec<Release> = Vec::new();
         let mut page = 1;
 
@@ -220,7 +216,7 @@ impl ReleasePageQuery {
         }
     }
 
-    fn query(self, bodhi: &BodhiService) -> Result<ReleaseListPage, String> {
+    fn query(self, bodhi: &BodhiService) -> Result<ReleaseListPage, QueryError> {
         let path = String::from("/releases/");
 
         let mut args: HashMap<&str, String> = HashMap::new();
@@ -248,55 +244,9 @@ impl ReleasePageQuery {
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        // retry once and keep track of errors
-        // bodhi returns non-JSON responses in rare circumstances
-        let mut retries = 2;
-        let mut errors: Vec<String> = Vec::new();
+        let result = retry_query(bodhi, &path, args)?;
+        let releases: ReleaseListPage = serde_json::from_str(&result)?;
 
-        loop {
-            if retries == 0 {
-                break;
-            }
-
-            let mut response = bodhi.request(&path, Some(args.clone()))?;
-            let status = response.status();
-
-            if status.is_success() {
-                let releases: ReleaseListPage = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize response (probably bodhi returned garbage)
-                        retries -= 1;
-                        errors.push(format!("Unexpected response: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                return Ok(releases);
-            } else {
-                let error: BodhiError = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize error response, this is unexpected
-                        retries -= 1;
-                        errors.push(format!("Unexpected error message: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                // bodhi returned an error message
-                retries -= 1;
-                errors.push(format!("{:?}", error));
-                sleep(Duration::from_secs(1));
-                continue;
-            }
-        }
-
-        Err(format!(
-            "Query unsuccessful; the following errors occurred: {:?}",
-            errors
-        ))
+        Ok(releases)
     }
 }

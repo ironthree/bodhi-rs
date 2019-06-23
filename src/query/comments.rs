@@ -13,20 +13,22 @@
 //! created by specific users.
 
 use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
 
 use serde::Deserialize;
 
-use crate::data::{BodhiError, Comment};
+use crate::data::Comment;
+use crate::error::{BodhiError, QueryError};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+use super::retry_query;
 
 /// Use this for querying bodhi for a specific comment by its ID.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let comment = bodhi::CommentIDQuery::new(19999).query(&bodhi).unwrap();
+/// let comment = bodhi::query::CommentIDQuery::new(19999).query(&bodhi).unwrap();
 /// ```
 #[derive(Debug)]
 pub struct CommentIDQuery {
@@ -40,7 +42,7 @@ struct CommentPage {
 
 impl CommentIDQuery {
     /// This method is the only way to create a new `CommentIDQuery` instance.
-    pub fn new(id: u32) -> CommentIDQuery {
+    pub fn new(id: u32) -> Self {
         CommentIDQuery { id }
     }
 
@@ -48,35 +50,27 @@ impl CommentIDQuery {
     /// and will either return an `Ok(Some(Comment))` matching the specified ID,
     /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
     /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Comment>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Comment>, QueryError> {
         let path = format!("/comments/{}", self.id);
 
-        let mut response = bodhi.request(&path, None)?;
+        let mut response = bodhi.get(&path, None)?;
         let status = response.status();
 
         if status.is_success() {
-            let comment: CommentPage = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("{:?}", error));
-                }
-            };
+            let result = response.text()?;
+            let comment: CommentPage = serde_json::from_str(&result)?;
 
             Ok(Some(comment.comment))
         } else {
-            let error: BodhiError = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("Unexpected error message: {:?}", error));
-                }
-            };
-
             if status == 404 {
                 // bodhi query successful, but comment not found
                 Ok(None)
             } else {
                 // other server-side error
-                Err(format!("{:?}", error))
+                let result = response.text()?;
+                let error: BodhiError = serde_json::from_str(&result)?;
+
+                Err(QueryError::BodhiError { error })
             }
         }
     }
@@ -88,9 +82,10 @@ impl CommentIDQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let comments = bodhi::CommentQuery::new()
+/// let comments = bodhi::query::CommentQuery::new()
 ///     .anonymous(true)
 ///     .users(String::from("decathorpe"))
 ///     .packages(String::from("rust"))
@@ -111,7 +106,7 @@ pub struct CommentQuery {
 
 impl CommentQuery {
     /// This method returns a new `CommentQuery` with *no* filters set.
-    pub fn new() -> CommentQuery {
+    pub fn new() -> Self {
         CommentQuery {
             anonymous: None,
             ignore_users: None,
@@ -126,14 +121,14 @@ impl CommentQuery {
     }
 
     /// Restrict the returned results to (not) anonymous comments.
-    pub fn anonymous(mut self, anonymous: bool) -> CommentQuery {
+    pub fn anonymous(mut self, anonymous: bool) -> Self {
         self.anonymous = Some(anonymous);
         self
     }
 
     /// Restrict results to ignore comments by certain users.
     /// Can be specified multiple times.
-    pub fn ignore_users(mut self, ignore_user: String) -> CommentQuery {
+    pub fn ignore_users(mut self, ignore_user: String) -> Self {
         match &mut self.ignore_users {
             Some(ignore_users) => ignore_users.push(ignore_user),
             None => self.ignore_users = Some(vec![ignore_user]),
@@ -150,7 +145,7 @@ impl CommentQuery {
 
     /// Restrict the returned results to comments filed against updates for the
     /// given package(s). Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> CommentQuery {
+    pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -160,20 +155,20 @@ impl CommentQuery {
     }
 
     /// Restrict search to comments containing the given argument.
-    pub fn search(mut self, search: String) -> CommentQuery {
+    pub fn search(mut self, search: String) -> Self {
         self.search = Some(search);
         self
     }
 
     /// Restrict the returned results to comments filed since the given date and time.
-    pub fn since(mut self, since: String) -> CommentQuery {
+    pub fn since(mut self, since: String) -> Self {
         self.since = Some(since);
         self
     }
 
     /// Restrict the returned results to comments filed against updates
     /// created by the specified user(s). Can be specified multiple times.
-    pub fn update_owners(mut self, update_owner: String) -> CommentQuery {
+    pub fn update_owners(mut self, update_owner: String) -> Self {
         match &mut self.update_owners {
             Some(update_owners) => update_owners.push(update_owner),
             None => self.update_owners = Some(vec![update_owner]),
@@ -184,7 +179,7 @@ impl CommentQuery {
 
     /// Restrict the returned results to comments filed against the given update(s).
     /// Can be specified multiple times.
-    pub fn updates(mut self, update: String) -> CommentQuery {
+    pub fn updates(mut self, update: String) -> Self {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -195,7 +190,7 @@ impl CommentQuery {
 
     /// Restrict the returned results to comments filed by the given user(s).
     /// Can be specified multiple times.
-    pub fn users(mut self, user: String) -> CommentQuery {
+    pub fn users(mut self, user: String) -> Self {
         match &mut self.users {
             Some(users) => users.push(user),
             None => self.users = Some(vec![user]),
@@ -205,7 +200,7 @@ impl CommentQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Comment>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
         let mut comments: Vec<Comment> = Vec::new();
         let mut page = 1;
 
@@ -262,7 +257,7 @@ struct CommentPageQuery {
 }
 
 impl CommentPageQuery {
-    fn new() -> CommentPageQuery {
+    fn new() -> Self {
         CommentPageQuery {
             anonymous: None,
             ignore_users: None,
@@ -278,7 +273,7 @@ impl CommentPageQuery {
         }
     }
 
-    fn query(self, bodhi: &BodhiService) -> Result<CommentListPage, String> {
+    fn query(self, bodhi: &BodhiService) -> Result<CommentListPage, QueryError> {
         let path = String::from("/comments/");
 
         let mut args: HashMap<&str, String> = HashMap::new();
@@ -318,54 +313,9 @@ impl CommentPageQuery {
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        // retry once and keep track of errors
-        // bodhi returns non-JSON responses in rare circumstances
-        let mut retries = 2;
-        let mut errors: Vec<String> = Vec::new();
+        let result = retry_query(bodhi, &path, args)?;
+        let comments: CommentListPage = serde_json::from_str(&result)?;
 
-        loop {
-            if retries == 0 {
-                break;
-            }
-
-            let mut response = bodhi.request(&path, Some(args.clone()))?;
-            let status = response.status();
-
-            if status.is_success() {
-                let comments: CommentListPage = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        retries -= 1;
-                        errors.push(format!("Unexpected response: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                return Ok(comments);
-            } else {
-                let error: BodhiError = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize error response, this is unexpected
-                        retries -= 1;
-                        errors.push(format!("Unexpected error message: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                // bodhi returned an error message
-                retries -= 1;
-                errors.push(format!("{:?}", error));
-                sleep(Duration::from_secs(1));
-                continue;
-            }
-        }
-
-        Err(format!(
-            "Query unsuccessful; the following errors occurred: {:?}",
-            errors
-        ))
+        Ok(comments)
     }
 }

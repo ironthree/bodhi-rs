@@ -7,8 +7,6 @@
 //! corresponding query filters accept some of the enum types defined here,
 //! instead of the String arguments directly.
 
-use std::collections::HashMap;
-
 use serde::Deserialize;
 
 /// base URL of the fedora bodhi instance
@@ -16,7 +14,6 @@ pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
 
 /// base URL of the fedora bodhi staging instance
 pub const FEDORA_BODHI_STAGING_URL: &str = "https://bodhi.stg.fedoraproject.org";
-
 
 /// This enum represents a fedora release.
 #[derive(Debug)]
@@ -43,21 +40,21 @@ impl Into<String> for FedoraRelease {
     fn into(self) -> String {
         match self {
             FedoraRelease::F31C => String::from("F31C"),
-            FedoraRelease::F30  => String::from("F30"),
+            FedoraRelease::F30 => String::from("F30"),
             FedoraRelease::F30C => String::from("F30C"),
             FedoraRelease::F30F => String::from("F30F"),
             FedoraRelease::F30M => String::from("F30M"),
-            FedoraRelease::F29  => String::from("F29"),
+            FedoraRelease::F29 => String::from("F29"),
             FedoraRelease::F29C => String::from("F29C"),
             FedoraRelease::F29F => String::from("F29F"),
             FedoraRelease::F29M => String::from("F29M"),
-            FedoraRelease::F28  => String::from("F28"),
+            FedoraRelease::F28 => String::from("F28"),
             FedoraRelease::F28C => String::from("F28C"),
             FedoraRelease::F28M => String::from("F28M"),
-            FedoraRelease::F27  => String::from("F27"),
+            FedoraRelease::F27 => String::from("F27"),
             FedoraRelease::F27M => String::from("F27M"),
-            FedoraRelease::F26  => String::from("F26"),
-            FedoraRelease::F25  => String::from("F25"),
+            FedoraRelease::F26 => String::from("F26"),
+            FedoraRelease::F25 => String::from("F25"),
         }
     }
 }
@@ -225,14 +222,6 @@ impl Into<String> for UpdateType {
             UpdateType::Security => String::from("security"),
         }
     }
-}
-
-/// This struct contains error messages that are deserialized from bodhi's error responses.
-/// TODO: make this a proper error
-#[derive(Debug, Deserialize)]
-pub struct BodhiError {
-    pub errors: Vec<HashMap<String, String>>,
-    pub status: String,
 }
 
 /// This struct represents a specific BugZilla bug that is associated with an update.

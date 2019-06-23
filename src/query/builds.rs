@@ -15,21 +15,23 @@
 //! associated with a given set of updates is possible.
 
 use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
 
 use serde::Deserialize;
 
-use crate::data::{BodhiError, Build, FedoraRelease};
+use crate::data::{Build, FedoraRelease};
+use crate::error::{BodhiError, QueryError};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+use super::retry_query;
 
 /// Use this for querying bodhi for a specific build,
 /// by its Name-Version-Release string.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let build = bodhi::BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29"))
+/// let build = bodhi::query::BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29"))
 ///     .query(&bodhi).unwrap();
 /// ```
 #[derive(Debug)]
@@ -39,7 +41,7 @@ pub struct BuildNVRQuery {
 
 impl BuildNVRQuery {
     /// This method is the only way to create a new `BuildNVRQuery` instance.
-    pub fn new(nvr: String) -> BuildNVRQuery {
+    pub fn new(nvr: String) -> Self {
         BuildNVRQuery { nvr }
     }
 
@@ -47,35 +49,27 @@ impl BuildNVRQuery {
     /// and will either return an `Ok(Some(Build))` matching the specified NVR,
     /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
     /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Build>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Build>, QueryError> {
         let path = format!("/builds/{}", self.nvr);
 
-        let mut response = bodhi.request(&path, None)?;
+        let mut response = bodhi.get(&path, None)?;
         let status = response.status();
 
         if status.is_success() {
-            let build: Build = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("{:?}", error));
-                }
-            };
+            let result = response.text()?;
+            let build: Build = serde_json::from_str(&result)?;
 
             Ok(Some(build))
         } else {
-            let error: BodhiError = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("Unexpected error message: {:?}", error));
-                }
-            };
-
             if status == 404 {
                 // bodhi query successful, but build not found
                 Ok(None)
             } else {
                 // other server-side error
-                Err(format!("{:?}", error))
+                let result = response.text()?;
+                let error: BodhiError = serde_json::from_str(&result)?;
+
+                Err(QueryError::BodhiError { error })
             }
         }
     }
@@ -87,11 +81,12 @@ impl BuildNVRQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let builds = bodhi::BuildQuery::new()
-///     .releases(bodhi::FedoraRelease::F30)
-///     .releases(bodhi::FedoraRelease::F29)
+/// let builds = bodhi::query::BuildQuery::new()
+///     .releases(bodhi::data::FedoraRelease::F30)
+///     .releases(bodhi::data::FedoraRelease::F29)
 ///     .packages(String::from("rust"))
 ///     .query(&bodhi).unwrap();
 /// ```
@@ -116,14 +111,14 @@ impl BuildQuery {
 
     /// Restrict the returned results to builds with the given NVR.
     /// If this is the only required filter, consider using a `BuildNVRQuery` instead.
-    pub fn nvr(mut self, nvr: String) -> BuildQuery {
+    pub fn nvr(mut self, nvr: String) -> Self {
         self.nvr = Some(nvr);
         self
     }
 
     /// Restrict the returned results to builds of the given package(s).
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> BuildQuery {
+    pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -134,7 +129,7 @@ impl BuildQuery {
 
     /// Restrict the returned results to builds for the given release(s).
     /// Can be specified multiple times.
-    pub fn releases(mut self, release: FedoraRelease) -> BuildQuery {
+    pub fn releases(mut self, release: FedoraRelease) -> Self {
         match &mut self.releases {
             Some(releases) => releases.push(release.into()),
             None => self.releases = Some(vec![release.into()]),
@@ -145,7 +140,7 @@ impl BuildQuery {
 
     /// Restrict the returned results to builds for the given update(s).
     /// Can be specified multiple times.
-    pub fn updates(mut self, update: String) -> BuildQuery {
+    pub fn updates(mut self, update: String) -> Self {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -155,7 +150,7 @@ impl BuildQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Build>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
         let mut builds: Vec<Build> = Vec::new();
         let mut page = 1;
 
@@ -214,7 +209,7 @@ impl BuildPageQuery {
         }
     }
 
-    fn query(self, bodhi: &BodhiService) -> Result<BuildListPage, String> {
+    fn query(self, bodhi: &BodhiService) -> Result<BuildListPage, QueryError> {
         let path = String::from("/builds/");
 
         let mut args: HashMap<&str, String> = HashMap::new();
@@ -238,55 +233,9 @@ impl BuildPageQuery {
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        // retry once and keep track of errors
-        // bodhi returns non-JSON responses in rare circumstances
-        let mut retries = 2;
-        let mut errors: Vec<String> = Vec::new();
+        let result = retry_query(bodhi, &path, args)?;
+        let builds: BuildListPage = serde_json::from_str(&result)?;
 
-        loop {
-            if retries == 0 {
-                break;
-            }
-
-            let mut response = bodhi.request(&path, Some(args.clone()))?;
-            let status = response.status();
-
-            if status.is_success() {
-                let builds: BuildListPage = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize response (probably bodhi returned garbage)
-                        retries -= 1;
-                        errors.push(format!("Unexpected response: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                return Ok(builds);
-            } else {
-                let error: BodhiError = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize error response, this is unexpected
-                        retries -= 1;
-                        errors.push(format!("Unexpected error message: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                // bodhi returned an error message
-                retries -= 1;
-                errors.push(format!("{:?}", error));
-                sleep(Duration::from_secs(1));
-                continue;
-            }
-        }
-
-        Err(format!(
-            "Query unsuccessful; the following errors occurred: {:?}",
-            errors
-        ))
+        Ok(builds)
     }
 }

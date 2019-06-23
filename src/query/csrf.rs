@@ -5,15 +5,16 @@
 
 use serde::Deserialize;
 
-use crate::data::BodhiError;
+use crate::error::{BodhiError, QueryError};
 use crate::service::BodhiService;
 
 /// Use this for querying bodhi for a new CSRF token.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let token = bodhi::CSRFQuery::new().query(&bodhi).unwrap();
+/// let token = bodhi::query::CSRFQuery::new().query(&bodhi).unwrap();
 /// ```
 #[derive(Debug, Default)]
 pub struct CSRFQuery {}
@@ -25,37 +26,29 @@ struct CSRFPage {
 
 impl CSRFQuery {
     /// This method creates a new CSRF token query.
-    pub fn new() -> CSRFQuery {
+    pub fn new() -> Self {
         CSRFQuery {}
     }
 
     /// This method will query the remote bodhi instance for a new CSRF token.
     /// It will return either an `Ok(String)` with the new token,
     /// or an `Err(String)` if an error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<String, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<String, QueryError> {
         let path = String::from("/csrf");
 
-        let mut response = bodhi.request(&path, None)?;
+        let mut response = bodhi.get(&path, None)?;
         let status = response.status();
 
         if status.is_success() {
-            let page: CSRFPage = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("{:?}", error));
-                }
-            };
+            let result = response.text()?;
+            let page: CSRFPage = serde_json::from_str(&result)?;
 
             Ok(page.csrf_token)
         } else {
-            let error: BodhiError = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("Unexpected error message: {:?}", error));
-                }
-            };
+            let result = response.text()?;
+            let error: BodhiError = serde_json::from_str(&result)?;
 
-            Err(format!("{:?}", error))
+            Err(QueryError::BodhiError { error })
         }
     }
 }

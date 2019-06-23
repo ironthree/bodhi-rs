@@ -1,11 +1,16 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
-use crate::{BodhiService, Comment, CommentIDQuery, FEDORA_BODHI_URL};
+
+use crate::data::*;
+use crate::query::*;
+use crate::service::*;
 
 #[test]
 fn id_query_some() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     let comment: Option<Comment> = CommentIDQuery::new(19999).query(&bodhi).unwrap();
 
@@ -14,9 +19,11 @@ fn id_query_some() {
 
 #[test]
 fn id_query_none() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     let comment: Option<Comment> = CommentIDQuery::new(999999999).query(&bodhi).unwrap();
 

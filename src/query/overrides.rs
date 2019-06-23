@@ -12,21 +12,23 @@
 //! overrides filed by a given list of users.
 
 use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
 
 use serde::Deserialize;
 
-use crate::data::{BodhiError, Override, FedoraRelease};
+use crate::data::{FedoraRelease, Override};
+use crate::error::{BodhiError, QueryError};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+use super::retry_query;
 
 /// Use this for querying bodhi for a specific override,
 /// by its Name-Version-Release string.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let over_ride = bodhi::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
+/// let over_ride = bodhi::query::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
 ///     .query(&bodhi).unwrap();
 /// ```
 #[derive(Debug)]
@@ -41,7 +43,7 @@ struct OverridePage {
 
 impl OverrideNVRQuery {
     /// This method is the only way to create a new `OverrideNVRQuery` instance.
-    pub fn new(nvr: String) -> OverrideNVRQuery {
+    pub fn new(nvr: String) -> Self {
         OverrideNVRQuery { nvr }
     }
 
@@ -49,34 +51,27 @@ impl OverrideNVRQuery {
     /// and will return either an `Ok(Some(Override))` matching the specified NVR,
     /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
     /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Override>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Override>, QueryError> {
         let path = format!("/overrides/{}", self.nvr);
 
-        let mut response = bodhi.request(&path, None)?;
+        let mut response = bodhi.get(&path, None)?;
         let status = response.status();
 
         if status.is_success() {
-            let override_page: OverridePage = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("{:?}", error));
-                }
-            };
+            let result = response.text()?;
+            let override_page: OverridePage = serde_json::from_str(&result)?;
 
             Ok(Some(override_page.r#override))
         } else {
-            let error: BodhiError = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("Unexpected error message: {:?}", error));
-                }
-            };
-
             if status == 404 {
                 // bodhi query successful, but override not found
                 Ok(None)
             } else {
-                Err(format!("{:?}", error))
+                // other server-side error
+                let result = response.text()?;
+                let error: BodhiError = serde_json::from_str(&result)?;
+
+                Err(QueryError::BodhiError { error })
             }
         }
     }
@@ -88,10 +83,11 @@ impl OverrideNVRQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let overrides = bodhi::OverrideQuery::new()
-///     .releases(bodhi::FedoraRelease::F29)
+/// let overrides = bodhi::query::OverrideQuery::new()
+///     .releases(bodhi::data::FedoraRelease::F29)
 ///     .users(String::from("decathorpe"))
 ///     .query(&bodhi).unwrap();
 /// ```
@@ -108,7 +104,7 @@ pub struct OverrideQuery {
 
 impl OverrideQuery {
     /// This method returns a new `OverrideQuery` with *no* filters set.
-    pub fn new() -> OverrideQuery {
+    pub fn new() -> Self {
         OverrideQuery {
             builds: None,
             expired: None,
@@ -122,7 +118,7 @@ impl OverrideQuery {
 
     /// Restrict the returned results to overrides for the given build(s).
     /// Can be specified multiple times.
-    pub fn builds(mut self, build: String) -> OverrideQuery {
+    pub fn builds(mut self, build: String) -> Self {
         match &mut self.builds {
             Some(builds) => builds.push(build),
             None => self.builds = Some(vec![build]),
@@ -132,20 +128,20 @@ impl OverrideQuery {
     }
 
     /// Restrict the returned results to (not) expired overrides.
-    pub fn expired(mut self, expired: bool) -> OverrideQuery {
+    pub fn expired(mut self, expired: bool) -> Self {
         self.expired = Some(expired);
         self
     }
 
     /// Restrict search to overrides *like* the given argument (in the SQL sense).
-    pub fn like(mut self, like: String) -> OverrideQuery {
+    pub fn like(mut self, like: String) -> Self {
         self.like = Some(like);
         self
     }
 
     /// Restrict the returned results to overrides for the given package(s).
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> OverrideQuery {
+    pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -156,7 +152,7 @@ impl OverrideQuery {
 
     /// Restrict the returned results to overrides for the given release(s).
     /// Can be specified multiple times.
-    pub fn releases(mut self, release: FedoraRelease) -> OverrideQuery {
+    pub fn releases(mut self, release: FedoraRelease) -> Self {
         match &mut self.releases {
             Some(releases) => releases.push(release.into()),
             None => self.releases = Some(vec![release.into()]),
@@ -166,14 +162,14 @@ impl OverrideQuery {
     }
 
     /// Restrict search to overrides containing the given argument.
-    pub fn search(mut self, search: String) -> OverrideQuery {
+    pub fn search(mut self, search: String) -> Self {
         self.search = Some(search);
         self
     }
 
     /// Restrict the returned results to overrides created by the given user(s).
     /// Can be specified multiple times.
-    pub fn users(mut self, user: String) -> OverrideQuery {
+    pub fn users(mut self, user: String) -> Self {
         match &mut self.users {
             Some(users) => users.push(user),
             None => self.users = Some(vec![user]),
@@ -183,7 +179,7 @@ impl OverrideQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Override>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
         let mut overrides: Vec<Override> = Vec::new();
         let mut page = 1;
 
@@ -237,7 +233,7 @@ struct OverridePageQuery {
 }
 
 impl OverridePageQuery {
-    fn new() -> OverridePageQuery {
+    fn new() -> Self {
         OverridePageQuery {
             builds: None,
             expired: None,
@@ -251,7 +247,7 @@ impl OverridePageQuery {
         }
     }
 
-    fn query(self, bodhi: &BodhiService) -> Result<OverrideListPage, String> {
+    fn query(self, bodhi: &BodhiService) -> Result<OverrideListPage, QueryError> {
         let path = String::from("/overrides/");
 
         let mut args: HashMap<&str, String> = HashMap::new();
@@ -287,55 +283,9 @@ impl OverridePageQuery {
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        // retry once and keep track of errors
-        // bodhi returns non-JSON responses in rare circumstances
-        let mut retries = 2;
-        let mut errors: Vec<String> = Vec::new();
+        let result = retry_query(bodhi, &path, args)?;
+        let overrides: OverrideListPage = serde_json::from_str(&result)?;
 
-        loop {
-            if retries == 0 {
-                break;
-            }
-
-            let mut response = bodhi.request(&path, Some(args.clone()))?;
-            let status = response.status();
-
-            if status.is_success() {
-                let overrides: OverrideListPage = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize response (probably bodhi returned garbage)
-                        retries -= 1;
-                        errors.push(format!("Unexpected response: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                return Ok(overrides);
-            } else {
-                let error: BodhiError = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize error response, this is unexpected
-                        retries -= 1;
-                        errors.push(format!("Unexpected error message: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                // bodhi returned an error message
-                retries -= 1;
-                errors.push(format!("{:?}", error));
-                sleep(Duration::from_secs(1));
-                continue;
-            }
-        }
-
-        Err(format!(
-            "Query unsuccessful; the following errors occurred: {:?}",
-            errors
-        ))
+        Ok(overrides)
     }
 }

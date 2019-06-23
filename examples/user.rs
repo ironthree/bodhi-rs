@@ -1,9 +1,14 @@
 use std::env::args;
 
-use bodhi::*;
+use bodhi::data::FEDORA_BODHI_URL;
+use bodhi::error::QueryError;
+use bodhi::query::UserNameQuery;
+use bodhi::service::BodhiServiceBuilder;
 
-fn main() -> Result<(), String> {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL));
+fn main() -> Result<(), QueryError> {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .build()
+        .unwrap();
 
     let mut arguments = args();
 

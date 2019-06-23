@@ -11,20 +11,22 @@
 //! that are associated with a given set of updates or packages.
 
 use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
 
 use serde::Deserialize;
 
-use crate::data::{BodhiError, User};
+use crate::data::User;
+use crate::error::{BodhiError, QueryError};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+use super::retry_query;
 
 /// Use this for querying bodhi for a specific user by their name.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let comment = bodhi::UserNameQuery::new(String::from("decathorpe"))
+/// let comment = bodhi::query::UserNameQuery::new(String::from("decathorpe"))
 ///     .query(&bodhi).unwrap();
 /// ```
 #[derive(Debug)]
@@ -39,7 +41,7 @@ struct UserPage {
 
 impl UserNameQuery {
     /// This method is the only way to create a new `UserNameQuery` instance.
-    pub fn new(name: String) -> UserNameQuery {
+    pub fn new(name: String) -> Self {
         UserNameQuery { name }
     }
 
@@ -47,34 +49,27 @@ impl UserNameQuery {
     /// and will either return an `Ok(User)` matching the specified name,
     /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
     /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<User>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Option<User>, QueryError> {
         let path = format!("/users/{}", self.name);
 
-        let mut response = bodhi.request(&path, None)?;
+        let mut response = bodhi.get(&path, None)?;
         let status = response.status();
 
         if status.is_success() {
-            let user: UserPage = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("{:?}", error));
-                }
-            };
+            let result = response.text()?;
+            let user: UserPage = serde_json::from_str(&result)?;
 
             Ok(Some(user.user))
         } else {
-            let error: BodhiError = match response.json() {
-                Ok(value) => value,
-                Err(error) => {
-                    return Err(format!("Unexpected error message: {:?}", error));
-                }
-            };
-
             if status == 404 {
                 // bodhi query successful, but user not found
                 Ok(None)
             } else {
-                Err(format!("{:?}", error))
+                // other server-side error
+                let result = response.text()?;
+                let error: BodhiError = serde_json::from_str(&result)?;
+
+                Err(QueryError::BodhiError { error })
             }
         }
     }
@@ -86,9 +81,10 @@ impl UserNameQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let users = bodhi::UserQuery::new()
+/// let users = bodhi::query::UserQuery::new()
 ///     .groups(String::from("provenpackager"))
 ///     .query(&bodhi).unwrap();
 /// ```
@@ -104,7 +100,7 @@ pub struct UserQuery {
 
 impl UserQuery {
     /// This method returns a new `UserQuery` with *no* filters set.
-    pub fn new() -> UserQuery {
+    pub fn new() -> Self {
         UserQuery {
             groups: None,
             like: None,
@@ -117,7 +113,7 @@ impl UserQuery {
 
     /// Restrict the returned results to members of the given group(s).
     /// Can be specified multiple times.
-    pub fn groups(mut self, group: String) -> UserQuery {
+    pub fn groups(mut self, group: String) -> Self {
         match &mut self.groups {
             Some(groups) => groups.push(group),
             None => self.groups = Some(vec![group]),
@@ -127,21 +123,21 @@ impl UserQuery {
     }
 
     /// Restrict search to users *like* the given argument (in the SQL sense).
-    pub fn like(mut self, like: String) -> UserQuery {
+    pub fn like(mut self, like: String) -> Self {
         self.like = Some(like);
         self
     }
 
     /// Restrict results to users with the given username.
     /// If this is the only required filter, consider using a `UserNameQuery` instead.
-    pub fn name(mut self, name: String) -> UserQuery {
+    pub fn name(mut self, name: String) -> Self {
         self.name = Some(name);
         self
     }
 
     /// Restrict the returned results to users associated with the given package(s).
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> UserQuery {
+    pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -151,14 +147,14 @@ impl UserQuery {
     }
 
     /// Restrict search to users containing the given argument.
-    pub fn search(mut self, search: String) -> UserQuery {
+    pub fn search(mut self, search: String) -> Self {
         self.search = Some(search);
         self
     }
 
     /// Restrict the returned results to users associated with the given update(s).
     /// Can be specified multiple times.
-    pub fn updates(mut self, update: String) -> UserQuery {
+    pub fn updates(mut self, update: String) -> Self {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -168,7 +164,7 @@ impl UserQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<User>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
         let mut users: Vec<User> = Vec::new();
         let mut page = 1;
 
@@ -220,7 +216,7 @@ struct UserPageQuery {
 }
 
 impl UserPageQuery {
-    fn new() -> UserPageQuery {
+    fn new() -> Self {
         UserPageQuery {
             groups: None,
             like: None,
@@ -233,7 +229,7 @@ impl UserPageQuery {
         }
     }
 
-    fn query(self, bodhi: &BodhiService) -> Result<UserListPage, String> {
+    fn query(self, bodhi: &BodhiService) -> Result<UserListPage, QueryError> {
         let path = String::from("/users/");
 
         let mut args: HashMap<&str, String> = HashMap::new();
@@ -265,55 +261,9 @@ impl UserPageQuery {
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        // retry once and keep track of errors
-        // bodhi returns non-JSON responses in rare circumstances
-        let mut retries = 2;
-        let mut errors: Vec<String> = Vec::new();
+        let result = retry_query(bodhi, &path, args)?;
+        let users: UserListPage = serde_json::from_str(&result)?;
 
-        loop {
-            if retries == 0 {
-                break;
-            }
-
-            let mut response = bodhi.request(&path, Some(args.clone()))?;
-            let status = response.status();
-
-            if status.is_success() {
-                let users: UserListPage = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize response (probably bodhi returned garbage)
-                        retries -= 1;
-                        errors.push(format!("Unexpected response: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                return Ok(users);
-            } else {
-                let error: BodhiError = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize error response, this is unexpected
-                        retries -= 1;
-                        errors.push(format!("Unexpected error message: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                // bodhi returned an error message
-                retries -= 1;
-                errors.push(format!("{:?}", error));
-                sleep(Duration::from_secs(1));
-                continue;
-            }
-        }
-
-        Err(format!(
-            "Query unsuccessful; the following errors occurred: {:?}",
-            errors
-        ))
+        Ok(users)
     }
 }

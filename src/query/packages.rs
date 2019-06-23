@@ -7,13 +7,14 @@
 //! packages by name, or filter packages matching a certain search string.
 
 use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
 
 use serde::Deserialize;
 
-use crate::data::{BodhiError, Package};
+use crate::data::Package;
+use crate::error::QueryError;
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+
+use super::retry_query;
 
 /// Use this for querying bodhi about a set of packages with the given properties,
 /// which can be specified with the builder pattern. Note that some options can be
@@ -21,9 +22,10 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiService::new(String::from(bodhi::FEDORA_BODHI_URL));
+/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
+///     .build().unwrap();
 ///
-/// let packages = bodhi::PackageQuery::new()
+/// let packages = bodhi::query::PackageQuery::new()
 ///     .search(String::from("rust*"))
 ///     .query(&bodhi).unwrap();
 /// ```
@@ -36,7 +38,7 @@ pub struct PackageQuery {
 
 impl PackageQuery {
     /// This method returns a new `PackageQuery` with *no* filters set.
-    pub fn new() -> PackageQuery {
+    pub fn new() -> Self {
         PackageQuery {
             like: None,
             name: None,
@@ -45,25 +47,25 @@ impl PackageQuery {
     }
 
     /// Restrict search to packages *like* the given argument (in the SQL sense).
-    pub fn like(mut self, like: String) -> PackageQuery {
+    pub fn like(mut self, like: String) -> Self {
         self.like = Some(like);
         self
     }
 
     /// Restrict the returned results to packages matching the given name.
-    pub fn name(mut self, name: String) -> PackageQuery {
+    pub fn name(mut self, name: String) -> Self {
         self.name = Some(name);
         self
     }
 
     /// Restrict search to packages containing the given argument.
-    pub fn search(mut self, search: String) -> PackageQuery {
+    pub fn search(mut self, search: String) -> Self {
         self.search = Some(search);
         self
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Package>, String> {
+    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
         let mut packages: Vec<Package> = Vec::new();
         let mut page = 1;
 
@@ -109,7 +111,7 @@ struct PackagePageQuery {
 }
 
 impl PackagePageQuery {
-    fn new() -> PackagePageQuery {
+    fn new() -> Self {
         PackagePageQuery {
             like: None,
             name: None,
@@ -119,7 +121,7 @@ impl PackagePageQuery {
         }
     }
 
-    fn query(self, bodhi: &BodhiService) -> Result<PackageListPage, String> {
+    fn query(self, bodhi: &BodhiService) -> Result<PackageListPage, QueryError> {
         let path = String::from("/packages/");
 
         let mut args: HashMap<&str, String> = HashMap::new();
@@ -139,55 +141,9 @@ impl PackagePageQuery {
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        // retry once and keep track of errors
-        // bodhi returns non-JSON responses in rare circumstances
-        let mut retries = 2;
-        let mut errors: Vec<String> = Vec::new();
+        let result = retry_query(bodhi, &path, args)?;
+        let packages: PackageListPage = serde_json::from_str(&result)?;
 
-        loop {
-            if retries == 0 {
-                break;
-            }
-
-            let mut response = bodhi.request(&path, Some(args.clone()))?;
-            let status = response.status();
-
-            if status.is_success() {
-                let packages: PackageListPage = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize response (probably bodhi returned garbage)
-                        retries -= 1;
-                        errors.push(format!("Unexpected response: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                return Ok(packages);
-            } else {
-                let error: BodhiError = match response.json() {
-                    Ok(value) => value,
-                    Err(error) => {
-                        // failed to deserialize error response, this is unexpected
-                        retries -= 1;
-                        errors.push(format!("Unexpected error message: {:?}", error));
-                        sleep(Duration::from_secs(1));
-                        continue;
-                    }
-                };
-
-                // bodhi returned an error message
-                retries -= 1;
-                errors.push(format!("{:?}", error));
-                sleep(Duration::from_secs(1));
-                continue;
-            }
-        }
-
-        Err(format!(
-            "Query unsuccessful; the following errors occurred: {:?}",
-            errors
-        ))
+        Ok(packages)
     }
 }

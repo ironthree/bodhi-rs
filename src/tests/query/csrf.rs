@@ -1,11 +1,16 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
-use crate::{BodhiService, CSRFQuery, FEDORA_BODHI_URL};
+
+use crate::data::*;
+use crate::query::*;
+use crate::service::*;
 
 #[test]
 fn deserialize() {
-    let bodhi = BodhiService::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES);
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
 
     // query and deserialize a new CSRF token
     CSRFQuery::new().query(&bodhi).unwrap();
