@@ -5,6 +5,36 @@ use crate::query::*;
 use crate::service::*;
 
 #[test]
+fn deserialize_f32() {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only builds for one release, and deserialize them
+    BuildQuery::new()
+        .releases(FedoraRelease::F32)
+        .query(&bodhi)
+        .unwrap();
+}
+
+#[test]
+fn deserialize_f31() {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only builds for one release, and deserialize them
+    BuildQuery::new()
+        .releases(FedoraRelease::F31)
+        .query(&bodhi)
+        .unwrap();
+}
+
+#[test]
 fn deserialize_f31c() {
     let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
@@ -243,6 +273,38 @@ fn deserialize_f25() {
         .query(&bodhi)
         .unwrap();
 }
+
+#[test]
+fn deserialize_epel8() {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only builds for one release, and deserialize them
+    BuildQuery::new()
+        .releases(FedoraRelease::EPEL8)
+        .query(&bodhi)
+        .unwrap();
+}
+
+/*
+#[test]
+fn deserialize_epel7() {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only builds for one release, and deserialize them
+    BuildQuery::new()
+        .releases(FedoraRelease::EPEL7)
+        .query(&bodhi)
+        .unwrap();
+}
+*/
 
 #[test]
 fn nvr_query_some() {

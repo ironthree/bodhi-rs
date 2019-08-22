@@ -4,7 +4,7 @@ use std::time::Duration;
 const TEST_TIMEOUT: Duration = Duration::from_secs(120);
 
 // More retries for running the tests, since they fail quite often
-const TEST_RETRIES: u32 = 5;
+const TEST_RETRIES: usize = 5;
 
 mod builds;
 mod comments;
