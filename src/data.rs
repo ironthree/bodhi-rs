@@ -18,6 +18,7 @@ pub const FEDORA_BODHI_STAGING_URL: &str = "https://bodhi.stg.fedoraproject.org"
 /// This enum represents a fedora release.
 #[derive(Debug)]
 pub enum FedoraRelease {
+    F32,
     F31,
     F31C,
     F30,
@@ -35,11 +36,14 @@ pub enum FedoraRelease {
     F27M,
     F26,
     F25,
+    EPEL8,
+    // EPEL7,
 }
 
 impl Into<String> for FedoraRelease {
     fn into(self) -> String {
         match self {
+            FedoraRelease::F32 => String::from("F32"),
             FedoraRelease::F31 => String::from("F31"),
             FedoraRelease::F31C => String::from("F31C"),
             FedoraRelease::F30 => String::from("F30"),
@@ -57,6 +61,8 @@ impl Into<String> for FedoraRelease {
             FedoraRelease::F27M => String::from("F27M"),
             FedoraRelease::F26 => String::from("F26"),
             FedoraRelease::F25 => String::from("F25"),
+            FedoraRelease::EPEL8 => String::from("EPEL-8"),
+            // FedoraRelease::EPEL7 => String::from("EPEL-7"),
         }
     }
 }

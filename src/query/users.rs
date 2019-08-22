@@ -60,17 +60,15 @@ impl UserNameQuery {
             let user: UserPage = serde_json::from_str(&result)?;
 
             Ok(Some(user.user))
+        } else if status == 404 {
+            // bodhi query successful, but user not found
+            Ok(None)
         } else {
-            if status == 404 {
-                // bodhi query successful, but user not found
-                Ok(None)
-            } else {
-                // other server-side error
-                let result = response.text()?;
-                let error: BodhiError = serde_json::from_str(&result)?;
+            // other server-side error
+            let result = response.text()?;
+            let error: BodhiError = serde_json::from_str(&result)?;
 
-                Err(QueryError::BodhiError { error })
-            }
+            Err(QueryError::BodhiError { error })
         }
     }
 }

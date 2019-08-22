@@ -2,7 +2,6 @@
 //! bodhi server instance.
 
 use std::collections::HashMap;
-use std::thread::sleep;
 use std::time::Duration;
 
 use failure::Fail;
@@ -22,7 +21,7 @@ pub const DEFAULT_ROWS: u32 = 50;
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
 
 /// Specify a number of retries in case of connection failures.
-const REQUEST_RETRIES: u32 = 3;
+const REQUEST_RETRIES: usize = 3;
 
 /// TODO
 ///
@@ -35,7 +34,7 @@ const REQUEST_RETRIES: u32 = 3;
 pub struct BodhiServiceBuilder {
     url: String,
     timeout: Option<Duration>,
-    retries: Option<u32>,
+    retries: Option<usize>,
 }
 
 #[derive(Debug, Fail)]
@@ -75,7 +74,7 @@ impl BodhiServiceBuilder {
     }
 
     /// TODO
-    pub fn retries(mut self, retries: u32) -> Self {
+    pub fn retries(mut self, retries: usize) -> Self {
         self.retries = Some(retries);
         self
     }
@@ -118,7 +117,7 @@ pub struct BodhiService {
     session: OpenIDClient,
     username: Option<String>,
     authenticated: bool,
-    retries: u32,
+    retries: usize,
 }
 
 #[derive(Debug, Fail)]
@@ -133,6 +132,8 @@ pub enum ServiceError {
     UrlParsingError { error: reqwest::UrlError },
     #[fail(display = "Received an empty response.")]
     EmptyResponseError,
+    #[fail(display = "Retrying a failed request failed repeatedly.")]
+    RetryError,
 }
 
 impl From<reqwest::Error> for ServiceError {
@@ -186,41 +187,41 @@ impl BodhiService {
             None => Vec::new(),
         };
 
-        // retry in case of connection failures
-        let mut retries = REQUEST_RETRIES;
-        let mut errors: Vec<ServiceError> = Vec::new();
-
-        while retries > 0 {
+        let qf = || {
             match self.session.session().get(url.clone()).query(&query).send() {
                 Ok(response) => {
                     match response.content_length() {
-                        None => {
-                            // response is empty
-                            errors.push(ServiceError::EmptyResponseError);
-                            sleep(Duration::from_secs(1));
-                            retries -= 1;
-                        }
                         Some(_len) => {
                             // return the first valid response
-                            return Ok(response);
+                            Ok(response)
+                        }
+                        None => {
+                            // response is empty
+                            Err(ServiceError::EmptyResponseError)
                         }
                     }
                 }
 
                 Err(error) => {
                     // take a breath, and keep on trying (or not)
-                    errors.push(ServiceError::RequestError { error });
-                    sleep(Duration::from_secs(1));
-                    retries -= 1;
+                    Err(ServiceError::RequestError { error })
+                }
+            }
+        };
+
+        let retries: Vec<Duration> = vec![Duration::from_secs(1); REQUEST_RETRIES];
+        match retry::retry(retries, qf) {
+            Ok(response) => Ok(response),
+            Err(error) => {
+                if let retry::Error::Operation { error: inner, ..} = error {
+                    Err(inner)
+                } else {
+                    Err(ServiceError::RetryError)
                 }
             }
         }
-
-        // fail if the connection keeps failing
-        Err(errors.into_iter().last().unwrap())
     }
 
-    /*
     /// TODO
     pub(crate) fn post(
         &self,
@@ -245,5 +246,4 @@ impl BodhiService {
 
         Ok(response)
     }
-    */
 }

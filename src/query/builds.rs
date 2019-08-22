@@ -60,17 +60,15 @@ impl BuildNVRQuery {
             let build: Build = serde_json::from_str(&result)?;
 
             Ok(Some(build))
+        } else if status == 404 {
+            // bodhi query successful, but build not found
+            Ok(None)
         } else {
-            if status == 404 {
-                // bodhi query successful, but build not found
-                Ok(None)
-            } else {
-                // other server-side error
-                let result = response.text()?;
-                let error: BodhiError = serde_json::from_str(&result)?;
+            // other server-side error
+            let result = response.text()?;
+            let error: BodhiError = serde_json::from_str(&result)?;
 
-                Err(QueryError::BodhiError { error })
-            }
+            Err(QueryError::BodhiError { error })
         }
     }
 }
@@ -192,7 +190,6 @@ struct BuildPageQuery {
     packages: Option<Vec<String>>,
     releases: Option<Vec<String>>,
     updates: Option<Vec<String>>,
-
     page: u32,
     rows_per_page: u32,
 }
