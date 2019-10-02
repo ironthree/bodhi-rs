@@ -25,6 +25,6 @@ Note that the API is not finalized yet, and minor changes will still happen befo
 
 ## TODO
 
-- OpenID authentication
-- authenticated POST requests for editing and creating stuff
+- _**working**_ OpenID authentication
+- implementing all POST requests for creating and editing things (WIP)
 
