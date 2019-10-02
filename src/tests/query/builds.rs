@@ -290,6 +290,66 @@ fn deserialize_f25() {
 }
 
 #[test]
+fn deserialize_f24() {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only builds for one release, and deserialize them
+    BuildQuery::new()
+        .releases(FedoraRelease::F24)
+        .query(&bodhi)
+        .unwrap();
+}
+
+#[test]
+fn deserialize_f23() {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only builds for one release, and deserialize them
+    BuildQuery::new()
+        .releases(FedoraRelease::F23)
+        .query(&bodhi)
+        .unwrap();
+}
+
+#[test]
+fn deserialize_f22() {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only builds for one release, and deserialize them
+    BuildQuery::new()
+        .releases(FedoraRelease::F22)
+        .query(&bodhi)
+        .unwrap();
+}
+
+#[test]
+fn deserialize_f21() {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only builds for one release, and deserialize them
+    BuildQuery::new()
+        .releases(FedoraRelease::F21)
+        .query(&bodhi)
+        .unwrap();
+}
+
+#[test]
 fn deserialize_epel8() {
     let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)
@@ -304,7 +364,6 @@ fn deserialize_epel8() {
         .unwrap();
 }
 
-/*
 #[test]
 fn deserialize_epel7() {
     let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
@@ -319,7 +378,6 @@ fn deserialize_epel7() {
         .query(&bodhi)
         .unwrap();
 }
-*/
 
 #[test]
 fn nvr_query_some() {

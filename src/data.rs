@@ -77,8 +77,12 @@ pub enum FedoraRelease {
     F27M,
     F26,
     F25,
+    F24,
+    F23,
+    F22,
+    F21,
     EPEL8,
-    // EPEL7,
+    EPEL7,
 }
 
 impl Into<String> for FedoraRelease {
@@ -103,8 +107,12 @@ impl Into<String> for FedoraRelease {
             FedoraRelease::F27M => String::from("F27M"),
             FedoraRelease::F26 => String::from("F26"),
             FedoraRelease::F25 => String::from("F25"),
+            FedoraRelease::F24 => String::from("F24"),
+            FedoraRelease::F23 => String::from("F23"),
+            FedoraRelease::F22 => String::from("F22"),
+            FedoraRelease::F21 => String::from("F21"),
             FedoraRelease::EPEL8 => String::from("EPEL-8"),
-            // FedoraRelease::EPEL7 => String::from("EPEL-7"),
+            FedoraRelease::EPEL7 => String::from("EPEL-7"),
         }
     }
 }
@@ -292,12 +300,11 @@ pub struct Bug {
 pub struct BugFeedback {
     pub bug: Option<Bug>,
     pub bug_id: u32,
-    pub comment_id: u32,
+    pub comment_id: Option<u32>,
     pub karma: Karma,
 }
 
 /// This struct represents a specific koji build that bodhi is aware of.
-/// This does not include "rpm" or "module" builds for rawhide (yet).
 #[derive(Debug, Deserialize)]
 pub struct Build {
     #[serde(rename(deserialize = "type"))]
@@ -392,7 +399,7 @@ pub struct TestCase {
 /// This struct represents an update feedback item associated with a specific test case.
 #[derive(Debug, Deserialize)]
 pub struct TestCaseFeedback {
-    pub comment_id: u32,
+    pub comment_id: Option<u32>,
     pub karma: Karma,
     pub testcase: TestCase,
     pub testcase_id: u32,
