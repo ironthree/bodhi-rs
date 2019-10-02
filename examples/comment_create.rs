@@ -1,6 +1,6 @@
 use std::io::{stdin, stdout, Write};
 
-use bodhi::create::{CommentBuilder, Karma};
+use bodhi::create::CommentBuilder;
 use bodhi::data::*;
 use bodhi::service::BodhiServiceBuilder;
 

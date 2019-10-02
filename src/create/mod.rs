@@ -1,35 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::error::{QueryError, BodhiError};
+use crate::data::Karma;
+use crate::error::{BodhiError, QueryError};
 use crate::query::csrf::CSRFQuery;
 use crate::service::BodhiService;
-
-#[derive(Debug, Clone)]
-pub enum Karma {
-    Positive,
-    Neutral,
-    Negative,
-}
-
-impl Into<i32> for Karma {
-    fn into(self) -> i32 {
-        match self {
-            Karma::Positive => 1,
-            Karma::Neutral => 0,
-            Karma::Negative => -1,
-        }
-    }
-}
-
-impl Into<String> for Karma {
-    fn into(self) -> String {
-        match self {
-            Karma::Positive => String::from("+1"),
-            Karma::Neutral => String::from("0"),
-            Karma::Negative => String::from("-1"),
-        }
-    }
-}
 
 #[derive(Debug, Serialize)]
 struct CommentData {
@@ -146,16 +120,6 @@ impl CommentBuilder {
 
         // FIXME
 
-        /*
-        {\"status\": \"error\",
-         \"errors\": [{
-              \"location\": \"body\",
-              \"name\": \"comment\",
-              \"description\": \"You must provide a comment author\"
-              }]
-        }
-        */
-
         let mut response = bodhi.post(&path, data, None)?;
         let status = response.status();
 
@@ -202,7 +166,7 @@ impl OverrideBuilder {
         }
     }
 
-    pub fn create(self, bodhi: &BodhiService) -> Result<(), QueryError> {
+    pub fn create(self, bodhi: &BodhiService) -> Result<NewOverride, QueryError> {
         // let user = bodhi.username()?;
         bodhi.username()?;
 
@@ -214,13 +178,15 @@ impl OverrideBuilder {
             nvr: self.nvr.clone(),
             notes: self.notes.clone(),
             expiration_date: self.expiration_date.clone(),
-            csrf_token
+            csrf_token,
         };
 
         let data = match serde_json::to_string(&new_override) {
             Ok(data) => data,
             Err(error) => return Err(QueryError::SerializationError { error }),
         };
+
+        // FIXME
 
         let mut response = bodhi.post(&path, data, None)?;
         let status = response.status();
@@ -233,9 +199,8 @@ impl OverrideBuilder {
         };
 
         let result = response.text()?;
-        // let new_override: NewOverride = serde_json::from_str(&result)?;
-        println!("{:#?}", result);
+        let new_override: NewOverride = serde_json::from_str(&result)?;
 
-        Ok(())
+        Ok(new_override)
     }
 }

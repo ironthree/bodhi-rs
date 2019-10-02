@@ -213,7 +213,7 @@ impl BodhiService {
         match retry::retry(retries, qf) {
             Ok(response) => Ok(response),
             Err(error) => {
-                if let retry::Error::Operation { error: inner, ..} = error {
+                if let retry::Error::Operation { error: inner, .. } = error {
                     Err(inner)
                 } else {
                     Err(ServiceError::RetryError)

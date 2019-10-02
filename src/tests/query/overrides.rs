@@ -20,6 +20,21 @@ fn deserialize_f32() {
 }
 
 #[test]
+fn deserialize_f32c() {
+    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only overrides for one release, and deserialize them
+    OverrideQuery::new()
+        .releases(FedoraRelease::F32C)
+        .query(&bodhi)
+        .unwrap();
+}
+
+#[test]
 fn deserialize_f31() {
     let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
         .timeout(TEST_TIMEOUT)

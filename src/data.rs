@@ -8,6 +8,7 @@
 //! instead of the String arguments directly.
 
 use serde::Deserialize;
+use serde_repr::Deserialize_repr;
 
 /// base URL of the fedora bodhi instance
 pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
@@ -15,10 +16,50 @@ pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
 /// base URL of the fedora bodhi staging instance
 pub const FEDORA_BODHI_STAGING_URL: &str = "https://bodhi.stg.fedoraproject.org";
 
+#[derive(Debug, Clone, Deserialize_repr)]
+#[repr(i8)]
+pub enum Karma {
+    Positive = -1,
+    Neutral = 0,
+    Negative = 1,
+}
+
+impl Into<i32> for Karma {
+    fn into(self) -> i32 {
+        match self {
+            Karma::Positive => 1,
+            Karma::Neutral => 0,
+            Karma::Negative => -1,
+        }
+    }
+}
+
+impl Into<String> for Karma {
+    fn into(self) -> String {
+        match self {
+            Karma::Positive => String::from("+1"),
+            Karma::Neutral => String::from("0"),
+            Karma::Negative => String::from("-1"),
+        }
+    }
+}
+
+impl From<i32> for Karma {
+    fn from(karma: i32) -> Karma {
+        match karma {
+            -1 => Karma::Negative,
+            0 => Karma::Neutral,
+            1 => Karma::Positive,
+            _ => unreachable!(),
+        }
+    }
+}
+
 /// This enum represents a fedora release.
 #[derive(Debug)]
 pub enum FedoraRelease {
     F32,
+    F32C,
     F31,
     F31C,
     F30,
@@ -44,6 +85,7 @@ impl Into<String> for FedoraRelease {
     fn into(self) -> String {
         match self {
             FedoraRelease::F32 => String::from("F32"),
+            FedoraRelease::F32C => String::from("F32C"),
             FedoraRelease::F31 => String::from("F31"),
             FedoraRelease::F31C => String::from("F31C"),
             FedoraRelease::F30 => String::from("F30"),
@@ -238,7 +280,7 @@ impl Into<String> for UpdateType {
 /// This struct represents a specific BugZilla bug that is associated with an update.
 #[derive(Debug, Deserialize)]
 pub struct Bug {
-    pub bug_id: i32,
+    pub bug_id: u32,
     pub feedback: Option<Vec<BugFeedback>>,
     pub parent: bool,
     pub security: bool,
@@ -249,9 +291,9 @@ pub struct Bug {
 #[derive(Debug, Deserialize)]
 pub struct BugFeedback {
     pub bug: Option<Bug>,
-    pub bug_id: i32,
-    pub comment_id: i32,
-    pub karma: i32,
+    pub bug_id: u32,
+    pub comment_id: u32,
+    pub karma: Karma,
 }
 
 /// This struct represents a specific koji build that bodhi is aware of.
@@ -261,9 +303,9 @@ pub struct Build {
     #[serde(rename(deserialize = "type"))]
     pub build_type: String,
     pub ci_url: Option<String>,
-    pub epoch: Option<i32>,
+    pub epoch: Option<u32>,
     pub nvr: String,
-    pub release_id: Option<i32>,
+    pub release_id: Option<u32>,
     pub signed: bool,
 }
 
@@ -273,17 +315,17 @@ pub struct Build {
 pub struct Comment {
     pub author: Option<String>,
     pub bug_feedback: Vec<BugFeedback>,
-    pub id: i32,
-    pub karma: i32,
-    pub karma_critpath: i32,
+    pub id: u32,
+    pub karma: Karma,
+    pub karma_critpath: Karma,
     pub testcase_feedback: Vec<TestCaseFeedback>,
     pub text: String,
     pub timestamp: String,
     pub update: Option<Update>,
-    pub update_id: i32,
+    pub update_id: u32,
     pub update_title: Option<String>,
     pub user: User,
-    pub user_id: i32,
+    pub user_id: u32,
 }
 
 /// This struct represents a group from the fedora accounts system (FAS).
@@ -296,14 +338,14 @@ pub struct Group {
 #[derive(Debug, Deserialize)]
 pub struct Override {
     pub build: Build,
-    pub build_id: i32,
+    pub build_id: u32,
     pub expiration_date: String,
     pub expired_date: Option<String>,
     pub notes: String,
     pub nvr: String,
     pub submission_date: String,
     pub submitter: User,
-    pub submitter_id: i32,
+    pub submitter_id: u32,
 }
 
 /// This struct represents a specific fedora package.
@@ -344,22 +386,22 @@ pub struct Release {
 pub struct TestCase {
     pub name: String,
     pub package: Option<Package>,
-    pub package_id: i32,
+    pub package_id: u32,
 }
 
 /// This struct represents an update feedback item associated with a specific test case.
 #[derive(Debug, Deserialize)]
 pub struct TestCaseFeedback {
-    pub comment_id: i32,
-    pub karma: i32,
+    pub comment_id: u32,
+    pub karma: Karma,
     pub testcase: TestCase,
-    pub testcase_id: i32,
+    pub testcase_id: u32,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 pub enum UpdateID {
-    ID(i32),
+    ID(u32),
     Alias(String),
 }
 
@@ -419,7 +461,7 @@ pub struct User {
     pub avatar: String,
     pub email: Option<String>,
     pub groups: Vec<Group>,
-    pub id: i32,
+    pub id: u32,
     pub name: String,
     pub openid: String,
 }
