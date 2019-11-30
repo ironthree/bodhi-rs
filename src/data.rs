@@ -7,6 +7,8 @@
 //! corresponding query filters accept some of the enum types defined here,
 //! instead of the String arguments directly.
 
+use std::convert::TryFrom;
+
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
@@ -91,6 +93,45 @@ pub enum FedoraRelease {
     EL6,
     #[serde(rename(deserialize = "EL-5"))]
     EL5,
+}
+
+impl TryFrom<&str> for FedoraRelease {
+    type Error = String;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "F32" => Ok(FedoraRelease::F32),
+            "F32C" => Ok(FedoraRelease::F32C),
+            "F31" => Ok(FedoraRelease::F31),
+            "F31C" => Ok(FedoraRelease::F31C),
+            "F31F" => Ok(FedoraRelease::F31F),
+            "F31M" => Ok(FedoraRelease::F31M),
+            "F30" => Ok(FedoraRelease::F30),
+            "F30C" => Ok(FedoraRelease::F30C),
+            "F30F" => Ok(FedoraRelease::F30F),
+            "F30M" => Ok(FedoraRelease::F30M),
+            "F29" => Ok(FedoraRelease::F29),
+            "F29C" => Ok(FedoraRelease::F29C),
+            "F29F" => Ok(FedoraRelease::F29F),
+            "F29M" => Ok(FedoraRelease::F29M),
+            "F28" => Ok(FedoraRelease::F28),
+            "F28C" => Ok(FedoraRelease::F28C),
+            "F28M" => Ok(FedoraRelease::F28M),
+            "F27" => Ok(FedoraRelease::F27),
+            "F27M" => Ok(FedoraRelease::F27M),
+            "F26" => Ok(FedoraRelease::F26),
+            "F25" => Ok(FedoraRelease::F25),
+            "F24" => Ok(FedoraRelease::F24),
+            "F23" => Ok(FedoraRelease::F23),
+            "F22" => Ok(FedoraRelease::F22),
+            "F21" => Ok(FedoraRelease::F21),
+            "EPEL-8" => Ok(FedoraRelease::EPEL8),
+            "EPEL-7" => Ok(FedoraRelease::EPEL7),
+            "EL-6" => Ok(FedoraRelease::EL6),
+            "EL-5" => Ok(FedoraRelease::EL5),
+            _ => Err(format!("Unrecognised release: {}", value)),
+        }
+    }
 }
 
 impl Into<String> for FedoraRelease {

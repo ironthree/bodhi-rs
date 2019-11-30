@@ -8,7 +8,7 @@ use failure::Fail;
 use fedora::{OpenIDClient, OpenIDClientBuilder};
 use reqwest::{Response, Url};
 
-use crate::{FEDORA_BODHI_URL, FEDORA_BODHI_STG_URL};
+use crate::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 
 /// Always start with page 1 for multi-page queries.
 /// Everything else would be stupid.
@@ -126,18 +126,14 @@ impl BodhiServiceBuilder {
         };
 
         let session = match self.service_type {
-            BodhiServiceType::DEFAULT => {
-                OpenIDClientBuilder::default()
-                    .user_agent(String::from("bodhi-rs"))
-                    .timeout(timeout)
-                    .build()?
-            },
-            BodhiServiceType::STAGING => {
-                OpenIDClientBuilder::staging()
-                    .user_agent(String::from("bodhi-rs"))
-                    .timeout(timeout)
-                    .build()?
-            },
+            BodhiServiceType::DEFAULT => OpenIDClientBuilder::default()
+                .user_agent(String::from("bodhi-rs"))
+                .timeout(timeout)
+                .build()?,
+            BodhiServiceType::STAGING => OpenIDClientBuilder::staging()
+                .user_agent(String::from("bodhi-rs"))
+                .timeout(timeout)
+                .build()?,
             // BodhiServiceType::CUSTOM
         };
 
