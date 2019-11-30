@@ -14,7 +14,7 @@ use serde_repr::Deserialize_repr;
 pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
 
 /// base URL of the fedora bodhi staging instance
-pub const FEDORA_BODHI_STAGING_URL: &str = "https://bodhi.stg.fedoraproject.org";
+pub const FEDORA_BODHI_STG_URL: &str = "https://bodhi.stg.fedoraproject.org";
 
 #[derive(Debug, Clone, Deserialize_repr)]
 #[repr(i8)]
@@ -56,12 +56,14 @@ impl From<i32> for Karma {
 }
 
 /// This enum represents a fedora release.
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub enum FedoraRelease {
     F32,
     F32C,
     F31,
     F31C,
+    F31F,
+    F31M,
     F30,
     F30C,
     F30F,
@@ -81,8 +83,14 @@ pub enum FedoraRelease {
     F23,
     F22,
     F21,
+    #[serde(rename(deserialize = "EPEL-8"))]
     EPEL8,
+    #[serde(rename(deserialize = "EPEL-7"))]
     EPEL7,
+    #[serde(rename(deserialize = "EL-6"))]
+    EL6,
+    #[serde(rename(deserialize = "EL-5"))]
+    EL5,
 }
 
 impl Into<String> for FedoraRelease {
@@ -92,6 +100,8 @@ impl Into<String> for FedoraRelease {
             FedoraRelease::F32C => String::from("F32C"),
             FedoraRelease::F31 => String::from("F31"),
             FedoraRelease::F31C => String::from("F31C"),
+            FedoraRelease::F31F => String::from("F31F"),
+            FedoraRelease::F31M => String::from("F31M"),
             FedoraRelease::F30 => String::from("F30"),
             FedoraRelease::F30C => String::from("F30C"),
             FedoraRelease::F30F => String::from("F30F"),
@@ -113,6 +123,8 @@ impl Into<String> for FedoraRelease {
             FedoraRelease::F21 => String::from("F21"),
             FedoraRelease::EPEL8 => String::from("EPEL-8"),
             FedoraRelease::EPEL7 => String::from("EPEL-7"),
+            FedoraRelease::EL6 => String::from("EL-6"),
+            FedoraRelease::EL5 => String::from("EL-5"),
         }
     }
 }
@@ -376,7 +388,7 @@ pub struct Release {
     pub id_prefix: String,
     pub long_name: String,
     pub mail_template: String,
-    pub name: String,
+    pub name: FedoraRelease,
     pub override_tag: String,
     pub pending_signing_tag: String,
     pub pending_stable_tag: String,

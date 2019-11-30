@@ -23,8 +23,7 @@ use super::retry_query;
 /// Use this for querying bodhi for a specific user by their name.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let comment = bodhi::query::UserNameQuery::new(String::from("decathorpe"))
 ///     .query(&bodhi).unwrap();
@@ -79,8 +78,7 @@ impl UserNameQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let users = bodhi::query::UserQuery::new()
 ///     .groups(String::from("provenpackager"))

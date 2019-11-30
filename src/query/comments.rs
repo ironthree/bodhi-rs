@@ -25,8 +25,7 @@ use super::retry_query;
 /// Use this for querying bodhi for a specific comment by its ID.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let comment = bodhi::query::CommentIDQuery::new(19999).query(&bodhi).unwrap();
 /// ```
@@ -80,8 +79,7 @@ impl CommentIDQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let comments = bodhi::query::CommentQuery::new()
 ///     .anonymous(true)

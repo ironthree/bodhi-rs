@@ -8,6 +8,8 @@ use failure::Fail;
 use fedora::{OpenIDClient, OpenIDClientBuilder};
 use reqwest::{Response, Url};
 
+use crate::{FEDORA_BODHI_URL, FEDORA_BODHI_STG_URL};
+
 /// Always start with page 1 for multi-page queries.
 /// Everything else would be stupid.
 pub const DEFAULT_PAGE: u32 = 1;
@@ -23,15 +25,22 @@ const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
 /// Specify a number of retries in case of connection failures.
 const REQUEST_RETRIES: usize = 3;
 
-/// TODO
-///
+#[derive(Debug)]
+enum BodhiServiceType {
+    DEFAULT,
+    STAGING,
+    // CUSTOM,
+}
+
+// TODO
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from("https://bodhi.fedoraproject.org"))
+/// let bodhi = bodhi::BodhiServiceBuilder::default()
 ///     .timeout(std::time::Duration::from_secs(42))
 ///     .retries(9001);
 /// ```
 #[derive(Debug)]
 pub struct BodhiServiceBuilder {
+    service_type: BodhiServiceType,
     url: String,
     timeout: Option<Duration>,
     retries: Option<usize>,
@@ -58,28 +67,51 @@ impl From<fedora::openid::BuilderError> for BuilderError {
 }
 
 impl BodhiServiceBuilder {
-    /// TODO
-    pub fn new(url: String) -> Self {
+    // TODO
+    pub fn default() -> Self {
         BodhiServiceBuilder {
-            url,
+            service_type: BodhiServiceType::DEFAULT,
+            url: FEDORA_BODHI_URL.to_string(),
             timeout: None,
             retries: None,
         }
     }
 
-    /// TODO
+    // TODO
+    pub fn staging() -> Self {
+        BodhiServiceBuilder {
+            service_type: BodhiServiceType::STAGING,
+            url: FEDORA_BODHI_STG_URL.to_string(),
+            timeout: None,
+            retries: None,
+        }
+    }
+
+    /*
+    // TODO
+    pub fn custom(url: String, openid_url: String) -> Self {
+        BodhiServiceBuilder {
+            service_type: BodhiServiceType::CUSTOM,
+            url,
+            timeout: None,
+            retries: None,
+        }
+    }
+    */
+
+    // TODO
     pub fn timeout(mut self, timeout: Duration) -> Self {
         self.timeout = Some(timeout);
         self
     }
 
-    /// TODO
+    // TODO
     pub fn retries(mut self, retries: usize) -> Self {
         self.retries = Some(retries);
         self
     }
 
-    /// TODO
+    // TODO
     pub fn build(self) -> Result<BodhiService, BuilderError> {
         let url = Url::parse(&self.url)?;
 
@@ -93,10 +125,21 @@ impl BodhiServiceBuilder {
             None => REQUEST_RETRIES,
         };
 
-        let session = OpenIDClientBuilder::new(url.clone())
-            .user_agent(String::from("bodhi-rs"))
-            .timeout(timeout)
-            .build()?;
+        let session = match self.service_type {
+            BodhiServiceType::DEFAULT => {
+                OpenIDClientBuilder::default()
+                    .user_agent(String::from("bodhi-rs"))
+                    .timeout(timeout)
+                    .build()?
+            },
+            BodhiServiceType::STAGING => {
+                OpenIDClientBuilder::staging()
+                    .user_agent(String::from("bodhi-rs"))
+                    .timeout(timeout)
+                    .build()?
+            },
+            // BodhiServiceType::CUSTOM
+        };
 
         Ok(BodhiService {
             url,
@@ -149,7 +192,7 @@ impl From<reqwest::UrlError> for ServiceError {
 }
 
 impl BodhiService {
-    /// TODO
+    // TODO
     pub fn authenticate(&mut self, username: String, password: String) -> Result<(), ServiceError> {
         match self.session.login(username.clone(), password) {
             Ok(_) => {
@@ -161,12 +204,12 @@ impl BodhiService {
         }
     }
 
-    /// TODO
+    // TODO
     pub fn authenticated(&self) -> bool {
         self.authenticated
     }
 
-    /// TODO
+    // TODO
     pub fn username(&self) -> Result<String, ServiceError> {
         match &self.username {
             Some(username) => Ok(username.clone()),
@@ -174,7 +217,7 @@ impl BodhiService {
         }
     }
 
-    /// TODO
+    // TODO
     pub(crate) fn get(
         &self,
         path: &str,
@@ -222,7 +265,7 @@ impl BodhiService {
         }
     }
 
-    /// TODO
+    // TODO
     pub(crate) fn post(
         &self,
         path: &str,

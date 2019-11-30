@@ -28,8 +28,7 @@ use super::retry_query;
 /// by its Name-Version-Release string.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let build = bodhi::query::BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29"))
 ///     .query(&bodhi).unwrap();
@@ -79,8 +78,7 @@ impl BuildNVRQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let builds = bodhi::query::BuildQuery::new()
 ///     .releases(bodhi::data::FedoraRelease::F30)

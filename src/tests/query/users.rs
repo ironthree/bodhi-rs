@@ -6,7 +6,7 @@ use crate::service::*;
 
 #[test]
 fn deserialize_all() {
-    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES)
         .build()
@@ -18,7 +18,7 @@ fn deserialize_all() {
 
 #[test]
 fn name_query_some() {
-    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES)
         .build()
@@ -33,7 +33,7 @@ fn name_query_some() {
 
 #[test]
 fn name_query_none() {
-    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES)
         .build()

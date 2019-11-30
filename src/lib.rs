@@ -48,22 +48,23 @@
 //! different connection settings:
 //!
 //! ```
-//! let bodhi = bodhi::BodhiServiceBuilder::new(bodhi::FEDORA_BODHI_URL.to_string())
-//!     .build().unwrap();
+//! let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 //!
 //! let package_query = bodhi::query::PackageQuery::new().name("rust".to_string());
 //! let packages = package_query.query(&bodhi).unwrap();
 //! ```
 
 pub mod data;
-pub use data::{FEDORA_BODHI_STAGING_URL, FEDORA_BODHI_URL};
+pub use data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 
 pub mod service;
 pub use service::{BodhiService, BodhiServiceBuilder};
 
 pub mod error;
 
+#[deprecated]
 pub mod create;
+
 pub mod query;
 
 #[cfg(test)]

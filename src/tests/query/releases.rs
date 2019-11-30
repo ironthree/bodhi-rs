@@ -6,7 +6,7 @@ use crate::service::*;
 
 #[test]
 fn deserialize_all() {
-    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES)
         .build()
@@ -21,30 +21,30 @@ fn deserialize_all() {
 
 #[test]
 fn name_query_some() {
-    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES)
         .build()
         .unwrap();
 
-    let build: Option<Release> = ReleaseNameQuery::new(String::from("F30"))
+    let release: Option<Release> = ReleaseNameQuery::new(String::from("F30"))
         .query(&bodhi)
         .unwrap();
 
-    assert!(build.is_some());
+    assert!(release.is_some());
 }
 
 #[test]
 fn name_query_none() {
-    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES)
         .build()
         .unwrap();
 
-    let build: Option<Release> = ReleaseNameQuery::new(String::from("X10"))
+    let release: Option<Release> = ReleaseNameQuery::new(String::from("X10"))
         .query(&bodhi)
         .unwrap();
 
-    assert!(build.is_none());
+    assert!(release.is_none());
 }

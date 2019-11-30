@@ -23,8 +23,7 @@ use super::retry_query;
 /// Use this for querying bodhi for a specific release by its name.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let release = bodhi::query::ReleaseNameQuery::new(String::from("F30"))
 ///     .query(&bodhi).unwrap();
@@ -77,8 +76,7 @@ impl ReleaseNameQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::service::BodhiServiceBuilder::new(String::from(bodhi::data::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::service::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let releases = bodhi::query::ReleaseQuery::new()
 ///     .exclude_archived(true)

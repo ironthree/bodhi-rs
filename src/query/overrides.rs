@@ -25,8 +25,7 @@ use super::retry_query;
 /// by its Name-Version-Release string.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let over_ride = bodhi::query::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
 ///     .query(&bodhi).unwrap();
@@ -81,8 +80,7 @@ impl OverrideNVRQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let overrides = bodhi::query::OverrideQuery::new()
 ///     .releases(bodhi::data::FedoraRelease::F29)

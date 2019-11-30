@@ -1,12 +1,11 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::data::*;
 use crate::query::*;
 use crate::service::*;
 
 #[test]
 fn deserialize() {
-    let bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_URL))
+    let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES)
         .build()

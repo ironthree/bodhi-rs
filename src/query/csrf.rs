@@ -11,8 +11,7 @@ use crate::service::BodhiService;
 /// Use this for querying bodhi for a new CSRF token.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let token = bodhi::query::CSRFQuery::new().query(&bodhi).unwrap();
 /// ```

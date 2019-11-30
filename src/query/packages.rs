@@ -22,8 +22,7 @@ use super::retry_query;
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let packages = bodhi::query::PackageQuery::new()
 ///     .search(String::from("rust*"))

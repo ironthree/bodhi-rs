@@ -22,9 +22,7 @@ fn main() -> Result<(), String> {
     }
     let password = password.trim().to_string();
 
-    let mut bodhi = BodhiServiceBuilder::new(String::from(FEDORA_BODHI_STAGING_URL))
-        .build()
-        .unwrap();
+    let mut bodhi = BodhiServiceBuilder::staging().build().unwrap();
 
     let auth = bodhi.authenticate(username, password);
 

@@ -27,8 +27,7 @@ use super::retry_query;
 /// Use this for querying bodhi for a specific update by its ID or alias.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let update = bodhi::query::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
 ///     .query(&bodhi).unwrap();
@@ -84,8 +83,7 @@ impl UpdateIDQuery {
 /// This is consistent with both the web interface and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::new(String::from(bodhi::FEDORA_BODHI_URL))
-///     .build().unwrap();
+/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let updates = bodhi::query::UpdateQuery::new()
 ///     .users(String::from("decathorpe"))
