@@ -57,14 +57,14 @@
 pub mod data;
 pub use data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 
+// pub mod client;
+
 pub mod service;
 pub use service::{BodhiService, BodhiServiceBuilder};
 
 pub mod error;
 
-#[deprecated]
 pub mod create;
-
 pub mod query;
 
 #[cfg(test)]

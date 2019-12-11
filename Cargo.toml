@@ -12,9 +12,13 @@ categories = ["api-bindings"]
 keywords = ["fedora", "bodhi", "REST", "client"]
 repository = "https://github.com/ironthree/bodhi-rs"
 
+[features]
+default = []
+debug = []
+
 [dependencies]
 failure = "^0.1"
-fedora = "^0.0.6"
+fedora = "^0.0.7"
 reqwest = "^0.9"
 retry = "^0.5"
 serde = { version = "^1.0", features = ["derive"] }

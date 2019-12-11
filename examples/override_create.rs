@@ -21,18 +21,15 @@ fn main() -> Result<(), String> {
     }
     let password = password.trim().to_string();
 
-    let mut bodhi = BodhiServiceBuilder::staging().build().unwrap();
-
-    let auth = bodhi.authenticate(username, password);
-
-    if let Err(error) = auth {
-        return Err(format!("Failed to authenticate: {:?}", error));
-    }
+    let bodhi = BodhiServiceBuilder::staging()
+        .authentication(username, password)
+        .build()
+        .unwrap();
 
     let new_override = OverrideBuilder::new(
         String::from("libcloudproviders-0.3.0-1.fc30"),
         String::from("Test buildroot override created by bodhi-rs."),
-        String::from("2019-08-31"),
+        String::from("2019-12-31"),
     );
 
     let response = new_override.create(&bodhi);

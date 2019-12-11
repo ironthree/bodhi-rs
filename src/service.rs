@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use failure::Fail;
-use fedora::{OpenIDClient, OpenIDClientBuilder};
+use fedora::Session;
 use reqwest::{Response, Url};
 
 use crate::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
@@ -41,9 +41,16 @@ enum BodhiServiceType {
 #[derive(Debug)]
 pub struct BodhiServiceBuilder {
     service_type: BodhiServiceType,
+    authentication: Option<Authentication>,
     url: String,
     timeout: Option<Duration>,
     retries: Option<usize>,
+}
+
+#[derive(Debug)]
+struct Authentication {
+    username: String,
+    password: String,
 }
 
 #[derive(Debug, Fail)]
@@ -51,7 +58,9 @@ pub enum BuilderError {
     #[fail(display = "Failed to parse service URL: {}", error)]
     UrlParsingError { error: reqwest::UrlError },
     #[fail(display = "Failed to initialize OpenID client: {}", error)]
-    OpenIDClientError { error: fedora::openid::BuilderError },
+    OpenIDClientError {
+        error: fedora::openid::OpenIDClientError,
+    },
 }
 
 impl From<reqwest::UrlError> for BuilderError {
@@ -60,8 +69,8 @@ impl From<reqwest::UrlError> for BuilderError {
     }
 }
 
-impl From<fedora::openid::BuilderError> for BuilderError {
-    fn from(error: fedora::openid::BuilderError) -> Self {
+impl From<fedora::openid::OpenIDClientError> for BuilderError {
+    fn from(error: fedora::openid::OpenIDClientError) -> Self {
         BuilderError::OpenIDClientError { error }
     }
 }
@@ -71,6 +80,7 @@ impl BodhiServiceBuilder {
     pub fn default() -> Self {
         BodhiServiceBuilder {
             service_type: BodhiServiceType::DEFAULT,
+            authentication: None,
             url: FEDORA_BODHI_URL.to_string(),
             timeout: None,
             retries: None,
@@ -81,6 +91,7 @@ impl BodhiServiceBuilder {
     pub fn staging() -> Self {
         BodhiServiceBuilder {
             service_type: BodhiServiceType::STAGING,
+            authentication: None,
             url: FEDORA_BODHI_STG_URL.to_string(),
             timeout: None,
             retries: None,
@@ -112,6 +123,12 @@ impl BodhiServiceBuilder {
     }
 
     // TODO
+    pub fn authentication(mut self, username: String, password: String) -> Self {
+        self.authentication = Some(Authentication { username, password });
+        self
+    }
+
+    // TODO
     pub fn build(self) -> Result<BodhiService, BuilderError> {
         let url = Url::parse(&self.url)?;
 
@@ -125,23 +142,46 @@ impl BodhiServiceBuilder {
             None => REQUEST_RETRIES,
         };
 
-        let session = match self.service_type {
-            BodhiServiceType::DEFAULT => OpenIDClientBuilder::default()
-                .user_agent(String::from("bodhi-rs"))
-                .timeout(timeout)
-                .build()?,
-            BodhiServiceType::STAGING => OpenIDClientBuilder::staging()
-                .user_agent(String::from("bodhi-rs"))
-                .timeout(timeout)
-                .build()?,
-            // BodhiServiceType::CUSTOM
+        let login_url = url.join("/login")?;
+
+        let session: Box<dyn Session> = if let Some(authentication) = self.authentication {
+            match self.service_type {
+                BodhiServiceType::DEFAULT => Box::new(
+                    fedora::OpenIDSessionBuilder::default(
+                        login_url,
+                        authentication.username,
+                        authentication.password,
+                    )
+                    .user_agent(String::from("bodhi-rs"))
+                    .timeout(timeout)
+                    .build()
+                    .unwrap(),
+                ),
+                BodhiServiceType::STAGING => Box::new(
+                    fedora::OpenIDSessionBuilder::staging(
+                        login_url,
+                        authentication.username,
+                        authentication.password,
+                    )
+                    .user_agent(String::from("bodhi-rs"))
+                    .timeout(timeout)
+                    .build()
+                    .unwrap(),
+                ),
+            }
+        } else {
+            Box::new(
+                fedora::AnonymousSessionBuilder::new()
+                    .user_agent(String::from("bodhi-rs"))
+                    .timeout(timeout)
+                    .build()
+                    .unwrap(),
+            )
         };
 
         Ok(BodhiService {
             url,
             session,
-            username: None,
-            authenticated: false,
             retries,
         })
     }
@@ -150,19 +190,18 @@ impl BodhiServiceBuilder {
 /// This struct represents a specific bodhi service, typically running remotely,
 /// although a local URL could be specified, as well. This BodhiService instance
 /// is then used by queries to actually submit to, and receive from - the service.
-#[derive(Debug)]
 pub struct BodhiService {
     url: Url,
-    session: OpenIDClient,
-    username: Option<String>,
-    authenticated: bool,
+    session: Box<dyn Session>,
     retries: usize,
 }
 
 #[derive(Debug, Fail)]
 pub enum ServiceError {
     #[fail(display = "Failed to authenticate with OpenID provider: {}", error)]
-    AuthenticationError { error: fedora::openid::ClientError },
+    AuthenticationError {
+        error: fedora::openid::OpenIDClientError,
+    },
     #[fail(display = "Authorization required but not provided.")]
     NotAuthenticated,
     #[fail(display = "Failed to query bodhi instance: {}", error)]
@@ -188,31 +227,6 @@ impl From<reqwest::UrlError> for ServiceError {
 }
 
 impl BodhiService {
-    // TODO
-    pub fn authenticate(&mut self, username: String, password: String) -> Result<(), ServiceError> {
-        match self.session.login(username.clone(), password) {
-            Ok(_) => {
-                self.username = Some(username);
-                self.authenticated = true;
-                Ok(())
-            }
-            Err(error) => Err(ServiceError::AuthenticationError { error }),
-        }
-    }
-
-    // TODO
-    pub fn authenticated(&self) -> bool {
-        self.authenticated
-    }
-
-    // TODO
-    pub fn username(&self) -> Result<String, ServiceError> {
-        match &self.username {
-            Some(username) => Ok(username.clone()),
-            None => Err(ServiceError::NotAuthenticated),
-        }
-    }
-
     // TODO
     pub(crate) fn get(
         &self,
@@ -248,7 +262,7 @@ impl BodhiService {
             }
         };
 
-        let retries: Vec<Duration> = vec![Duration::from_secs(1); REQUEST_RETRIES];
+        let retries: Vec<Duration> = vec![Duration::from_secs(1); self.retries];
         match retry::retry(retries, qf) {
             Ok(response) => Ok(response),
             Err(error) => {

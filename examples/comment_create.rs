@@ -22,15 +22,12 @@ fn main() -> Result<(), String> {
     }
     let password = password.trim().to_string();
 
-    let mut bodhi = BodhiServiceBuilder::staging().build().unwrap();
+    let bodhi = BodhiServiceBuilder::staging()
+        .authentication(username, password)
+        .build()
+        .unwrap();
 
-    let auth = bodhi.authenticate(username, password);
-
-    if let Err(error) = auth {
-        return Err(format!("Failed to authenticate: {:?}", error));
-    }
-
-    let new_comment = CommentBuilder::new(String::from("FEDORA-2019-e39d4910c6"))
+    let new_comment = CommentBuilder::new(String::from("FEDORA-2019-e7f463674c"))
         .text(String::from("Test comment from bodhi-rs."))
         .karma(Karma::Positive);
 
@@ -42,6 +39,9 @@ fn main() -> Result<(), String> {
             println!("{:#?}", new_comment);
             Ok(())
         }
-        Err(error) => Err(format!("{:?}", error)),
+        Err(error) => {
+            dbg!(&error);
+            Err(format!("{:?}", error))
+        }
     }
 }

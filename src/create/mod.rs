@@ -70,13 +70,10 @@ impl CommentBuilder {
     }
 
     pub fn create(self, bodhi: &BodhiService) -> Result<NewComment, QueryError> {
-        // let user = bodhi.username()?;
-        bodhi.username()?;
-
         // TODO: check if lengths of feedback vectors is good
         let path = String::from("/comments/");
 
-        let csrf_token = CSRFQuery::new().query(&bodhi)?;
+        let csrf_token = CSRFQuery::new().query(bodhi)?;
 
         let text = match self.text {
             Some(text) => text,
@@ -167,12 +164,9 @@ impl OverrideBuilder {
     }
 
     pub fn create(self, bodhi: &BodhiService) -> Result<NewOverride, QueryError> {
-        // let user = bodhi.username()?;
-        bodhi.username()?;
-
         let path = String::from("/overrides/");
 
-        let csrf_token = CSRFQuery::new().query(&bodhi)?;
+        let csrf_token = CSRFQuery::new().query(bodhi)?;
 
         let new_override = OverrideData {
             nvr: self.nvr.clone(),
