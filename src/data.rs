@@ -87,6 +87,8 @@ pub enum FedoraRelease {
     F21,
     #[serde(rename(deserialize = "EPEL-8"))]
     EPEL8,
+    #[serde(rename(deserialize = "EPEL-8M"))]
+    EPEL8M,
     #[serde(rename(deserialize = "EPEL-7"))]
     EPEL7,
     #[serde(rename(deserialize = "EL-6"))]
@@ -126,6 +128,7 @@ impl TryFrom<&str> for FedoraRelease {
             "F22" => Ok(FedoraRelease::F22),
             "F21" => Ok(FedoraRelease::F21),
             "EPEL-8" => Ok(FedoraRelease::EPEL8),
+            "EPEL-8M" => Ok(FedoraRelease::EPEL8M),
             "EPEL-7" => Ok(FedoraRelease::EPEL7),
             "EL-6" => Ok(FedoraRelease::EL6),
             "EL-5" => Ok(FedoraRelease::EL5),
@@ -163,6 +166,7 @@ impl Into<String> for FedoraRelease {
             FedoraRelease::F22 => String::from("F22"),
             FedoraRelease::F21 => String::from("F21"),
             FedoraRelease::EPEL8 => String::from("EPEL-8"),
+            FedoraRelease::EPEL8M => String::from("EPEL-8M"),
             FedoraRelease::EPEL7 => String::from("EPEL-7"),
             FedoraRelease::EL6 => String::from("EL-6"),
             FedoraRelease::EL5 => String::from("EL-5"),

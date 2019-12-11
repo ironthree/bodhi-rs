@@ -395,6 +395,21 @@ fn deserialize_epel8() {
 }
 
 #[test]
+fn deserialize_epel8m() {
+    let bodhi = BodhiServiceBuilder::default()
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only updates for one release, and deserialize them
+    UpdateQuery::new()
+        .releases(FedoraRelease::EPEL8M)
+        .query(&bodhi)
+        .unwrap();
+}
+
+#[test]
 fn deserialize_epel7() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
