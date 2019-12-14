@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::data::Karma;
 use crate::error::{BodhiError, QueryError};
-use crate::query::csrf::CSRFQuery;
+use crate::query::*;
 use crate::service::BodhiService;
 
 #[derive(Debug, Serialize)]

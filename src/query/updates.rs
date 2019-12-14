@@ -14,19 +14,18 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::data::{
-    ContentType, FedoraRelease, Update, UpdateRequest, UpdateSeverity, UpdateStatus,
-    UpdateSuggestion, UpdateType,
-};
-
-use crate::error::{BodhiError, QueryError};
+use crate::data::*;
+use crate::error::QueryError;
+use crate::query::{retry_query, SinglePageQuery};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
-use super::retry_query;
-
-/// Use this for querying bodhi for a specific update by its ID or alias.
+/// Use this for querying bodhi for a specific update by its ID or alias. It
+/// will either return an `Ok(Some(Update))` matching the specified ID or
+/// alias, return `Ok(None)` if it doesn't exist, or return an `Err(String)`
+/// if another error occurred.
 ///
 /// ```
+/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let update = bodhi::query::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
@@ -48,32 +47,26 @@ impl UpdateIDQuery {
     pub fn new(id: String) -> Self {
         UpdateIDQuery { id }
     }
+}
 
-    /// This method will query the remote bodhi instance for the requested update by ID,
-    /// or alias, and will either return an `Ok(Some(Update))` matching the specified ID
-    /// or alias, return `Ok(None)` if it doesn't exist, or return an `Err(String)`
-    /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Update>, QueryError> {
-        let path = format!("/updates/{}", self.id);
+impl SinglePageQuery for UpdateIDQuery {
+    type Output = Option<Update>;
 
-        let mut response = bodhi.get(&path, None)?;
-        let status = response.status();
+    fn path(&self) -> String {
+        format!("/updates/{}", self.id)
+    }
 
-        if status.is_success() {
-            let result = response.text()?;
-            let update: UpdatePage = serde_json::from_str(&result)?;
+    fn args(&self) -> Option<HashMap<&str, String>> {
+        None
+    }
 
-            Ok(Some(update.update))
-        } else if status == 404 {
-            // bodhi query successful, but update not found
-            Ok(None)
-        } else {
-            // other server-side error
-            let result = response.text()?;
-            let error: BodhiError = serde_json::from_str(&result)?;
+    fn parse(string: String) -> Result<Option<Update>, QueryError> {
+        let update_page: UpdatePage = serde_json::from_str(&string)?;
+        Ok(Some(update_page.update))
+    }
 
-            Err(QueryError::BodhiError { error })
-        }
+    fn missing() -> Result<Option<Update>, QueryError> {
+        Ok(None)
     }
 }
 

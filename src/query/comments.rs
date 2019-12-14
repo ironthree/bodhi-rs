@@ -17,14 +17,16 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::Comment;
-use crate::error::{BodhiError, QueryError};
+use crate::error::QueryError;
+use crate::query::{retry_query, SinglePageQuery};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
-use super::retry_query;
-
-/// Use this for querying bodhi for a specific comment by its ID.
+/// Use this for querying bodhi for a specific comment by its ID. It will either
+/// return an `Ok(Some(Comment))` matching the specified ID, return `Ok(None)`
+/// if it doesn't exist, or return an `Err(String)` if another error occurred.
 ///
 /// ```
+/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let comment = bodhi::query::CommentIDQuery::new(19999).query(&bodhi).unwrap();
@@ -44,32 +46,26 @@ impl CommentIDQuery {
     pub fn new(id: u32) -> Self {
         CommentIDQuery { id }
     }
+}
 
-    /// This method will query the remote bodhi instance for the requested comment by ID,
-    /// and will either return an `Ok(Some(Comment))` matching the specified ID,
-    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
-    /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Comment>, QueryError> {
-        let path = format!("/comments/{}", self.id);
+impl SinglePageQuery for CommentIDQuery {
+    type Output = Option<Comment>;
 
-        let mut response = bodhi.get(&path, None)?;
-        let status = response.status();
+    fn path(&self) -> String {
+        format!("/comments/{}", self.id)
+    }
 
-        if status.is_success() {
-            let result = response.text()?;
-            let comment: CommentPage = serde_json::from_str(&result)?;
+    fn args(&self) -> Option<HashMap<&str, String>> {
+        None
+    }
 
-            Ok(Some(comment.comment))
-        } else if status == 404 {
-            // bodhi query successful, but comment not found
-            Ok(None)
-        } else {
-            // other server-side error
-            let result = response.text()?;
-            let error: BodhiError = serde_json::from_str(&result)?;
+    fn parse(string: String) -> Result<Option<Comment>, QueryError> {
+        let comment: Comment = serde_json::from_str(&string)?;
+        Ok(Some(comment))
+    }
 
-            Err(QueryError::BodhiError { error })
-        }
+    fn missing() -> Result<Option<Comment>, QueryError> {
+        Ok(None)
     }
 }
 

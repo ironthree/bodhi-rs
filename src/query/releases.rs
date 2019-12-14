@@ -15,14 +15,17 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::Release;
-use crate::error::{BodhiError, QueryError};
+use crate::error::QueryError;
+use crate::query::{retry_query, SinglePageQuery};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
-use super::retry_query;
-
-/// Use this for querying bodhi for a specific release by its name.
+/// Use this for querying bodhi for a specific release by its name. It will
+/// either return an `Ok(Some(Release))` matching the specified name, return
+/// `Ok(None)` if it doesn't exist, or return an `Err(String)` if another
+/// error occurred.
 ///
 /// ```
+/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let release = bodhi::query::ReleaseNameQuery::new(String::from("F30"))
@@ -41,32 +44,26 @@ impl ReleaseNameQuery {
     pub fn new(name: String) -> Self {
         ReleaseNameQuery { name }
     }
+}
 
-    /// This method will query the remote bodhi instance for the requested release by name,
-    /// and will either return an `Ok(Some(Release))` matching the specified name,
-    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
-    /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Release>, QueryError> {
-        let path = format!("/releases/{}", self.name);
+impl SinglePageQuery for ReleaseNameQuery {
+    type Output = Option<Release>;
 
-        let mut response = bodhi.get(&path, None)?;
-        let status = response.status();
+    fn path(&self) -> String {
+        format!("/releases/{}", self.name)
+    }
 
-        if status.is_success() {
-            let result = response.text()?;
-            let release: Release = serde_json::from_str(&result)?;
+    fn args(&self) -> Option<HashMap<&str, String>> {
+        None
+    }
 
-            Ok(Some(release))
-        } else if status == 404 {
-            // bodhi query successful, but release not found
-            Ok(None)
-        } else {
-            // other server-side error
-            let result = response.text()?;
-            let error: BodhiError = serde_json::from_str(&result)?;
+    fn parse(string: String) -> Result<Option<Release>, QueryError> {
+        let release: Release = serde_json::from_str(&string)?;
+        Ok(Some(release))
+    }
 
-            Err(QueryError::BodhiError { error })
-        }
+    fn missing() -> Result<Option<Release>, QueryError> {
+        Ok(None)
     }
 }
 

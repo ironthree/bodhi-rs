@@ -16,15 +16,16 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::{FedoraRelease, Override};
-use crate::error::{BodhiError, QueryError};
+use crate::error::QueryError;
+use crate::query::{retry_query, SinglePageQuery};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
-use super::retry_query;
-
-/// Use this for querying bodhi for a specific override,
-/// by its Name-Version-Release string.
-///
+/// Use this for querying bodhi for a specific override, by its NVR
+/// (Name-Version-Release) string. It will return either an `Ok(Some(Override))`
+/// matching the specified NVR, return `Ok(None)` if it doesn't exist, or return
+/// an `Err(String)` if another error occurred.
 /// ```
+/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let over_ride = bodhi::query::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
@@ -45,32 +46,26 @@ impl OverrideNVRQuery {
     pub fn new(nvr: String) -> Self {
         OverrideNVRQuery { nvr }
     }
+}
 
-    /// This method will query the remote bodhi instance for the given NVR,
-    /// and will return either an `Ok(Some(Override))` matching the specified NVR,
-    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
-    /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Override>, QueryError> {
-        let path = format!("/overrides/{}", self.nvr);
+impl SinglePageQuery for OverrideNVRQuery {
+    type Output = Option<Override>;
 
-        let mut response = bodhi.get(&path, None)?;
-        let status = response.status();
+    fn path(&self) -> String {
+        format!("/overrides/{}", self.nvr)
+    }
 
-        if status.is_success() {
-            let result = response.text()?;
-            let override_page: OverridePage = serde_json::from_str(&result)?;
+    fn args(&self) -> Option<HashMap<&str, String>> {
+        None
+    }
 
-            Ok(Some(override_page.r#override))
-        } else if status == 404 {
-            // bodhi query successful, but override not found
-            Ok(None)
-        } else {
-            // other server-side error
-            let result = response.text()?;
-            let error: BodhiError = serde_json::from_str(&result)?;
+    fn parse(string: String) -> Result<Option<Override>, QueryError> {
+        let override_page: OverridePage = serde_json::from_str(&string)?;
+        Ok(Some(override_page.r#override))
+    }
 
-            Err(QueryError::BodhiError { error })
-        }
+    fn missing() -> Result<Option<Override>, QueryError> {
+        Ok(None)
     }
 }
 

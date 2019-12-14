@@ -19,15 +19,17 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::{Build, FedoraRelease};
-use crate::error::{BodhiError, QueryError};
+use crate::error::QueryError;
+use crate::query::{retry_query, SinglePageQuery};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
-use super::retry_query;
-
-/// Use this for querying bodhi for a specific build,
-/// by its Name-Version-Release string.
+/// Use this for querying bodhi for a specific build, by its NVR
+/// (Name-Version-Release) string. It will either return an `Ok(Some(Build))`
+/// matching the specified NVR, return `Ok(None)` if it doesn't exist, or
+/// return an `Err(QueryError)` if another error occurred.
 ///
 /// ```
+/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let build = bodhi::query::BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29"))
@@ -43,32 +45,26 @@ impl BuildNVRQuery {
     pub fn new(nvr: String) -> Self {
         BuildNVRQuery { nvr }
     }
+}
 
-    /// This method will query the remote bodhi instance for the given NVR,
-    /// and will either return an `Ok(Some(Build))` matching the specified NVR,
-    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
-    /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<Build>, QueryError> {
-        let path = format!("/builds/{}", self.nvr);
+impl SinglePageQuery for BuildNVRQuery {
+    type Output = Option<Build>;
 
-        let mut response = bodhi.get(&path, None)?;
-        let status = response.status();
+    fn path(&self) -> String {
+        format!("/builds/{}", self.nvr)
+    }
 
-        if status.is_success() {
-            let result = response.text()?;
-            let build: Build = serde_json::from_str(&result)?;
+    fn args(&self) -> Option<HashMap<&str, String>> {
+        None
+    }
 
-            Ok(Some(build))
-        } else if status == 404 {
-            // bodhi query successful, but build not found
-            Ok(None)
-        } else {
-            // other server-side error
-            let result = response.text()?;
-            let error: BodhiError = serde_json::from_str(&result)?;
+    fn parse(string: String) -> Result<Option<Build>, QueryError> {
+        let build: Build = serde_json::from_str(&string)?;
+        Ok(Some(build))
+    }
 
-            Err(QueryError::BodhiError { error })
-        }
+    fn missing() -> Result<Option<Build>, QueryError> {
+        Ok(None)
     }
 }
 

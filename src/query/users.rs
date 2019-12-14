@@ -15,14 +15,16 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::User;
-use crate::error::{BodhiError, QueryError};
+use crate::error::QueryError;
+use crate::query::{retry_query, SinglePageQuery};
 use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
-use super::retry_query;
-
-/// Use this for querying bodhi for a specific user by their name.
+/// Use this for querying bodhi for a specific user by their name. It will
+/// either return an `Ok(User)` matching the specified name, return `Ok(None)`
+/// if it doesn't exist, or return an `Err(String)` if another error occurred.
 ///
 /// ```
+/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let comment = bodhi::query::UserNameQuery::new(String::from("decathorpe"))
@@ -43,32 +45,26 @@ impl UserNameQuery {
     pub fn new(name: String) -> Self {
         UserNameQuery { name }
     }
+}
 
-    /// This method will query the remote bodhi instance for the requested user by name,
-    /// and will either return an `Ok(User)` matching the specified name,
-    /// return `Ok(None)` if it doesn't exist, or return an `Err(String)`
-    /// if another error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Option<User>, QueryError> {
-        let path = format!("/users/{}", self.name);
+impl SinglePageQuery for UserNameQuery {
+    type Output = Option<User>;
 
-        let mut response = bodhi.get(&path, None)?;
-        let status = response.status();
+    fn path(&self) -> String {
+        format!("/users/{}", self.name)
+    }
 
-        if status.is_success() {
-            let result = response.text()?;
-            let user: UserPage = serde_json::from_str(&result)?;
+    fn args(&self) -> Option<HashMap<&str, String>> {
+        None
+    }
 
-            Ok(Some(user.user))
-        } else if status == 404 {
-            // bodhi query successful, but user not found
-            Ok(None)
-        } else {
-            // other server-side error
-            let result = response.text()?;
-            let error: BodhiError = serde_json::from_str(&result)?;
+    fn parse(string: String) -> Result<Option<User>, QueryError> {
+        let user_page: UserPage = serde_json::from_str(&string)?;
+        Ok(Some(user_page.user))
+    }
 
-            Err(QueryError::BodhiError { error })
-        }
+    fn missing() -> Result<Option<User>, QueryError> {
+        Ok(None)
     }
 }
 

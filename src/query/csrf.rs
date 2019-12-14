@@ -3,14 +3,20 @@
 //! The contents of this module can be used to query a bodhi instance for a
 //! new CSRF token.
 
+use std::collections::HashMap;
+
 use serde::Deserialize;
 
-use crate::error::{BodhiError, QueryError};
-use crate::service::BodhiService;
+use crate::error::QueryError;
+use crate::query::SinglePageQuery;
+use crate::service::ServiceError;
 
 /// Use this for querying bodhi for a new CSRF token.
-///
+/// It will return either an `Ok(String)` with the new token,
+/// or an `Err(String)` if an error occurred.
 /// ```
+/// # use bodhi::query::SinglePageQuery;
+///
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let token = bodhi::query::CSRFQuery::new().query(&bodhi).unwrap();
@@ -28,26 +34,27 @@ impl CSRFQuery {
     pub fn new() -> Self {
         CSRFQuery {}
     }
+}
 
-    /// This method will query the remote bodhi instance for a new CSRF token.
-    /// It will return either an `Ok(String)` with the new token,
-    /// or an `Err(String)` if an error occurred.
-    pub fn query(self, bodhi: &BodhiService) -> Result<String, QueryError> {
-        let path = String::from("/csrf");
+impl SinglePageQuery for CSRFQuery {
+    type Output = String;
 
-        let mut response = bodhi.get(&path, None)?;
-        let status = response.status();
+    fn path(&self) -> String {
+        String::from("/csrf")
+    }
 
-        if status.is_success() {
-            let result = response.text()?;
-            let page: CSRFPage = serde_json::from_str(&result)?;
+    fn args(&self) -> Option<HashMap<&str, String>> {
+        None
+    }
 
-            Ok(page.csrf_token)
-        } else {
-            let result = response.text()?;
-            let error: BodhiError = serde_json::from_str(&result)?;
+    fn missing() -> Result<Self::Output, QueryError> {
+        Err(QueryError::ServiceError {
+            error: ServiceError::EmptyResponseError,
+        })
+    }
 
-            Err(QueryError::BodhiError { error })
-        }
+    fn parse(string: String) -> Result<String, QueryError> {
+        let page: CSRFPage = serde_json::from_str(&string)?;
+        Ok(page.csrf_token)
     }
 }

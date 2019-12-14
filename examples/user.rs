@@ -1,7 +1,7 @@
 use std::env::args;
 
 use bodhi::error::QueryError;
-use bodhi::query::UserNameQuery;
+use bodhi::query::{SinglePageQuery, UserNameQuery};
 use bodhi::service::BodhiServiceBuilder;
 
 fn main() -> Result<(), QueryError> {
