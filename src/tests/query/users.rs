@@ -5,6 +5,7 @@ use crate::query::*;
 use crate::service::*;
 
 #[test]
+#[ignore]
 fn deserialize_all() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)

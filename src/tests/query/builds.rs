@@ -5,6 +5,7 @@ use crate::query::*;
 use crate::service::*;
 
 #[test]
+#[ignore]
 fn deserialize_f32() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -35,6 +36,7 @@ fn deserialize_f32c() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f31() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -95,6 +97,7 @@ fn deserialize_f31m() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f30() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -155,6 +158,7 @@ fn deserialize_f30m() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f29() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -215,6 +219,7 @@ fn deserialize_f29m() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f28() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -260,6 +265,7 @@ fn deserialize_f28m() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f27() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -290,6 +296,7 @@ fn deserialize_f27m() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f26() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -305,6 +312,7 @@ fn deserialize_f26() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f25() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -320,6 +328,7 @@ fn deserialize_f25() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f24() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -335,6 +344,7 @@ fn deserialize_f24() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f23() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -350,6 +360,7 @@ fn deserialize_f23() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f22() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -365,6 +376,7 @@ fn deserialize_f22() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_f21() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -380,6 +392,7 @@ fn deserialize_f21() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_epel8() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -410,6 +423,7 @@ fn deserialize_epel8m() {
 }
 
 #[test]
+#[ignore]
 fn deserialize_epel7() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)

@@ -17,14 +17,20 @@ It uses the awesome [`reqwest`][reqwest] and [`serde`][serde] packages.
 ## Current status
 
 - All `GET` requests are implemented, and all actual API responses should successfully deserialize.
-- No `POST` requests are implemented yet, because
-- `OpenID` authentication is not yet implemented.
+- `POST` requests are work-in-progress.
+- refactoring around common traits with common logic is happening
 
 Note that the API is not finalized yet, and minor changes will still happen before the `0.1.0` release.
 
 
 ## TODO
 
-- _**working**_ OpenID authentication
 - implementing all POST requests for creating and editing things (WIP)
+
+
+## Test coverage
+
+Tests should pass for every commit that gets pushed to master. By default, only "fast" tests are run by `cargo test`.
+Before pushing, the ignored, "slow" tests are also run once with `cargo test -- --ignored`. These make sure that this
+library can still successfully deserialize all JSON server responses.
 
