@@ -16,8 +16,8 @@ use serde::Deserialize;
 
 use crate::data::User;
 use crate::error::QueryError;
-use crate::query::{retry_query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::query::SinglePageQuery;
+use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific user by their name. It will
 /// either return an `Ok(User)` matching the specified name, return `Ok(None)`
@@ -220,42 +220,56 @@ impl UserPageQuery {
             rows_per_page: DEFAULT_ROWS,
         }
     }
+}
 
-    fn query(self, bodhi: &BodhiService) -> Result<UserListPage, QueryError> {
-        let path = String::from("/users/");
+impl SinglePageQuery for UserPageQuery {
+    type Output = UserListPage;
 
+    fn path(&self) -> String {
+        String::from("/users/")
+    }
+
+    fn args(&self) -> Option<HashMap<&str, String>> {
         let mut args: HashMap<&str, String> = HashMap::new();
 
-        if let Some(groups) = self.groups {
+        if let Some(groups) = &self.groups {
             args.insert("groups", groups.join(","));
         };
 
-        if let Some(like) = self.like {
-            args.insert("like", like);
+        if let Some(like) = &self.like {
+            args.insert("like", like.to_owned());
         };
 
-        if let Some(name) = self.name {
-            args.insert("name", name);
+        if let Some(name) = &self.name {
+            args.insert("name", name.to_owned());
         };
 
-        if let Some(packages) = self.packages {
+        if let Some(packages) = &self.packages {
             args.insert("packages", packages.join(","));
         };
 
-        if let Some(search) = self.search {
-            args.insert("search", search);
+        if let Some(search) = &self.search {
+            args.insert("search", search.to_owned());
         };
 
-        if let Some(updates) = self.updates {
+        if let Some(updates) = &self.updates {
             args.insert("updates", updates.join(","));
         };
 
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        let result = retry_query(bodhi, &path, args)?;
-        let users: UserListPage = serde_json::from_str(&result)?;
+        Some(args)
+    }
 
-        Ok(users)
+    fn parse(string: String) -> Result<UserListPage, QueryError> {
+        let user_page: UserListPage = serde_json::from_str(&string)?;
+        Ok(user_page)
+    }
+
+    fn missing() -> Result<UserListPage, QueryError> {
+        Err(QueryError::ServiceError {
+            error: ServiceError::EmptyResponseError,
+        })
     }
 }

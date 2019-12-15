@@ -18,8 +18,8 @@ use serde::Deserialize;
 
 use crate::data::Comment;
 use crate::error::QueryError;
-use crate::query::{retry_query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::query::SinglePageQuery;
+use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific comment by its ID. It will either
 /// return an `Ok(Some(Comment))` matching the specified ID, return `Ok(None)`
@@ -60,8 +60,8 @@ impl SinglePageQuery for CommentIDQuery {
     }
 
     fn parse(string: String) -> Result<Option<Comment>, QueryError> {
-        let comment: Comment = serde_json::from_str(&string)?;
-        Ok(Some(comment))
+        let comment: CommentPage = serde_json::from_str(&string)?;
+        Ok(Some(comment.comment))
     }
 
     fn missing() -> Result<Option<Comment>, QueryError> {
@@ -264,50 +264,64 @@ impl CommentPageQuery {
             users: None,
         }
     }
+}
 
-    fn query(self, bodhi: &BodhiService) -> Result<CommentListPage, QueryError> {
-        let path = String::from("/comments/");
+impl SinglePageQuery for CommentPageQuery {
+    type Output = CommentListPage;
 
+    fn path(&self) -> String {
+        String::from("/comments/")
+    }
+
+    fn args(&self) -> Option<HashMap<&str, String>> {
         let mut args: HashMap<&str, String> = HashMap::new();
 
         if let Some(anonymous) = self.anonymous {
             args.insert("anonymous", anonymous.to_string());
         }
 
-        if let Some(ignore_users) = self.ignore_users {
+        if let Some(ignore_users) = &self.ignore_users {
             args.insert("ignore_user", ignore_users.join(","));
         }
 
-        if let Some(like) = self.like {
-            args.insert("like", like);
+        if let Some(like) = &self.like {
+            args.insert("like", like.to_owned());
         }
 
-        if let Some(packages) = self.packages {
+        if let Some(packages) = &self.packages {
             args.insert("packages", packages.join(","));
         }
 
-        if let Some(search) = self.search {
-            args.insert("search", search);
+        if let Some(search) = &self.search {
+            args.insert("search", search.to_owned());
         }
 
-        if let Some(update_owners) = self.update_owners {
+        if let Some(update_owners) = &self.update_owners {
             args.insert("update_owner", update_owners.join(","));
         }
 
-        if let Some(updates) = self.updates {
+        if let Some(updates) = &self.updates {
             args.insert("updates", updates.join(","));
         }
 
-        if let Some(users) = self.users {
+        if let Some(users) = &self.users {
             args.insert("user", users.join(","));
         }
 
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        let result = retry_query(bodhi, &path, args)?;
-        let comments: CommentListPage = serde_json::from_str(&result)?;
+        Some(args)
+    }
 
-        Ok(comments)
+    fn parse(string: String) -> Result<CommentListPage, QueryError> {
+        let comment_page: CommentListPage = serde_json::from_str(&string)?;
+        Ok(comment_page)
+    }
+
+    fn missing() -> Result<CommentListPage, QueryError> {
+        Err(QueryError::ServiceError {
+            error: ServiceError::EmptyResponseError,
+        })
     }
 }

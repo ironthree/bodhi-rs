@@ -12,9 +12,8 @@ use serde::Deserialize;
 
 use crate::data::Package;
 use crate::error::QueryError;
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
-
-use super::retry_query;
+use crate::query::SinglePageQuery;
+use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi about a set of packages with the given properties,
 /// which can be specified with the builder pattern. Note that some options can be
@@ -119,30 +118,44 @@ impl PackagePageQuery {
             rows_per_page: DEFAULT_ROWS,
         }
     }
+}
 
-    fn query(self, bodhi: &BodhiService) -> Result<PackageListPage, QueryError> {
-        let path = String::from("/packages/");
+impl SinglePageQuery for PackagePageQuery {
+    type Output = PackageListPage;
 
+    fn path(&self) -> String {
+        String::from("/packages/")
+    }
+
+    fn args(&self) -> Option<HashMap<&str, String>> {
         let mut args: HashMap<&str, String> = HashMap::new();
 
-        if let Some(like) = self.like {
-            args.insert("like", like);
+        if let Some(like) = &self.like {
+            args.insert("like", like.to_owned());
         }
 
-        if let Some(name) = self.name {
-            args.insert("name", name);
+        if let Some(name) = &self.name {
+            args.insert("name", name.to_owned());
         }
 
-        if let Some(search) = self.search {
-            args.insert("search", search);
+        if let Some(search) = &self.search {
+            args.insert("search", search.to_owned());
         }
 
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        let result = retry_query(bodhi, &path, args)?;
-        let packages: PackageListPage = serde_json::from_str(&result)?;
+        Some(args)
+    }
 
-        Ok(packages)
+    fn parse(string: String) -> Result<PackageListPage, QueryError> {
+        let package_page: PackageListPage = serde_json::from_str(&string)?;
+        Ok(package_page)
+    }
+
+    fn missing() -> Result<PackageListPage, QueryError> {
+        Err(QueryError::ServiceError {
+            error: ServiceError::EmptyResponseError,
+        })
     }
 }

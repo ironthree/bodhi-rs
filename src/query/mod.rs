@@ -81,6 +81,8 @@ pub trait SinglePageQuery {
     }
 }
 
+// TODO: MultiPageQuery (with retry logic)
+
 pub(crate) fn retry_query(
     bodhi: &BodhiService,
     path: &str,

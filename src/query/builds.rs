@@ -20,8 +20,8 @@ use serde::Deserialize;
 
 use crate::data::{Build, FedoraRelease};
 use crate::error::QueryError;
-use crate::query::{retry_query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::query::SinglePageQuery;
+use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific build, by its NVR
 /// (Name-Version-Release) string. It will either return an `Ok(Some(Build))`
@@ -199,34 +199,48 @@ impl BuildPageQuery {
             rows_per_page: DEFAULT_ROWS,
         }
     }
+}
 
-    fn query(self, bodhi: &BodhiService) -> Result<BuildListPage, QueryError> {
-        let path = String::from("/builds/");
+impl SinglePageQuery for BuildPageQuery {
+    type Output = BuildListPage;
 
+    fn path(&self) -> String {
+        String::from("/builds/")
+    }
+
+    fn args(&self) -> Option<HashMap<&str, String>> {
         let mut args: HashMap<&str, String> = HashMap::new();
 
-        if let Some(nvr) = self.nvr {
-            args.insert("nvr", nvr);
+        if let Some(nvr) = &self.nvr {
+            args.insert("nvr", nvr.to_owned());
         }
 
-        if let Some(packages) = self.packages {
+        if let Some(packages) = &self.packages {
             args.insert("packages", packages.join(","));
         }
 
-        if let Some(releases) = self.releases {
+        if let Some(releases) = &self.releases {
             args.insert("releases", releases.join(","));
         }
 
-        if let Some(updates) = self.updates {
+        if let Some(updates) = &self.updates {
             args.insert("updates", updates.join(","));
         }
 
-        args.insert("page", format!("{}", self.page));
+        args.insert("page", format!("{}", &self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        let result = retry_query(bodhi, &path, args)?;
-        let builds: BuildListPage = serde_json::from_str(&result)?;
+        Some(args)
+    }
 
-        Ok(builds)
+    fn parse(string: String) -> Result<BuildListPage, QueryError> {
+        let build_page: BuildListPage = serde_json::from_str(&string)?;
+        Ok(build_page)
+    }
+
+    fn missing() -> Result<BuildListPage, QueryError> {
+        Err(QueryError::ServiceError {
+            error: ServiceError::EmptyResponseError,
+        })
     }
 }

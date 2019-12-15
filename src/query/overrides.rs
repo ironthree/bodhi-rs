@@ -17,8 +17,8 @@ use serde::Deserialize;
 
 use crate::data::{FedoraRelease, Override};
 use crate::error::QueryError;
-use crate::query::{retry_query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::query::SinglePageQuery;
+use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific override, by its NVR
 /// (Name-Version-Release) string. It will return either an `Ok(Some(Override))`
@@ -237,13 +237,19 @@ impl OverridePageQuery {
             rows_per_page: DEFAULT_ROWS,
         }
     }
+}
 
-    fn query(self, bodhi: &BodhiService) -> Result<OverrideListPage, QueryError> {
-        let path = String::from("/overrides/");
+impl SinglePageQuery for OverridePageQuery {
+    type Output = OverrideListPage;
 
+    fn path(&self) -> String {
+        String::from("/overrides/")
+    }
+
+    fn args(&self) -> Option<HashMap<&str, String>> {
         let mut args: HashMap<&str, String> = HashMap::new();
 
-        if let Some(builds) = self.builds {
+        if let Some(builds) = &self.builds {
             args.insert("builds", builds.join(","));
         }
 
@@ -251,32 +257,40 @@ impl OverridePageQuery {
             args.insert("expired", expired.to_string());
         }
 
-        if let Some(like) = self.like {
-            args.insert("like", like);
+        if let Some(like) = &self.like {
+            args.insert("like", like.to_owned());
         }
 
-        if let Some(packages) = self.packages {
+        if let Some(packages) = &self.packages {
             args.insert("packages", packages.join(","));
         }
 
-        if let Some(releases) = self.releases {
+        if let Some(releases) = &self.releases {
             args.insert("releases", releases.join(","));
         }
 
-        if let Some(search) = self.search {
-            args.insert("search", search);
+        if let Some(search) = &self.search {
+            args.insert("search", search.to_owned());
         }
 
-        if let Some(users) = self.users {
+        if let Some(users) = &self.users {
             args.insert("user", users.join(","));
         }
 
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        let result = retry_query(bodhi, &path, args)?;
-        let overrides: OverrideListPage = serde_json::from_str(&result)?;
+        Some(args)
+    }
 
-        Ok(overrides)
+    fn parse(string: String) -> Result<OverrideListPage, QueryError> {
+        let override_page: OverrideListPage = serde_json::from_str(&string)?;
+        Ok(override_page)
+    }
+
+    fn missing() -> Result<OverrideListPage, QueryError> {
+        Err(QueryError::ServiceError {
+            error: ServiceError::EmptyResponseError,
+        })
     }
 }

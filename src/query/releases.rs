@@ -16,8 +16,8 @@ use serde::Deserialize;
 
 use crate::data::Release;
 use crate::error::QueryError;
-use crate::query::{retry_query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::query::SinglePageQuery;
+use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific release by its name. It will
 /// either return an `Ok(Some(Release))` matching the specified name, return
@@ -208,38 +208,52 @@ impl ReleasePageQuery {
             rows_per_page: DEFAULT_ROWS,
         }
     }
+}
 
-    fn query(self, bodhi: &BodhiService) -> Result<ReleaseListPage, QueryError> {
-        let path = String::from("/releases/");
+impl SinglePageQuery for ReleasePageQuery {
+    type Output = ReleaseListPage;
 
+    fn path(&self) -> String {
+        String::from("/releases/")
+    }
+
+    fn args(&self) -> Option<HashMap<&str, String>> {
         let mut args: HashMap<&str, String> = HashMap::new();
 
         if let Some(exclude_archived) = self.exclude_archived {
             args.insert("exclude_archived", exclude_archived.to_string());
         };
 
-        if let Some(ids) = self.ids {
+        if let Some(ids) = &self.ids {
             args.insert("ids", ids.join(","));
         };
 
-        if let Some(name) = self.name {
-            args.insert("name", name);
+        if let Some(name) = &self.name {
+            args.insert("name", name.to_owned());
         };
 
-        if let Some(packages) = self.packages {
+        if let Some(packages) = &self.packages {
             args.insert("packages", packages.join(","));
         };
 
-        if let Some(updates) = self.updates {
+        if let Some(updates) = &self.updates {
             args.insert("updates", updates.join(","));
         };
 
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        let result = retry_query(bodhi, &path, args)?;
-        let releases: ReleaseListPage = serde_json::from_str(&result)?;
+        Some(args)
+    }
 
-        Ok(releases)
+    fn parse(string: String) -> Result<ReleaseListPage, QueryError> {
+        let release_page: ReleaseListPage = serde_json::from_str(&string)?;
+        Ok(release_page)
+    }
+
+    fn missing() -> Result<ReleaseListPage, QueryError> {
+        Err(QueryError::ServiceError {
+            error: ServiceError::EmptyResponseError,
+        })
     }
 }

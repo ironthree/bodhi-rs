@@ -16,8 +16,8 @@ use serde::Deserialize;
 
 use crate::data::*;
 use crate::error::QueryError;
-use crate::query::{retry_query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::query::SinglePageQuery;
+use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific update by its ID or alias. It
 /// will either return an `Ok(Some(Update))` matching the specified ID or
@@ -498,65 +498,71 @@ impl UpdatePageQuery {
             rows_per_page: DEFAULT_ROWS,
         }
     }
+}
 
-    fn query(self, bodhi: &BodhiService) -> Result<UpdateListPage, QueryError> {
-        let path = String::from("/updates/");
+impl SinglePageQuery for UpdatePageQuery {
+    type Output = UpdateListPage;
 
+    fn path(&self) -> String {
+        String::from("/updates/")
+    }
+
+    fn args(&self) -> Option<HashMap<&str, String>> {
         let mut args: HashMap<&str, String> = HashMap::new();
 
         if let Some(active_releases) = self.active_releases {
             args.insert("active_releases", active_releases.to_string());
         };
 
-        if let Some(aliases) = self.aliases {
+        if let Some(aliases) = &self.aliases {
             args.insert("alias", aliases.join(","));
         };
 
-        if let Some(approved_before) = self.approved_before {
-            args.insert("approved_before", approved_before);
+        if let Some(approved_before) = &self.approved_before {
+            args.insert("approved_before", approved_before.to_owned());
         };
 
-        if let Some(approved_since) = self.approved_since {
-            args.insert("approved_since", approved_since);
+        if let Some(approved_since) = &self.approved_since {
+            args.insert("approved_since", approved_since.to_owned());
         };
 
-        if let Some(bugs) = self.bugs {
+        if let Some(bugs) = &self.bugs {
             args.insert("bugs", bugs.join(","));
         };
 
-        if let Some(builds) = self.builds {
+        if let Some(builds) = &self.builds {
             args.insert("builds", builds.join(","));
         };
 
-        if let Some(content_type) = self.content_type {
-            args.insert("content_type", content_type);
+        if let Some(content_type) = &self.content_type {
+            args.insert("content_type", content_type.to_owned());
         };
 
         if let Some(critpath) = self.critpath {
             args.insert("critpath", critpath.to_string());
         };
 
-        if let Some(cves) = self.cves {
+        if let Some(cves) = &self.cves {
             args.insert("cves", cves.join(","));
         };
 
-        if let Some(like) = self.like {
-            args.insert("like", like);
+        if let Some(like) = &self.like {
+            args.insert("like", like.to_owned());
         };
 
         if let Some(locked) = self.locked {
             args.insert("locked", locked.to_string());
         };
 
-        if let Some(modified_before) = self.modified_before {
-            args.insert("modified_before", modified_before);
+        if let Some(modified_before) = &self.modified_before {
+            args.insert("modified_before", modified_before.to_owned());
         };
 
-        if let Some(modified_since) = self.modified_since {
-            args.insert("modified_since", modified_since);
+        if let Some(modified_since) = &self.modified_since {
+            args.insert("modified_since", modified_since.to_owned());
         };
 
-        if let Some(packages) = self.packages {
+        if let Some(packages) = &self.packages {
             args.insert("packages", packages.join(","));
         };
 
@@ -564,64 +570,72 @@ impl UpdatePageQuery {
             args.insert("pushed", pushed.to_string());
         };
 
-        if let Some(pushed_before) = self.pushed_before {
-            args.insert("pushed_before", pushed_before);
+        if let Some(pushed_before) = &self.pushed_before {
+            args.insert("pushed_before", pushed_before.to_owned());
         };
 
-        if let Some(pushed_since) = self.pushed_since {
-            args.insert("pushed_since", pushed_since);
+        if let Some(pushed_since) = &self.pushed_since {
+            args.insert("pushed_since", pushed_since.to_owned());
         };
 
-        if let Some(releases) = self.releases {
+        if let Some(releases) = &self.releases {
             args.insert("releases", releases.join(","));
         };
 
-        if let Some(request) = self.request {
-            args.insert("request", request);
+        if let Some(request) = &self.request {
+            args.insert("request", request.to_owned());
         };
 
-        if let Some(search) = self.search {
-            args.insert("search", search);
+        if let Some(search) = &self.search {
+            args.insert("search", search.to_owned());
         };
 
-        if let Some(severity) = self.severity {
-            args.insert("severity", severity);
+        if let Some(severity) = &self.severity {
+            args.insert("severity", severity.to_owned());
         };
 
-        if let Some(status) = self.status {
-            args.insert("status", status);
+        if let Some(status) = &self.status {
+            args.insert("status", status.to_owned());
         };
 
-        if let Some(submitted_before) = self.submitted_before {
-            args.insert("submitted_before", submitted_before);
+        if let Some(submitted_before) = &self.submitted_before {
+            args.insert("submitted_before", submitted_before.to_owned());
         };
 
-        if let Some(submitted_since) = self.submitted_since {
-            args.insert("submitted_since", submitted_since);
+        if let Some(submitted_since) = &self.submitted_since {
+            args.insert("submitted_since", submitted_since.to_owned());
         };
 
-        if let Some(suggest) = self.suggest {
-            args.insert("suggest", suggest);
+        if let Some(suggest) = &self.suggest {
+            args.insert("suggest", suggest.to_owned());
         };
 
-        if let Some(update_ids) = self.update_ids {
+        if let Some(update_ids) = &self.update_ids {
             args.insert("updateid", update_ids.join(","));
         };
 
-        if let Some(update_type) = self.update_type {
-            args.insert("type", update_type);
+        if let Some(update_type) = &self.update_type {
+            args.insert("type", update_type.to_owned());
         };
 
-        if let Some(users) = self.users {
+        if let Some(users) = &self.users {
             args.insert("user", users.join(","));
         };
 
         args.insert("page", format!("{}", self.page));
         args.insert("rows_per_page", format!("{}", self.rows_per_page));
 
-        let result = retry_query(bodhi, &path, args)?;
-        let updates: UpdateListPage = serde_json::from_str(&result)?;
+        Some(args)
+    }
 
-        Ok(updates)
+    fn parse(string: String) -> Result<UpdateListPage, QueryError> {
+        let update_page: UpdateListPage = serde_json::from_str(&string)?;
+        Ok(update_page)
+    }
+
+    fn missing() -> Result<UpdateListPage, QueryError> {
+        Err(QueryError::ServiceError {
+            error: ServiceError::EmptyResponseError,
+        })
     }
 }
