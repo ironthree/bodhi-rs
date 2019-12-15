@@ -7,6 +7,11 @@
 //! The Rust API abstracts this as with methods on the query that accept normal
 //! Strings and then construct the comma-separated lists on demand.
 
+use std::collections::HashMap;
+
+use crate::error::{BodhiError, QueryError};
+use crate::service::BodhiService;
+
 pub mod builds;
 pub use builds::*;
 
@@ -30,13 +35,6 @@ pub use updates::*;
 
 pub mod users;
 pub use users::*;
-
-use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
-
-use crate::error::{BodhiError, QueryError};
-use crate::service::BodhiService;
 
 pub trait SinglePageQuery {
     type Output;
@@ -79,62 +77,4 @@ pub trait SinglePageQuery {
             Err(QueryError::BodhiError { error })
         }
     }
-}
-
-// TODO: MultiPageQuery (with retry logic)
-
-pub(crate) fn retry_query(
-    bodhi: &BodhiService,
-    path: &str,
-    args: HashMap<&str, String>,
-) -> Result<String, QueryError> {
-    // retry once and keep track of errors
-    // bodhi returns non-JSON responses in rare circumstances
-    let mut retries = 2;
-    let mut errors: Vec<QueryError> = Vec::new();
-
-    loop {
-        if retries == 0 {
-            break;
-        }
-
-        let mut response = bodhi.get(&path, Some(args.clone()))?;
-        let status = response.status();
-
-        if status.is_success() {
-            let value = match response.text() {
-                Ok(value) => value,
-                Err(error) => {
-                    // request successful but other error occurred
-                    retries -= 1;
-                    errors.push(QueryError::RequestError { error });
-                    sleep(Duration::from_secs(1));
-                    continue;
-                }
-            };
-
-            return Ok(value);
-        } else {
-            let message = response.text()?;
-
-            let error: BodhiError = match serde_json::from_str(&message) {
-                Ok(value) => value,
-                Err(error) => {
-                    retries -= 1;
-                    errors.push(error.into());
-                    sleep(Duration::from_secs(1));
-                    continue;
-                }
-            };
-
-            // bodhi returned an error message
-            retries -= 1;
-            errors.push(QueryError::BodhiError { error });
-            sleep(Duration::from_secs(1));
-            continue;
-        }
-    }
-
-    // return the last error
-    Err(errors.into_iter().last().unwrap())
 }
