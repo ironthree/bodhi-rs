@@ -507,6 +507,7 @@ impl SinglePageQuery for UpdatePageQuery {
         String::from("/updates/")
     }
 
+    #[allow(clippy::cognitive_complexity)]
     fn args(&self) -> Option<HashMap<&str, String>> {
         let mut args: HashMap<&str, String> = HashMap::new();
 
