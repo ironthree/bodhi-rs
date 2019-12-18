@@ -14,7 +14,10 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::data::*;
+use crate::data::{
+    ContentType, FedoraRelease, Update, UpdateRequest, UpdateSeverity, UpdateStatus,
+    UpdateSuggestion, UpdateType,
+};
 use crate::error::QueryError;
 use crate::query::SinglePageQuery;
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};

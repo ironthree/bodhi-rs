@@ -62,7 +62,7 @@ pub trait SinglePageQuery {
     /// deserializing JSON, handling 404 errors, or getting API paths and
     /// arguments).
     fn query(&self, bodhi: &BodhiService) -> Result<Self::Output, QueryError> {
-        let mut response = bodhi.get(&self.path(), self.args())?;
+        let response = bodhi.get(&self.path(), self.args())?;
         let status = response.status();
 
         if status.is_success() {

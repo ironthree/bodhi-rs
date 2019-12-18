@@ -6,7 +6,8 @@ use std::time::Duration;
 
 use failure::Fail;
 use fedora::Session;
-use reqwest::{Response, Url};
+use reqwest::blocking::Response;
+use url::Url;
 
 use crate::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 
@@ -56,15 +57,15 @@ struct Authentication {
 #[derive(Debug, Fail)]
 pub enum BuilderError {
     #[fail(display = "Failed to parse service URL: {}", error)]
-    UrlParsingError { error: reqwest::UrlError },
+    UrlParsingError { error: url::ParseError },
     #[fail(display = "Failed to initialize OpenID client: {}", error)]
     OpenIDClientError {
         error: fedora::openid::OpenIDClientError,
     },
 }
 
-impl From<reqwest::UrlError> for BuilderError {
-    fn from(error: reqwest::UrlError) -> Self {
+impl From<url::ParseError> for BuilderError {
+    fn from(error: url::ParseError) -> Self {
         BuilderError::UrlParsingError { error }
     }
 }
@@ -207,7 +208,7 @@ pub enum ServiceError {
     #[fail(display = "Failed to query bodhi instance: {}", error)]
     RequestError { error: reqwest::Error },
     #[fail(display = "Failed to parse redirection URL: {}", error)]
-    UrlParsingError { error: reqwest::UrlError },
+    UrlParsingError { error: url::ParseError },
     #[fail(display = "Received an empty response.")]
     EmptyResponseError,
     #[fail(display = "Retrying a failed request failed repeatedly.")]
@@ -220,8 +221,8 @@ impl From<reqwest::Error> for ServiceError {
     }
 }
 
-impl From<reqwest::UrlError> for ServiceError {
-    fn from(error: reqwest::UrlError) -> Self {
+impl From<url::ParseError> for ServiceError {
+    fn from(error: url::ParseError) -> Self {
         ServiceError::UrlParsingError { error }
     }
 }
@@ -264,7 +265,13 @@ impl BodhiService {
 
         let retries: Vec<Duration> = vec![Duration::from_secs(1); self.retries];
         match retry::retry(retries, qf) {
-            Ok(response) => Ok(response),
+            Ok(response) => {
+                #[cfg(feature = "debug")]
+                {
+                    dbg!(&response);
+                };
+                Ok(response)
+            }
             Err(error) => {
                 if let retry::Error::Operation { error: inner, .. } = error {
                     Err(inner)
@@ -296,6 +303,11 @@ impl BodhiService {
             .body(body)
             .query(&query)
             .send()?;
+
+        #[cfg(feature = "debug")]
+        {
+            dbg!(&response);
+        }
 
         Ok(response)
     }
