@@ -1,8 +1,8 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::data::*;
-use crate::query::*;
-use crate::service::*;
+use crate::data::Comment;
+use crate::query::CommentIDQuery;
+use crate::service::BodhiServiceBuilder;
 
 #[test]
 fn id_query_some() {
@@ -12,7 +12,7 @@ fn id_query_some() {
         .build()
         .unwrap();
 
-    let comment: Option<Comment> = CommentIDQuery::new(19_999).query(&bodhi).unwrap();
+    let comment: Option<Comment> = bodhi.query(&CommentIDQuery::new(19_999)).unwrap();
 
     assert!(comment.is_some());
 }
@@ -25,7 +25,7 @@ fn id_query_none() {
         .build()
         .unwrap();
 
-    let comment: Option<Comment> = CommentIDQuery::new(999_999_999).query(&bodhi).unwrap();
+    let comment: Option<Comment> = bodhi.query(&CommentIDQuery::new(999_999_999)).unwrap();
 
     assert!(comment.is_none());
 }

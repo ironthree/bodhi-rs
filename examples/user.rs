@@ -1,7 +1,7 @@
 use std::env::args;
 
 use bodhi::error::QueryError;
-use bodhi::query::{SinglePageQuery, UserNameQuery};
+use bodhi::query::UserNameQuery;
 use bodhi::service::BodhiServiceBuilder;
 
 fn main() -> Result<(), QueryError> {
@@ -15,7 +15,7 @@ fn main() -> Result<(), QueryError> {
     for argument in arguments {
         println!("User: {}", argument);
 
-        let user = UserNameQuery::new(argument).query(&bodhi)?;
+        let user = bodhi.query(&UserNameQuery::new(argument))?;
 
         println!("{:#?}", user);
     }

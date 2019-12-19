@@ -12,7 +12,7 @@ use serde::Deserialize;
 
 use crate::data::Package;
 use crate::error::QueryError;
-use crate::query::SinglePageQuery;
+use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi about a set of packages with the given properties,
@@ -23,9 +23,10 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 /// ```
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let packages = bodhi::query::PackageQuery::new()
+/// let packages = bodhi.query(
+///     &bodhi::query::PackageQuery::new()
 ///     .search(String::from("rust*"))
-///     .query(&bodhi).unwrap();
+/// ).unwrap();
 /// ```
 #[derive(Debug, Default)]
 pub struct PackageQuery {
@@ -63,7 +64,7 @@ impl PackageQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
         let mut packages: Vec<Package> = Vec::new();
         let mut page = 1;
 
@@ -86,6 +87,12 @@ impl PackageQuery {
         }
 
         Ok(packages)
+    }
+}
+
+impl Query<Vec<Package>> for PackageQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
+        PackageQuery::query(self, bodhi)
     }
 }
 
@@ -120,9 +127,7 @@ impl PackagePageQuery {
     }
 }
 
-impl SinglePageQuery for PackagePageQuery {
-    type Output = PackageListPage;
-
+impl SinglePageQuery<PackageListPage> for PackagePageQuery {
     fn path(&self) -> String {
         String::from("/packages/")
     }

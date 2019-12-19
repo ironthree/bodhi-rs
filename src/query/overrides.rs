@@ -17,19 +17,20 @@ use serde::Deserialize;
 
 use crate::data::{FedoraRelease, Override};
 use crate::error::QueryError;
-use crate::query::SinglePageQuery;
+use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific override, by its NVR
 /// (Name-Version-Release) string. It will return either an `Ok(Some(Override))`
 /// matching the specified NVR, return `Ok(None)` if it doesn't exist, or return
 /// an `Err(String)` if another error occurred.
+///
 /// ```
-/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let over_ride = bodhi::query::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
-///     .query(&bodhi).unwrap();
+/// let over_ride = bodhi.query(
+///     &bodhi::query::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
+/// ).unwrap();
 /// ```
 #[derive(Debug)]
 pub struct OverrideNVRQuery {
@@ -48,9 +49,7 @@ impl OverrideNVRQuery {
     }
 }
 
-impl SinglePageQuery for OverrideNVRQuery {
-    type Output = Option<Override>;
-
+impl SinglePageQuery<Option<Override>> for OverrideNVRQuery {
     fn path(&self) -> String {
         format!("/overrides/{}", self.nvr)
     }
@@ -69,6 +68,12 @@ impl SinglePageQuery for OverrideNVRQuery {
     }
 }
 
+impl Query<Option<Override>> for OverrideNVRQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Option<Override>, QueryError> {
+        <Self as SinglePageQuery<Option<Override>>>::query(self, bodhi)
+    }
+}
+
 /// Use this for querying bodhi about a set of overrides with the given properties,
 /// which can be specified with the builder pattern. Note that some options can be
 /// specified multiple times, and overrides will be returned if any criteria match.
@@ -77,10 +82,11 @@ impl SinglePageQuery for OverrideNVRQuery {
 /// ```
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let overrides = bodhi::query::OverrideQuery::new()
+/// let overrides = bodhi.query(
+///     &bodhi::query::OverrideQuery::new()
 ///     .releases(bodhi::data::FedoraRelease::F29)
 ///     .users(String::from("decathorpe"))
-///     .query(&bodhi).unwrap();
+/// ).unwrap();
 /// ```
 #[derive(Debug, Default)]
 pub struct OverrideQuery {
@@ -170,7 +176,7 @@ impl OverrideQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
         let mut overrides: Vec<Override> = Vec::new();
         let mut page = 1;
 
@@ -197,6 +203,12 @@ impl OverrideQuery {
         }
 
         Ok(overrides)
+    }
+}
+
+impl Query<Vec<Override>> for OverrideQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
+        OverrideQuery::query(self, bodhi)
     }
 }
 
@@ -239,9 +251,7 @@ impl OverridePageQuery {
     }
 }
 
-impl SinglePageQuery for OverridePageQuery {
-    type Output = OverrideListPage;
-
+impl SinglePageQuery<OverrideListPage> for OverridePageQuery {
     fn path(&self) -> String {
         String::from("/overrides/")
     }

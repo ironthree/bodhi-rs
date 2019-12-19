@@ -16,7 +16,7 @@ use serde::Deserialize;
 
 use crate::data::Release;
 use crate::error::QueryError;
-use crate::query::SinglePageQuery;
+use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific release by its name. It will
@@ -25,14 +25,15 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 /// error occurred.
 ///
 /// ```
-/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let release = bodhi::query::ReleaseNameQuery::new(String::from("F30"))
-///     .query(&bodhi).unwrap();
+/// let release = bodhi.query(
+///     &bodhi::query::ReleaseNameQuery::new(String::from("F30"))
+/// ).unwrap();
 ///
-/// let release = bodhi::query::ReleaseNameQuery::new(bodhi::data::FedoraRelease::F30.into())
-///     .query(&bodhi).unwrap();
+/// let release = bodhi.query(
+///     &bodhi::query::ReleaseNameQuery::new(bodhi::data::FedoraRelease::F30.into())
+/// ).unwrap();
 /// ```
 #[derive(Debug)]
 pub struct ReleaseNameQuery {
@@ -46,9 +47,7 @@ impl ReleaseNameQuery {
     }
 }
 
-impl SinglePageQuery for ReleaseNameQuery {
-    type Output = Option<Release>;
-
+impl SinglePageQuery<Option<Release>> for ReleaseNameQuery {
     fn path(&self) -> String {
         format!("/releases/{}", self.name)
     }
@@ -67,6 +66,12 @@ impl SinglePageQuery for ReleaseNameQuery {
     }
 }
 
+impl Query<Option<Release>> for ReleaseNameQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Option<Release>, QueryError> {
+        <Self as SinglePageQuery<Option<Release>>>::query(self, bodhi)
+    }
+}
+
 /// Use this for querying bodhi about a set of releases with the given properties,
 /// which can be specified with the builder pattern. Note that some options can be
 /// specified multiple times, and comments will be returned if any criteria match.
@@ -75,9 +80,10 @@ impl SinglePageQuery for ReleaseNameQuery {
 /// ```
 /// let bodhi = bodhi::service::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let releases = bodhi::query::ReleaseQuery::new()
+/// let releases = bodhi.query(
+///     &bodhi::query::ReleaseQuery::new()
 ///     .exclude_archived(true)
-///     .query(&bodhi).unwrap();
+/// ).unwrap();
 /// ```
 #[derive(Debug, Default)]
 pub struct ReleaseQuery {
@@ -147,7 +153,7 @@ impl ReleaseQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
         let mut overrides: Vec<Release> = Vec::new();
         let mut page = 1;
 
@@ -172,6 +178,12 @@ impl ReleaseQuery {
         }
 
         Ok(overrides)
+    }
+}
+
+impl Query<Vec<Release>> for ReleaseQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
+        ReleaseQuery::query(self, bodhi)
     }
 }
 
@@ -210,9 +222,7 @@ impl ReleasePageQuery {
     }
 }
 
-impl SinglePageQuery for ReleasePageQuery {
-    type Output = ReleaseListPage;
-
+impl SinglePageQuery<ReleaseListPage> for ReleasePageQuery {
     fn path(&self) -> String {
         String::from("/releases/")
     }

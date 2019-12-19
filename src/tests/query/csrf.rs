@@ -1,7 +1,7 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::query::*;
-use crate::service::*;
+use crate::query::CSRFQuery;
+use crate::service::BodhiServiceBuilder;
 
 #[test]
 fn deserialize() {
@@ -12,5 +12,5 @@ fn deserialize() {
         .unwrap();
 
     // query and deserialize a new CSRF token
-    CSRFQuery::new().query(&bodhi).unwrap();
+    bodhi.query(&CSRFQuery::new()).unwrap();
 }

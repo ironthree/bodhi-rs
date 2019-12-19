@@ -19,7 +19,7 @@ use crate::data::{
     UpdateSuggestion, UpdateType,
 };
 use crate::error::QueryError;
-use crate::query::SinglePageQuery;
+use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific update by its ID or alias. It
@@ -28,11 +28,11 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 /// if another error occurred.
 ///
 /// ```
-/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let update = bodhi::query::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
-///     .query(&bodhi).unwrap();
+/// let update = bodhi.query(
+///     &bodhi::query::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
+/// ).unwrap();
 /// ```
 #[derive(Debug)]
 pub struct UpdateIDQuery {
@@ -52,9 +52,7 @@ impl UpdateIDQuery {
     }
 }
 
-impl SinglePageQuery for UpdateIDQuery {
-    type Output = Option<Update>;
-
+impl SinglePageQuery<Option<Update>> for UpdateIDQuery {
     fn path(&self) -> String {
         format!("/updates/{}", self.id)
     }
@@ -73,6 +71,12 @@ impl SinglePageQuery for UpdateIDQuery {
     }
 }
 
+impl Query<Option<Update>> for UpdateIDQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Option<Update>, QueryError> {
+        <Self as SinglePageQuery<Option<Update>>>::query(self, bodhi)
+    }
+}
+
 /// Use this for querying bodhi about a set of updates with the given properties,
 /// which can be specified with the builder pattern. Note that some options can be
 /// specified multiple times, and updates will be returned if any criteria match.
@@ -81,11 +85,12 @@ impl SinglePageQuery for UpdateIDQuery {
 /// ```
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let updates = bodhi::query::UpdateQuery::new()
+/// let updates = bodhi.query(
+///     &bodhi::query::UpdateQuery::new()
 ///     .users(String::from("decathorpe"))
 ///     .releases(bodhi::data::FedoraRelease::F30)
 ///     .status(bodhi::data::UpdateStatus::Testing)
-///     .query(&bodhi).unwrap();
+/// ).unwrap();
 /// ```
 #[derive(Debug, Default)]
 pub struct UpdateQuery {
@@ -371,7 +376,7 @@ impl UpdateQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
         let mut updates: Vec<Update> = Vec::new();
         let mut page = 1;
 
@@ -419,6 +424,12 @@ impl UpdateQuery {
         }
 
         Ok(updates)
+    }
+}
+
+impl Query<Vec<Update>> for UpdateQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
+        UpdateQuery::query(self, bodhi)
     }
 }
 
@@ -503,9 +514,7 @@ impl UpdatePageQuery {
     }
 }
 
-impl SinglePageQuery for UpdatePageQuery {
-    type Output = UpdateListPage;
-
+impl SinglePageQuery<UpdateListPage> for UpdatePageQuery {
     fn path(&self) -> String {
         String::from("/updates/")
     }

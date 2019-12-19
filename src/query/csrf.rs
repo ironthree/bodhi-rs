@@ -8,18 +8,16 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::error::QueryError;
-use crate::query::SinglePageQuery;
-use crate::service::ServiceError;
+use crate::query::{Query, SinglePageQuery};
+use crate::service::{BodhiService, ServiceError};
 
 /// Use this for querying bodhi for a new CSRF token.
 /// It will return either an `Ok(String)` with the new token,
 /// or an `Err(String)` if an error occurred.
 /// ```
-/// # use bodhi::query::SinglePageQuery;
-///
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let token = bodhi::query::CSRFQuery::new().query(&bodhi).unwrap();
+/// let token = bodhi.query(&bodhi::query::CSRFQuery::new()).unwrap();
 /// ```
 #[derive(Debug, Default)]
 pub struct CSRFQuery {}
@@ -36,9 +34,7 @@ impl CSRFQuery {
     }
 }
 
-impl SinglePageQuery for CSRFQuery {
-    type Output = String;
-
+impl SinglePageQuery<String> for CSRFQuery {
     fn path(&self) -> String {
         String::from("/csrf")
     }
@@ -47,14 +43,20 @@ impl SinglePageQuery for CSRFQuery {
         None
     }
 
-    fn missing() -> Result<Self::Output, QueryError> {
+    fn parse(string: String) -> Result<String, QueryError> {
+        let page: CSRFPage = serde_json::from_str(&string)?;
+        Ok(page.csrf_token)
+    }
+
+    fn missing() -> Result<String, QueryError> {
         Err(QueryError::ServiceError {
             error: ServiceError::EmptyResponseError,
         })
     }
+}
 
-    fn parse(string: String) -> Result<String, QueryError> {
-        let page: CSRFPage = serde_json::from_str(&string)?;
-        Ok(page.csrf_token)
+impl Query<String> for CSRFQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<String, QueryError> {
+        <Self as SinglePageQuery<String>>::query(self, bodhi)
     }
 }

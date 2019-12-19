@@ -53,7 +53,9 @@ Note that the API is not finalized yet, and minor changes will still happen befo
 
 ## Test coverage
 
-Tests should pass for every commit that gets pushed to master. By default, only "fast" tests are run by `cargo test`.
+Tests should pass for every commit that gets pushed to master. By default, only "fast" tests are run by `cargo test`,
+where "fast" means that they should finish within a minute or so.
+
 Before pushing, the ignored, "slow" tests are also run once with `cargo test -- --ignored`. These make sure that this
 library can still successfully deserialize all JSON server responses.
 

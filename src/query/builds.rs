@@ -20,7 +20,7 @@ use serde::Deserialize;
 
 use crate::data::{Build, FedoraRelease};
 use crate::error::QueryError;
-use crate::query::SinglePageQuery;
+use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific build, by its NVR
@@ -29,11 +29,11 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 /// return an `Err(QueryError)` if another error occurred.
 ///
 /// ```
-/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let build = bodhi::query::BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29"))
-///     .query(&bodhi).unwrap();
+/// let build = bodhi.query(
+///     &bodhi::query::BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29"))
+/// ).unwrap();
 /// ```
 #[derive(Debug)]
 pub struct BuildNVRQuery {
@@ -47,9 +47,7 @@ impl BuildNVRQuery {
     }
 }
 
-impl SinglePageQuery for BuildNVRQuery {
-    type Output = Option<Build>;
-
+impl SinglePageQuery<Option<Build>> for BuildNVRQuery {
     fn path(&self) -> String {
         format!("/builds/{}", self.nvr)
     }
@@ -68,6 +66,12 @@ impl SinglePageQuery for BuildNVRQuery {
     }
 }
 
+impl Query<Option<Build>> for BuildNVRQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Option<Build>, QueryError> {
+        <Self as SinglePageQuery<Option<Build>>>::query(self, bodhi)
+    }
+}
+
 /// Use this for querying bodhi about a set of builds with the given properties,
 /// which can be specified with the builder pattern. Note that some options can be
 /// specified multiple times, and builds will be returned if any criteria match.
@@ -76,11 +80,12 @@ impl SinglePageQuery for BuildNVRQuery {
 /// ```
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let builds = bodhi::query::BuildQuery::new()
+/// let builds = bodhi.query(
+///     &bodhi::query::BuildQuery::new()
 ///     .releases(bodhi::data::FedoraRelease::F30)
 ///     .releases(bodhi::data::FedoraRelease::F29)
 ///     .packages(String::from("rust"))
-///     .query(&bodhi).unwrap();
+/// ).unwrap();
 /// ```
 #[derive(Debug, Default)]
 pub struct BuildQuery {
@@ -142,7 +147,7 @@ impl BuildQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
         let mut builds: Vec<Build> = Vec::new();
         let mut page = 1;
 
@@ -166,6 +171,12 @@ impl BuildQuery {
         }
 
         Ok(builds)
+    }
+}
+
+impl Query<Vec<Build>> for BuildQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
+        BuildQuery::query(self, bodhi)
     }
 }
 
@@ -201,9 +212,7 @@ impl BuildPageQuery {
     }
 }
 
-impl SinglePageQuery for BuildPageQuery {
-    type Output = BuildListPage;
-
+impl SinglePageQuery<BuildListPage> for BuildPageQuery {
     fn path(&self) -> String {
         String::from("/builds/")
     }

@@ -10,6 +10,8 @@ use reqwest::blocking::Response;
 use url::Url;
 
 use crate::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
+use crate::error::QueryError;
+use crate::query::Query;
 
 /// Always start with page 1 for multi-page queries.
 /// Everything else would be stupid.
@@ -30,7 +32,7 @@ const REQUEST_RETRIES: usize = 3;
 enum BodhiServiceType {
     DEFAULT,
     STAGING,
-    // CUSTOM,
+    CUSTOM { openid_url: String },
 }
 
 // TODO
@@ -99,17 +101,16 @@ impl BodhiServiceBuilder {
         }
     }
 
-    /*
     // TODO
     pub fn custom(url: String, openid_url: String) -> Self {
         BodhiServiceBuilder {
-            service_type: BodhiServiceType::CUSTOM,
+            service_type: BodhiServiceType::CUSTOM { openid_url },
+            authentication: None,
             url,
             timeout: None,
             retries: None,
         }
     }
-    */
 
     // TODO
     pub fn timeout(mut self, timeout: Duration) -> Self {
@@ -168,6 +169,17 @@ impl BodhiServiceBuilder {
                     .timeout(timeout)
                     .build()
                     .unwrap(),
+                ),
+                BodhiServiceType::CUSTOM { openid_url} => Box::new(
+                    fedora::OpenIDSessionBuilder::custom(
+                        Url::parse(&openid_url)?,
+                        login_url,
+                        authentication.username,
+                        authentication.password
+                    ).user_agent(String::from("bodhi-rs"))
+                        .timeout(timeout)
+                        .build()
+                        .unwrap(),
                 ),
             }
         } else {
@@ -310,5 +322,9 @@ impl BodhiService {
         }
 
         Ok(response)
+    }
+
+    pub fn query<T>(&self, query: &dyn Query<T>) -> Result<T, QueryError> {
+        Query::query(query, self)
     }
 }

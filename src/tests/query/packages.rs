@@ -1,7 +1,7 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::query::*;
-use crate::service::*;
+use crate::query::PackageQuery;
+use crate::service::BodhiServiceBuilder;
 
 #[test]
 #[ignore]
@@ -13,5 +13,5 @@ fn deserialize_all() {
         .unwrap();
 
     // query and deserialize all packages
-    PackageQuery::new().query(&bodhi).unwrap();
+    bodhi.query(&PackageQuery::new()).unwrap();
 }

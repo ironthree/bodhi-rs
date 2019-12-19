@@ -16,7 +16,7 @@ use serde::Deserialize;
 
 use crate::data::User;
 use crate::error::QueryError;
-use crate::query::SinglePageQuery;
+use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific user by their name. It will
@@ -24,11 +24,11 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 /// if it doesn't exist, or return an `Err(String)` if another error occurred.
 ///
 /// ```
-/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comment = bodhi::query::UserNameQuery::new(String::from("decathorpe"))
-///     .query(&bodhi).unwrap();
+/// let comment = bodhi.query(
+///     &bodhi::query::UserNameQuery::new(String::from("decathorpe"))
+/// ).unwrap();
 /// ```
 #[derive(Debug)]
 pub struct UserNameQuery {
@@ -47,9 +47,7 @@ impl UserNameQuery {
     }
 }
 
-impl SinglePageQuery for UserNameQuery {
-    type Output = Option<User>;
-
+impl SinglePageQuery<Option<User>> for UserNameQuery {
     fn path(&self) -> String {
         format!("/users/{}", self.name)
     }
@@ -68,6 +66,12 @@ impl SinglePageQuery for UserNameQuery {
     }
 }
 
+impl Query<Option<User>> for UserNameQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Option<User>, QueryError> {
+        <Self as SinglePageQuery<Option<User>>>::query(self, bodhi)
+    }
+}
+
 /// Use this for querying bodhi about a set of users with the given properties,
 /// which can be specified with the builder pattern. Note that some options can be
 /// specified multiple times, and users will be returned if any criteria match.
@@ -76,9 +80,10 @@ impl SinglePageQuery for UserNameQuery {
 /// ```
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let users = bodhi::query::UserQuery::new()
+/// let users = bodhi.query(
+///     &bodhi::query::UserQuery::new()
 ///     .groups(String::from("provenpackager"))
-///     .query(&bodhi).unwrap();
+/// ).unwrap();
 /// ```
 #[derive(Debug, Default)]
 pub struct UserQuery {
@@ -156,7 +161,7 @@ impl UserQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
         let mut users: Vec<User> = Vec::new();
         let mut page = 1;
 
@@ -182,6 +187,12 @@ impl UserQuery {
         }
 
         Ok(users)
+    }
+}
+
+impl Query<Vec<User>> for UserQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
+        UserQuery::query(self, bodhi)
     }
 }
 
@@ -222,9 +233,7 @@ impl UserPageQuery {
     }
 }
 
-impl SinglePageQuery for UserPageQuery {
-    type Output = UserListPage;
-
+impl SinglePageQuery<UserListPage> for UserPageQuery {
     fn path(&self) -> String {
         String::from("/users/")
     }

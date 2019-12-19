@@ -18,7 +18,7 @@ use serde::Deserialize;
 
 use crate::data::Comment;
 use crate::error::QueryError;
-use crate::query::SinglePageQuery;
+use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific comment by its ID. It will either
@@ -26,10 +26,9 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 /// if it doesn't exist, or return an `Err(String)` if another error occurred.
 ///
 /// ```
-/// # use bodhi::query::SinglePageQuery;
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comment = bodhi::query::CommentIDQuery::new(19999).query(&bodhi).unwrap();
+/// let comment = bodhi.query(&bodhi::query::CommentIDQuery::new(19999)).unwrap();
 /// ```
 #[derive(Debug)]
 pub struct CommentIDQuery {
@@ -48,9 +47,7 @@ impl CommentIDQuery {
     }
 }
 
-impl SinglePageQuery for CommentIDQuery {
-    type Output = Option<Comment>;
-
+impl SinglePageQuery<Option<Comment>> for CommentIDQuery {
     fn path(&self) -> String {
         format!("/comments/{}", self.id)
     }
@@ -69,6 +66,12 @@ impl SinglePageQuery for CommentIDQuery {
     }
 }
 
+impl Query<Option<Comment>> for CommentIDQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Option<Comment>, QueryError> {
+        <Self as SinglePageQuery<Option<Comment>>>::query(self, bodhi)
+    }
+}
+
 /// Use this for querying bodhi about a set of comments with the given properties,
 /// which can be specified with the builder pattern. Note that some options can be
 /// specified multiple times, and comments will be returned if any criteria match.
@@ -77,11 +80,12 @@ impl SinglePageQuery for CommentIDQuery {
 /// ```
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comments = bodhi::query::CommentQuery::new()
+/// let comments = bodhi.query(
+///     &bodhi::query::CommentQuery::new()
 ///     .anonymous(true)
 ///     .users(String::from("decathorpe"))
 ///     .packages(String::from("rust"))
-///     .query(&bodhi).unwrap();
+/// ).unwrap();
 /// ```
 #[derive(Debug, Default)]
 pub struct CommentQuery {
@@ -192,7 +196,7 @@ impl CommentQuery {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    pub fn query(self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
         let mut comments: Vec<Comment> = Vec::new();
         let mut page = 1;
 
@@ -220,6 +224,12 @@ impl CommentQuery {
         }
 
         Ok(comments)
+    }
+}
+
+impl Query<Vec<Comment>> for CommentQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
+        CommentQuery::query(self, bodhi)
     }
 }
 
@@ -266,9 +276,7 @@ impl CommentPageQuery {
     }
 }
 
-impl SinglePageQuery for CommentPageQuery {
-    type Output = CommentListPage;
-
+impl SinglePageQuery<CommentListPage> for CommentPageQuery {
     fn path(&self) -> String {
         String::from("/comments/")
     }

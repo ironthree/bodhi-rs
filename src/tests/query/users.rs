@@ -1,8 +1,8 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::data::*;
-use crate::query::*;
-use crate::service::*;
+use crate::data::User;
+use crate::query::{UserNameQuery, UserQuery};
+use crate::service::BodhiServiceBuilder;
 
 #[test]
 #[ignore]
@@ -14,7 +14,7 @@ fn deserialize_all() {
         .unwrap();
 
     // query and deserialize all users
-    UserQuery::new().query(&bodhi).unwrap();
+    bodhi.query(&UserQuery::new()).unwrap();
 }
 
 #[test]
@@ -25,9 +25,9 @@ fn name_query_some() {
         .build()
         .unwrap();
 
-    let user: Option<User> = UserNameQuery::new(String::from("decathorpe"))
-        .query(&bodhi)
-        .unwrap();
+    let user: Option<User> = bodhi.query(
+        &UserNameQuery::new(String::from("decathorpe"))
+    ).unwrap();
 
     assert!(user.is_some());
 }
@@ -40,9 +40,9 @@ fn name_query_none() {
         .build()
         .unwrap();
 
-    let user: Option<User> = UserNameQuery::new(String::from("nobody"))
-        .query(&bodhi)
-        .unwrap();
+    let user: Option<User> = bodhi.query(
+        &UserNameQuery::new(String::from("nobody"))
+    ).unwrap();
 
     assert!(user.is_none());
 }

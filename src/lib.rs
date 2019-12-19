@@ -51,7 +51,7 @@
 //! let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 //!
 //! let package_query = bodhi::query::PackageQuery::new().name("rust".to_string());
-//! let packages = package_query.query(&bodhi).unwrap();
+//! let packages = bodhi.query(&package_query).unwrap();
 //! ```
 
 pub mod data;
