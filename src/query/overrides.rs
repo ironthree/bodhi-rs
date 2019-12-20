@@ -32,6 +32,8 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 ///     &bodhi::query::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-0>
 #[derive(Debug)]
 pub struct OverrideNVRQuery {
     nvr: String,
@@ -88,6 +90,8 @@ impl Query<Option<Override>> for OverrideNVRQuery {
 ///     .users(String::from("decathorpe"))
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1>
 #[derive(Debug, Default)]
 pub struct OverrideQuery {
     builds: Option<Vec<String>>,

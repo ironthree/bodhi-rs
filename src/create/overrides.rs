@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use crate::create::Create;
 use crate::error::{BodhiError, QueryError};
 use crate::query::{CSRFQuery, SinglePageQuery};
 use crate::service::BodhiService;
@@ -32,8 +33,10 @@ impl OverrideBuilder {
             expiration_date,
         }
     }
+}
 
-    pub fn create(self, bodhi: &BodhiService) -> Result<NewOverride, QueryError> {
+impl Create<NewOverride> for OverrideBuilder {
+    fn create(&self, bodhi: &BodhiService) -> Result<NewOverride, QueryError> {
         let path = String::from("/overrides/");
 
         let csrf_token = CSRFQuery::new().query(bodhi)?;
@@ -55,12 +58,17 @@ impl OverrideBuilder {
 
         if !status.is_success() {
             let text = response.text().unwrap_or_else(|_| String::from(""));
+            println!("{}", &text);  // TODO: remove this
 
             let error: BodhiError = serde_json::from_str(&text)?;
             return Err(QueryError::BodhiError { error });
         };
 
         let result = response.text()?;
+
+        // TODO
+        println!("{}", &result);
+
         let new_override: NewOverride = serde_json::from_str(&result)?;
 
         Ok(new_override)

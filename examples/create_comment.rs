@@ -31,7 +31,7 @@ fn main() -> Result<(), String> {
         .text(String::from("Test comment from bodhi-rs."))
         .karma(Karma::Positive);
 
-    let response = new_comment.create(&bodhi);
+    let response = bodhi.create(&new_comment);
 
     match response {
         Ok(new_comment) => {

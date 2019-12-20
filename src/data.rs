@@ -21,9 +21,9 @@ pub const FEDORA_BODHI_STG_URL: &str = "https://bodhi.stg.fedoraproject.org";
 #[derive(Debug, Clone, Deserialize_repr)]
 #[repr(i8)]
 pub enum Karma {
-    Positive = -1,
+    Positive = 1,
     Neutral = 0,
-    Negative = 1,
+    Negative = -1,
 }
 
 impl Into<i32> for Karma {
@@ -49,9 +49,9 @@ impl Into<String> for Karma {
 impl From<i32> for Karma {
     fn from(karma: i32) -> Karma {
         match karma {
-            -1 => Karma::Negative,
-            0 => Karma::Neutral,
             1 => Karma::Positive,
+            0 => Karma::Neutral,
+            -1 => Karma::Negative,
             _ => unreachable!(),
         }
     }

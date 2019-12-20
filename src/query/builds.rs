@@ -35,8 +35,11 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 ///     &bodhi::query::BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29"))
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-0>
 #[derive(Debug)]
 pub struct BuildNVRQuery {
+    /// NVR of the build to query (Name-Version-Release format, without Epoch)
     nvr: String,
 }
 
@@ -87,11 +90,17 @@ impl Query<Option<Build>> for BuildNVRQuery {
 ///     .packages(String::from("rust"))
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-1>
 #[derive(Debug, Default)]
 pub struct BuildQuery {
+    /// NVR of the build to query (Name-Version-Release format, without Epoch)
     nvr: Option<String>,
+    /// list of packages to request builds for
     packages: Option<Vec<String>>,
+    /// list of releases to request builds for
     releases: Option<Vec<String>>,
+    /// list of updates to request builds for
     updates: Option<Vec<String>>,
 }
 

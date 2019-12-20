@@ -34,6 +34,8 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 ///     &bodhi::query::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-0>
 #[derive(Debug)]
 pub struct UpdateIDQuery {
     id: String,
@@ -92,6 +94,8 @@ impl Query<Option<Update>> for UpdateIDQuery {
 ///     .status(bodhi::data::UpdateStatus::Testing)
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2>
 #[derive(Debug, Default)]
 pub struct UpdateQuery {
     active_releases: Option<bool>,

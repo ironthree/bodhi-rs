@@ -1,4 +1,5 @@
 use std::io::{stdin, stdout, Write};
+use std::time::Duration;
 
 use bodhi::create::OverrideBuilder;
 use bodhi::service::BodhiServiceBuilder;
@@ -21,8 +22,10 @@ fn main() -> Result<(), String> {
     }
     let password = password.trim().to_string();
 
+    // TODO: looks like the staging instance can't create buildroot overrides
     let bodhi = BodhiServiceBuilder::staging()
         .authentication(username, password)
+        .timeout(Duration::from_secs(300))
         .build()
         .unwrap();
 
@@ -32,7 +35,7 @@ fn main() -> Result<(), String> {
         String::from("2019-12-31"),
     );
 
-    let response = new_override.create(&bodhi);
+    let response = bodhi.create(&new_override);
 
     match response {
         Ok(_) => Ok(()),

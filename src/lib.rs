@@ -54,10 +54,11 @@
 //! let packages = bodhi.query(&package_query).unwrap();
 //! ```
 
-pub mod data;
-pub use data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
+// TODO: this is temporary, to reduce noise from cargo output
+#![allow(unused_imports)]
+#![allow(unused_variables)]
 
-// pub mod client;
+pub mod data;
 
 pub mod service;
 pub use service::{BodhiService, BodhiServiceBuilder};

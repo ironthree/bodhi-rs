@@ -28,6 +28,8 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 ///     .search(String::from("rust*"))
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/packages.html#service-0>
 #[derive(Debug, Default)]
 pub struct PackageQuery {
     like: Option<String>,

@@ -30,6 +30,8 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 ///
 /// let comment = bodhi.query(&bodhi::query::CommentIDQuery::new(19999)).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-0>
 #[derive(Debug)]
 pub struct CommentIDQuery {
     id: u32,
@@ -87,6 +89,8 @@ impl Query<Option<Comment>> for CommentIDQuery {
 ///     .packages(String::from("rust"))
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1>
 #[derive(Debug, Default)]
 pub struct CommentQuery {
     anonymous: Option<bool>,

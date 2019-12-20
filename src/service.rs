@@ -9,7 +9,8 @@ use fedora::Session;
 use reqwest::blocking::Response;
 use url::Url;
 
-use crate::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
+use crate::create::Create;
+use crate::data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 use crate::error::QueryError;
 use crate::query::Query;
 
@@ -170,16 +171,17 @@ impl BodhiServiceBuilder {
                     .build()
                     .unwrap(),
                 ),
-                BodhiServiceType::CUSTOM { openid_url} => Box::new(
+                BodhiServiceType::CUSTOM { openid_url } => Box::new(
                     fedora::OpenIDSessionBuilder::custom(
                         Url::parse(&openid_url)?,
                         login_url,
                         authentication.username,
-                        authentication.password
-                    ).user_agent(String::from("bodhi-rs"))
-                        .timeout(timeout)
-                        .build()
-                        .unwrap(),
+                        authentication.password,
+                    )
+                    .user_agent(String::from("bodhi-rs"))
+                    .timeout(timeout)
+                    .build()
+                    .unwrap(),
                 ),
             }
         } else {
@@ -326,5 +328,9 @@ impl BodhiService {
 
     pub fn query<T>(&self, query: &dyn Query<T>) -> Result<T, QueryError> {
         Query::query(query, self)
+    }
+
+    pub fn create<T>(&self, creator: &dyn Create<T>) -> Result<T, QueryError> {
+        Create::create(creator, self)
     }
 }

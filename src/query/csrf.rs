@@ -19,6 +19,8 @@ use crate::service::{BodhiService, ServiceError};
 ///
 /// let token = bodhi.query(&bodhi::query::CSRFQuery::new()).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/csrf.html>
 #[derive(Debug, Default)]
 pub struct CSRFQuery {}
 

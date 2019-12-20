@@ -65,3 +65,11 @@ library can still successfully deserialize all JSON server responses.
 The `examples` directory contains a few example applications to test and showcase some library functionality. Currently,
 this includes a simple program to file a comment or create a buildroot override in the staging instance of bodhi.
 
+
+## Development
+
+It might be helpful to enable the `debug` feature for local testing, since that enables some debugging statements at
+various places in the code (mostly HTTP responses from `reqwest`).
+
+It might also be helpful to enable building documentation for private items with `cargo doc --document-private-items`
+for locally browsing all documented items.

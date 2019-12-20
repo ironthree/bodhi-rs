@@ -1,18 +1,27 @@
 use serde::{Deserialize, Serialize};
 
+use crate::create::Create;
 use crate::data::{Comment, Karma};
 use crate::error::{BodhiError, QueryError};
 use crate::query::{CSRFQuery, SinglePageQuery};
 use crate::service::BodhiService;
 
+// https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST
 #[derive(Debug, Serialize)]
 struct CommentData {
+    /// alias of the update for which this is a comment
     update: String,
-    text: String,
-    karma: i32,
+    /// comment text (default: `""`)
+    text: Option<String>,
+    /// comment karma (default: `0`)
+    karma: Option<i32>,
+    /// critpath karma (default: `0`)
     karma_critpath: Option<i32>,
+    /// bug feedback vector (default: `[]`)
     bug_feedback: Option<Vec<i32>>,
+    /// testcase feedback vector (default: `[]`)
     testcase_feedback: Option<Vec<i32>>,
+    /// CSRF token
     csrf_token: String,
 }
 
@@ -24,6 +33,7 @@ pub struct NewComment {
 
 #[derive(Debug)]
 pub struct CommentBuilder {
+    // TODO: take &Update instead
     update: String,
     text: Option<String>,
     karma: Option<Karma>,
@@ -68,42 +78,44 @@ impl CommentBuilder {
         self.testcase_feedback = Some(feedback);
         self
     }
+}
 
-    pub fn create(self, bodhi: &BodhiService) -> Result<NewComment, QueryError> {
+impl Create<NewComment> for CommentBuilder {
+    fn create(&self, bodhi: &BodhiService) -> Result<NewComment, QueryError> {
         // TODO: check if lengths of feedback vectors is good
         let path = String::from("/comments/");
 
         let csrf_token = CSRFQuery::new().query(bodhi)?;
 
-        let text = match self.text {
-            Some(text) => text,
-            None => String::from(""),
+        let text = match &self.text {
+            Some(text) => Some(text.to_owned()),
+            None => None,
         };
 
-        let karma: i32 = match self.karma {
-            Some(karma) => karma.into(),
+        let karma: i32 = match &self.karma {
+            Some(karma) => karma.clone().into(),
             None => 0,
         };
 
-        let karma_critpath: Option<i32> = match self.karma_critpath {
-            Some(karma) => Some(karma.into()),
+        let karma_critpath: Option<i32> = match &self.karma_critpath {
+            Some(karma) => Some(karma.clone().into()),
             None => None,
         };
 
-        let bug_feedback: Option<Vec<i32>> = match self.bug_feedback {
-            Some(feedback) => Some(feedback.into_iter().map(|k| k.into()).collect()),
+        let bug_feedback: Option<Vec<i32>> = match &self.bug_feedback {
+            Some(feedback) => Some(feedback.iter().map(|k| k.clone().into()).collect()),
             None => None,
         };
 
-        let testcase_feedback: Option<Vec<i32>> = match self.testcase_feedback {
-            Some(feedback) => Some(feedback.into_iter().map(|k| k.into()).collect()),
+        let testcase_feedback: Option<Vec<i32>> = match &self.testcase_feedback {
+            Some(feedback) => Some(feedback.iter().map(|k| k.clone().into()).collect()),
             None => None,
         };
 
         let new_comment = CommentData {
-            update: self.update,
+            update: self.update.clone(),
             text,
-            karma,
+            karma: Some(karma),
             karma_critpath,
             bug_feedback,
             testcase_feedback,

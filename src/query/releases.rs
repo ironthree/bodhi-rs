@@ -35,6 +35,8 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 ///     &bodhi::query::ReleaseNameQuery::new(bodhi::data::FedoraRelease::F30.into())
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-0>
 #[derive(Debug)]
 pub struct ReleaseNameQuery {
     name: String,
@@ -85,6 +87,8 @@ impl Query<Option<Release>> for ReleaseNameQuery {
 ///     .exclude_archived(true)
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-1>
 #[derive(Debug, Default)]
 pub struct ReleaseQuery {
     exclude_archived: Option<bool>,

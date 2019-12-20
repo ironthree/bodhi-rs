@@ -1,3 +1,6 @@
+pub(crate) mod traits;
+pub(crate) use traits::*;
+
 pub mod comments;
 pub use comments::{CommentBuilder, NewComment};
 

@@ -30,6 +30,8 @@ use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 ///     &bodhi::query::UserNameQuery::new(String::from("decathorpe"))
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-0>
 #[derive(Debug)]
 pub struct UserNameQuery {
     name: String,
@@ -85,6 +87,8 @@ impl Query<Option<User>> for UserNameQuery {
 ///     .groups(String::from("provenpackager"))
 /// ).unwrap();
 /// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-1>
 #[derive(Debug, Default)]
 pub struct UserQuery {
     groups: Option<Vec<String>>,
