@@ -5,7 +5,6 @@ use crate::query::{OverrideNVRQuery, OverrideQuery};
 use crate::service::BodhiServiceBuilder;
 
 #[test]
-#[ignore]
 fn deserialize_f32() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -14,9 +13,7 @@ fn deserialize_f32() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F32))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F32)).unwrap();
 }
 
 #[test]
@@ -34,7 +31,6 @@ fn deserialize_f32c() {
 }
 
 #[test]
-#[ignore]
 fn deserialize_f31() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -43,9 +39,7 @@ fn deserialize_f31() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F31))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F31)).unwrap();
 }
 
 #[test]
@@ -91,7 +85,6 @@ fn deserialize_f31m() {
 }
 
 #[test]
-#[ignore]
 fn deserialize_f30() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -100,9 +93,7 @@ fn deserialize_f30() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F30))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F30)).unwrap();
 }
 
 #[test]
@@ -148,7 +139,6 @@ fn deserialize_f30m() {
 }
 
 #[test]
-#[ignore]
 fn deserialize_f29() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -157,9 +147,7 @@ fn deserialize_f29() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F29))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F29)).unwrap();
 }
 
 #[test]
@@ -205,7 +193,6 @@ fn deserialize_f29m() {
 }
 
 #[test]
-#[ignore]
 fn deserialize_f28() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -214,9 +201,7 @@ fn deserialize_f28() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F28))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F28)).unwrap();
 }
 
 #[test]
@@ -248,7 +233,6 @@ fn deserialize_f28m() {
 }
 
 #[test]
-#[ignore]
 fn deserialize_f27() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -257,9 +241,7 @@ fn deserialize_f27() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F27))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F27)).unwrap();
 }
 
 #[test]
@@ -277,7 +259,6 @@ fn deserialize_f27m() {
 }
 
 #[test]
-#[ignore]
 fn deserialize_f26() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -286,13 +267,10 @@ fn deserialize_f26() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F26))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F26)).unwrap();
 }
 
 #[test]
-#[ignore]
 fn deserialize_f25() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -301,13 +279,10 @@ fn deserialize_f25() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F25))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F25)).unwrap();
 }
 
 #[test]
-#[ignore]
 fn deserialize_f24() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -316,13 +291,10 @@ fn deserialize_f24() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F24))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F24)).unwrap();
 }
 
 #[test]
-#[ignore]
 fn deserialize_f23() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -331,13 +303,10 @@ fn deserialize_f23() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F23))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F23)).unwrap();
 }
 
 #[test]
-#[ignore]
 fn deserialize_f22() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -346,13 +315,10 @@ fn deserialize_f22() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F22))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F22)).unwrap();
 }
 
 #[test]
-#[ignore]
 fn deserialize_f21() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -361,13 +327,10 @@ fn deserialize_f21() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::F21))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::F21)).unwrap();
 }
 
 #[test]
-#[ignore]
 fn deserialize_epel8() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -396,7 +359,6 @@ fn deserialize_epel8m() {
 }
 
 #[test]
-#[ignore]
 fn deserialize_epel7() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -407,6 +369,34 @@ fn deserialize_epel7() {
     // query only overrides for one release, and deserialize them
     bodhi
         .query(&OverrideQuery::new().releases(FedoraRelease::EPEL7))
+        .unwrap();
+}
+
+#[test]
+fn deserialize_epel6() {
+    let bodhi = BodhiServiceBuilder::default()
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only overrides for one release, and deserialize them
+    bodhi
+        .query(&OverrideQuery::new().releases(FedoraRelease::EL6))
+        .unwrap();
+}
+
+#[test]
+fn deserialize_epel5() {
+    let bodhi = BodhiServiceBuilder::default()
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query only overrides for one release, and deserialize them
+    bodhi
+        .query(&OverrideQuery::new().releases(FedoraRelease::EL5))
         .unwrap();
 }
 
@@ -434,9 +424,7 @@ fn nvr_query_none() {
         .unwrap();
 
     let over_ride: Option<Override> = bodhi
-        .query(&OverrideNVRQuery::new(String::from(
-            "syncthing-1.1.3-1.fc30",
-        )))
+        .query(&OverrideNVRQuery::new(String::from("syncthing-1.1.3-1.fc30")))
         .unwrap();
 
     assert!(over_ride.is_none());
@@ -451,9 +439,7 @@ fn nvr_query_invalid() {
         .unwrap();
 
     let over_ride: Option<Override> = bodhi
-        .query(&OverrideNVRQuery::new(String::from(
-            "this-doesnt-exist-1-1.fc30",
-        )))
+        .query(&OverrideNVRQuery::new(String::from("this-doesnt-exist-1-1.fc30")))
         .unwrap();
 
     assert!(over_ride.is_none());

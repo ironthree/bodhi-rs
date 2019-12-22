@@ -1,7 +1,4 @@
-//! request a new CSRF token
-//!
-//! The contents of this module can be used to query a bodhi instance for a
-//! new CSRF token.
+//! The contents of this module can be used to query a bodhi instance for a new CSRF token.
 
 use std::collections::HashMap;
 
@@ -11,13 +8,15 @@ use crate::error::QueryError;
 use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError};
 
-/// Use this for querying bodhi for a new CSRF token.
-/// It will return either an `Ok(String)` with the new token,
-/// or an `Err(String)` if an error occurred.
-/// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// Use this for querying bodhi for a new CSRF token. It will return either an `Ok(String)` with the
+/// new token, or an `Err(String)` if an error occurred.
 ///
-/// let token = bodhi.query(&bodhi::query::CSRFQuery::new()).unwrap();
+/// ```
+/// # use bodhi::BodhiServiceBuilder;
+/// # use bodhi::query::CSRFQuery;
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
+///
+/// let token = bodhi.query(&CSRFQuery::new()).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/csrf.html>
@@ -30,7 +29,7 @@ struct CSRFPage {
 }
 
 impl CSRFQuery {
-    /// This method creates a new CSRF token query.
+    /// This method creates a new [`CSRFQuery`](struct.CSRFQuery.html).
     pub fn new() -> Self {
         CSRFQuery {}
     }

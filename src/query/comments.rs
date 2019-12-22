@@ -1,16 +1,12 @@
-//! query comments (or *one* comment by ID)
+//! The contents of this module can be used to query a bodhi instance about existing comments.
 //!
-//! The contents of this module can be used to query a bodhi instance about
-//! existing comments.
+//! The [`CommentIDQuery`](struct.CommentIDQuery.html) returns exactly one
+//! [`Comment`](../../data/struct.Comment.html), if and only if a Comment with the given integer ID
+//! exists - otherwise, it will return an error.
 //!
-//! The `CommentIDQuery` returns exactly one Comment, if and only if a
-//! Comment with the given integer ID exists - otherwise, it will return an
-//! error.
-//!
-//! The `CommentQuery` can be used to execute more complex queries, for example
-//! filtering comments that are associated with a set of updates or packages,
-//! or query comments made by certain users, or filed against updates that were
-//! created by specific users.
+//! The [`CommentQuery`](struct.CommentQuery.html) can be used to execute more complex queries, for
+//! example filtering comments that are associated with a set of updates or packages, or query
+//! comments made by certain users, or filed against updates that were created by specific users.
 
 use std::collections::HashMap;
 
@@ -21,14 +17,16 @@ use crate::error::QueryError;
 use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
-/// Use this for querying bodhi for a specific comment by its ID. It will either
-/// return an `Ok(Some(Comment))` matching the specified ID, return `Ok(None)`
-/// if it doesn't exist, or return an `Err(String)` if another error occurred.
+/// Use this for querying bodhi for a specific comment by its ID. It will either return an
+/// `Ok(Some(Comment))` matching the specified ID, return `Ok(None)` if it doesn't exist, or return
+/// an `Err(String)` if another error occurred.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::BodhiServiceBuilder;
+/// # use bodhi::query::CommentIDQuery;
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comment = bodhi.query(&bodhi::query::CommentIDQuery::new(19999)).unwrap();
+/// let comment = bodhi.query(&CommentIDQuery::new(19999)).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-0>
@@ -43,7 +41,8 @@ struct CommentPage {
 }
 
 impl CommentIDQuery {
-    /// This method is the only way to create a new `CommentIDQuery` instance.
+    /// This method is the only way to create a new [`CommentIDQuery`](struct.CommentIDQuery.html)
+    /// instance.
     pub fn new(id: u32) -> Self {
         CommentIDQuery { id }
     }
@@ -74,20 +73,23 @@ impl Query<Option<Comment>> for CommentIDQuery {
     }
 }
 
-/// Use this for querying bodhi about a set of comments with the given properties,
-/// which can be specified with the builder pattern. Note that some options can be
-/// specified multiple times, and comments will be returned if any criteria match.
-/// This is consistent with both the web interface and REST API behavior.
+/// Use this for querying bodhi about a set of comments with the given properties, which can be
+/// specified with the builder pattern. Note that some options can be specified multiple times, and
+/// comments will be returned if any criteria match. This is consistent with both the web interface
+/// and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::BodhiServiceBuilder;
+/// # use bodhi::query::CommentQuery;
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comments = bodhi.query(
-///     &bodhi::query::CommentQuery::new()
-///     .anonymous(true)
-///     .users(String::from("decathorpe"))
-///     .packages(String::from("rust"))
-/// ).unwrap();
+/// let comments = bodhi
+///     .query(
+///         &CommentQuery::new()
+///             .users(String::from("decathorpe"))
+///             .packages(String::from("rust")),
+///     )
+///     .unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1>
@@ -105,7 +107,7 @@ pub struct CommentQuery {
 }
 
 impl CommentQuery {
-    /// This method returns a new `CommentQuery` with *no* filters set.
+    /// This method returns a new [`CommentQuery`](struct.CommentQuery.html) with *no* filters set.
     pub fn new() -> Self {
         CommentQuery {
             anonymous: None,
@@ -121,12 +123,15 @@ impl CommentQuery {
     }
 
     /// Restrict the returned results to (not) anonymous comments.
+    ///
+    /// **NOTE**: Anonymous comments are no longer supported as of bodhi 4.0.
     pub fn anonymous(mut self, anonymous: bool) -> Self {
         self.anonymous = Some(anonymous);
         self
     }
 
     /// Restrict results to ignore comments by certain users.
+    ///
     /// Can be specified multiple times.
     pub fn ignore_users(mut self, ignore_user: String) -> Self {
         match &mut self.ignore_users {
@@ -143,8 +148,9 @@ impl CommentQuery {
         self
     }
 
-    /// Restrict the returned results to comments filed against updates for the
-    /// given package(s). Can be specified multiple times.
+    /// Restrict the returned results to comments filed against updates for the given package(s).
+    ///
+    /// Can be specified multiple times.
     pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
@@ -166,8 +172,10 @@ impl CommentQuery {
         self
     }
 
-    /// Restrict the returned results to comments filed against updates
-    /// created by the specified user(s). Can be specified multiple times.
+    /// Restrict the returned results to comments filed against updates created by the specified
+    /// user(s).
+    ///
+    /// Can be specified multiple times.
     pub fn update_owners(mut self, update_owner: String) -> Self {
         match &mut self.update_owners {
             Some(update_owners) => update_owners.push(update_owner),
@@ -178,6 +186,7 @@ impl CommentQuery {
     }
 
     /// Restrict the returned results to comments filed against the given update(s).
+    ///
     /// Can be specified multiple times.
     pub fn updates(mut self, update: String) -> Self {
         match &mut self.updates {
@@ -189,6 +198,7 @@ impl CommentQuery {
     }
 
     /// Restrict the returned results to comments filed by the given user(s).
+    ///
     /// Can be specified multiple times.
     pub fn users(mut self, user: String) -> Self {
         match &mut self.users {

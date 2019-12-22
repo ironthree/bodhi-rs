@@ -1,25 +1,33 @@
-use std::io::{stdin, stdout, Write};
-use std::time::Duration;
+use std::{
+    io::{stdin, stdout, Write},
+    time::Duration,
+};
 
-use bodhi::create::OverrideBuilder;
-use bodhi::service::BodhiServiceBuilder;
+use bodhi::{create::OverrideBuilder, service::BodhiServiceBuilder};
 
 fn main() -> Result<(), String> {
     let mut username = String::new();
+
     let mut password = String::new();
 
     print!("FAS username: ");
+
     stdout().flush().unwrap();
+
     if let Err(error) = stdin().read_line(&mut username) {
         return Err(error.to_string());
     }
+
     let username = username.trim().to_string();
 
     print!("FAS password: ");
+
     stdout().flush().unwrap();
+
     if let Err(error) = stdin().read_line(&mut password) {
         return Err(error.to_string());
     }
+
     let password = password.trim().to_string();
 
     // TODO: looks like the staging instance can't create buildroot overrides

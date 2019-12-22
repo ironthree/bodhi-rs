@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 use serde::{Deserialize, Serialize};
 
 use crate::create::Create;
@@ -6,7 +8,7 @@ use crate::error::{BodhiError, QueryError};
 use crate::query::{CSRFQuery, SinglePageQuery};
 use crate::service::BodhiService;
 
-// https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2-POST
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2-POST>
 #[derive(Debug, Serialize)]
 struct UpdateData {
     /// list of builds to include in the update

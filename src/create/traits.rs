@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 use crate::error::QueryError;
 use crate::service::BodhiService;
 

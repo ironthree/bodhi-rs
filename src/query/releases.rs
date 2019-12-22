@@ -1,14 +1,12 @@
-//! query for releases (or *one* release by name)
+//! The contents of this module can be used to query a bodhi instance about existing releases.
 //!
-//! The contents of this module can be used to query a bodhi instance about
-//! existing releases.
+//! The [`ReleaseNameQuery`](struct.ReleaseNameQuery.html) returns exactly one
+//! [`Release`](../../data/struct.Release.html), if and only if a `Release` with this name exists -
+//! otherwise, it will return an error.
 //!
-//! The `ReleaseNameQuery` returns exactly one Release, if and only if a Release
-//! with this name exists - otherwise, it will return an error.
-//!
-//! The `ReleaseQuery` can be used to execute more complex queries, for example
-//! filtering releases by status, or query the releases associated with a
-//! given set of updates or packages.
+//! The [`ReleaseQuery`](struct.ReleaseQuery.html) can be used to execute more complex queries, for
+//! example filtering releases by status, or query the releases associated with a given set of
+//! updates or packages.
 
 use std::collections::HashMap;
 
@@ -19,21 +17,19 @@ use crate::error::QueryError;
 use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
-/// Use this for querying bodhi for a specific release by its name. It will
-/// either return an `Ok(Some(Release))` matching the specified name, return
-/// `Ok(None)` if it doesn't exist, or return an `Err(String)` if another
-/// error occurred.
+/// Use this for querying bodhi for a specific release by its name. It will either return an
+/// `Ok(Some(Release))` matching the specified name, return `Ok(None)` if it doesn't exist, or
+/// return an `Err(String)` if another error occurred.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::BodhiServiceBuilder;
+/// # use bodhi::data::FedoraRelease;
+/// # use bodhi::query::ReleaseNameQuery;
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let release = bodhi.query(
-///     &bodhi::query::ReleaseNameQuery::new(String::from("F30"))
-/// ).unwrap();
+/// let release = bodhi.query(&ReleaseNameQuery::new(String::from("F30"))).unwrap();
 ///
-/// let release = bodhi.query(
-///     &bodhi::query::ReleaseNameQuery::new(bodhi::data::FedoraRelease::F30.into())
-/// ).unwrap();
+/// let release = bodhi.query(&ReleaseNameQuery::new(FedoraRelease::F30.into())).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-0>
@@ -43,7 +39,8 @@ pub struct ReleaseNameQuery {
 }
 
 impl ReleaseNameQuery {
-    /// This method is the only way to create a new `ReleaseNameQuery` instance.
+    /// This method is the only way to create a new
+    /// [`ReleaseNameQuery`](struct.ReleaseNameQuery.html) instance.
     pub fn new(name: String) -> Self {
         ReleaseNameQuery { name }
     }
@@ -74,22 +71,22 @@ impl Query<Option<Release>> for ReleaseNameQuery {
     }
 }
 
-/// Use this for querying bodhi about a set of releases with the given properties,
-/// which can be specified with the builder pattern. Note that some options can be
-/// specified multiple times, and comments will be returned if any criteria match.
-/// This is consistent with both the web interface and REST API behavior.
+/// Use this for querying bodhi about a set of releases with the given properties, which can be
+/// specified with the builder pattern. Note that some options can be specified multiple times, and
+/// comments will be returned if any criteria match. This is consistent with both the web interface
+/// and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::service::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::BodhiServiceBuilder;
+/// # use bodhi::query::ReleaseQuery;
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let releases = bodhi.query(
-///     &bodhi::query::ReleaseQuery::new()
-///     .exclude_archived(true)
-/// ).unwrap();
+/// let releases = bodhi.query(&ReleaseQuery::new().exclude_archived(true)).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-1>
 #[derive(Debug, Default)]
+
 pub struct ReleaseQuery {
     exclude_archived: Option<bool>,
     ids: Option<Vec<String>>,
@@ -99,7 +96,7 @@ pub struct ReleaseQuery {
 }
 
 impl ReleaseQuery {
-    /// This method returns a new `ReleaseQuery` with *no* filters set.
+    /// This method returns a new [`ReleaseQuery`](struct.ReleaseQuery.html) with *no* filters set.
     pub fn new() -> Self {
         ReleaseQuery {
             exclude_archived: None,
@@ -117,6 +114,7 @@ impl ReleaseQuery {
     }
 
     /// Restrict results to releases with the given ID.
+    ///
     /// Can be specified multiple times.
     pub fn ids(mut self, id: String) -> Self {
         match &mut self.ids {
@@ -127,14 +125,15 @@ impl ReleaseQuery {
         self
     }
 
-    /// Restrict results to releases with the given name.
-    /// If this is the only required filter, consider using a `ReleaseNameQuery` instead.
+    /// Restrict results to a release with the given name. If this is the only required filter,
+    /// consider using a [`ReleaseNameQuery`](struct.ReleaseNameQuery.html) instead.
     pub fn name(mut self, name: String) -> Self {
         self.name = Some(name);
         self
     }
 
     /// Restrict the returned results to releases containing the given package(s).
+    ///
     /// Can be specified multiple times.
     pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
@@ -146,6 +145,7 @@ impl ReleaseQuery {
     }
 
     /// Restrict the returned results to releases matching the given updates(s).
+    ///
     /// Can be specified multiple times.
     pub fn updates(mut self, update: String) -> Self {
         match &mut self.updates {

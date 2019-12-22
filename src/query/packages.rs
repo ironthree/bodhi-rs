@@ -1,10 +1,7 @@
-//! query for packages
+//! The contents of this module can be used to query a bodhi instance about existing packages.
 //!
-//! The contents of this module can be used to query a bodhi instance about
-//! existing packages.
-//!
-//! The `Package` can be used to execute complex queries, for example query
-//! packages by name, or filter packages matching a certain search string.
+//! The [`PackageQuery`](struct.PackageQuery.html) can be used to execute complex queries, for
+//! example query packages by name, or filter packages matching a certain search string.
 
 use std::collections::HashMap;
 
@@ -15,18 +12,17 @@ use crate::error::QueryError;
 use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
-/// Use this for querying bodhi about a set of packages with the given properties,
-/// which can be specified with the builder pattern. Note that some options can be
-/// specified multiple times, and packages will be returned if any criteria match.
-/// This is consistent with both the web interface and REST API behavior.
+/// Use this for querying bodhi about a set of packages with the given properties, which can be
+/// specified with the builder pattern. Note that some options can be specified multiple times, and
+/// packages will be returned if any criteria match. This is consistent with both the web interface
+/// and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::BodhiServiceBuilder;
+/// # use bodhi::query::PackageQuery;
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let packages = bodhi.query(
-///     &bodhi::query::PackageQuery::new()
-///     .search(String::from("rust*"))
-/// ).unwrap();
+/// let packages = bodhi.query(&PackageQuery::new().search(String::from("rust*"))).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/packages.html#service-0>
@@ -38,7 +34,7 @@ pub struct PackageQuery {
 }
 
 impl PackageQuery {
-    /// This method returns a new `PackageQuery` with *no* filters set.
+    /// This method returns a new [`PackageQuery`](struct.PackageQuery.html) with *no* filters set.
     pub fn new() -> Self {
         PackageQuery {
             like: None,

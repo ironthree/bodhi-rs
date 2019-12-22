@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 use serde::{Deserialize, Serialize};
 
 use crate::create::Create;
@@ -58,7 +60,7 @@ impl Create<NewOverride> for OverrideBuilder {
 
         if !status.is_success() {
             let text = response.text().unwrap_or_else(|_| String::from(""));
-            println!("{}", &text);  // TODO: remove this
+            println!("{}", &text); // TODO: remove this print once the response contents are clear
 
             let error: BodhiError = serde_json::from_str(&text)?;
             return Err(QueryError::BodhiError { error });

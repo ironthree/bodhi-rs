@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 pub(crate) mod traits;
 pub(crate) use traits::*;
 

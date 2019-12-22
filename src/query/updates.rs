@@ -1,38 +1,42 @@
-//! query for updates (or *one* update by ID, title, or alias)
+//! The contents of this module can be used to query a bodhi instance about existing updates.
 //!
-//! The contents of this module can be used to query a bodhi instance about
-//! existing updates.
+//! The `UpdateIDQuery` returns exactly one Update, if and only if a Update with this ID or alias
+//! exists - otherwise, it will return an error.
 //!
-//! The `UpdateIDQuery` returns exactly one Update, if and only if a Update
-//! with this ID or alias exists - otherwise, it will return an error.
-//!
-//! The `UpdateQuery` can be used to execute more complex queries, for example
-//! filtering updates by release, status, security impact, reboot suggestion,
-//! or for updates that are associated with a given set of packages.
+//! The `UpdateQuery` can be used to execute more complex queries, for example filtering updates by
+//! release, status, security impact, reboot suggestion, or for updates that are associated with a
+//! given set of packages.
 
 use std::collections::HashMap;
 
 use serde::Deserialize;
 
 use crate::data::{
-    ContentType, FedoraRelease, Update, UpdateRequest, UpdateSeverity, UpdateStatus,
-    UpdateSuggestion, UpdateType,
+    ContentType,
+    FedoraRelease,
+    Update,
+    UpdateRequest,
+    UpdateSeverity,
+    UpdateStatus,
+    UpdateSuggestion,
+    UpdateType,
 };
 use crate::error::QueryError;
 use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
-/// Use this for querying bodhi for a specific update by its ID or alias. It
-/// will either return an `Ok(Some(Update))` matching the specified ID or
-/// alias, return `Ok(None)` if it doesn't exist, or return an `Err(String)`
-/// if another error occurred.
+/// Use this for querying bodhi for a specific update by its ID or alias. It will either return an
+/// `Ok(Some(Update))` matching the specified ID or alias, return `Ok(None)` if it doesn't exist, or
+/// return an `Err(String)` if another error occurred.
 ///
 /// ```
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let update = bodhi.query(
-///     &bodhi::query::UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e"))
-/// ).unwrap();
+/// let update = bodhi
+///     .query(&bodhi::query::UpdateIDQuery::new(String::from(
+///         "FEDORA-2019-3dd0cf468e",
+///     )))
+///     .unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-0>
@@ -79,20 +83,22 @@ impl Query<Option<Update>> for UpdateIDQuery {
     }
 }
 
-/// Use this for querying bodhi about a set of updates with the given properties,
-/// which can be specified with the builder pattern. Note that some options can be
-/// specified multiple times, and updates will be returned if any criteria match.
-/// This is consistent with both the web interface and REST API behavior.
+/// Use this for querying bodhi about a set of updates with the given properties, which can be
+/// specified with the builder pattern. Note that some options can be specified multiple times, and
+/// updates will be returned if any criteria match. This is consistent with both the web interface
+/// and REST API behavior.
 ///
 /// ```
 /// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let updates = bodhi.query(
-///     &bodhi::query::UpdateQuery::new()
-///     .users(String::from("decathorpe"))
-///     .releases(bodhi::data::FedoraRelease::F30)
-///     .status(bodhi::data::UpdateStatus::Testing)
-/// ).unwrap();
+/// let updates = bodhi
+///     .query(
+///         &bodhi::query::UpdateQuery::new()
+///             .users(String::from("decathorpe"))
+///             .releases(bodhi::data::FedoraRelease::F30)
+///             .status(bodhi::data::UpdateStatus::Testing),
+///     )
+///     .unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2>
@@ -170,6 +176,7 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates matching the given alias(es).
+    ///
     /// Can be specified multiple times.
     pub fn aliases(mut self, alias: String) -> Self {
         match &mut self.aliases {
@@ -195,6 +202,7 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates associated with the given bug(s).
+    ///
     /// Can be specified multiple times.
     pub fn bugs(mut self, bug: String) -> Self {
         match &mut self.bugs {
@@ -206,6 +214,7 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates associated with the given build(s).
+    ///
     /// Can be specified multiple times.
     pub fn builds(mut self, build: String) -> Self {
         match &mut self.builds {
@@ -229,6 +238,7 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates associated with the given CVE(s).
+    ///
     /// Can be specified multiple times.
     pub fn cves(mut self, cve: String) -> Self {
         match &mut self.cves {
@@ -266,6 +276,7 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates associated for the given package(s).
+    ///
     /// Can be specified multiple times.
     pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
@@ -297,6 +308,7 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates for the given release(s).
+    ///
     /// Can be specified multiple times.
     pub fn releases(mut self, release: FedoraRelease) -> Self {
         match &mut self.releases {
@@ -352,6 +364,7 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates matching the given update ID(s).
+    ///
     /// Can be specified multiple times.
     pub fn update_ids(mut self, update_id: String) -> Self {
         match &mut self.update_ids {
@@ -369,6 +382,7 @@ impl UpdateQuery {
     }
 
     /// Restrict results to updates associated with the given user(s).
+    ///
     /// Can be specified multiple times.
     pub fn users(mut self, user: String) -> Self {
         match &mut self.users {

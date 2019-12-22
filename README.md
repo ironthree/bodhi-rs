@@ -50,6 +50,9 @@ Note that the API is not finalized yet, and minor changes will still happen befo
     - releases (REALLY?)
     - updates (NSY)
 
+- use `chrono` for date/time handling and conversions from/to strings instead of supplying date
+  arguments as strings (with `chrono/serde` feature)
+
 
 ## Test coverage
 

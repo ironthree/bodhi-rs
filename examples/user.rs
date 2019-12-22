@@ -1,8 +1,6 @@
 use std::env::args;
 
-use bodhi::error::QueryError;
-use bodhi::query::UserNameQuery;
-use bodhi::service::BodhiServiceBuilder;
+use bodhi::{error::QueryError, query::UserNameQuery, service::BodhiServiceBuilder};
 
 fn main() -> Result<(), QueryError> {
     let bodhi = BodhiServiceBuilder::default().build().unwrap();

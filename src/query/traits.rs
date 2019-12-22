@@ -14,22 +14,21 @@ pub trait SinglePageQuery<T> {
     /// This method returns an optional map of query arguments.
     fn args(&self) -> Option<HashMap<&str, String>>;
 
-    /// This associated method is expected to return the result that was
-    /// parsed from the JSON response, or an error.
+    /// This associated method is expected to return the result that was parsed from the JSON
+    /// response, or an error.
     fn parse(string: String) -> Result<T, QueryError>;
 
-    /// This associated method returns the item that represents the
-    /// "missing" state (when getting a 404 error from the server).
+    /// This associated method returns the item that represents the "missing" state (when getting a
+    /// 404 error from the server).
     ///
-    /// This can be a valid response for missing things (in which case the trait
-    /// implementation will probably will return `None` here, or an invalid
-    /// response, where the trait implementation will return an error.
+    /// This can be a valid response for missing things (in which case the trait implementation will
+    /// probably will return `None` here, or an invalid response, where the trait implementation
+    /// will return an error.
     fn missing() -> Result<T, QueryError>;
 
-    /// This method executes a single-page query, but delegates execution of
-    /// some things to the individual trait implementations (such as
-    /// deserializing JSON, handling 404 errors, or getting API paths and
-    /// arguments).
+    /// This method executes a single-page query, but delegates execution of some things to the
+    /// individual trait implementations (such as deserializing JSON, handling 404 errors, or
+    /// getting API paths and arguments).
     fn query(&self, bodhi: &BodhiService) -> Result<T, QueryError> {
         let response = bodhi.get(&self.path(), self.args())?;
         let status = response.status();

@@ -1,11 +1,10 @@
-//! This module contains the data types that are needed to deserialize bodhi
-//! server responses which are also public outside this crate. Some internal
-//! data types for queries are implemented in the corresponding query module.
+//! This module contains the data types that are needed to deserialize bodhi server responses which
+//! are also public outside this crate. Some internal data types for queries are implemented in the
+//! corresponding query module.
 //!
-//! Additionally, the bodhi REST API has some arguments that accept Strings,
-//! but only from a limited set of enumerated values. To abstract this, the
-//! corresponding query filters accept some of the enum types defined here,
-//! instead of the String arguments directly.
+//! Additionally, the bodhi REST API has some arguments that accept Strings, but only from a limited
+//! set of enumerated values. To abstract this, the corresponding query filters accept some of the
+//! enum types defined here, instead of the String arguments directly.
 
 use std::convert::TryFrom;
 
@@ -18,11 +17,18 @@ pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
 /// base URL of the fedora bodhi staging instance
 pub const FEDORA_BODHI_STG_URL: &str = "https://bodhi.stg.fedoraproject.org";
 
+/// This enum represents a "Karma" value, which is either a positive (+1), neutral (±0), or negative
+/// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and
+/// possibly also a [`TestCaseFeedback`](struct.TestCase.html) or a
+/// [`BugFeedback`](struct.BugFeedback.html).
 #[derive(Debug, Clone, Deserialize_repr)]
 #[repr(i8)]
 pub enum Karma {
+    /// positive feedback
     Positive = 1,
+    /// neutral / informational feedback
     Neutral = 0,
+    /// negative feedback
     Negative = -1,
 }
 
@@ -58,6 +64,7 @@ impl From<i32> for Karma {
 }
 
 /// This enum represents a fedora release.
+#[allow(missing_docs)]
 #[derive(Debug, Deserialize)]
 pub enum FedoraRelease {
     F32,
@@ -177,14 +184,19 @@ impl Into<String> for FedoraRelease {
 /// This enum represents the content type of a bodhi update.
 #[derive(Debug, Deserialize)]
 pub enum ContentType {
+    /// "base" content type (seems to be unused)
     #[serde(rename(deserialize = "base"))]
     Base,
+    /// tag for container image updates
     #[serde(rename(deserialize = "container"))]
     Container,
+    /// tag for flatpak updates
     #[serde(rename(deserialize = "flatpak"))]
     Flatpak,
+    /// tag for module updates
     #[serde(rename(deserialize = "module"))]
     Module,
+    /// tag for traditional RPM package updates
     #[serde(rename(deserialize = "rpm"))]
     RPM,
 }
@@ -204,16 +216,23 @@ impl Into<String> for ContentType {
 /// This enum represents a requested state change of an update.
 #[derive(Debug, Deserialize)]
 pub enum UpdateRequest {
+    /// request for an update to get "batched" for the next stable push (no longer used)
     #[serde(rename(deserialize = "batched"))]
     Batched,
+    /// request for the update to be removed as "obsolete" (usually when another update supersedes
+    /// it)
     #[serde(rename(deserialize = "obsolete"))]
     Obsolete,
+    /// request for the update to be "revoked" or removed
     #[serde(rename(deserialize = "revoke"))]
     Revoke,
+    /// request for the update to get pushed to stable
     #[serde(rename(deserialize = "stable"))]
     Stable,
+    /// request for the update to get pushed to testing
     #[serde(rename(deserialize = "testing"))]
     Testing,
+    /// request for the update to get "unpushed" (removed) from testing
     #[serde(rename(deserialize = "unpush"))]
     Unpush,
 }
@@ -232,6 +251,7 @@ impl Into<String> for UpdateRequest {
 }
 
 /// This enum represents the associated severity of a bodhi update.
+#[allow(missing_docs)]
 #[derive(Debug, Deserialize)]
 pub enum UpdateSeverity {
     #[serde(rename(deserialize = "high"))]
@@ -261,20 +281,28 @@ impl Into<String> for UpdateSeverity {
 /// This enum represents the current state of a bodhi update.
 #[derive(Debug, Deserialize)]
 pub enum UpdateStatus {
+    /// tag for updates that have been obsoleted by another update
     #[serde(rename(deserialize = "obsolete"))]
     Obsolete,
+    /// tag for updates that are pending for either testing or stable
     #[serde(rename(deserialize = "pending"))]
     Pending,
+    /// tag for updates that are still being processed
     #[serde(rename(deserialize = "processing"))]
     Processing,
+    /// tag for updates that are associated with an active side tag
     #[serde(rename(deserialize = "side_tag_active"))]
     SideTagActive,
+    /// tag for updates that are associated with an expired side tag
     #[serde(rename(deserialize = "side_tag_expired"))]
     SideTagExpired,
+    /// tag for updates that have been pushed to stable
     #[serde(rename(deserialize = "stable"))]
     Stable,
+    /// tag for updates that have been pushed to testing
     #[serde(rename(deserialize = "testing"))]
     Testing,
+    /// tag for updates that have been "unpushed" from testing
     #[serde(rename(deserialize = "unpushed"))]
     Unpushed,
 }
@@ -297,10 +325,13 @@ impl Into<String> for UpdateStatus {
 /// This enum represents the associated suggested action for a bodhi update.
 #[derive(Debug, Deserialize)]
 pub enum UpdateSuggestion {
+    /// recommendation to log out for the update to get applied
     #[serde(rename(deserialize = "logout"))]
     Logout,
+    /// recommendation to reboot for the update to get applied
     #[serde(rename(deserialize = "reboot"))]
     Reboot,
+    /// no recommendation
     #[serde(rename(deserialize = "unspecified"))]
     Unspecified,
 }
@@ -316,6 +347,7 @@ impl Into<String> for UpdateSuggestion {
 }
 
 /// This enum represents the type of a bodhi update.
+#[allow(missing_docs)]
 #[derive(Debug, Deserialize)]
 pub enum UpdateType {
     #[serde(rename(deserialize = "bugfix"))]
@@ -345,10 +377,15 @@ impl Into<String> for UpdateType {
 /// This struct represents a specific BugZilla bug that is associated with an update.
 #[derive(Debug, Deserialize)]
 pub struct Bug {
+    /// bug ID in the BugZilla system: <https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}>
     pub bug_id: u32,
+    /// list of [`BugFeedback`](struct.BugFeedback.html) items associated with this bug
     pub feedback: Option<Vec<BugFeedback>>,
-    pub parent: bool,
-    pub security: bool,
+    // what is this?
+    parent: bool,
+    // what is this?
+    security: bool,
+    /// title of the bug in BugZilla
     pub title: Option<String>,
 }
 
@@ -373,8 +410,8 @@ pub struct Build {
     pub signed: bool,
 }
 
-/// This struct represents one comment against a specific update,
-/// along with its associated bug and test case feedback.
+/// This struct represents one comment against a specific update, along with its associated bug and
+/// test case feedback.
 #[derive(Debug, Deserialize)]
 pub struct Comment {
     pub author: Option<String>,
@@ -421,9 +458,8 @@ pub struct Package {
     pub requirements: Option<String>,
 }
 
-/// This struct represents a fedora release as present in the bodhi database.
-/// This includes variants (Modular, Container, Flatpak), identified with
-/// the "C", "F", and "M" suffixes.
+/// This struct represents a fedora release as present in the bodhi database. This includes variants
+/// (Modular, Container, Flatpak), identified with the "C", "F", and "M" suffixes.
 #[derive(Debug, Deserialize)]
 pub struct Release {
     pub branch: String,
@@ -444,8 +480,8 @@ pub struct Release {
     pub version: String,
 }
 
-/// This struct represents a specific test case as associated with
-/// a given test case feedback and update.
+/// This struct represents a specific test case as associated with a given test case feedback and
+/// update.
 #[derive(Debug, Deserialize)]
 pub struct TestCase {
     pub name: String,
@@ -469,8 +505,8 @@ pub enum UpdateID {
     Alias(String),
 }
 
-/// This struct represents a bodhi update, with associated items:
-/// bugs, builds, comments, release, status, submitter, etc.
+/// This struct represents a bodhi update, with associated items: bugs, builds, comments, release,
+/// status, submitter, etc.
 #[derive(Debug, Deserialize)]
 pub struct Update {
     pub alias: String,
@@ -519,7 +555,7 @@ pub struct Update {
     pub user: User,
 }
 
-/// This struct represents a specific fedora user.
+/// This struct represents one fedora user that bodhi is aware of.
 #[derive(Debug, Deserialize)]
 pub struct User {
     pub avatar: String,

@@ -1,15 +1,13 @@
-//! query for buildroot overrides (or *one* override by NVR)
+//! The contents of this module can be used to query a bodhi instance about existing buildroot
+//! overrides.
 //!
-//! The contents of this module can be used to query a bodhi instance about
-//! existing buildroot overrides.
+//! The [`OverrideNVRQuery`](struct.OverrideNVRQuery.html) returns exactly one
+//! [`Override`](../../data/struct.Override.html), if and only if an `Override` for the build with
+//! this NVR exists - otherwise, it will return an error.
 //!
-//! The `OverrideNVRQuery` returns exactly one Override, if and only if a
-//! Override for the build with this NVR exists - otherwise, it will return an
-//! error.
-//!
-//! The `OverrideQuery` can be used to execute more complex queries, for example
-//! filtering overrides by status, sets of overrides for certain packages, or
-//! overrides filed by a given list of users.
+//! The [`OverrideQuery`](struct.OverrideQuery.html) can be used to execute more complex queries,
+//! for example filtering overrides by status, sets of overrides for certain packages, or overrides
+//! filed by a given list of users.
 
 use std::collections::HashMap;
 
@@ -20,17 +18,18 @@ use crate::error::QueryError;
 use crate::query::{Query, SinglePageQuery};
 use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
 
-/// Use this for querying bodhi for a specific override, by its NVR
-/// (Name-Version-Release) string. It will return either an `Ok(Some(Override))`
-/// matching the specified NVR, return `Ok(None)` if it doesn't exist, or return
-/// an `Err(String)` if another error occurred.
+/// Use this for querying bodhi for a specific override, by its NVR (Name-Version-Release) string.
+/// It will return either an `Ok(Some(Override))` matching the specified NVR, return `Ok(None)` if
+/// it doesn't exist, or return an `Err(String)` if another error occurred.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::BodhiServiceBuilder;
+/// # use bodhi::query::OverrideNVRQuery;
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let over_ride = bodhi.query(
-///     &bodhi::query::OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28"))
-/// ).unwrap();
+/// let over_ride = bodhi
+///     .query(&OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28")))
+///     .unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-0>
@@ -45,7 +44,8 @@ struct OverridePage {
 }
 
 impl OverrideNVRQuery {
-    /// This method is the only way to create a new `OverrideNVRQuery` instance.
+    /// This method is the only way to create a new
+    /// [`OverrideNVRQuery`](struct.OverrideNVRQuery.html) instance.
     pub fn new(nvr: String) -> Self {
         OverrideNVRQuery { nvr }
     }
@@ -76,19 +76,24 @@ impl Query<Option<Override>> for OverrideNVRQuery {
     }
 }
 
-/// Use this for querying bodhi about a set of overrides with the given properties,
-/// which can be specified with the builder pattern. Note that some options can be
-/// specified multiple times, and overrides will be returned if any criteria match.
-/// This is consistent with both the web interface and REST API behavior.
+/// Use this for querying bodhi about a set of overrides with the given properties, which can be
+/// specified with the builder pattern. Note that some options can be specified multiple times, and
+/// overrides will be returned if any criteria match. This is consistent with both the web interface
+/// and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::BodhiServiceBuilder;
+/// # use bodhi::data::FedoraRelease;
+/// # use bodhi::query::OverrideQuery;
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let overrides = bodhi.query(
-///     &bodhi::query::OverrideQuery::new()
-///     .releases(bodhi::data::FedoraRelease::F29)
-///     .users(String::from("decathorpe"))
-/// ).unwrap();
+/// let overrides = bodhi
+///     .query(
+///         &OverrideQuery::new()
+///             .releases(FedoraRelease::F29)
+///             .users(String::from("decathorpe")),
+///     )
+///     .unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1>
@@ -104,7 +109,8 @@ pub struct OverrideQuery {
 }
 
 impl OverrideQuery {
-    /// This method returns a new `OverrideQuery` with *no* filters set.
+    /// This method returns a new [`OverrideQuery`](struct.OverrideQuery.html) with *no* filters
+    /// set.
     pub fn new() -> Self {
         OverrideQuery {
             builds: None,
@@ -118,6 +124,7 @@ impl OverrideQuery {
     }
 
     /// Restrict the returned results to overrides for the given build(s).
+    ///
     /// Can be specified multiple times.
     pub fn builds(mut self, build: String) -> Self {
         match &mut self.builds {
@@ -141,6 +148,7 @@ impl OverrideQuery {
     }
 
     /// Restrict the returned results to overrides for the given package(s).
+    ///
     /// Can be specified multiple times.
     pub fn packages(mut self, package: String) -> Self {
         match &mut self.packages {
@@ -152,6 +160,7 @@ impl OverrideQuery {
     }
 
     /// Restrict the returned results to overrides for the given release(s).
+    ///
     /// Can be specified multiple times.
     pub fn releases(mut self, release: FedoraRelease) -> Self {
         match &mut self.releases {
@@ -169,6 +178,7 @@ impl OverrideQuery {
     }
 
     /// Restrict the returned results to overrides created by the given user(s).
+    ///
     /// Can be specified multiple times.
     pub fn users(mut self, user: String) -> Self {
         match &mut self.users {

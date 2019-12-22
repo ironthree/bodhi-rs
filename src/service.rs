@@ -1,11 +1,11 @@
-//! This module contains the structures and methods to interact with a (remote)
-//! bodhi server instance.
+//! This module contains the structures and methods to interact with a (remote) bodhi server
+//! instance.
 
 use std::collections::HashMap;
 use std::time::Duration;
 
 use failure::Fail;
-use fedora::Session;
+use fedora::{AnonymousSessionBuilder, OpenIDSessionBuilder, Session};
 use reqwest::blocking::Response;
 use url::Url;
 
@@ -14,20 +14,22 @@ use crate::data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 use crate::error::QueryError;
 use crate::query::Query;
 
-/// Always start with page 1 for multi-page queries.
-/// Everything else would be stupid.
+/// Always start with page 1 for multi-page queries. Everything else would be stupid.
 pub const DEFAULT_PAGE: u32 = 1;
 
-/// This constant defines how many items are queried every time for multi-page queries.
-/// The maximum is 100, the default is 20, and 50 seems a good compromise for speed.
+/// This constant defines how many items are queried every time for multi-page queries. The
+/// server-side maximum is usually 100, the default is 20, and 50 seems a good compromise for speed.
 pub const DEFAULT_ROWS: u32 = 50;
 
-/// Specify a longer timeout duration (60 s) for bodhi requests.
-/// The `reqwest` default value of 30 seconds is a bit too short for long-running queries.
+/// Specify a longer timeout duration (60 s) for bodhi requests. The `reqwest` default value of 30
+/// seconds is a bit too short for long-running queries.
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
 
-/// Specify a number of retries in case of connection failures.
+/// Specify a number of retries in case of connection or transient server failures.
 const REQUEST_RETRIES: usize = 3;
+
+/// Specify a sane default user agent for bodhi-rs.
+const USER_AGENT: &str = "bodhi-rs";
 
 #[derive(Debug)]
 enum BodhiServiceType {
@@ -62,9 +64,7 @@ pub enum BuilderError {
     #[fail(display = "Failed to parse service URL: {}", error)]
     UrlParsingError { error: url::ParseError },
     #[fail(display = "Failed to initialize OpenID client: {}", error)]
-    OpenIDClientError {
-        error: fedora::openid::OpenIDClientError,
-    },
+    OpenIDClientError { error: fedora::openid::OpenIDClientError },
 }
 
 impl From<url::ParseError> for BuilderError {
@@ -146,65 +146,53 @@ impl BodhiServiceBuilder {
         };
 
         let login_url = url.join("/login")?;
+        let user_agent = USER_AGENT.to_string();
 
-        let session: Box<dyn Session> = if let Some(authentication) = self.authentication {
+        let session: Box<dyn Session> = if let Some(auth) = self.authentication {
             match self.service_type {
                 BodhiServiceType::DEFAULT => Box::new(
-                    fedora::OpenIDSessionBuilder::default(
-                        login_url,
-                        authentication.username,
-                        authentication.password,
-                    )
-                    .user_agent(String::from("bodhi-rs"))
-                    .timeout(timeout)
-                    .build()
-                    .unwrap(),
+                    OpenIDSessionBuilder::default(login_url, auth.username, auth.password)
+                        .user_agent(user_agent)
+                        .timeout(timeout)
+                        .build()
+                        .unwrap(),
                 ),
                 BodhiServiceType::STAGING => Box::new(
-                    fedora::OpenIDSessionBuilder::staging(
-                        login_url,
-                        authentication.username,
-                        authentication.password,
-                    )
-                    .user_agent(String::from("bodhi-rs"))
-                    .timeout(timeout)
-                    .build()
-                    .unwrap(),
+                    OpenIDSessionBuilder::staging(login_url, auth.username, auth.password)
+                        .user_agent(user_agent)
+                        .timeout(timeout)
+                        .build()
+                        .unwrap(),
                 ),
-                BodhiServiceType::CUSTOM { openid_url } => Box::new(
-                    fedora::OpenIDSessionBuilder::custom(
-                        Url::parse(&openid_url)?,
-                        login_url,
-                        authentication.username,
-                        authentication.password,
+                BodhiServiceType::CUSTOM { openid_url } => {
+                    let url = Url::parse(&openid_url)?;
+
+                    Box::new(
+                        OpenIDSessionBuilder::custom(url, login_url, auth.username, auth.password)
+                            .user_agent(user_agent)
+                            .timeout(timeout)
+                            .build()
+                            .unwrap(),
                     )
-                    .user_agent(String::from("bodhi-rs"))
-                    .timeout(timeout)
-                    .build()
-                    .unwrap(),
-                ),
+                },
             }
         } else {
             Box::new(
-                fedora::AnonymousSessionBuilder::new()
-                    .user_agent(String::from("bodhi-rs"))
+                AnonymousSessionBuilder::new()
+                    .user_agent(user_agent)
                     .timeout(timeout)
                     .build()
                     .unwrap(),
             )
         };
 
-        Ok(BodhiService {
-            url,
-            session,
-            retries,
-        })
+        Ok(BodhiService { url, session, retries })
     }
 }
 
-/// This struct represents a specific bodhi service, typically running remotely,
-/// although a local URL could be specified, as well. This BodhiService instance
-/// is then used by queries to actually submit to, and receive from - the service.
+/// This struct represents a specific bodhi service, typically running remotely, although a local
+/// URL could be specified, as well. This BodhiService instance is then used by queries to actually
+/// submit to, and receive from - the service.
 pub struct BodhiService {
     url: Url,
     session: Box<dyn Session>,
@@ -214,9 +202,7 @@ pub struct BodhiService {
 #[derive(Debug, Fail)]
 pub enum ServiceError {
     #[fail(display = "Failed to authenticate with OpenID provider: {}", error)]
-    AuthenticationError {
-        error: fedora::openid::OpenIDClientError,
-    },
+    AuthenticationError { error: fedora::openid::OpenIDClientError },
     #[fail(display = "Authorization required but not provided.")]
     NotAuthenticated,
     #[fail(display = "Failed to query bodhi instance: {}", error)]
@@ -243,11 +229,7 @@ impl From<url::ParseError> for ServiceError {
 
 impl BodhiService {
     // TODO
-    pub(crate) fn get(
-        &self,
-        path: &str,
-        args: Option<HashMap<&str, String>>,
-    ) -> Result<Response, ServiceError> {
+    pub(crate) fn get(&self, path: &str, args: Option<HashMap<&str, String>>) -> Result<Response, ServiceError> {
         let url = self.url.join(path)?;
 
         let query: Vec<(&str, String)> = match args {
@@ -262,18 +244,17 @@ impl BodhiService {
                         Some(_len) => {
                             // return the first valid response
                             Ok(response)
-                        }
+                        },
                         None => {
                             // response is empty
                             Err(ServiceError::EmptyResponseError)
-                        }
+                        },
                     }
-                }
-
+                },
                 Err(error) => {
                     // take a breath, and keep on trying (or not)
                     Err(ServiceError::RequestError { error })
-                }
+                },
             }
         };
 
@@ -284,15 +265,16 @@ impl BodhiService {
                 {
                     dbg!(&response);
                 };
+
                 Ok(response)
-            }
+            },
             Err(error) => {
                 if let retry::Error::Operation { error: inner, .. } = error {
                     Err(inner)
                 } else {
                     Err(ServiceError::RetryError)
                 }
-            }
+            },
         }
     }
 
@@ -310,13 +292,7 @@ impl BodhiService {
             None => Vec::new(),
         };
 
-        let response = self
-            .session
-            .session()
-            .post(url)
-            .body(body)
-            .query(&query)
-            .send()?;
+        let response = self.session.session().post(url).body(body).query(&query).send()?;
 
         #[cfg(feature = "debug")]
         {
