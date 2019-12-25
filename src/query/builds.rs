@@ -16,9 +16,9 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::{Build, FedoraRelease};
-use crate::error::QueryError;
+use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific build, by its NVR (Name-Version-Release) string. It
 /// will either return an `Ok(Some(Build))` matching the specified NVR, return `Ok(None)` if it

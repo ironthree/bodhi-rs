@@ -4,9 +4,9 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::error::QueryError;
+use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, ServiceError};
+use crate::BodhiService;
 
 /// Use this for querying bodhi for a new CSRF token. It will return either an `Ok(String)` with the
 /// new token, or an `Err(String)` if an error occurred.

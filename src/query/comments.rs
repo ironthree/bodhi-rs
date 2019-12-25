@@ -13,9 +13,9 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::Comment;
-use crate::error::QueryError;
+use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific comment by its ID. It will either return an
 /// `Ok(Some(Comment))` matching the specified ID, return `Ok(None)` if it doesn't exist, or return

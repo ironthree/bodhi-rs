@@ -1,4 +1,6 @@
 #![allow(missing_docs)]
+#![allow(unused_imports)]
+#![allow(unused_variables)]
 
 use serde::{Deserialize, Serialize};
 

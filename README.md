@@ -1,4 +1,4 @@
-# bodhi REST API client
+## bodhi REST API client
 
 [![crates.io](https://img.shields.io/crates/v/bodhi.svg)](https://crates.io/crates/bodhi/)
 [![crates.io](https://img.shields.io/crates/d/bodhi.svg)](https://crates.io/crates/bodhi/)
@@ -59,8 +59,12 @@ Note that the API is not finalized yet, and minor changes will still happen befo
 Tests should pass for every commit that gets pushed to master. By default, only "fast" tests are run by `cargo test`,
 where "fast" means that they should finish within a minute or so.
 
-Before pushing, the ignored, "slow" tests are also run once with `cargo test -- --ignored`. These make sure that this
-library can still successfully deserialize all JSON server responses.
+Before pushing, the "slow" tests are also run once with `cargo test --features slow_tests`. These make sure that this
+library can still successfully deserialize all JSON server responses. These tests take more than an hour to complete.
+
+There are also some "ignored" tests, which cannot ever feasibly be run regularly, since they basically read the complete
+database of the bodhi instance, which takes *ages*. These tests are also set up to run against the staging instance
+of bodhi, so the production instance isn't DOSed.
 
 
 ## Examples

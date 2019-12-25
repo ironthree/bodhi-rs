@@ -1,14 +1,16 @@
+//! This module contains some common error types for wrapping networking-related issues,
+//! server-side issues, and client-side issues (including JSON deserialization problems).
 use std::collections::HashMap;
 
 use failure::Fail;
 use serde::Deserialize;
 
-use crate::service::ServiceError;
-
 /// This struct contains error messages that are deserialized from bodhi's error responses.
 #[derive(Debug, Deserialize, Fail)]
 pub struct BodhiError {
+    /// This field contains a list of server-side error messages.
     pub errors: Vec<HashMap<String, String>>,
+    /// This field contains the server-side status message for the failure.
     pub status: String,
 }
 
@@ -18,6 +20,7 @@ impl std::fmt::Display for BodhiError {
     }
 }
 
+/// This enum encapsulates the different ways in which bodhi queries can fail.
 #[derive(Debug, Fail)]
 pub enum QueryError {
     /// This error represents a network-related issue that occurred within
@@ -78,19 +81,30 @@ impl From<ServiceError> for QueryError {
     }
 }
 
+/// This enum encapsulates the different ways in which requests to bodhi can fail.
 #[derive(Debug, Fail)]
 pub enum ServiceError {
-    #[fail(display = "Failed to authenticate with OpenID provider: {}", error)]
-    AuthenticationError { error: fedora::openid::OpenIDClientError },
-    #[fail(display = "Authorization required but not provided.")]
-    NotAuthenticated,
+    /// This error represents a network-related issue that occurred within
+    /// [`reqwest`](https://docs.rs/reqwest).
     #[fail(display = "Failed to query bodhi instance: {}", error)]
-    RequestError { error: reqwest::Error },
-    #[fail(display = "Failed to parse redirection URL: {}", error)]
-    UrlParsingError { error: url::ParseError },
+    RequestError {
+        /// The inner error contains the error passed from [`reqwest`](https://docs.rs/reqwest).
+        error: reqwest::Error,
+    },
+    /// This error represents an issue with constructing the request URL from the base API URL
+    /// and the query string.
+    #[fail(display = "Failed to compute request URL: {}", error)]
+    UrlParsingError {
+        /// The inner error contains the error that occurred when parsing the URL.
+        error: url::ParseError,
+    },
+    /// This error represents an issue where a response with an empty body was received (which is a
+    /// server-side issue in bodhi, that sometimes happens under load).
     #[fail(display = "Received an empty response.")]
     EmptyResponseError,
-    #[fail(display = "Retrying a failed request failed repeatedly.")]
+    /// This error represents an unexpected error in the retry logic internal to
+    /// [`retry`](https://docs.rs/retry).
+    #[fail(display = "Retrying a failed request failed.")]
     RetryError,
 }
 

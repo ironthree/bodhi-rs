@@ -92,15 +92,15 @@ pub enum FedoraRelease {
     F23,
     F22,
     F21,
-    #[serde(rename(deserialize = "EPEL-8"))]
+    #[serde(rename = "EPEL-8")]
     EPEL8,
-    #[serde(rename(deserialize = "EPEL-8M"))]
+    #[serde(rename = "EPEL-8M")]
     EPEL8M,
-    #[serde(rename(deserialize = "EPEL-7"))]
+    #[serde(rename = "EPEL-7")]
     EPEL7,
-    #[serde(rename(deserialize = "EL-6"))]
+    #[serde(rename = "EL-6")]
     EL6,
-    #[serde(rename(deserialize = "EL-5"))]
+    #[serde(rename = "EL-5")]
     EL5,
 }
 
@@ -185,19 +185,19 @@ impl Into<String> for FedoraRelease {
 #[derive(Debug, Deserialize)]
 pub enum ContentType {
     /// "base" content type (seems to be unused)
-    #[serde(rename(deserialize = "base"))]
+    #[serde(rename = "base")]
     Base,
     /// tag for container image updates
-    #[serde(rename(deserialize = "container"))]
+    #[serde(rename = "container")]
     Container,
     /// tag for flatpak updates
-    #[serde(rename(deserialize = "flatpak"))]
+    #[serde(rename = "flatpak")]
     Flatpak,
     /// tag for module updates
-    #[serde(rename(deserialize = "module"))]
+    #[serde(rename = "module")]
     Module,
     /// tag for traditional RPM package updates
-    #[serde(rename(deserialize = "rpm"))]
+    #[serde(rename = "rpm")]
     RPM,
 }
 
@@ -217,23 +217,22 @@ impl Into<String> for ContentType {
 #[derive(Debug, Deserialize)]
 pub enum UpdateRequest {
     /// request for an update to get "batched" for the next stable push (no longer used)
-    #[serde(rename(deserialize = "batched"))]
+    #[serde(rename = "batched")]
     Batched,
-    /// request for the update to be removed as "obsolete" (usually when another update supersedes
-    /// it)
-    #[serde(rename(deserialize = "obsolete"))]
+    /// request for an update to be marked as "obsolete" (usually when another update supersedes it)
+    #[serde(rename = "obsolete")]
     Obsolete,
     /// request for the update to be "revoked" or removed
-    #[serde(rename(deserialize = "revoke"))]
+    #[serde(rename = "revoke")]
     Revoke,
     /// request for the update to get pushed to stable
-    #[serde(rename(deserialize = "stable"))]
+    #[serde(rename = "stable")]
     Stable,
     /// request for the update to get pushed to testing
-    #[serde(rename(deserialize = "testing"))]
+    #[serde(rename = "testing")]
     Testing,
     /// request for the update to get "unpushed" (removed) from testing
-    #[serde(rename(deserialize = "unpush"))]
+    #[serde(rename = "unpush")]
     Unpush,
 }
 
@@ -254,15 +253,15 @@ impl Into<String> for UpdateRequest {
 #[allow(missing_docs)]
 #[derive(Debug, Deserialize)]
 pub enum UpdateSeverity {
-    #[serde(rename(deserialize = "high"))]
+    #[serde(rename = "high")]
     High,
-    #[serde(rename(deserialize = "low"))]
+    #[serde(rename = "low")]
     Low,
-    #[serde(rename(deserialize = "medium"))]
+    #[serde(rename = "medium")]
     Medium,
-    #[serde(rename(deserialize = "unspecified"))]
+    #[serde(rename = "unspecified")]
     Unspecified,
-    #[serde(rename(deserialize = "urgent"))]
+    #[serde(rename = "urgent")]
     Urgent,
 }
 
@@ -282,28 +281,28 @@ impl Into<String> for UpdateSeverity {
 #[derive(Debug, Deserialize)]
 pub enum UpdateStatus {
     /// tag for updates that have been obsoleted by another update
-    #[serde(rename(deserialize = "obsolete"))]
+    #[serde(rename = "obsolete")]
     Obsolete,
     /// tag for updates that are pending for either testing or stable
-    #[serde(rename(deserialize = "pending"))]
+    #[serde(rename = "pending")]
     Pending,
     /// tag for updates that are still being processed
-    #[serde(rename(deserialize = "processing"))]
+    #[serde(rename = "processing")]
     Processing,
     /// tag for updates that are associated with an active side tag
-    #[serde(rename(deserialize = "side_tag_active"))]
+    #[serde(rename = "side_tag_active")]
     SideTagActive,
     /// tag for updates that are associated with an expired side tag
-    #[serde(rename(deserialize = "side_tag_expired"))]
+    #[serde(rename = "side_tag_expired")]
     SideTagExpired,
     /// tag for updates that have been pushed to stable
-    #[serde(rename(deserialize = "stable"))]
+    #[serde(rename = "stable")]
     Stable,
     /// tag for updates that have been pushed to testing
-    #[serde(rename(deserialize = "testing"))]
+    #[serde(rename = "testing")]
     Testing,
     /// tag for updates that have been "unpushed" from testing
-    #[serde(rename(deserialize = "unpushed"))]
+    #[serde(rename = "unpushed")]
     Unpushed,
 }
 
@@ -326,13 +325,13 @@ impl Into<String> for UpdateStatus {
 #[derive(Debug, Deserialize)]
 pub enum UpdateSuggestion {
     /// recommendation to log out for the update to get applied
-    #[serde(rename(deserialize = "logout"))]
+    #[serde(rename = "logout")]
     Logout,
     /// recommendation to reboot for the update to get applied
-    #[serde(rename(deserialize = "reboot"))]
+    #[serde(rename = "reboot")]
     Reboot,
     /// no recommendation
-    #[serde(rename(deserialize = "unspecified"))]
+    #[serde(rename = "unspecified")]
     Unspecified,
 }
 
@@ -350,15 +349,15 @@ impl Into<String> for UpdateSuggestion {
 #[allow(missing_docs)]
 #[derive(Debug, Deserialize)]
 pub enum UpdateType {
-    #[serde(rename(deserialize = "bugfix"))]
+    #[serde(rename = "bugfix")]
     BugFix,
-    #[serde(rename(deserialize = "security"))]
+    #[serde(rename = "security")]
     Enhancement,
-    #[serde(rename(deserialize = "newpackage"))]
+    #[serde(rename = "newpackage")]
     NewPackage,
-    #[serde(rename(deserialize = "enhancement"))]
+    #[serde(rename = "enhancement")]
     Security,
-    #[serde(rename(deserialize = "unspecified"))]
+    #[serde(rename = "unspecified")]
     Unspecified,
 }
 
@@ -392,69 +391,122 @@ pub struct Bug {
 /// This struct represents an update feedback item associated with a specific bug.
 #[derive(Debug, Deserialize)]
 pub struct BugFeedback {
+    /// bug this feedback is associated with
     pub bug: Option<Bug>,
+    /// ID of the bug this feedback is associated with
     pub bug_id: u32,
+    /// ID of the comment that this feedback is associated with
     pub comment_id: Option<u32>,
+    /// feedback (positive, neutral, negative)
     pub karma: Karma,
 }
 
 /// This struct represents a specific koji build that bodhi is aware of.
 #[derive(Debug, Deserialize)]
 pub struct Build {
-    #[serde(rename(deserialize = "type"))]
-    pub build_type: String,
+    /// type of this build; one of: `container`, `flatpak`, `module`, `rpm`
+    #[serde(rename = "type")]
+    pub build_type: BuildType,
+    /// URL pointing to the results of CI tests
     pub ci_url: Option<String>,
+    /// epoch associated with this build
     pub epoch: Option<u32>,
+    /// (Name-Version-Release) value for this build
     pub nvr: String,
+    /// release ID of the release this build is associated with
     pub release_id: Option<u32>,
+    /// flag to indicate whether this build has been signed yet
     pub signed: bool,
+}
+
+#[allow(missing_docs)]
+#[derive(Debug, Deserialize)]
+pub enum BuildType {
+    #[serde(rename = "container")]
+    Container,
+    #[serde(rename = "flatpak")]
+    Flatpak,
+    #[serde(rename = "module")]
+    Module,
+    #[serde(rename = "rpm")]
+    RPM,
 }
 
 /// This struct represents one comment against a specific update, along with its associated bug and
 /// test case feedback.
 #[derive(Debug, Deserialize)]
 pub struct Comment {
+    /// author of the comment (username)
     pub author: Option<String>,
+    /// list of bug feedback items
     pub bug_feedback: Vec<BugFeedback>,
+    /// numerical ID of this comment
     pub id: u32,
+    /// feedback associated with this comment
     pub karma: Karma,
+    /// feedback associated with "critpath" checks
     pub karma_critpath: Karma,
+    /// list of test case feedback items
     pub testcase_feedback: Vec<TestCaseFeedback>,
+    /// text of the comment
     pub text: String,
+    /// date & time this comment was published
+    // TODO: use chrono
     pub timestamp: String,
+    /// update this comment is associated with
     pub update: Option<Update>,
+    /// ID of the update this comment is associated with
     pub update_id: u32,
+    /// title of the update this comment is associated with
     pub update_title: Option<String>,
+    /// user who submitted this comment
     pub user: User,
+    /// user ID of the user who submitted this comment
     pub user_id: u32,
 }
 
 /// This struct represents a group from the fedora accounts system (FAS).
 #[derive(Debug, Deserialize)]
 pub struct Group {
+    /// name of the group
     pub name: String,
 }
 
 /// This struct represents a buildroot override, along with the associated build.
 #[derive(Debug, Deserialize)]
 pub struct Override {
+    /// build associated with this buildroot override
     pub build: Build,
+    /// build ID of the build associated with this buildroot override
     pub build_id: u32,
+    /// date & time this buildroot override will expire
+    // TODO: use chrono
     pub expiration_date: String,
+    /// date & time this buildroot override has expired
+    // TODO: use chrono
     pub expired_date: Option<String>,
+    /// public notes associated with this buildroot override
     pub notes: String,
+    /// value of (Name-Version-Release) of the build associated with this buildroot override
     pub nvr: String,
+    /// date & time this buildroot override was submitted
+    // TODO: use chrono
     pub submission_date: String,
+    /// user who submitted this buildroot override
     pub submitter: User,
+    /// user ID of the user who submitted this buildroot override
     pub submitter_id: u32,
 }
 
 /// This struct represents a specific fedora package.
 #[derive(Debug, Deserialize)]
 pub struct Package {
+    /// unique name of the (source) package
     pub name: String,
-    #[serde(rename(deserialize = "type"))]
+    // TODO: what is this? make it an enum
+    #[serde(rename = "type")]
     pub package_type: String,
+    // TODO: what is this?
     pub requirements: Option<String>,
 }
 
@@ -462,46 +514,74 @@ pub struct Package {
 /// (Modular, Container, Flatpak), identified with the "C", "F", and "M" suffixes.
 #[derive(Debug, Deserialize)]
 pub struct Release {
+    /// dist-git branch for this release
     pub branch: String,
+    /// name of the tag for update candidates
     pub candidate_tag: String,
+    /// flag to indicate whether this release is composed by bodhi
     pub composed_by_bodhi: bool,
+    /// value of the RPM `%{?dist}` tag on this release
     pub dist_tag: String,
+    // TODO: what is this?
     pub id_prefix: String,
+    /// long name of this release
     pub long_name: String,
+    // TODO: what is this?
     pub mail_template: String,
+    /// short name of this release
     pub name: FedoraRelease,
+    /// name of the tag for builds in buildroot overrides
     pub override_tag: String,
+    /// name of the tag for builds that are pending to be signed
     pub pending_signing_tag: String,
+    /// name of the tag for builds that are pending to be pushed to stable
     pub pending_stable_tag: String,
+    /// name of the tag for builds that are pending to be pushed to testing
     pub pending_testing_tag: String,
+    /// name of the tag for builds that have been pushed to stable
     pub stable_tag: String,
+    /// current state of this release
+    // TODO: make this an enum
     pub state: String,
+    /// name of the tag for builds that have been pushed to testing
     pub testing_tag: String,
+    /// version string of this release
     pub version: String,
 }
 
-/// This struct represents a specific test case as associated with a given test case feedback and
-/// update.
+/// This struct represents a specific test case as associated with a package.
 #[derive(Debug, Deserialize)]
 pub struct TestCase {
+    /// name of this test case
     pub name: String,
+    /// package this test case is associated with
     pub package: Option<Package>,
+    /// ID of the package this test case is associated with
     pub package_id: u32,
 }
 
 /// This struct represents an update feedback item associated with a specific test case.
 #[derive(Debug, Deserialize)]
 pub struct TestCaseFeedback {
+    /// ID of the comment this feedback is associated with
     pub comment_id: Option<u32>,
+    /// karma feedback
     pub karma: Karma,
+    /// test case this feedback is associated with
     pub testcase: TestCase,
+    /// ID of the test case this feedback is associated with
     pub testcase_id: u32,
 }
 
+/// This enum represents the two possible ways to identify a fedora update:
+/// - internal, numerical ID
+/// - public, human-readable "alias" (FEDORA-2019-XXXXXXXX)
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 pub enum UpdateID {
+    /// identified via numerical update ID
     ID(u32),
+    /// identified via update alias
     Alias(String),
 }
 
@@ -509,59 +589,113 @@ pub enum UpdateID {
 /// status, submitter, etc.
 #[derive(Debug, Deserialize)]
 pub struct Update {
+    /// user-visible, human-readable update alias (FEDORA-2019-XXXXXXXX)
     pub alias: String,
+    /// flag to indicate whether this update can be pushed to stable automatically based on karma
     pub autokarma: bool,
+    /// bugs associated with this update
     pub bugs: Vec<Bug>,
+    /// builds associated with this update
     pub builds: Vec<Build>,
+    /// flag to indicate whether bugs will be closed when this update is pushed to stable
     pub close_bugs: bool,
+    /// list of comments associated with this update
     pub comments: Option<Vec<Comment>>,
+    /// content type of this update (RPM, Module, Flatpak, Container)
     pub content_type: Option<ContentType>,
+    /// flag to indicate whether this update contains packages from the "critical path"
     pub critpath: bool,
+    /// date & time when this update has last been approved
+    // TODO: use chrono
     pub date_approved: Option<String>,
+    /// date & time when this update has last been modified
+    // TODO: use chrono
     pub date_modified: Option<String>,
+    /// date & time when this update has last been pushed
+    // TODO: use chrono
     pub date_pushed: Option<String>,
+    /// date & time when this update has last been pushed to stable
+    // TODO: use chrono
     pub date_stable: Option<String>,
+    /// date & time when this update has last been submitted
+    // TODO: use chrono
     pub date_submitted: Option<String>,
+    /// date & time when this update has last been pushed to testing
+    // TODO: use chrono
     pub date_testing: Option<String>,
+    /// displayed name of this update
     pub display_name: String,
+    /// greenwave status summary
     pub greenwave_summary_string: Option<String>,
+    /// comma-separated list of unsatisfied greenwave gating requirements
     pub greenwave_unsatisfied_requirements: Option<String>,
+    /// current karma total
     pub karma: Option<i32>,
+    /// flag indicating whether this update can be edited
     pub locked: bool,
+    /// flag indicating whether the update satisfies requirements
     pub meets_testing_requirements: bool,
+    /// public notes associated with this update
     pub notes: String,
-    #[serde(rename(deserialize = "old_updateid"))]
+    /// when editing an existing update, this ID has to be specified
+    #[serde(rename = "old_updateid")]
     pub old_update_id: Option<UpdateID>,
+    /// flag indicating whether this update has already been pushed
     pub pushed: bool,
+    /// release this update was submitted for
     pub release: Release,
+    /// currently requested new update status
     pub request: Option<UpdateRequest>,
+    /// flag to specify whether feedback for bugs is required when counting karma
     pub require_bugs: bool,
+    /// flag to specify whether feedback for test cases is required when counting karma
     pub require_testcases: bool,
+    // TODO: what is this?
     pub requirements: Option<String>,
+    /// severity of this update
     pub severity: UpdateSeverity,
+    /// stable karma threshold set for this update
     pub stable_karma: Option<i32>,
+    /// current status of this update
     pub status: UpdateStatus,
+    /// username of the update submitter
     pub submitter: Option<String>,
+    /// suggested action to take after installing this update
     pub suggest: UpdateSuggestion,
+    /// list test cases associated with this update
     pub test_cases: Option<Vec<TestCase>>,
+    /// greenwave gating status
+    // TODO: make this an enum
     pub test_gating_status: Option<String>,
+    /// title of this update
     pub title: String,
+    /// unstable karma threshold set for this update
     pub unstable_karma: Option<i32>,
-    #[serde(rename(deserialize = "updateid"))]
+    /// update ID associated with this update (either alias or numeric ID)
+    #[serde(rename = "updateid")]
     pub update_id: Option<UpdateID>,
-    #[serde(rename(deserialize = "type"))]
+    /// type of this update
+    #[serde(rename = "type")]
     pub update_type: UpdateType,
+    /// public URL of this update
     pub url: String,
+    /// user who created this update
     pub user: User,
 }
 
 /// This struct represents one fedora user that bodhi is aware of.
 #[derive(Debug, Deserialize)]
 pub struct User {
+    /// URL of the [libravatar](https://www.libravatar.org/) avatar for this user
     pub avatar: String,
+    /// E-Mail address associated with this user (if set to public)
     pub email: Option<String>,
+    /// group memberships for this user
     pub groups: Vec<Group>,
+    /// user ID associated with this user
     pub id: u32,
+    /// username identifying this user
     pub name: String,
+    /// OpenID identity associated with the user
     pub openid: String,
 }

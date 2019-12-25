@@ -8,9 +8,9 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::Package;
-use crate::error::QueryError;
+use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi about a set of packages with the given properties, which can be
 /// specified with the builder pattern. Note that some options can be specified multiple times, and

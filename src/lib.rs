@@ -52,6 +52,7 @@
 
 #![warn(missing_docs)]
 #![warn(missing_debug_implementations)]
+#![warn(clippy::result_unwrap_used)]
 
 pub mod data;
 

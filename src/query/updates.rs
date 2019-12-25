@@ -21,9 +21,9 @@ use crate::data::{
     UpdateSuggestion,
     UpdateType,
 };
-use crate::error::QueryError;
+use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific update by its ID or alias. It will either return an
 /// `Ok(Some(Update))` matching the specified ID or alias, return `Ok(None)` if it doesn't exist, or

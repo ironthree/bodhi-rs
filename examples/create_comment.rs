@@ -1,6 +1,8 @@
 use std::io::{stdin, stdout, Write};
 
-use bodhi::{create::CommentBuilder, data::*, service::BodhiServiceBuilder};
+use bodhi::create::CommentBuilder;
+use bodhi::data::Karma;
+use bodhi::BodhiServiceBuilder;
 
 fn main() -> Result<(), String> {
     let mut username = String::new();

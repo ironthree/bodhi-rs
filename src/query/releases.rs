@@ -13,9 +13,9 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::Release;
-use crate::error::QueryError;
+use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific release by its name. It will either return an
 /// `Ok(Some(Release))` matching the specified name, return `Ok(None)` if it doesn't exist, or

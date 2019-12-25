@@ -1,9 +1,8 @@
-use std::{
-    io::{stdin, stdout, Write},
-    time::Duration,
-};
+use std::io::{stdin, stdout, Write};
+use std::time::Duration;
 
-use bodhi::{create::OverrideBuilder, service::BodhiServiceBuilder};
+use bodhi::create::OverrideBuilder;
+use bodhi::BodhiServiceBuilder;
 
 fn main() -> Result<(), String> {
     let mut username = String::new();

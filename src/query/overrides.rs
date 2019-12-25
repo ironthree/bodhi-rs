@@ -14,9 +14,9 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::data::{FedoraRelease, Override};
-use crate::error::QueryError;
+use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, ServiceError, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific override, by its NVR (Name-Version-Release) string.
 /// It will return either an `Ok(Some(Override))` matching the specified NVR, return `Ok(None)` if
