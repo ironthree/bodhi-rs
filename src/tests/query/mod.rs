@@ -1,10 +1,10 @@
 use std::time::Duration;
 
 // Longer timeout value for tests, since these queries can take a long time
-const TEST_TIMEOUT: Duration = Duration::from_secs(120);
+const TEST_TIMEOUT: Duration = Duration::from_secs(300);
 
-// More retries for running the tests, since they fail quite often
-const TEST_RETRIES: usize = 5;
+// More retries for running the tests, since they can fail quite often under load
+const TEST_RETRIES: usize = 10;
 
 mod builds;
 mod comments;

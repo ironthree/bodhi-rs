@@ -19,19 +19,20 @@ pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
 /// base URL of the fedora bodhi staging instance
 pub const FEDORA_BODHI_STG_URL: &str = "https://bodhi.stg.fedoraproject.org";
 
+/// date format internally used by bodhi
+pub const BODHI_DATE_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+
 // https://serde.rs/custom-date-format.html
 #[allow(dead_code)]
 mod bodhi_date_format {
     use chrono::{DateTime, TimeZone, Utc};
     use serde::{self, Deserialize, Deserializer, Serializer};
 
-    const FORMAT: &str = "%Y-%m-%d %H:%M:%S";
-
     pub fn serialize<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let s = format!("{}", date.format(FORMAT));
+        let s = format!("{}", date.format(super::BODHI_DATE_FORMAT));
         serializer.serialize_str(&s)
     }
 
@@ -40,7 +41,8 @@ mod bodhi_date_format {
         D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
+        Utc.datetime_from_str(&s, super::BODHI_DATE_FORMAT)
+            .map_err(serde::de::Error::custom)
     }
 }
 
