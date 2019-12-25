@@ -5,6 +5,19 @@ use crate::query::{OverrideNVRQuery, OverrideQuery};
 use crate::service::BodhiServiceBuilder;
 
 #[test]
+#[cfg(feature = "slow_tests")]
+fn deserialize_all() {
+    let bodhi = BodhiServiceBuilder::staging()
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query all overrides (this is *very very slow*)
+    bodhi.query(&OverrideQuery::new()).unwrap();
+}
+
+#[test]
 fn deserialize_f32() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -381,9 +394,7 @@ fn deserialize_epel6() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::EL6))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::EL6)).unwrap();
 }
 
 #[test]
@@ -395,9 +406,7 @@ fn deserialize_epel5() {
         .unwrap();
 
     // query only overrides for one release, and deserialize them
-    bodhi
-        .query(&OverrideQuery::new().releases(FedoraRelease::EL5))
-        .unwrap();
+    bodhi.query(&OverrideQuery::new().releases(FedoraRelease::EL5)).unwrap();
 }
 
 #[test]

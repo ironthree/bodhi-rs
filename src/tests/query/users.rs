@@ -1,11 +1,14 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
 use crate::data::User;
-use crate::query::{UserNameQuery, UserQuery};
+use crate::query::UserNameQuery;
 use crate::service::BodhiServiceBuilder;
 
+#[cfg(feature = "slow_tests")]
+use crate::query::UserQuery;
+
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_all() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)

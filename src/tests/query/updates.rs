@@ -6,6 +6,19 @@ use crate::service::BodhiServiceBuilder;
 
 #[test]
 #[ignore]
+fn deserialize_all() {
+    let bodhi = BodhiServiceBuilder::staging()
+        .timeout(TEST_TIMEOUT)
+        .retries(TEST_RETRIES)
+        .build()
+        .unwrap();
+
+    // query all builds (this is *very very slow*)
+    bodhi.query(&UpdateQuery::new()).unwrap();
+}
+
+#[test]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f32() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -30,7 +43,7 @@ fn deserialize_f32c() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f31() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -79,7 +92,7 @@ fn deserialize_f31m() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f30() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -128,7 +141,7 @@ fn deserialize_f30m() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f29() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -177,7 +190,7 @@ fn deserialize_f29m() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f28() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -214,7 +227,7 @@ fn deserialize_f28m() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f27() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -239,7 +252,7 @@ fn deserialize_f27m() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f26() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -252,7 +265,7 @@ fn deserialize_f26() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f25() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -265,7 +278,7 @@ fn deserialize_f25() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f24() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -278,7 +291,7 @@ fn deserialize_f24() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f23() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -291,7 +304,7 @@ fn deserialize_f23() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f22() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -304,7 +317,7 @@ fn deserialize_f22() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_f21() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -317,7 +330,7 @@ fn deserialize_f21() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_epel8() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -344,7 +357,7 @@ fn deserialize_epel8m() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_epel7() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -357,7 +370,7 @@ fn deserialize_epel7() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_epel6() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
@@ -370,7 +383,7 @@ fn deserialize_epel6() {
 }
 
 #[test]
-#[ignore]
+#[cfg(feature = "slow_tests")]
 fn deserialize_epel5() {
     let bodhi = BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
