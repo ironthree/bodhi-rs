@@ -8,6 +8,8 @@
 
 use std::convert::TryFrom;
 
+use chrono::{DateTime, Utc};
+
 use serde::Deserialize;
 use serde_repr::Deserialize_repr;
 
@@ -16,6 +18,59 @@ pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
 
 /// base URL of the fedora bodhi staging instance
 pub const FEDORA_BODHI_STG_URL: &str = "https://bodhi.stg.fedoraproject.org";
+
+// https://serde.rs/custom-date-format.html
+#[allow(dead_code)]
+mod bodhi_date_format {
+    use chrono::{DateTime, TimeZone, Utc};
+    use serde::{self, Deserialize, Deserializer, Serializer};
+
+    const FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+
+    pub fn serialize<S>(date: &DateTime<Utc>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = format!("{}", date.format(FORMAT));
+        serializer.serialize_str(&s)
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
+    }
+}
+
+// https://github.com/serde-rs/serde/issues/1444#issuecomment-447546415
+#[allow(dead_code)]
+mod option_bodhi_date_format {
+    use chrono::{DateTime, Utc};
+    use serde::{self, Deserialize, Deserializer, Serializer};
+
+    pub fn serialize<S>(date: &Option<DateTime<Utc>>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match date {
+            Some(ref dt) => super::bodhi_date_format::serialize(dt, serializer),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<DateTime<Utc>>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct Wrapper(#[serde(with = "super::bodhi_date_format")] DateTime<Utc>);
+
+        let v: Option<Wrapper> = Deserialize::deserialize(deserializer)?;
+        Ok(v.map(|Wrapper(a)| a))
+    }
+}
 
 /// This enum represents a "Karma" value, which is either a positive (+1), neutral (±0), or negative
 /// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and
@@ -451,8 +506,8 @@ pub struct Comment {
     /// text of the comment
     pub text: String,
     /// date & time this comment was published
-    // TODO: use chrono
-    pub timestamp: String,
+    #[serde(with = "bodhi_date_format")]
+    pub timestamp: DateTime<Utc>,
     /// update this comment is associated with
     pub update: Option<Update>,
     /// ID of the update this comment is associated with
@@ -480,18 +535,18 @@ pub struct Override {
     /// build ID of the build associated with this buildroot override
     pub build_id: u32,
     /// date & time this buildroot override will expire
-    // TODO: use chrono
-    pub expiration_date: String,
+    #[serde(with = "bodhi_date_format")]
+    pub expiration_date: DateTime<Utc>,
     /// date & time this buildroot override has expired
-    // TODO: use chrono
-    pub expired_date: Option<String>,
+    #[serde(with = "option_bodhi_date_format")]
+    pub expired_date: Option<DateTime<Utc>>,
     /// public notes associated with this buildroot override
     pub notes: String,
     /// value of (Name-Version-Release) of the build associated with this buildroot override
     pub nvr: String,
     /// date & time this buildroot override was submitted
-    // TODO: use chrono
-    pub submission_date: String,
+    #[serde(with = "bodhi_date_format")]
+    pub submission_date: DateTime<Utc>,
     /// user who submitted this buildroot override
     pub submitter: User,
     /// user ID of the user who submitted this buildroot override
@@ -575,7 +630,7 @@ pub struct TestCaseFeedback {
 
 /// This enum represents the two possible ways to identify a fedora update:
 /// - internal, numerical ID
-/// - public, human-readable "alias" (FEDORA-2019-XXXXXXXX)
+/// - public, human-readable "alias" (`FEDORA-2019-1A2BB23E`)
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
 pub enum UpdateID {
@@ -589,7 +644,7 @@ pub enum UpdateID {
 /// status, submitter, etc.
 #[derive(Debug, Deserialize)]
 pub struct Update {
-    /// user-visible, human-readable update alias (FEDORA-2019-XXXXXXXX)
+    /// user-visible, human-readable update alias (FEDORA-2019-1A2BB23E)
     pub alias: String,
     /// flag to indicate whether this update can be pushed to stable automatically based on karma
     pub autokarma: bool,
@@ -606,23 +661,23 @@ pub struct Update {
     /// flag to indicate whether this update contains packages from the "critical path"
     pub critpath: bool,
     /// date & time when this update has last been approved
-    // TODO: use chrono
-    pub date_approved: Option<String>,
+    #[serde(with = "option_bodhi_date_format")]
+    pub date_approved: Option<DateTime<Utc>>,
     /// date & time when this update has last been modified
-    // TODO: use chrono
-    pub date_modified: Option<String>,
+    #[serde(with = "option_bodhi_date_format")]
+    pub date_modified: Option<DateTime<Utc>>,
     /// date & time when this update has last been pushed
-    // TODO: use chrono
-    pub date_pushed: Option<String>,
+    #[serde(with = "option_bodhi_date_format")]
+    pub date_pushed: Option<DateTime<Utc>>,
     /// date & time when this update has last been pushed to stable
-    // TODO: use chrono
-    pub date_stable: Option<String>,
+    #[serde(with = "option_bodhi_date_format")]
+    pub date_stable: Option<DateTime<Utc>>,
     /// date & time when this update has last been submitted
-    // TODO: use chrono
-    pub date_submitted: Option<String>,
+    #[serde(with = "option_bodhi_date_format")]
+    pub date_submitted: Option<DateTime<Utc>>,
     /// date & time when this update has last been pushed to testing
-    // TODO: use chrono
-    pub date_testing: Option<String>,
+    #[serde(with = "option_bodhi_date_format")]
+    pub date_testing: Option<DateTime<Utc>>,
     /// displayed name of this update
     pub display_name: String,
     /// greenwave status summary

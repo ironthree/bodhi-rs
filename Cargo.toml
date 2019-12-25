@@ -18,7 +18,7 @@ debug = []
 slow_tests = []
 
 [dependencies]
-#chrono = { version = "^0.4.10", features = ["serde"] }
+chrono = { version = "^0.4.10", features = ["serde"] }
 failure = "^0.1.6"
 fedora = "^0.1.0"
 #fedora = { path = "../fedora-rs", features = ["debug"] }
