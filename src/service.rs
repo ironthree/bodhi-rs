@@ -39,11 +39,29 @@ enum BodhiServiceType {
     CUSTOM { openid_url: String },
 }
 
-// TODO
+/// This struct contains information necessary to build an instance of
+/// [`BodhiService`](struct.BodhiService.html) with the necessary flags. Additionally, depending on
+/// whether username and password were supplied as arguments, building the service instance will
+/// try to return a privileged session by authenticating via the fedora OpenID endpoint first.
+///
+/// It's possible to target either the fedora production or the staging instances of bodhi, or
+/// provide a custom URL, via the `default()`, `staging()`, and `custom()` methods, respectively.
+///
 /// ```
+/// // create service with anonymous session
 /// let bodhi = bodhi::BodhiServiceBuilder::default()
 ///     .timeout(std::time::Duration::from_secs(42))
-///     .retries(9001);
+///     .retries(9001)
+///     .build();
+/// ```
+///
+/// ```
+/// // builder for an authenticated session
+/// let builder = bodhi::BodhiServiceBuilder::staging()
+///     .timeout(std::time::Duration::from_secs(120))
+///     .retries(2)
+///     .authentication(String::from("bodhi-rs"), String::from("password1"));
+/// // builder.build();
 /// ```
 #[derive(Debug)]
 pub struct BodhiServiceBuilder {
