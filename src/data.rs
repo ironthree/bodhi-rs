@@ -238,7 +238,7 @@ impl Into<String> for FedoraRelease {
     }
 }
 
-/// This enum represents the content type of a bodhi update.
+/// This enum represents the type of a bodhi update, of a package, and of builds.
 #[derive(Debug, Deserialize)]
 pub enum ContentType {
     /// "base" content type (seems to be unused)
@@ -463,7 +463,7 @@ pub struct BugFeedback {
 pub struct Build {
     /// type of this build; one of: `container`, `flatpak`, `module`, `rpm`
     #[serde(rename = "type")]
-    pub build_type: BuildType,
+    pub build_type: ContentType,
     /// URL pointing to the results of CI tests
     pub ci_url: Option<String>,
     /// epoch associated with this build
@@ -474,19 +474,6 @@ pub struct Build {
     pub release_id: Option<u32>,
     /// flag to indicate whether this build has been signed yet
     pub signed: bool,
-}
-
-#[allow(missing_docs)]
-#[derive(Debug, Deserialize)]
-pub enum BuildType {
-    #[serde(rename = "container")]
-    Container,
-    #[serde(rename = "flatpak")]
-    Flatpak,
-    #[serde(rename = "module")]
-    Module,
-    #[serde(rename = "rpm")]
-    RPM,
 }
 
 /// This struct represents one comment against a specific update, along with its associated bug and
@@ -555,16 +542,28 @@ pub struct Override {
     pub submitter_id: u32,
 }
 
-/// This struct represents a specific fedora package.
+/// This struct represents a specific fedora package (or another distributable unit)
 #[derive(Debug, Deserialize)]
 pub struct Package {
-    /// unique name of the (source) package
+    /// unique name of the (source) package (or container, flatpak, or module, as appropriate)
     pub name: String,
-    // TODO: what is this? make it an enum
+    /// content type; one of: `rpm`, `container`, `flatpak`, `module`
     #[serde(rename = "type")]
-    pub package_type: String,
-    // TODO: what is this?
-    pub requirements: Option<String>,
+    pub package_type: ContentType,
+}
+
+/// This enum represents the state of a release.
+#[derive(Debug, Deserialize)]
+pub enum ReleaseState {
+    /// release has been archived after it has reached its EOL
+    #[serde(rename = "archived")]
+    Archived,
+    /// release is currently supported
+    #[serde(rename = "current")]
+    Current,
+    /// release is in development
+    #[serde(rename = "pending")]
+    Pending,
 }
 
 /// This struct represents a fedora release as present in the bodhi database. This includes variants
@@ -579,11 +578,11 @@ pub struct Release {
     pub composed_by_bodhi: bool,
     /// value of the RPM `%{?dist}` tag on this release
     pub dist_tag: String,
-    // TODO: what is this?
+    /// prefix for update aliases: one of `FEDORA{-EPEL,}{-CONTAINER,-FLATPAK,-MODULAR,}`
     pub id_prefix: String,
     /// long name of this release
     pub long_name: String,
-    // TODO: what is this?
+    /// name of the email template for errata
     pub mail_template: String,
     /// short name of this release
     pub name: FedoraRelease,
@@ -597,9 +596,8 @@ pub struct Release {
     pub pending_testing_tag: String,
     /// name of the tag for builds that have been pushed to stable
     pub stable_tag: String,
-    /// current state of this release
-    // TODO: make this an enum
-    pub state: String,
+    /// current state of this release; one of: `archived`, `current`, `pending`
+    pub state: ReleaseState,
     /// name of the tag for builds that have been pushed to testing
     pub testing_tag: String,
     /// version string of this release
@@ -683,8 +681,10 @@ pub struct Update {
     /// displayed name of this update
     pub display_name: String,
     /// greenwave status summary
+    // TODO: what is this?
     pub greenwave_summary_string: Option<String>,
     /// comma-separated list of unsatisfied greenwave gating requirements
+    // TODO: what is this?
     pub greenwave_unsatisfied_requirements: Option<String>,
     /// current karma total
     pub karma: Option<i32>,
