@@ -8,14 +8,12 @@
 //! example filtering comments that are associated with a set of updates or packages, or query
 //! comments made by certain users, or filed against updates that were created by specific users.
 
-use std::collections::HashMap;
-
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::data::Comment;
 use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific comment by its ID. It will either return an
 /// `Ok(Some(Comment))` matching the specified ID, return `Ok(None)` if it doesn't exist, or return
@@ -51,10 +49,6 @@ impl CommentIDQuery {
 impl SinglePageQuery<Option<Comment>> for CommentIDQuery {
     fn path(&self) -> String {
         format!("/comments/{}", self.id)
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        None
     }
 
     fn parse(string: String) -> Result<Option<Comment>, QueryError> {
@@ -215,21 +209,10 @@ impl CommentQuery {
         let mut page = 1;
 
         loop {
-            let mut query = CommentPageQuery::new();
-            query.page = page;
-
-            query.anonymous = self.anonymous;
-            query.ignore_users = self.ignore_users.clone();
-            query.like = self.like.clone();
-            query.packages = self.packages.clone();
-            query.search = self.search.clone();
-            query.update_owners = self.update_owners.clone();
-            query.updates = self.updates.clone();
-            query.users = self.users.clone();
-
+            let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
-            comments.extend(result.comments);
 
+            comments.extend(result.comments);
             page += 1;
 
             if page > result.pages {
@@ -238,6 +221,22 @@ impl CommentQuery {
         }
 
         Ok(comments)
+    }
+
+    fn page_query(&self, page: u32, rows_per_page: u32) -> CommentPageQuery {
+        CommentPageQuery {
+            anonymous: self.anonymous,
+            ignore_users: self.ignore_users.as_ref(),
+            like: self.like.as_ref(),
+            packages: self.packages.as_ref(),
+            search: self.search.as_ref(),
+            since: self.since.as_ref(),
+            update_owners: self.update_owners.as_ref(),
+            updates: self.updates.as_ref(),
+            users: self.users.as_ref(),
+            page,
+            rows_per_page,
+        }
     }
 }
 
@@ -256,84 +255,25 @@ struct CommentListPage {
     total: u32,
 }
 
-#[derive(Debug)]
-struct CommentPageQuery {
+#[derive(Debug, Serialize)]
+struct CommentPageQuery<'a> {
     anonymous: Option<bool>,
-    ignore_users: Option<Vec<String>>,
-    like: Option<String>,
-    packages: Option<Vec<String>>,
-    search: Option<String>,
-    since: Option<String>,
-    update_owners: Option<Vec<String>>,
-    updates: Option<Vec<String>>,
-    users: Option<Vec<String>>,
+    ignore_users: Option<&'a Vec<String>>,
+    like: Option<&'a String>,
+    packages: Option<&'a Vec<String>>,
+    search: Option<&'a String>,
+    since: Option<&'a String>,
+    update_owners: Option<&'a Vec<String>>,
+    updates: Option<&'a Vec<String>>,
+    users: Option<&'a Vec<String>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl CommentPageQuery {
-    fn new() -> Self {
-        CommentPageQuery {
-            anonymous: None,
-            ignore_users: None,
-            like: None,
-            packages: None,
-            page: DEFAULT_PAGE,
-            rows_per_page: DEFAULT_ROWS,
-            search: None,
-            since: None,
-            update_owners: None,
-            updates: None,
-            users: None,
-        }
-    }
-}
-
-impl SinglePageQuery<CommentListPage> for CommentPageQuery {
+impl<'a> SinglePageQuery<CommentListPage> for CommentPageQuery<'a> {
     fn path(&self) -> String {
-        String::from("/comments/")
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        let mut args: HashMap<&str, String> = HashMap::new();
-
-        if let Some(anonymous) = self.anonymous {
-            args.insert("anonymous", anonymous.to_string());
-        }
-
-        if let Some(ignore_users) = &self.ignore_users {
-            args.insert("ignore_user", ignore_users.join(","));
-        }
-
-        if let Some(like) = &self.like {
-            args.insert("like", like.to_owned());
-        }
-
-        if let Some(packages) = &self.packages {
-            args.insert("packages", packages.join(","));
-        }
-
-        if let Some(search) = &self.search {
-            args.insert("search", search.to_owned());
-        }
-
-        if let Some(update_owners) = &self.update_owners {
-            args.insert("update_owner", update_owners.join(","));
-        }
-
-        if let Some(updates) = &self.updates {
-            args.insert("updates", updates.join(","));
-        }
-
-        if let Some(users) = &self.users {
-            args.insert("user", users.join(","));
-        }
-
-        args.insert("page", format!("{}", self.page));
-        args.insert("rows_per_page", format!("{}", self.rows_per_page));
-
-        Some(args)
+        format!("/comments/?{}", serde_url_params::to_string(self).unwrap())
     }
 
     fn parse(string: String) -> Result<CommentListPage, QueryError> {

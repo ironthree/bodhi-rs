@@ -7,9 +7,7 @@
 //! release, status, security impact, reboot suggestion, or for updates that are associated with a
 //! given set of packages.
 
-use std::collections::HashMap;
-
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::data::{
     ContentType,
@@ -23,7 +21,7 @@ use crate::data::{
 };
 use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific update by its ID or alias. It will either return an
 /// `Ok(Some(Update))` matching the specified ID or alias, return `Ok(None)` if it doesn't exist, or
@@ -61,10 +59,6 @@ impl UpdateIDQuery {
 impl SinglePageQuery<Option<Update>> for UpdateIDQuery {
     fn path(&self) -> String {
         format!("/updates/{}", self.id)
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        None
     }
 
     fn parse(string: String) -> Result<Option<Update>, QueryError> {
@@ -110,7 +104,7 @@ pub struct UpdateQuery {
     approved_since: Option<String>,
     bugs: Option<Vec<String>>,
     builds: Option<Vec<String>>,
-    content_type: Option<String>,
+    content_type: Option<ContentType>,
     critpath: Option<bool>,
     cves: Option<Vec<String>>,
     like: Option<String>,
@@ -121,16 +115,16 @@ pub struct UpdateQuery {
     pushed: Option<bool>,
     pushed_before: Option<String>,
     pushed_since: Option<String>,
-    releases: Option<Vec<String>>,
-    request: Option<String>,
+    releases: Option<Vec<FedoraRelease>>,
+    request: Option<UpdateRequest>,
     search: Option<String>,
-    severity: Option<String>,
-    status: Option<String>,
+    severity: Option<UpdateSeverity>,
+    status: Option<UpdateStatus>,
     submitted_before: Option<String>,
     submitted_since: Option<String>,
-    suggest: Option<String>,
+    suggest: Option<UpdateSuggestion>,
     update_ids: Option<Vec<String>>,
-    update_type: Option<String>,
+    update_type: Option<UpdateType>,
     users: Option<Vec<String>>,
 }
 
@@ -227,7 +221,7 @@ impl UpdateQuery {
 
     /// Restrict the returned results to the given content type.
     pub fn content_type(mut self, content_type: ContentType) -> Self {
-        self.content_type = Some(content_type.into());
+        self.content_type = Some(content_type);
         self
     }
 
@@ -312,8 +306,8 @@ impl UpdateQuery {
     /// Can be specified multiple times.
     pub fn releases(mut self, release: FedoraRelease) -> Self {
         match &mut self.releases {
-            Some(releases) => releases.push(release.into()),
-            None => self.releases = Some(vec![release.into()]),
+            Some(releases) => releases.push(release),
+            None => self.releases = Some(vec![release]),
         }
 
         self
@@ -321,7 +315,7 @@ impl UpdateQuery {
 
     /// Restrict the returned results to updates with the given request.
     pub fn request(mut self, request: UpdateRequest) -> Self {
-        self.request = Some(request.into());
+        self.request = Some(request);
         self
     }
 
@@ -333,13 +327,13 @@ impl UpdateQuery {
 
     /// Restrict the returned results to updates with the given severity.
     pub fn severity(mut self, severity: UpdateSeverity) -> Self {
-        self.severity = Some(severity.into());
+        self.severity = Some(severity);
         self
     }
 
     /// Restrict the returned results to updates with the given status.
     pub fn status(mut self, status: UpdateStatus) -> Self {
-        self.status = Some(status.into());
+        self.status = Some(status);
         self
     }
 
@@ -359,7 +353,7 @@ impl UpdateQuery {
 
     /// Restrict the returned results to updates with the given "suggest" value.
     pub fn suggest(mut self, suggest: UpdateSuggestion) -> Self {
-        self.suggest = Some(suggest.into());
+        self.suggest = Some(suggest);
         self
     }
 
@@ -377,7 +371,7 @@ impl UpdateQuery {
 
     /// Restrict results to updates matching the given update type.
     pub fn update_type(mut self, update_type: UpdateType) -> Self {
-        self.update_type = Some(update_type.into());
+        self.update_type = Some(update_type);
         self
     }
 
@@ -399,41 +393,10 @@ impl UpdateQuery {
         let mut page = 1;
 
         loop {
-            let mut query = UpdatePageQuery::new();
-            query.page = page;
-
-            query.active_releases = self.active_releases;
-            query.aliases = self.aliases.clone();
-            query.approved_before = self.approved_before.clone();
-            query.approved_since = self.approved_since.clone();
-            query.bugs = self.bugs.clone();
-            query.builds = self.builds.clone();
-            query.content_type = self.content_type.clone();
-            query.critpath = self.critpath;
-            query.cves = self.cves.clone();
-            query.like = self.like.clone();
-            query.locked = self.locked;
-            query.modified_before = self.modified_before.clone();
-            query.modified_since = self.modified_since.clone();
-            query.packages = self.packages.clone();
-            query.pushed = self.pushed;
-            query.pushed_before = self.pushed_before.clone();
-            query.pushed_since = self.pushed_since.clone();
-            query.releases = self.releases.clone();
-            query.request = self.request.clone();
-            query.search = self.search.clone();
-            query.severity = self.severity.clone();
-            query.status = self.status.clone();
-            query.submitted_before = self.submitted_before.clone();
-            query.submitted_since = self.submitted_since.clone();
-            query.suggest = self.suggest.clone();
-            query.update_ids = self.update_ids.clone();
-            query.update_type = self.update_type.clone();
-            query.users = self.users.clone();
-
+            let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
-            updates.extend(result.updates);
 
+            updates.extend(result.updates);
             page += 1;
 
             if page > result.pages {
@@ -442,6 +405,41 @@ impl UpdateQuery {
         }
 
         Ok(updates)
+    }
+
+    fn page_query(&self, page: u32, rows_per_page: u32) -> UpdatePageQuery {
+        UpdatePageQuery {
+            active_releases: self.active_releases,
+            aliases: self.aliases.as_ref(),
+            approved_before: self.approved_before.as_ref(),
+            approved_since: self.approved_since.as_ref(),
+            bugs: self.bugs.as_ref(),
+            builds: self.builds.as_ref(),
+            content_type: self.content_type.as_ref(),
+            critpath: self.critpath,
+            cves: self.cves.as_ref(),
+            like: self.like.as_ref(),
+            locked: self.locked,
+            modified_before: self.modified_before.as_ref(),
+            modified_since: self.modified_since.as_ref(),
+            packages: self.packages.as_ref(),
+            pushed: self.pushed,
+            pushed_before: self.pushed_before.as_ref(),
+            pushed_since: self.pushed_since.as_ref(),
+            releases: self.releases.as_ref(),
+            request: self.request.as_ref(),
+            search: self.search.as_ref(),
+            severity: self.severity.as_ref(),
+            status: self.status.as_ref(),
+            submitted_before: self.submitted_before.as_ref(),
+            submitted_since: self.submitted_since.as_ref(),
+            suggest: self.suggest.as_ref(),
+            update_ids: self.update_ids.as_ref(),
+            update_type: self.update_type.as_ref(),
+            users: self.users.as_ref(),
+            page,
+            rows_per_page,
+        }
     }
 }
 
@@ -460,203 +458,44 @@ struct UpdateListPage {
     total: u32,
 }
 
-#[derive(Debug)]
-struct UpdatePageQuery {
+#[derive(Debug, Serialize)]
+struct UpdatePageQuery<'a> {
     active_releases: Option<bool>,
-    aliases: Option<Vec<String>>,
-    approved_before: Option<String>,
-    approved_since: Option<String>,
-    bugs: Option<Vec<String>>,
-    builds: Option<Vec<String>>,
-    content_type: Option<String>,
+    aliases: Option<&'a Vec<String>>,
+    approved_before: Option<&'a String>,
+    approved_since: Option<&'a String>,
+    bugs: Option<&'a Vec<String>>,
+    builds: Option<&'a Vec<String>>,
+    content_type: Option<&'a ContentType>,
     critpath: Option<bool>,
-    cves: Option<Vec<String>>,
-    like: Option<String>,
+    cves: Option<&'a Vec<String>>,
+    like: Option<&'a String>,
     locked: Option<bool>,
-    modified_before: Option<String>,
-    modified_since: Option<String>,
-    packages: Option<Vec<String>>,
+    modified_before: Option<&'a String>,
+    modified_since: Option<&'a String>,
+    packages: Option<&'a Vec<String>>,
     pushed: Option<bool>,
-    pushed_before: Option<String>,
-    pushed_since: Option<String>,
-    releases: Option<Vec<String>>,
-    request: Option<String>,
-    search: Option<String>,
-    severity: Option<String>,
-    status: Option<String>,
-    submitted_before: Option<String>,
-    submitted_since: Option<String>,
-    suggest: Option<String>,
-    update_ids: Option<Vec<String>>,
-    update_type: Option<String>,
-    users: Option<Vec<String>>,
+    pushed_before: Option<&'a String>,
+    pushed_since: Option<&'a String>,
+    releases: Option<&'a Vec<FedoraRelease>>,
+    request: Option<&'a UpdateRequest>,
+    search: Option<&'a String>,
+    severity: Option<&'a UpdateSeverity>,
+    status: Option<&'a UpdateStatus>,
+    submitted_before: Option<&'a String>,
+    submitted_since: Option<&'a String>,
+    suggest: Option<&'a UpdateSuggestion>,
+    update_ids: Option<&'a Vec<String>>,
+    update_type: Option<&'a UpdateType>,
+    users: Option<&'a Vec<String>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl UpdatePageQuery {
-    fn new() -> Self {
-        UpdatePageQuery {
-            active_releases: None,
-            aliases: None,
-            approved_before: None,
-            approved_since: None,
-            bugs: None,
-            builds: None,
-            content_type: None,
-            critpath: None,
-            cves: None,
-            like: None,
-            locked: None,
-            modified_before: None,
-            modified_since: None,
-            packages: None,
-            pushed: None,
-            pushed_before: None,
-            pushed_since: None,
-            releases: None,
-            request: None,
-            search: None,
-            severity: None,
-            status: None,
-            submitted_before: None,
-            submitted_since: None,
-            suggest: None,
-            update_ids: None,
-            update_type: None,
-            users: None,
-            page: DEFAULT_PAGE,
-            rows_per_page: DEFAULT_ROWS,
-        }
-    }
-}
-
-impl SinglePageQuery<UpdateListPage> for UpdatePageQuery {
+impl<'a> SinglePageQuery<UpdateListPage> for UpdatePageQuery<'a> {
     fn path(&self) -> String {
-        String::from("/updates/")
-    }
-
-    #[allow(clippy::cognitive_complexity)]
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        let mut args: HashMap<&str, String> = HashMap::new();
-
-        if let Some(active_releases) = self.active_releases {
-            args.insert("active_releases", active_releases.to_string());
-        };
-
-        if let Some(aliases) = &self.aliases {
-            args.insert("alias", aliases.join(","));
-        };
-
-        if let Some(approved_before) = &self.approved_before {
-            args.insert("approved_before", approved_before.to_owned());
-        };
-
-        if let Some(approved_since) = &self.approved_since {
-            args.insert("approved_since", approved_since.to_owned());
-        };
-
-        if let Some(bugs) = &self.bugs {
-            args.insert("bugs", bugs.join(","));
-        };
-
-        if let Some(builds) = &self.builds {
-            args.insert("builds", builds.join(","));
-        };
-
-        if let Some(content_type) = &self.content_type {
-            args.insert("content_type", content_type.to_owned());
-        };
-
-        if let Some(critpath) = self.critpath {
-            args.insert("critpath", critpath.to_string());
-        };
-
-        if let Some(cves) = &self.cves {
-            args.insert("cves", cves.join(","));
-        };
-
-        if let Some(like) = &self.like {
-            args.insert("like", like.to_owned());
-        };
-
-        if let Some(locked) = self.locked {
-            args.insert("locked", locked.to_string());
-        };
-
-        if let Some(modified_before) = &self.modified_before {
-            args.insert("modified_before", modified_before.to_owned());
-        };
-
-        if let Some(modified_since) = &self.modified_since {
-            args.insert("modified_since", modified_since.to_owned());
-        };
-
-        if let Some(packages) = &self.packages {
-            args.insert("packages", packages.join(","));
-        };
-
-        if let Some(pushed) = self.pushed {
-            args.insert("pushed", pushed.to_string());
-        };
-
-        if let Some(pushed_before) = &self.pushed_before {
-            args.insert("pushed_before", pushed_before.to_owned());
-        };
-
-        if let Some(pushed_since) = &self.pushed_since {
-            args.insert("pushed_since", pushed_since.to_owned());
-        };
-
-        if let Some(releases) = &self.releases {
-            args.insert("releases", releases.join(","));
-        };
-
-        if let Some(request) = &self.request {
-            args.insert("request", request.to_owned());
-        };
-
-        if let Some(search) = &self.search {
-            args.insert("search", search.to_owned());
-        };
-
-        if let Some(severity) = &self.severity {
-            args.insert("severity", severity.to_owned());
-        };
-
-        if let Some(status) = &self.status {
-            args.insert("status", status.to_owned());
-        };
-
-        if let Some(submitted_before) = &self.submitted_before {
-            args.insert("submitted_before", submitted_before.to_owned());
-        };
-
-        if let Some(submitted_since) = &self.submitted_since {
-            args.insert("submitted_since", submitted_since.to_owned());
-        };
-
-        if let Some(suggest) = &self.suggest {
-            args.insert("suggest", suggest.to_owned());
-        };
-
-        if let Some(update_ids) = &self.update_ids {
-            args.insert("updateid", update_ids.join(","));
-        };
-
-        if let Some(update_type) = &self.update_type {
-            args.insert("type", update_type.to_owned());
-        };
-
-        if let Some(users) = &self.users {
-            args.insert("user", users.join(","));
-        };
-
-        args.insert("page", format!("{}", self.page));
-        args.insert("rows_per_page", format!("{}", self.rows_per_page));
-
-        Some(args)
+        format!("/updates/?{}", serde_url_params::to_string(self).unwrap())
     }
 
     fn parse(string: String) -> Result<UpdateListPage, QueryError> {

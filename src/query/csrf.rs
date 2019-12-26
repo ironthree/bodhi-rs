@@ -1,7 +1,5 @@
 //! The contents of this module can be used to query a bodhi instance for a new CSRF token.
 
-use std::collections::HashMap;
-
 use serde::Deserialize;
 
 use crate::error::{QueryError, ServiceError};
@@ -38,10 +36,6 @@ impl CSRFQuery {
 impl SinglePageQuery<String> for CSRFQuery {
     fn path(&self) -> String {
         String::from("/csrf")
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        None
     }
 
     fn parse(string: String) -> Result<String, QueryError> {

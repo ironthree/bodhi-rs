@@ -8,14 +8,12 @@
 //! example filtering releases by status, or query the releases associated with a given set of
 //! updates or packages.
 
-use std::collections::HashMap;
-
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::data::Release;
 use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific release by its name. It will either return an
 /// `Ok(Some(Release))` matching the specified name, return `Ok(None)` if it doesn't exist, or
@@ -28,8 +26,6 @@ use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let release = bodhi.query(&ReleaseNameQuery::new(String::from("F30"))).unwrap();
-///
-/// let release = bodhi.query(&ReleaseNameQuery::new(FedoraRelease::F30.into())).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-0>
@@ -49,10 +45,6 @@ impl ReleaseNameQuery {
 impl SinglePageQuery<Option<Release>> for ReleaseNameQuery {
     fn path(&self) -> String {
         format!("/releases/{}", self.name)
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        None
     }
 
     fn parse(string: String) -> Result<Option<Release>, QueryError> {
@@ -162,18 +154,10 @@ impl ReleaseQuery {
         let mut page = 1;
 
         loop {
-            let mut query = ReleasePageQuery::new();
-            query.page = page;
-
-            query.exclude_archived = self.exclude_archived;
-            query.ids = self.ids.clone();
-            query.name = self.name.clone();
-            query.packages = self.packages.clone();
-            query.updates = self.updates.clone();
-
+            let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
-            overrides.extend(result.releases);
 
+            overrides.extend(result.releases);
             page += 1;
 
             if page > result.pages {
@@ -182,6 +166,18 @@ impl ReleaseQuery {
         }
 
         Ok(overrides)
+    }
+
+    fn page_query(&self, page: u32, rows_per_page: u32) -> ReleasePageQuery {
+        ReleasePageQuery {
+            exclude_archived: self.exclude_archived,
+            ids: self.ids.as_ref(),
+            name: self.name.as_ref(),
+            packages: self.packages.as_ref(),
+            updates: self.updates.as_ref(),
+            page,
+            rows_per_page,
+        }
     }
 }
 
@@ -200,64 +196,21 @@ struct ReleaseListPage {
     total: u32,
 }
 
-#[derive(Debug)]
-struct ReleasePageQuery {
+#[derive(Debug, Serialize)]
+struct ReleasePageQuery<'a> {
     exclude_archived: Option<bool>,
-    ids: Option<Vec<String>>,
-    name: Option<String>,
-    packages: Option<Vec<String>>,
-    updates: Option<Vec<String>>,
+    ids: Option<&'a Vec<String>>,
+    name: Option<&'a String>,
+    packages: Option<&'a Vec<String>>,
+    updates: Option<&'a Vec<String>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl ReleasePageQuery {
-    fn new() -> ReleasePageQuery {
-        ReleasePageQuery {
-            exclude_archived: None,
-            ids: None,
-            name: None,
-            packages: None,
-            updates: None,
-            page: DEFAULT_PAGE,
-            rows_per_page: DEFAULT_ROWS,
-        }
-    }
-}
-
-impl SinglePageQuery<ReleaseListPage> for ReleasePageQuery {
+impl<'a> SinglePageQuery<ReleaseListPage> for ReleasePageQuery<'a> {
     fn path(&self) -> String {
-        String::from("/releases/")
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        let mut args: HashMap<&str, String> = HashMap::new();
-
-        if let Some(exclude_archived) = self.exclude_archived {
-            args.insert("exclude_archived", exclude_archived.to_string());
-        };
-
-        if let Some(ids) = &self.ids {
-            args.insert("ids", ids.join(","));
-        };
-
-        if let Some(name) = &self.name {
-            args.insert("name", name.to_owned());
-        };
-
-        if let Some(packages) = &self.packages {
-            args.insert("packages", packages.join(","));
-        };
-
-        if let Some(updates) = &self.updates {
-            args.insert("updates", updates.join(","));
-        };
-
-        args.insert("page", format!("{}", self.page));
-        args.insert("rows_per_page", format!("{}", self.rows_per_page));
-
-        Some(args)
+        format!("/releases/?{}", serde_url_params::to_string(self).unwrap())
     }
 
     fn parse(string: String) -> Result<ReleaseListPage, QueryError> {

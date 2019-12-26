@@ -1,7 +1,6 @@
 //! This module contains the structures and methods to interact with a (remote) bodhi server
 //! instance.
 
-use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::time::Duration;
 
@@ -252,16 +251,11 @@ impl Debug for BodhiService {
 }
 
 impl BodhiService {
-    pub(crate) fn get(&self, path: &str, args: Option<HashMap<&str, String>>) -> Result<Response, ServiceError> {
+    pub(crate) fn get(&self, path: &str) -> Result<Response, ServiceError> {
         let url = self.url.join(path)?;
 
-        let query: Vec<(&str, String)> = match args {
-            Some(mut map) => map.drain().collect(),
-            None => Vec::new(),
-        };
-
         let qf = || {
-            match self.session.session().get(url.clone()).query(&query).send() {
+            match self.session.session().get(url.clone()).send() {
                 Ok(response) => {
                     match response.content_length() {
                         Some(_len) => {
@@ -301,20 +295,10 @@ impl BodhiService {
         }
     }
 
-    pub(crate) fn post(
-        &self,
-        path: &str,
-        body: String,
-        args: Option<HashMap<&str, String>>,
-    ) -> Result<Response, ServiceError> {
+    pub(crate) fn post(&self, path: &str, body: String) -> Result<Response, ServiceError> {
         let url = self.url.join(path)?;
 
-        let query: Vec<(&str, String)> = match args {
-            Some(mut map) => map.drain().collect(),
-            None => Vec::new(),
-        };
-
-        let response = self.session.session().post(url).body(body).query(&query).send()?;
+        let response = self.session.session().post(url).body(body).send()?;
 
         #[cfg(feature = "debug")]
         {

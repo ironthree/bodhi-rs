@@ -11,14 +11,12 @@
 //! querying builds of certain packages, builds for certain releases, or builds associated with a
 //! given set of updates is possible.
 
-use std::collections::HashMap;
-
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::data::{Build, FedoraRelease};
 use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific build, by its NVR (Name-Version-Release) string. It
 /// will either return an `Ok(Some(Build))` matching the specified NVR, return `Ok(None)` if it
@@ -52,10 +50,6 @@ impl BuildNVRQuery {
 impl SinglePageQuery<Option<Build>> for BuildNVRQuery {
     fn path(&self) -> String {
         format!("/builds/{}", self.nvr)
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        None
     }
 
     fn parse(string: String) -> Result<Option<Build>, QueryError> {
@@ -103,7 +97,7 @@ pub struct BuildQuery {
     /// list of packages to request builds for
     packages: Option<Vec<String>>,
     /// list of releases to request builds for
-    releases: Option<Vec<String>>,
+    releases: Option<Vec<FedoraRelease>>,
     /// list of updates to request builds for
     updates: Option<Vec<String>>,
 }
@@ -143,8 +137,8 @@ impl BuildQuery {
     /// Can be specified multiple times.
     pub fn releases(mut self, release: FedoraRelease) -> Self {
         match &mut self.releases {
-            Some(releases) => releases.push(release.into()),
-            None => self.releases = Some(vec![release.into()]),
+            Some(releases) => releases.push(release),
+            None => self.releases = Some(vec![release]),
         }
 
         self
@@ -168,17 +162,10 @@ impl BuildQuery {
         let mut page = 1;
 
         loop {
-            let mut query = BuildPageQuery::new();
-            query.page = page;
-
-            query.nvr = self.nvr.clone();
-            query.packages = self.packages.clone();
-            query.releases = self.releases.clone();
-            query.updates = self.updates.clone();
-
+            let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
-            builds.extend(result.builds);
 
+            builds.extend(result.builds);
             page += 1;
 
             if page > result.pages {
@@ -187,6 +174,17 @@ impl BuildQuery {
         }
 
         Ok(builds)
+    }
+
+    fn page_query(&self, page: u32, rows_per_page: u32) -> BuildPageQuery {
+        BuildPageQuery {
+            nvr: self.nvr.as_ref(),
+            packages: self.packages.as_ref(),
+            releases: self.releases.as_ref(),
+            updates: self.updates.as_ref(),
+            page,
+            rows_per_page,
+        }
     }
 }
 
@@ -205,57 +203,19 @@ struct BuildListPage {
     total: u32,
 }
 
-#[derive(Debug)]
-struct BuildPageQuery {
-    nvr: Option<String>,
-    packages: Option<Vec<String>>,
-    releases: Option<Vec<String>>,
-    updates: Option<Vec<String>>,
+#[derive(Debug, Serialize)]
+struct BuildPageQuery<'a> {
+    nvr: Option<&'a String>,
+    packages: Option<&'a Vec<String>>,
+    releases: Option<&'a Vec<FedoraRelease>>,
+    updates: Option<&'a Vec<String>>,
     page: u32,
     rows_per_page: u32,
 }
 
-impl BuildPageQuery {
-    fn new() -> BuildPageQuery {
-        BuildPageQuery {
-            nvr: None,
-            packages: None,
-            releases: None,
-            updates: None,
-            page: DEFAULT_PAGE,
-            rows_per_page: DEFAULT_ROWS,
-        }
-    }
-}
-
-impl SinglePageQuery<BuildListPage> for BuildPageQuery {
+impl<'a> SinglePageQuery<BuildListPage> for BuildPageQuery<'a> {
     fn path(&self) -> String {
-        String::from("/builds/")
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        let mut args: HashMap<&str, String> = HashMap::new();
-
-        if let Some(nvr) = &self.nvr {
-            args.insert("nvr", nvr.to_owned());
-        }
-
-        if let Some(packages) = &self.packages {
-            args.insert("packages", packages.join(","));
-        }
-
-        if let Some(releases) = &self.releases {
-            args.insert("releases", releases.join(","));
-        }
-
-        if let Some(updates) = &self.updates {
-            args.insert("updates", updates.join(","));
-        }
-
-        args.insert("page", format!("{}", &self.page));
-        args.insert("rows_per_page", format!("{}", self.rows_per_page));
-
-        Some(args)
+        format!("/builds/?{}", serde_url_params::to_string(self).unwrap())
     }
 
     fn parse(string: String) -> Result<BuildListPage, QueryError> {

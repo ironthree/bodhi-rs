@@ -9,14 +9,12 @@
 //! for example filtering overrides by status, sets of overrides for certain packages, or overrides
 //! filed by a given list of users.
 
-use std::collections::HashMap;
-
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::data::{FedoraRelease, Override};
 use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific override, by its NVR (Name-Version-Release) string.
 /// It will return either an `Ok(Some(Override))` matching the specified NVR, return `Ok(None)` if
@@ -54,10 +52,6 @@ impl OverrideNVRQuery {
 impl SinglePageQuery<Option<Override>> for OverrideNVRQuery {
     fn path(&self) -> String {
         format!("/overrides/{}", self.nvr)
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        None
     }
 
     fn parse(string: String) -> Result<Option<Override>, QueryError> {
@@ -103,7 +97,7 @@ pub struct OverrideQuery {
     expired: Option<bool>,
     like: Option<String>,
     packages: Option<Vec<String>>,
-    releases: Option<Vec<String>>,
+    releases: Option<Vec<FedoraRelease>>,
     search: Option<String>,
     users: Option<Vec<String>>,
 }
@@ -164,8 +158,8 @@ impl OverrideQuery {
     /// Can be specified multiple times.
     pub fn releases(mut self, release: FedoraRelease) -> Self {
         match &mut self.releases {
-            Some(releases) => releases.push(release.into()),
-            None => self.releases = Some(vec![release.into()]),
+            Some(releases) => releases.push(release),
+            None => self.releases = Some(vec![release]),
         }
 
         self
@@ -195,20 +189,10 @@ impl OverrideQuery {
         let mut page = 1;
 
         loop {
-            let mut query = OverridePageQuery::new();
-            query.page = page;
-
-            query.builds = self.builds.clone();
-            query.expired = self.expired;
-            query.like = self.like.clone();
-            query.packages = self.packages.clone();
-            query.releases = self.releases.clone();
-            query.search = self.search.clone();
-            query.users = self.users.clone();
-
+            let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
-            overrides.extend(result.r#overrides);
 
+            overrides.extend(result.r#overrides);
             page += 1;
 
             if page > result.pages {
@@ -217,6 +201,20 @@ impl OverrideQuery {
         }
 
         Ok(overrides)
+    }
+
+    fn page_query(&self, page: u32, rows_per_page: u32) -> OverridePageQuery {
+        OverridePageQuery {
+            builds: self.builds.as_ref(),
+            expired: self.expired,
+            like: self.like.as_ref(),
+            packages: self.packages.as_ref(),
+            releases: self.releases.as_ref(),
+            search: self.search.as_ref(),
+            users: self.users.as_ref(),
+            page,
+            rows_per_page,
+        }
     }
 }
 
@@ -235,76 +233,23 @@ struct OverrideListPage {
     total: u32,
 }
 
-#[derive(Debug)]
-struct OverridePageQuery {
-    builds: Option<Vec<String>>,
+#[derive(Debug, Serialize)]
+struct OverridePageQuery<'a> {
+    builds: Option<&'a Vec<String>>,
     expired: Option<bool>,
-    like: Option<String>,
-    packages: Option<Vec<String>>,
-    releases: Option<Vec<String>>,
-    search: Option<String>,
-    users: Option<Vec<String>>,
+    like: Option<&'a String>,
+    packages: Option<&'a Vec<String>>,
+    releases: Option<&'a Vec<FedoraRelease>>,
+    search: Option<&'a String>,
+    users: Option<&'a Vec<String>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl OverridePageQuery {
-    fn new() -> Self {
-        OverridePageQuery {
-            builds: None,
-            expired: None,
-            like: None,
-            packages: None,
-            releases: None,
-            search: None,
-            users: None,
-            page: DEFAULT_PAGE,
-            rows_per_page: DEFAULT_ROWS,
-        }
-    }
-}
-
-impl SinglePageQuery<OverrideListPage> for OverridePageQuery {
+impl<'a> SinglePageQuery<OverrideListPage> for OverridePageQuery<'a> {
     fn path(&self) -> String {
-        String::from("/overrides/")
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        let mut args: HashMap<&str, String> = HashMap::new();
-
-        if let Some(builds) = &self.builds {
-            args.insert("builds", builds.join(","));
-        }
-
-        if let Some(expired) = self.expired {
-            args.insert("expired", expired.to_string());
-        }
-
-        if let Some(like) = &self.like {
-            args.insert("like", like.to_owned());
-        }
-
-        if let Some(packages) = &self.packages {
-            args.insert("packages", packages.join(","));
-        }
-
-        if let Some(releases) = &self.releases {
-            args.insert("releases", releases.join(","));
-        }
-
-        if let Some(search) = &self.search {
-            args.insert("search", search.to_owned());
-        }
-
-        if let Some(users) = &self.users {
-            args.insert("user", users.join(","));
-        }
-
-        args.insert("page", format!("{}", self.page));
-        args.insert("rows_per_page", format!("{}", self.rows_per_page));
-
-        Some(args)
+        format!("/overrides/?{}", serde_url_params::to_string(self).unwrap())
     }
 
     fn parse(string: String) -> Result<OverrideListPage, QueryError> {

@@ -10,21 +10,21 @@ use crate::service::BodhiService;
 
 // https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST
 #[derive(Debug, Serialize)]
-struct CommentData {
+struct CommentData<'a> {
     /// alias of the update for which this is a comment
-    update: String,
+    update: &'a String,
     /// comment text (default: `""`)
-    text: Option<String>,
+    text: Option<&'a String>,
     /// comment karma (default: `0`)
-    karma: Option<i32>,
+    karma: Option<&'a Karma>,
     /// critpath karma (default: `0`)
-    karma_critpath: Option<i32>,
+    karma_critpath: Option<&'a Karma>,
     /// bug feedback vector (default: `[]`)
-    bug_feedback: Option<Vec<i32>>,
+    bug_feedback: Option<&'a Vec<Karma>>,
     /// testcase feedback vector (default: `[]`)
-    testcase_feedback: Option<Vec<i32>>,
+    testcase_feedback: Option<&'a Vec<Karma>>,
     /// CSRF token
-    csrf_token: String,
+    csrf_token: &'a String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -89,39 +89,14 @@ impl Create<NewComment> for CommentBuilder {
 
         let csrf_token = CSRFQuery::new().query(bodhi)?;
 
-        let text = match &self.text {
-            Some(text) => Some(text.to_owned()),
-            None => None,
-        };
-
-        let karma: i32 = match &self.karma {
-            Some(karma) => karma.clone().into(),
-            None => 0,
-        };
-
-        let karma_critpath: Option<i32> = match &self.karma_critpath {
-            Some(karma) => Some(karma.clone().into()),
-            None => None,
-        };
-
-        let bug_feedback: Option<Vec<i32>> = match &self.bug_feedback {
-            Some(feedback) => Some(feedback.iter().map(|k| k.clone().into()).collect()),
-            None => None,
-        };
-
-        let testcase_feedback: Option<Vec<i32>> = match &self.testcase_feedback {
-            Some(feedback) => Some(feedback.iter().map(|k| k.clone().into()).collect()),
-            None => None,
-        };
-
         let new_comment = CommentData {
-            update: self.update.clone(),
-            text,
-            karma: Some(karma),
-            karma_critpath,
-            bug_feedback,
-            testcase_feedback,
-            csrf_token,
+            update: &self.update,
+            text: self.text.as_ref(),
+            karma: self.karma.as_ref(),
+            karma_critpath: self.karma_critpath.as_ref(),
+            bug_feedback: self.bug_feedback.as_ref(),
+            testcase_feedback: self.testcase_feedback.as_ref(),
+            csrf_token: &csrf_token,
         };
 
         let data = match serde_json::to_string(&new_comment) {
@@ -129,7 +104,7 @@ impl Create<NewComment> for CommentBuilder {
             Err(error) => return Err(QueryError::SerializationError { error }),
         };
 
-        let response = bodhi.post(&path, data, None)?;
+        let response = bodhi.post(&path, data)?;
         let status = response.status();
 
         if !status.is_success() {

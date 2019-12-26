@@ -8,14 +8,12 @@
 //! groups they are members of, or querying for users that are associated with a given set of
 //! updates or packages.
 
-use std::collections::HashMap;
-
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::data::User;
 use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_ROWS};
 
 /// Use this for querying bodhi for a specific user by their name. It will either return an
 /// `Ok(User)` matching the specified name, return `Ok(None)` if it doesn't exist, or return an
@@ -50,10 +48,6 @@ impl UserNameQuery {
 impl SinglePageQuery<Option<User>> for UserNameQuery {
     fn path(&self) -> String {
         format!("/users/{}", self.name)
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        None
     }
 
     fn parse(string: String) -> Result<Option<User>, QueryError> {
@@ -173,19 +167,10 @@ impl UserQuery {
         let mut page = 1;
 
         loop {
-            let mut query = UserPageQuery::new();
-            query.page = page;
-
-            query.groups = self.groups.clone();
-            query.like = self.like.clone();
-            query.name = self.name.clone();
-            query.packages = self.packages.clone();
-            query.search = self.search.clone();
-            query.updates = self.updates.clone();
-
+            let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
-            users.extend(result.users);
 
+            users.extend(result.users);
             page += 1;
 
             if page > result.pages {
@@ -194,6 +179,19 @@ impl UserQuery {
         }
 
         Ok(users)
+    }
+
+    fn page_query(&self, page: u32, rows_per_page: u32) -> UserPageQuery {
+        UserPageQuery {
+            groups: self.groups.as_ref(),
+            like: self.like.as_ref(),
+            name: self.name.as_ref(),
+            packages: self.packages.as_ref(),
+            search: self.search.as_ref(),
+            updates: self.updates.as_ref(),
+            page,
+            rows_per_page,
+        }
     }
 }
 
@@ -212,70 +210,22 @@ struct UserListPage {
     total: u32,
 }
 
-#[derive(Debug)]
-struct UserPageQuery {
-    groups: Option<Vec<String>>,
-    like: Option<String>,
-    name: Option<String>,
-    packages: Option<Vec<String>>,
-    search: Option<String>,
-    updates: Option<Vec<String>>,
+#[derive(Debug, Serialize)]
+struct UserPageQuery<'a> {
+    groups: Option<&'a Vec<String>>,
+    like: Option<&'a String>,
+    name: Option<&'a String>,
+    packages: Option<&'a Vec<String>>,
+    search: Option<&'a String>,
+    updates: Option<&'a Vec<String>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl UserPageQuery {
-    fn new() -> Self {
-        UserPageQuery {
-            groups: None,
-            like: None,
-            name: None,
-            packages: None,
-            search: None,
-            updates: None,
-            page: DEFAULT_PAGE,
-            rows_per_page: DEFAULT_ROWS,
-        }
-    }
-}
-
-impl SinglePageQuery<UserListPage> for UserPageQuery {
+impl<'a> SinglePageQuery<UserListPage> for UserPageQuery<'a> {
     fn path(&self) -> String {
-        String::from("/users/")
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        let mut args: HashMap<&str, String> = HashMap::new();
-
-        if let Some(groups) = &self.groups {
-            args.insert("groups", groups.join(","));
-        };
-
-        if let Some(like) = &self.like {
-            args.insert("like", like.to_owned());
-        };
-
-        if let Some(name) = &self.name {
-            args.insert("name", name.to_owned());
-        };
-
-        if let Some(packages) = &self.packages {
-            args.insert("packages", packages.join(","));
-        };
-
-        if let Some(search) = &self.search {
-            args.insert("search", search.to_owned());
-        };
-
-        if let Some(updates) = &self.updates {
-            args.insert("updates", updates.join(","));
-        };
-
-        args.insert("page", format!("{}", self.page));
-        args.insert("rows_per_page", format!("{}", self.rows_per_page));
-
-        Some(args)
+        format!("/users/?{}", serde_url_params::to_string(self).unwrap())
     }
 
     fn parse(string: String) -> Result<UserListPage, QueryError> {

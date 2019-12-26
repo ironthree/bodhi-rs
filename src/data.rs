@@ -6,12 +6,10 @@
 //! set of enumerated values. To abstract this, the corresponding query filters accept some of the
 //! enum types defined here, instead of the String arguments directly.
 
-use std::convert::TryFrom;
-
 use chrono::{DateTime, Utc};
 
-use serde::Deserialize;
-use serde_repr::Deserialize_repr;
+use serde::{Deserialize, Serialize};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// base URL of the fedora bodhi instance
 pub const FEDORA_BODHI_URL: &str = "https://bodhi.fedoraproject.org";
@@ -78,7 +76,7 @@ mod option_bodhi_date_format {
 /// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and
 /// possibly also a [`TestCaseFeedback`](struct.TestCase.html) or a
 /// [`BugFeedback`](struct.BugFeedback.html).
-#[derive(Debug, Clone, Deserialize_repr)]
+#[derive(Debug, Clone, Deserialize_repr, Serialize_repr)]
 #[repr(i8)]
 pub enum Karma {
     /// positive feedback
@@ -89,40 +87,9 @@ pub enum Karma {
     Negative = -1,
 }
 
-impl Into<i32> for Karma {
-    fn into(self) -> i32 {
-        match self {
-            Karma::Positive => 1,
-            Karma::Neutral => 0,
-            Karma::Negative => -1,
-        }
-    }
-}
-
-impl Into<String> for Karma {
-    fn into(self) -> String {
-        match self {
-            Karma::Positive => String::from("+1"),
-            Karma::Neutral => String::from("0"),
-            Karma::Negative => String::from("-1"),
-        }
-    }
-}
-
-impl From<i32> for Karma {
-    fn from(karma: i32) -> Karma {
-        match karma {
-            1 => Karma::Positive,
-            0 => Karma::Neutral,
-            -1 => Karma::Negative,
-            _ => unreachable!(),
-        }
-    }
-}
-
 /// This enum represents a fedora release.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum FedoraRelease {
     F32,
     F32C,
@@ -161,85 +128,8 @@ pub enum FedoraRelease {
     EL5,
 }
 
-impl TryFrom<&str> for FedoraRelease {
-    type Error = String;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
-            "F32" => Ok(FedoraRelease::F32),
-            "F32C" => Ok(FedoraRelease::F32C),
-            "F31" => Ok(FedoraRelease::F31),
-            "F31C" => Ok(FedoraRelease::F31C),
-            "F31F" => Ok(FedoraRelease::F31F),
-            "F31M" => Ok(FedoraRelease::F31M),
-            "F30" => Ok(FedoraRelease::F30),
-            "F30C" => Ok(FedoraRelease::F30C),
-            "F30F" => Ok(FedoraRelease::F30F),
-            "F30M" => Ok(FedoraRelease::F30M),
-            "F29" => Ok(FedoraRelease::F29),
-            "F29C" => Ok(FedoraRelease::F29C),
-            "F29F" => Ok(FedoraRelease::F29F),
-            "F29M" => Ok(FedoraRelease::F29M),
-            "F28" => Ok(FedoraRelease::F28),
-            "F28C" => Ok(FedoraRelease::F28C),
-            "F28M" => Ok(FedoraRelease::F28M),
-            "F27" => Ok(FedoraRelease::F27),
-            "F27M" => Ok(FedoraRelease::F27M),
-            "F26" => Ok(FedoraRelease::F26),
-            "F25" => Ok(FedoraRelease::F25),
-            "F24" => Ok(FedoraRelease::F24),
-            "F23" => Ok(FedoraRelease::F23),
-            "F22" => Ok(FedoraRelease::F22),
-            "F21" => Ok(FedoraRelease::F21),
-            "EPEL-8" => Ok(FedoraRelease::EPEL8),
-            "EPEL-8M" => Ok(FedoraRelease::EPEL8M),
-            "EPEL-7" => Ok(FedoraRelease::EPEL7),
-            "EL-6" => Ok(FedoraRelease::EL6),
-            "EL-5" => Ok(FedoraRelease::EL5),
-            _ => Err(format!("Unrecognised release: {}", value)),
-        }
-    }
-}
-
-impl Into<String> for FedoraRelease {
-    fn into(self) -> String {
-        match self {
-            FedoraRelease::F32 => String::from("F32"),
-            FedoraRelease::F32C => String::from("F32C"),
-            FedoraRelease::F31 => String::from("F31"),
-            FedoraRelease::F31C => String::from("F31C"),
-            FedoraRelease::F31F => String::from("F31F"),
-            FedoraRelease::F31M => String::from("F31M"),
-            FedoraRelease::F30 => String::from("F30"),
-            FedoraRelease::F30C => String::from("F30C"),
-            FedoraRelease::F30F => String::from("F30F"),
-            FedoraRelease::F30M => String::from("F30M"),
-            FedoraRelease::F29 => String::from("F29"),
-            FedoraRelease::F29C => String::from("F29C"),
-            FedoraRelease::F29F => String::from("F29F"),
-            FedoraRelease::F29M => String::from("F29M"),
-            FedoraRelease::F28 => String::from("F28"),
-            FedoraRelease::F28C => String::from("F28C"),
-            FedoraRelease::F28M => String::from("F28M"),
-            FedoraRelease::F27 => String::from("F27"),
-            FedoraRelease::F27M => String::from("F27M"),
-            FedoraRelease::F26 => String::from("F26"),
-            FedoraRelease::F25 => String::from("F25"),
-            FedoraRelease::F24 => String::from("F24"),
-            FedoraRelease::F23 => String::from("F23"),
-            FedoraRelease::F22 => String::from("F22"),
-            FedoraRelease::F21 => String::from("F21"),
-            FedoraRelease::EPEL8 => String::from("EPEL-8"),
-            FedoraRelease::EPEL8M => String::from("EPEL-8M"),
-            FedoraRelease::EPEL7 => String::from("EPEL-7"),
-            FedoraRelease::EL6 => String::from("EL-6"),
-            FedoraRelease::EL5 => String::from("EL-5"),
-        }
-    }
-}
-
 /// This enum represents the type of a bodhi update, of a package, and of builds.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum ContentType {
     /// "base" content type (seems to be unused)
     #[serde(rename = "base")]
@@ -258,20 +148,8 @@ pub enum ContentType {
     RPM,
 }
 
-impl Into<String> for ContentType {
-    fn into(self) -> String {
-        match self {
-            ContentType::Base => String::from("base"),
-            ContentType::Container => String::from("container"),
-            ContentType::Flatpak => String::from("flatpak"),
-            ContentType::Module => String::from("module"),
-            ContentType::RPM => String::from("rpm"),
-        }
-    }
-}
-
 /// This enum represents a requested state change of an update.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum UpdateRequest {
     /// request for an update to get "batched" for the next stable push (no longer used)
     #[serde(rename = "batched")]
@@ -293,22 +171,9 @@ pub enum UpdateRequest {
     Unpush,
 }
 
-impl Into<String> for UpdateRequest {
-    fn into(self) -> String {
-        match self {
-            UpdateRequest::Batched => String::from("batched"),
-            UpdateRequest::Obsolete => String::from("obsolete"),
-            UpdateRequest::Revoke => String::from("revoke"),
-            UpdateRequest::Stable => String::from("stable"),
-            UpdateRequest::Testing => String::from("testing"),
-            UpdateRequest::Unpush => String::from("unpush"),
-        }
-    }
-}
-
 /// This enum represents the associated severity of a bodhi update.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum UpdateSeverity {
     #[serde(rename = "high")]
     High,
@@ -322,20 +187,8 @@ pub enum UpdateSeverity {
     Urgent,
 }
 
-impl Into<String> for UpdateSeverity {
-    fn into(self) -> String {
-        match self {
-            UpdateSeverity::High => String::from("high"),
-            UpdateSeverity::Low => String::from("low"),
-            UpdateSeverity::Medium => String::from("medium"),
-            UpdateSeverity::Unspecified => String::from("unspecified"),
-            UpdateSeverity::Urgent => String::from("urgent"),
-        }
-    }
-}
-
 /// This enum represents the current state of a bodhi update.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum UpdateStatus {
     /// tag for updates that have been obsoleted by another update
     #[serde(rename = "obsolete")]
@@ -363,23 +216,8 @@ pub enum UpdateStatus {
     Unpushed,
 }
 
-impl Into<String> for UpdateStatus {
-    fn into(self) -> String {
-        match self {
-            UpdateStatus::Obsolete => String::from("obsolete"),
-            UpdateStatus::Pending => String::from("pending"),
-            UpdateStatus::Processing => String::from("processing"),
-            UpdateStatus::SideTagActive => String::from("side_tag_active"),
-            UpdateStatus::SideTagExpired => String::from("side_tag_expired"),
-            UpdateStatus::Stable => String::from("stable"),
-            UpdateStatus::Testing => String::from("testing"),
-            UpdateStatus::Unpushed => String::from("unpushed"),
-        }
-    }
-}
-
 /// This enum represents the associated suggested action for a bodhi update.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum UpdateSuggestion {
     /// recommendation to log out for the update to get applied
     #[serde(rename = "logout")]
@@ -392,19 +230,9 @@ pub enum UpdateSuggestion {
     Unspecified,
 }
 
-impl Into<String> for UpdateSuggestion {
-    fn into(self) -> String {
-        match self {
-            UpdateSuggestion::Logout => String::from("logout"),
-            UpdateSuggestion::Reboot => String::from("reboot"),
-            UpdateSuggestion::Unspecified => String::from("unspecified"),
-        }
-    }
-}
-
 /// This enum represents the type of a bodhi update.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub enum UpdateType {
     #[serde(rename = "bugfix")]
     BugFix,
@@ -416,18 +244,6 @@ pub enum UpdateType {
     Security,
     #[serde(rename = "unspecified")]
     Unspecified,
-}
-
-impl Into<String> for UpdateType {
-    fn into(self) -> String {
-        match self {
-            UpdateType::BugFix => String::from("bugfix"),
-            UpdateType::Enhancement => String::from("enhancement"),
-            UpdateType::NewPackage => String::from("newpackage"),
-            UpdateType::Security => String::from("security"),
-            UpdateType::Unspecified => String::from("unspecified"),
-        }
-    }
 }
 
 /// This struct represents a specific BugZilla bug that is associated with an update.
@@ -680,11 +496,9 @@ pub struct Update {
     pub date_testing: Option<DateTime<Utc>>,
     /// displayed name of this update
     pub display_name: String,
-    /// greenwave status summary
-    // TODO: what is this?
+    /// greenwave status summary string
     pub greenwave_summary_string: Option<String>,
-    /// comma-separated list of unsatisfied greenwave gating requirements
-    // TODO: what is this?
+    /// comma- or space-separated list of unsatisfied greenwave gating requirements
     pub greenwave_unsatisfied_requirements: Option<String>,
     /// current karma total
     pub karma: Option<i32>,
@@ -707,7 +521,7 @@ pub struct Update {
     pub require_bugs: bool,
     /// flag to specify whether feedback for test cases is required when counting karma
     pub require_testcases: bool,
-    // TODO: what is this?
+    /// comma- or space-separated list of required taskotron test results
     pub requirements: Option<String>,
     /// severity of this update
     pub severity: UpdateSeverity,
@@ -721,8 +535,7 @@ pub struct Update {
     pub suggest: UpdateSuggestion,
     /// list test cases associated with this update
     pub test_cases: Option<Vec<TestCase>>,
-    /// greenwave gating status
-    // TODO: make this an enum
+    /// greenwave gating status; one of: `failed`, `greenwave_failed`, `ignored`, `passed`
     pub test_gating_status: Option<String>,
     /// title of this update
     pub title: String,

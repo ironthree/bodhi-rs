@@ -55,7 +55,7 @@ impl Create<NewOverride> for OverrideBuilder {
             Err(error) => return Err(QueryError::SerializationError { error }),
         };
 
-        let response = bodhi.post(&path, data, None)?;
+        let response = bodhi.post(&path, data)?;
         let status = response.status();
 
         if !status.is_success() {

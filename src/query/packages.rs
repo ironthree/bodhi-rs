@@ -3,14 +3,12 @@
 //! The [`PackageQuery`](struct.PackageQuery.html) can be used to execute complex queries, for
 //! example query packages by name, or filter packages matching a certain search string.
 
-use std::collections::HashMap;
-
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::data::Package;
 use crate::error::{QueryError, ServiceError};
 use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_PAGE, DEFAULT_ROWS};
+use crate::service::{BodhiService, DEFAULT_ROWS};
 
 /// Use this for querying bodhi about a set of packages with the given properties, which can be
 /// specified with the builder pattern. Note that some options can be specified multiple times, and
@@ -67,16 +65,10 @@ impl PackageQuery {
         let mut page = 1;
 
         loop {
-            let mut query = PackagePageQuery::new();
-            query.page = page;
-
-            query.like = self.like.clone();
-            query.name = self.name.clone();
-            query.search = self.search.clone();
-
+            let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
-            packages.extend(result.packages);
 
+            packages.extend(result.packages);
             page += 1;
 
             if page > result.pages {
@@ -85,6 +77,16 @@ impl PackageQuery {
         }
 
         Ok(packages)
+    }
+
+    fn page_query(&self, page: u32, rows_per_page: u32) -> PackagePageQuery {
+        PackagePageQuery {
+            like: self.like.as_ref(),
+            name: self.name.as_ref(),
+            search: self.search.as_ref(),
+            page,
+            rows_per_page,
+        }
     }
 }
 
@@ -103,52 +105,19 @@ struct PackageListPage {
     total: u32,
 }
 
-#[derive(Debug)]
-struct PackagePageQuery {
-    like: Option<String>,
-    name: Option<String>,
-    search: Option<String>,
+#[derive(Debug, Serialize)]
+struct PackagePageQuery<'a> {
+    like: Option<&'a String>,
+    name: Option<&'a String>,
+    search: Option<&'a String>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl PackagePageQuery {
-    fn new() -> Self {
-        PackagePageQuery {
-            like: None,
-            name: None,
-            search: None,
-            page: DEFAULT_PAGE,
-            rows_per_page: DEFAULT_ROWS,
-        }
-    }
-}
-
-impl SinglePageQuery<PackageListPage> for PackagePageQuery {
+impl<'a> SinglePageQuery<PackageListPage> for PackagePageQuery<'a> {
     fn path(&self) -> String {
-        String::from("/packages/")
-    }
-
-    fn args(&self) -> Option<HashMap<&str, String>> {
-        let mut args: HashMap<&str, String> = HashMap::new();
-
-        if let Some(like) = &self.like {
-            args.insert("like", like.to_owned());
-        }
-
-        if let Some(name) = &self.name {
-            args.insert("name", name.to_owned());
-        }
-
-        if let Some(search) = &self.search {
-            args.insert("search", search.to_owned());
-        }
-
-        args.insert("page", format!("{}", self.page));
-        args.insert("rows_per_page", format!("{}", self.rows_per_page));
-
-        Some(args)
+        format!("/packages/?{}", serde_url_params::to_string(self).unwrap())
     }
 
     fn parse(string: String) -> Result<PackageListPage, QueryError> {

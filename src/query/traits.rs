@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::error::{BodhiError, QueryError};
 use crate::service::BodhiService;
 
@@ -10,9 +8,6 @@ pub trait Query<T> {
 pub trait SinglePageQuery<T> {
     /// This method is expected to return the path of the API endpoint.
     fn path(&self) -> String;
-
-    /// This method returns an optional map of query arguments.
-    fn args(&self) -> Option<HashMap<&str, String>>;
 
     /// This associated method is expected to return the result that was parsed from the JSON
     /// response, or an error.
@@ -30,7 +25,7 @@ pub trait SinglePageQuery<T> {
     /// individual trait implementations (such as deserializing JSON, handling 404 errors, or
     /// getting API paths and arguments).
     fn query(&self, bodhi: &BodhiService) -> Result<T, QueryError> {
-        let response = bodhi.get(&self.path(), self.args())?;
+        let response = bodhi.get(&self.path())?;
         let status = response.status();
 
         if status.is_success() {
