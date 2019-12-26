@@ -4,21 +4,7 @@ use crate::data::User;
 use crate::query::UserNameQuery;
 use crate::service::BodhiServiceBuilder;
 
-#[cfg(feature = "slow_tests")]
-use crate::query::UserQuery;
-
-#[test]
-#[cfg(feature = "slow_tests")]
-fn deserialize_all() {
-    let bodhi = BodhiServiceBuilder::default()
-        .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES)
-        .build()
-        .unwrap();
-
-    // query and deserialize all users
-    bodhi.query(&UserQuery::new()).unwrap();
-}
+// TODO: make sure the new serde_url_params code works as expected
 
 #[test]
 fn name_query_some() {

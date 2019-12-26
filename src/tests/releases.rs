@@ -1,20 +1,10 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
 use crate::data::Release;
-use crate::query::{ReleaseNameQuery, ReleaseQuery};
+use crate::query::ReleaseNameQuery;
 use crate::service::BodhiServiceBuilder;
 
-#[test]
-fn deserialize_all() {
-    let bodhi = BodhiServiceBuilder::default()
-        .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES)
-        .build()
-        .unwrap();
-
-    // query and deserialize all releases
-    bodhi.query(&ReleaseQuery::new().exclude_archived(false)).unwrap();
-}
+// TODO: make sure the new serde_url_params code works as expected
 
 #[test]
 fn name_query_some() {
