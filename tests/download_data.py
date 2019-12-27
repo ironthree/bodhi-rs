@@ -1,5 +1,6 @@
 #!/usr/bin/python3 -OO
 
+import argparse
 import requests
 import json
 import threading
@@ -59,8 +60,6 @@ ACTIVE_RELEASES = [
 
 # change this to "ALL_RELEASES" regenerate data for archived releases as well
 RELEASES = ACTIVE_RELEASES
-
-# TODO: download data only for active releases
 
 
 class RetryError(Exception):
@@ -301,15 +300,41 @@ def do_users() -> int:
 
 
 def main() -> int:
-    do_builds()
-    do_composes()
-    do_overrides()
-    do_packages()
-    do_releases()
-    do_updates()
-    do_users()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("action", action="store", choices=[
+        "all", "builds", "composes", "overrides", "packages", "releases", "updates", "users"
+    ])
+    parser.add_argument("--include-archived", action="store_const", const=True, default=False)
 
-    return 0
+    args = vars(parser.parse_args())
+
+    action = args["action"]
+    include_archived = args["include_archived"]
+
+    if include_archived:
+        RELEASES.clear()
+        RELEASES.extend(ALL_RELEASES)
+
+    actions = {
+        "builds": do_builds,
+        "composes": do_composes,
+        "overrides": do_overrides,
+        "packages": do_packages,
+        "releases": do_releases,
+        "updates": do_updates,
+        "users": do_users,
+    }
+
+    if action == "all":
+        ret = 0
+
+        for fun in actions.values():
+            ret += fun()
+
+        return ret
+
+    else:
+        return actions[action]()
 
 
 if __name__ == "__main__":
