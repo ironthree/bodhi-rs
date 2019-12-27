@@ -11,18 +11,16 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::{FedoraRelease, Override};
 use crate::error::{QueryError, ServiceError};
-use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_ROWS};
+use crate::service::DEFAULT_ROWS;
+use crate::{BodhiService, FedoraRelease, Override, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific override, by its NVR (Name-Version-Release) string.
 /// It will return either an `Ok(Some(Override))` matching the specified NVR, return `Ok(None)` if
 /// it doesn't exist, or return an `Err(String)` if another error occurred.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::query::OverrideNVRQuery;
+/// # use bodhi::{BodhiServiceBuilder, OverrideNVRQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let over_ride = bodhi
@@ -50,8 +48,8 @@ impl OverrideNVRQuery {
 }
 
 impl SinglePageQuery<Option<Override>> for OverrideNVRQuery {
-    fn path(&self) -> String {
-        format!("/overrides/{}", self.nvr)
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/overrides/{}", self.nvr))
     }
 
     fn parse(string: String) -> Result<Option<Override>, QueryError> {
@@ -76,9 +74,7 @@ impl Query<Option<Override>> for OverrideNVRQuery {
 /// and REST API behavior.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::data::FedoraRelease;
-/// # use bodhi::query::OverrideQuery;
+/// # use bodhi::{BodhiServiceBuilder, FedoraRelease, OverrideQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let overrides = bodhi
@@ -248,8 +244,8 @@ struct OverridePageQuery<'a> {
 }
 
 impl<'a> SinglePageQuery<OverrideListPage> for OverridePageQuery<'a> {
-    fn path(&self) -> String {
-        format!("/overrides/?{}", serde_url_params::to_string(self).unwrap())
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/overrides/?{}", serde_url_params::to_string(self)?))
     }
 
     fn parse(string: String) -> Result<OverrideListPage, QueryError> {

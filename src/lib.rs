@@ -7,9 +7,12 @@
 //!
 //! The library is structured like this:
 //!
-//! - `BodhiService`, which contains all information related to connecting to a remote bodhi
-//!   instance
-//! - a set of `*Query` structs and implementations, which wrap the REST API with a Rust-y API
+//! - [`BodhiService`](service/struct.BodhiService.html), which contains all information related to
+//!   connecting to a remote bodhi instance
+//! - a set of `*Query` structs and implementations for querying bodhi, which wrap the REST API with
+//!   a Rust-y API
+//! - a set of `Create` implementations for creating new data on bodhi
+//! - a set of `Edit` implementations for editing data on bodhi
 //! - data type definitions, used for deserializing JSON responses with [serde]
 //!
 //! [serde]: https://docs.rs/serde
@@ -35,12 +38,14 @@
 //!
 //! ## Usage
 //!
-//! To query a remote bodhi instance, first construct a `BodhiService` instance with the desired
-//! properties (server URL, request timeout, retry limit).
+//! To query a remote bodhi instance, first construct a
+//! [`BodhiService`](service/struct.BodhiService.html) instance with the desired properties (server
+//! URL, request timeout, retry limit).
 //!
-//! Then, construct the required queries, and run the query against the `BodhiService` instance. In
-//! theory, this would let you run the same query multiple times, possibly against different server
-//! instances or with different connection settings:
+//! Then, construct the required queries, and run the query against the
+//! [`BodhiService`](service/struct.BodhiService.html) instance. In theory, this would let you run
+//! the same query multiple times, possibly against different server instances or with different
+//! connection settings:
 //!
 //! ```
 //! let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
@@ -50,9 +55,9 @@
 //! let packages = bodhi.query(&package_query).unwrap();
 //! ```
 
-#![warn(missing_docs)]
-#![warn(missing_debug_implementations)]
-#![warn(clippy::result_unwrap_used)]
+#![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
+#![deny(clippy::result_unwrap_used)]
 
 pub mod data;
 pub use data::*;

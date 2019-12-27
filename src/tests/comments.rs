@@ -1,8 +1,8 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::data::Comment;
-use crate::query::CommentIDQuery;
-use crate::service::BodhiServiceBuilder;
+use crate::{BodhiServiceBuilder, Comment, CommentIDQuery};
+
+// TODO: make sure the new serde_url_params code works as expected
 
 #[test]
 fn id_query_some() {

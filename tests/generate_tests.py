@@ -52,12 +52,11 @@ def do_builds():
     )
 
     contents = (
-            "use std::fs::read_to_string;\nuse bodhi::data::Build;" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Build;" +
             "\n\n" +
             "\n".join(import_template.format(release=release, release_lower=release.lower()) for release in RELEASES) +
             "\n\n" +
-            "\n".join(test_template.format(release=release, release_lower=release.lower()) for release in RELEASES) +
-            "\n"
+            "\n".join(test_template.format(release=release, release_lower=release.lower()) for release in RELEASES)
     )
 
     with open("builds.rs", "w") as file:
@@ -78,12 +77,11 @@ def do_overrides():
     )
 
     contents = (
-            "use std::fs::read_to_string;\nuse bodhi::data::Override;" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Override;" +
             "\n\n" +
             "\n".join(import_template.format(release=release, release_lower=release.lower()) for release in RELEASES) +
             "\n\n" +
-            "\n".join(test_template.format(release=release, release_lower=release.lower()) for release in RELEASES) +
-            "\n"
+            "\n".join(test_template.format(release=release, release_lower=release.lower()) for release in RELEASES)
     )
 
     with open("overrides.rs", "w") as file:
@@ -104,12 +102,11 @@ def do_packages():
     )
 
     contents = (
-            "use std::fs::read_to_string;\nuse bodhi::data::Package;" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Package;" +
             "\n\n" +
             import_string +
             "\n\n" +
-            test_string +
-            "\n"
+            test_string
     )
 
     with open("packages.rs", "w") as file:
@@ -130,12 +127,11 @@ def do_releases():
     )
 
     contents = (
-            "use std::fs::read_to_string;\nuse bodhi::data::Release;" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Release;" +
             "\n\n" +
             import_string +
             "\n\n" +
-            test_string +
-            "\n"
+            test_string
     )
 
     with open("releases.rs", "w") as file:
@@ -156,12 +152,11 @@ def do_updates():
     )
 
     contents = (
-            "use std::fs::read_to_string;\nuse bodhi::data::Update;" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Update;" +
             "\n\n" +
             "\n".join(import_template.format(release=release, release_lower=release.lower()) for release in RELEASES) +
             "\n\n" +
-            "\n".join(test_template.format(release=release, release_lower=release.lower()) for release in RELEASES) +
-            "\n"
+            "\n".join(test_template.format(release=release, release_lower=release.lower()) for release in RELEASES)
     )
 
     with open("updates.rs", "w") as file:
@@ -182,12 +177,11 @@ def do_users():
     )
 
     contents = (
-            "use std::fs::read_to_string;\nuse bodhi::data::User;" +
+            "use std::fs::read_to_string;\n\nuse bodhi::User;" +
             "\n\n" +
             import_string +
             "\n\n" +
-            test_string +
-            "\n"
+            test_string
     )
 
     with open("users.rs", "w") as file:

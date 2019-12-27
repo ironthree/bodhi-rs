@@ -2,13 +2,10 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::create::Create;
-use crate::data::{Comment, Karma};
 use crate::error::{BodhiError, QueryError};
-use crate::query::{CSRFQuery, SinglePageQuery};
-use crate::service::BodhiService;
+use crate::{BodhiService, CSRFQuery, Comment, Create, Karma, SinglePageQuery};
 
-// https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST>
 #[derive(Debug, Serialize)]
 struct CommentData<'a> {
     /// alias of the update for which this is a comment

@@ -1,5 +1,6 @@
 use std::fs::read_to_string;
-use bodhi::data::Release;
+
+use bodhi::Release;
 
 const JSON: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/releases.json");
 
@@ -7,4 +8,3 @@ const JSON: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/releases.jso
 fn releases_dejson() {
     let _: Vec<Release> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
 }
-

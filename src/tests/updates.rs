@@ -1,8 +1,6 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::data::Update;
-use crate::query::UpdateIDQuery;
-use crate::service::BodhiServiceBuilder;
+use crate::{BodhiServiceBuilder, Update, UpdateIDQuery};
 
 // TODO: make sure the new serde_url_params code works as expected
 

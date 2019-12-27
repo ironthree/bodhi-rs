@@ -97,7 +97,8 @@ pub enum UpdateRequest {
     Unpush,
 }
 
-/// This enum represents the associated severity of a bodhi update.
+/// This enum represents the associated severity of a bodhi update. This field is required to not be
+/// unspecified for updates with [`UpdateType::Security`](enum.UpdateType.html).
 #[allow(missing_docs)]
 #[derive(Debug, Deserialize, Serialize)]
 pub enum UpdateSeverity {
@@ -184,6 +185,22 @@ pub enum ReleaseState {
     /// release is in development
     #[serde(rename = "pending")]
     Pending,
+}
+
+/// This enum represents the test gating status from `greenwave`.
+#[allow(missing_docs)]
+#[derive(Debug, Deserialize)]
+pub enum TestGatingStatus {
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "greenwave_failed")]
+    GreenwaveFailed,
+    #[serde(rename = "ignored")]
+    Ignored,
+    #[serde(rename = "passed")]
+    Passed,
+    #[serde(rename = "waiting")]
+    Waiting,
 }
 
 /// This enum represents the two possible ways to identify a fedora update:

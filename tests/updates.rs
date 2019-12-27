@@ -1,5 +1,6 @@
 use std::fs::read_to_string;
-use bodhi::data::Update;
+
+use bodhi::Update;
 
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f32.json");
 const JSON_F32C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f32c.json");
@@ -181,4 +182,3 @@ fn updates_dejson_el6() {
 fn updates_dejson_el5() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_EL5).unwrap()).unwrap();
 }
-

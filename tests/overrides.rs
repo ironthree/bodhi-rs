@@ -1,5 +1,6 @@
 use std::fs::read_to_string;
-use bodhi::data::Override;
+
+use bodhi::Override;
 
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f32.json");
 const JSON_F32C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f32c.json");
@@ -181,4 +182,3 @@ fn overrides_dejson_el6() {
 fn overrides_dejson_el5() {
     let _: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EL5).unwrap()).unwrap();
 }
-

@@ -2,8 +2,8 @@ use chrono::{DateTime, Utc};
 
 use serde::Deserialize;
 
+use super::dates::*;
 use super::enums::*;
-use super::{bodhi_date_format, option_bodhi_date_format};
 
 /// This struct represents a specific BugZilla bug that is associated with an update.
 #[derive(Debug, Deserialize)]
@@ -12,10 +12,10 @@ pub struct Bug {
     pub bug_id: u32,
     /// list of [`BugFeedback`](struct.BugFeedback.html) items associated with this bug
     pub feedback: Option<Vec<BugFeedback>>,
-    // what is this?
-    parent: bool,
-    // what is this?
-    security: bool,
+    /// flag to indicate whether this bug has been tagged as a parent / tracking bug
+    pub parent: bool,
+    /// flag to indicate whether this bug has been tagged as a `Security` issue
+    pub security: bool,
     /// title of the bug in BugZilla
     pub title: Option<String>,
 }
@@ -193,7 +193,7 @@ pub struct TestCaseFeedback {
 /// status, submitter, etc.
 #[derive(Debug, Deserialize)]
 pub struct Update {
-    /// user-visible, human-readable update alias (FEDORA-2019-1A2BB23E)
+    /// user-visible, human-readable update alias (`FEDORA-2019-1A2BB23E`)
     pub alias: String,
     /// flag to indicate whether this update can be pushed to stable automatically based on karma
     pub autokarma: bool,
@@ -268,8 +268,9 @@ pub struct Update {
     pub suggest: UpdateSuggestion,
     /// list test cases associated with this update
     pub test_cases: Option<Vec<TestCase>>,
-    /// greenwave gating status; one of: `failed`, `greenwave_failed`, `ignored`, `passed`
-    pub test_gating_status: Option<String>,
+    /// greenwave gating status; one of:
+    /// `failed`, `greenwave_failed`, `ignored`, `passed`, `waiting`
+    pub test_gating_status: Option<TestGatingStatus>,
     /// title of this update
     pub title: String,
     /// unstable karma threshold set for this update

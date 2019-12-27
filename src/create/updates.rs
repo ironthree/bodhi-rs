@@ -4,11 +4,8 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::create::Create;
-use crate::data::Update;
 use crate::error::{BodhiError, QueryError};
-use crate::query::{CSRFQuery, SinglePageQuery};
-use crate::service::BodhiService;
+use crate::{BodhiService, CSRFQuery, Create, SinglePageQuery, Update};
 
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2-POST>
 #[derive(Debug, Serialize)]

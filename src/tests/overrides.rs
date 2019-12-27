@@ -1,8 +1,6 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::data::Override;
-use crate::query::OverrideNVRQuery;
-use crate::service::BodhiServiceBuilder;
+use crate::{BodhiServiceBuilder, Override, OverrideNVRQuery};
 
 // TODO: make sure the new serde_url_params code works as expected
 

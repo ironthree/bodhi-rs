@@ -1,8 +1,6 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::data::User;
-use crate::query::UserNameQuery;
-use crate::service::BodhiServiceBuilder;
+use crate::{BodhiServiceBuilder, User, UserNameQuery};
 
 // TODO: make sure the new serde_url_params code works as expected
 

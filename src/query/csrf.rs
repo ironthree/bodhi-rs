@@ -3,15 +3,13 @@
 use serde::Deserialize;
 
 use crate::error::{QueryError, ServiceError};
-use crate::query::{Query, SinglePageQuery};
-use crate::BodhiService;
+use crate::{BodhiService, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a new CSRF token. It will return either an `Ok(String)` with the
 /// new token, or an `Err(String)` if an error occurred.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::query::CSRFQuery;
+/// # use bodhi::{BodhiServiceBuilder, CSRFQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let token = bodhi.query(&CSRFQuery::new()).unwrap();
@@ -34,8 +32,8 @@ impl CSRFQuery {
 }
 
 impl SinglePageQuery<String> for CSRFQuery {
-    fn path(&self) -> String {
-        String::from("/csrf")
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(String::from("/csrf"))
     }
 
     fn parse(string: String) -> Result<String, QueryError> {

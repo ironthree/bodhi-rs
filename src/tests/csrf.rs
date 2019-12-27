@@ -1,7 +1,6 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::query::CSRFQuery;
-use crate::service::BodhiServiceBuilder;
+use crate::{BodhiServiceBuilder, CSRFQuery};
 
 #[test]
 fn deserialize() {

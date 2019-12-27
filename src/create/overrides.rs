@@ -2,11 +2,10 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::create::Create;
 use crate::error::{BodhiError, QueryError};
-use crate::query::{CSRFQuery, SinglePageQuery};
-use crate::service::BodhiService;
+use crate::{BodhiService, CSRFQuery, Create, SinglePageQuery};
 
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1-POST>
 #[derive(Debug, Serialize)]
 struct OverrideData {
     nvr: String,

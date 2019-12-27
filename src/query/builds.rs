@@ -1,7 +1,4 @@
 //! The contents of this module can be used to query a bodhi instance about existing builds.
-//! However, since rawhide builds are not passing through bodhi (yet), this can only be used to
-//! query bodhi about the builds it knows about: rpm, module, and flatpak builds for stable
-//! releases, and container builds for all releases (including rawhide).
 //!
 //! The [`BuildNVRQuery`](struct.BuildNVRQuery.html) returns exactly one Build, if and only if a
 //! [`Build`](../../data/struct.Build.html) with the given Name-Version-Release triple exists -
@@ -13,18 +10,16 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::{Build, FedoraRelease};
 use crate::error::{QueryError, ServiceError};
-use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_ROWS};
+use crate::service::DEFAULT_ROWS;
+use crate::{BodhiService, Build, FedoraRelease, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific build, by its NVR (Name-Version-Release) string. It
 /// will either return an `Ok(Some(Build))` matching the specified NVR, return `Ok(None)` if it
 /// doesn't exist, or return an `Err(QueryError)` if another error occurred.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::query::BuildNVRQuery;
+/// # use bodhi::{BuildNVRQuery, BodhiServiceBuilder};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let build = bodhi
@@ -48,8 +43,8 @@ impl BuildNVRQuery {
 }
 
 impl SinglePageQuery<Option<Build>> for BuildNVRQuery {
-    fn path(&self) -> String {
-        format!("/builds/{}", self.nvr)
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/builds/{}", self.nvr))
     }
 
     fn parse(string: String) -> Result<Option<Build>, QueryError> {
@@ -74,9 +69,7 @@ impl Query<Option<Build>> for BuildNVRQuery {
 /// and REST API behavior.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::data::FedoraRelease;
-/// # use bodhi::query::BuildQuery;
+/// # use bodhi::{BuildQuery, FedoraRelease, BodhiServiceBuilder};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let builds = bodhi
@@ -214,8 +207,8 @@ struct BuildPageQuery<'a> {
 }
 
 impl<'a> SinglePageQuery<BuildListPage> for BuildPageQuery<'a> {
-    fn path(&self) -> String {
-        format!("/builds/?{}", serde_url_params::to_string(self).unwrap())
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/builds/?{}", serde_url_params::to_string(self)?))
     }
 
     fn parse(string: String) -> Result<BuildListPage, QueryError> {

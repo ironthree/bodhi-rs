@@ -6,28 +6,28 @@
 //! the query that accept normal Strings and then construct the comma-separated lists on demand.
 
 pub mod builds;
-pub use builds::*;
+pub use builds::{BuildNVRQuery, BuildQuery};
 
 pub mod comments;
-pub use comments::*;
+pub use comments::{CommentIDQuery, CommentQuery};
 
 pub mod csrf;
-pub use csrf::*;
+pub use csrf::CSRFQuery;
 
 pub mod overrides;
-pub use overrides::*;
+pub use overrides::{OverrideNVRQuery, OverrideQuery};
 
 pub mod packages;
-pub use packages::*;
+pub use packages::PackageQuery;
 
 pub mod releases;
-pub use releases::*;
+pub use releases::{ReleaseNameQuery, ReleaseQuery};
 
 pub mod updates;
-pub use updates::*;
+pub use updates::{UpdateIDQuery, UpdateQuery};
 
 pub mod users;
-pub use users::*;
+pub use users::{UserNameQuery, UserQuery};
 
 pub(crate) mod traits;
 pub(crate) use traits::*;

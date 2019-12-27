@@ -61,6 +61,13 @@ pub enum QueryError {
         /// occurred, for example, malformed responses or network-related issues.
         error: ServiceError,
     },
+    /// This error represents an unexpected issue when constructing a query URL, probably due
+    /// to data that was not successfully deserialized into `x-www-urlencoded` format.
+    #[fail(display = "Failed to construct `x-www-urlencoded` query string: {}", error)]
+    UrlEncodedError {
+        /// This inner error contains the deserialization error.
+        error: String,
+    },
 }
 
 impl From<serde_json::Error> for QueryError {
@@ -78,6 +85,14 @@ impl From<reqwest::Error> for QueryError {
 impl From<ServiceError> for QueryError {
     fn from(error: ServiceError) -> Self {
         QueryError::ServiceError { error }
+    }
+}
+
+impl From<serde_url_params::Error> for QueryError {
+    fn from(error: serde_url_params::Error) -> Self {
+        QueryError::UrlEncodedError {
+            error: format!("{}", error),
+        }
     }
 }
 

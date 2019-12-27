@@ -9,13 +9,9 @@ use fedora::{AnonymousSessionBuilder, OpenIDSessionBuilder, Session};
 use reqwest::blocking::Response;
 use url::Url;
 
-use crate::create::Create;
 use crate::data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 use crate::error::{QueryError, ServiceError};
-use crate::query::Query;
-
-/// Always start with page 1 for multi-page queries. Everything else would be stupid.
-pub const DEFAULT_PAGE: u32 = 1;
+use crate::{Create, Query};
 
 /// This constant defines how many items are queried every time for multi-page queries. The
 /// server-side maximum is usually 100, the default is 20, and 50 seems a good compromise for speed.

@@ -1,39 +1,30 @@
 //! The contents of this module can be used to query a bodhi instance about existing updates.
 //!
-//! The `UpdateIDQuery` returns exactly one Update, if and only if a Update with this ID or alias
-//! exists - otherwise, it will return an error.
+//! The [`UpdateIDQuery`](struct.UpdateIDQuery.html) returns exactly one
+//! [`Update`](../../data/types/struct.Update.html), if and only if an `Update` with this ID or
+//! alias exists - otherwise, it will return an error.
 //!
-//! The `UpdateQuery` can be used to execute more complex queries, for example filtering updates by
-//! release, status, security impact, reboot suggestion, or for updates that are associated with a
-//! given set of packages.
+//! The [`UpdateQuery`](struct.UpdateQuery.html) can be used to execute more complex queries, for
+//! example filtering updates by release, status, security impact, reboot suggestion, or for updates
+//! that are associated with a given set of packages.
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::{
-    ContentType,
-    FedoraRelease,
-    Update,
-    UpdateRequest,
-    UpdateSeverity,
-    UpdateStatus,
-    UpdateSuggestion,
-    UpdateType,
-};
+use crate::data::*;
 use crate::error::{QueryError, ServiceError};
-use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_ROWS};
+use crate::service::DEFAULT_ROWS;
+use crate::{BodhiService, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific update by its ID or alias. It will either return an
 /// `Ok(Some(Update))` matching the specified ID or alias, return `Ok(None)` if it doesn't exist, or
 /// return an `Err(String)` if another error occurred.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::{BodhiServiceBuilder, UpdateIDQuery};
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let update = bodhi
-///     .query(&bodhi::query::UpdateIDQuery::new(String::from(
-///         "FEDORA-2019-3dd0cf468e",
-///     )))
+///     .query(&UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e")))
 ///     .unwrap();
 /// ```
 ///
@@ -57,8 +48,8 @@ impl UpdateIDQuery {
 }
 
 impl SinglePageQuery<Option<Update>> for UpdateIDQuery {
-    fn path(&self) -> String {
-        format!("/updates/{}", self.id)
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/updates/{}", self.id))
     }
 
     fn parse(string: String) -> Result<Option<Update>, QueryError> {
@@ -83,14 +74,15 @@ impl Query<Option<Update>> for UpdateIDQuery {
 /// and REST API behavior.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::{BodhiServiceBuilder, FedoraRelease, UpdateRequest, UpdateQuery};
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let updates = bodhi
 ///     .query(
-///         &bodhi::query::UpdateQuery::new()
+///         &UpdateQuery::new()
 ///             .users(String::from("decathorpe"))
-///             .releases(bodhi::data::FedoraRelease::F30)
-///             .status(bodhi::data::UpdateStatus::Testing),
+///             .releases(FedoraRelease::F30)
+///             .request(UpdateRequest::Testing),
 ///     )
 ///     .unwrap();
 /// ```
@@ -494,8 +486,8 @@ struct UpdatePageQuery<'a> {
 }
 
 impl<'a> SinglePageQuery<UpdateListPage> for UpdatePageQuery<'a> {
-    fn path(&self) -> String {
-        format!("/updates/?{}", serde_url_params::to_string(self).unwrap())
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/updates/?{}", serde_url_params::to_string(self)?))
     }
 
     fn parse(string: String) -> Result<UpdateListPage, QueryError> {

@@ -1,21 +1,23 @@
 use std::env::args;
 
-use bodhi::error::QueryError;
-use bodhi::query::UserNameQuery;
-use bodhi::service::BodhiServiceBuilder;
+use bodhi::{BodhiServiceBuilder, UserNameQuery};
 
-fn main() -> Result<(), QueryError> {
+fn main() -> Result<(), String> {
+    // construct bodhi client for the production instance
     let bodhi = BodhiServiceBuilder::default().build().unwrap();
 
     let mut arguments = args();
 
-    // skip 0th argument (self)
+    // skip 0th argument (program name)
     arguments.next();
 
     for argument in arguments {
         println!("User: {}", argument);
 
-        let user = bodhi.query(&UserNameQuery::new(argument))?;
+        let user = match bodhi.query(&UserNameQuery::new(argument)) {
+            Ok(user) => user,
+            Err(error) => return Err(format!("{}", error)),
+        };
 
         println!("{:#?}", user);
     }

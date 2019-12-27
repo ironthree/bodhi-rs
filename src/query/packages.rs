@@ -5,10 +5,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::Package;
 use crate::error::{QueryError, ServiceError};
-use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_ROWS};
+use crate::service::DEFAULT_ROWS;
+use crate::{BodhiService, Package, Query, SinglePageQuery};
 
 /// Use this for querying bodhi about a set of packages with the given properties, which can be
 /// specified with the builder pattern. Note that some options can be specified multiple times, and
@@ -16,8 +15,7 @@ use crate::service::{BodhiService, DEFAULT_ROWS};
 /// and REST API behavior.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::query::PackageQuery;
+/// # use bodhi::{BodhiServiceBuilder, PackageQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let packages = bodhi.query(&PackageQuery::new().search(String::from("rust*"))).unwrap();
@@ -116,8 +114,8 @@ struct PackagePageQuery<'a> {
 }
 
 impl<'a> SinglePageQuery<PackageListPage> for PackagePageQuery<'a> {
-    fn path(&self) -> String {
-        format!("/packages/?{}", serde_url_params::to_string(self).unwrap())
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/packages/?{}", serde_url_params::to_string(self)?))
     }
 
     fn parse(string: String) -> Result<PackageListPage, QueryError> {

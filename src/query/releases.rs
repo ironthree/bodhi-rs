@@ -10,19 +10,16 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::Release;
 use crate::error::{QueryError, ServiceError};
-use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_ROWS};
+use crate::service::DEFAULT_ROWS;
+use crate::{BodhiService, Query, Release, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific release by its name. It will either return an
 /// `Ok(Some(Release))` matching the specified name, return `Ok(None)` if it doesn't exist, or
 /// return an `Err(String)` if another error occurred.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::data::FedoraRelease;
-/// # use bodhi::query::ReleaseNameQuery;
+/// # use bodhi::{BodhiServiceBuilder, FedoraRelease, ReleaseNameQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let release = bodhi.query(&ReleaseNameQuery::new(String::from("F30"))).unwrap();
@@ -43,8 +40,8 @@ impl ReleaseNameQuery {
 }
 
 impl SinglePageQuery<Option<Release>> for ReleaseNameQuery {
-    fn path(&self) -> String {
-        format!("/releases/{}", self.name)
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/releases/{}", self.name))
     }
 
     fn parse(string: String) -> Result<Option<Release>, QueryError> {
@@ -69,8 +66,7 @@ impl Query<Option<Release>> for ReleaseNameQuery {
 /// and REST API behavior.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::query::ReleaseQuery;
+/// # use bodhi::{BodhiServiceBuilder, ReleaseQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let releases = bodhi.query(&ReleaseQuery::new().exclude_archived(true)).unwrap();
@@ -209,8 +205,8 @@ struct ReleasePageQuery<'a> {
 }
 
 impl<'a> SinglePageQuery<ReleaseListPage> for ReleasePageQuery<'a> {
-    fn path(&self) -> String {
-        format!("/releases/?{}", serde_url_params::to_string(self).unwrap())
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/releases/?{}", serde_url_params::to_string(self)?))
     }
 
     fn parse(string: String) -> Result<ReleaseListPage, QueryError> {

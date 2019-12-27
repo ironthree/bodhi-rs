@@ -1,5 +1,5 @@
 use crate::error::{BodhiError, QueryError};
-use crate::service::BodhiService;
+use crate::BodhiService;
 
 pub trait Query<T> {
     fn query(&self, bodhi: &BodhiService) -> Result<T, QueryError>;
@@ -7,7 +7,7 @@ pub trait Query<T> {
 
 pub trait SinglePageQuery<T> {
     /// This method is expected to return the path of the API endpoint.
-    fn path(&self) -> String;
+    fn path(&self) -> Result<String, QueryError>;
 
     /// This associated method is expected to return the result that was parsed from the JSON
     /// response, or an error.
@@ -25,7 +25,8 @@ pub trait SinglePageQuery<T> {
     /// individual trait implementations (such as deserializing JSON, handling 404 errors, or
     /// getting API paths and arguments).
     fn query(&self, bodhi: &BodhiService) -> Result<T, QueryError> {
-        let response = bodhi.get(&self.path())?;
+        let path = self.path()?;
+        let response = bodhi.get(&path)?;
         let status = response.status();
 
         if status.is_success() {

@@ -1,8 +1,6 @@
 use super::{TEST_RETRIES, TEST_TIMEOUT};
 
-use crate::data::Release;
-use crate::query::ReleaseNameQuery;
-use crate::service::BodhiServiceBuilder;
+use crate::{BodhiServiceBuilder, Release, ReleaseNameQuery};
 
 // TODO: make sure the new serde_url_params code works as expected
 

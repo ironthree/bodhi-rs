@@ -1,16 +1,16 @@
 #![allow(missing_docs)]
 
-pub(crate) mod traits;
+mod traits;
 pub(crate) use traits::*;
 
-pub mod comments;
+mod comments;
 pub use comments::{CommentBuilder, NewComment};
 
-pub mod overrides;
+mod overrides;
 pub use overrides::{NewOverride, OverrideBuilder};
 
-pub mod releases;
+mod releases;
 //pub use releases::{NewRelease, ReleaseBuilder};
 
-pub mod updates;
+mod updates;
 //pub use updates::{NewUpdate, UpdateBuilder};

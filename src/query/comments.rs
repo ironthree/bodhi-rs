@@ -10,18 +10,16 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::Comment;
 use crate::error::{QueryError, ServiceError};
-use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_ROWS};
+use crate::service::DEFAULT_ROWS;
+use crate::{BodhiService, Comment, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific comment by its ID. It will either return an
 /// `Ok(Some(Comment))` matching the specified ID, return `Ok(None)` if it doesn't exist, or return
 /// an `Err(String)` if another error occurred.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::query::CommentIDQuery;
+/// # use bodhi::{BodhiServiceBuilder, CommentIDQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let comment = bodhi.query(&CommentIDQuery::new(19999)).unwrap();
@@ -47,8 +45,8 @@ impl CommentIDQuery {
 }
 
 impl SinglePageQuery<Option<Comment>> for CommentIDQuery {
-    fn path(&self) -> String {
-        format!("/comments/{}", self.id)
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/comments/{}", self.id))
     }
 
     fn parse(string: String) -> Result<Option<Comment>, QueryError> {
@@ -73,8 +71,7 @@ impl Query<Option<Comment>> for CommentIDQuery {
 /// and REST API behavior.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::query::CommentQuery;
+/// # use bodhi::{BodhiServiceBuilder, CommentQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let comments = bodhi
@@ -272,8 +269,8 @@ struct CommentPageQuery<'a> {
 }
 
 impl<'a> SinglePageQuery<CommentListPage> for CommentPageQuery<'a> {
-    fn path(&self) -> String {
-        format!("/comments/?{}", serde_url_params::to_string(self).unwrap())
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/comments/?{}", serde_url_params::to_string(self)?))
     }
 
     fn parse(string: String) -> Result<CommentListPage, QueryError> {

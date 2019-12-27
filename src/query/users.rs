@@ -1,30 +1,29 @@
 //! The contents of this module can be used to query a bodhi instance about the user accounts it
 //! knows.
 //!
-//! The `UserNameQuery` returns exactly one User, if and only if a User with this username exists -
+//! The [`UserNameQuery`](struct.UserNameQuery.html) returns exactly one
+//! [`User`](../../data/types/struct.User.html), if and only if a `User` with this username exists -
 //! otherwise, it will return an error.
 //!
-//! The `UserQuery` can be used to execute more complex queries, for example filtering users by the
-//! groups they are members of, or querying for users that are associated with a given set of
-//! updates or packages.
+//! The [`UserQuery`](struct.UserQuery.html) can be used to execute more complex queries, for
+//! example filtering users by the groups they are members of, or querying for users that are
+//! associated with a given set of updates or packages.
 
 use serde::{Deserialize, Serialize};
 
-use crate::data::User;
 use crate::error::{QueryError, ServiceError};
-use crate::query::{Query, SinglePageQuery};
-use crate::service::{BodhiService, DEFAULT_ROWS};
+use crate::service::DEFAULT_ROWS;
+use crate::{BodhiService, Query, SinglePageQuery, User};
 
 /// Use this for querying bodhi for a specific user by their name. It will either return an
 /// `Ok(User)` matching the specified name, return `Ok(None)` if it doesn't exist, or return an
 /// `Err(String)` if another error occurred.
 ///
 /// ```
-/// let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
+/// # use bodhi::{BodhiServiceBuilder, UserNameQuery};
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comment = bodhi
-///     .query(&bodhi::query::UserNameQuery::new(String::from("decathorpe")))
-///     .unwrap();
+/// let comment = bodhi.query(&UserNameQuery::new(String::from("decathorpe"))).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-0>
@@ -46,8 +45,8 @@ impl UserNameQuery {
 }
 
 impl SinglePageQuery<Option<User>> for UserNameQuery {
-    fn path(&self) -> String {
-        format!("/users/{}", self.name)
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/users/{}", self.name))
     }
 
     fn parse(string: String) -> Result<Option<User>, QueryError> {
@@ -72,8 +71,7 @@ impl Query<Option<User>> for UserNameQuery {
 /// REST API behavior.
 ///
 /// ```
-/// # use bodhi::BodhiServiceBuilder;
-/// # use bodhi::query::UserQuery;
+/// # use bodhi::{BodhiServiceBuilder, UserQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let users = bodhi
@@ -125,7 +123,8 @@ impl UserQuery {
 
     /// Restrict results to users with the given username.
     ///
-    /// If this is the only required filter, consider using a `UserNameQuery` instead.
+    /// If this is the only required filter, consider using a
+    /// [`UserNameQuery`](struct.UserNameQuery.html) instead.
     pub fn name(mut self, name: String) -> Self {
         self.name = Some(name);
         self
@@ -224,8 +223,8 @@ struct UserPageQuery<'a> {
 }
 
 impl<'a> SinglePageQuery<UserListPage> for UserPageQuery<'a> {
-    fn path(&self) -> String {
-        format!("/users/?{}", serde_url_params::to_string(self).unwrap())
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/users/?{}", serde_url_params::to_string(self)?))
     }
 
     fn parse(string: String) -> Result<UserListPage, QueryError> {
