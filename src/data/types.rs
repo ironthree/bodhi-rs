@@ -97,7 +97,7 @@ pub struct Compose {
     /// error message in case of failure, else empty string
     pub error_message: String,
     /// release this compose is running for
-    pub release: Release,
+    pub release: Option<Release>,
     /// ID of the release this compose is running for
     pub release_id: u32,
     /// request for the compose (stable or testing)
@@ -166,6 +166,7 @@ pub struct Release {
     pub candidate_tag: String,
     /// flag to indicate whether this release is composed by bodhi
     pub composed_by_bodhi: bool,
+    pub composes: Option<Vec<Compose>>,
     /// value of the RPM `%{?dist}` tag on this release
     pub dist_tag: String,
     /// prefix for update aliases: one of `FEDORA{-EPEL,}{-CONTAINER,-FLATPAK,-MODULAR,}`
