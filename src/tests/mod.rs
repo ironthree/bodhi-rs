@@ -10,6 +10,7 @@ const TEST_RETRIES: usize = 10;
 
 mod builds;
 mod comments;
+mod composes;
 mod csrf;
 mod overrides;
 mod releases;

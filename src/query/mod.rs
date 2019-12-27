@@ -11,6 +11,9 @@ pub use builds::{BuildNVRQuery, BuildQuery};
 pub mod comments;
 pub use comments::{CommentIDQuery, CommentQuery};
 
+pub mod composes;
+pub use composes::ComposeQuery;
+
 pub mod csrf;
 pub use csrf::CSRFQuery;
 

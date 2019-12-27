@@ -1,7 +1,7 @@
 #![allow(missing_docs)]
 
 mod traits;
-pub(crate) use traits::*;
+pub(crate) use traits::Create;
 
 mod comments;
 pub use comments::{CommentBuilder, NewComment};

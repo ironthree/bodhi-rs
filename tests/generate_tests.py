@@ -63,6 +63,31 @@ def do_builds():
         file.write(contents)
 
 
+def do_composes():
+    import_string = "const JSON: &str = " + \
+                    "concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/tests/data/composes.json\");"
+
+    test_string = textwrap.dedent(
+        """\
+        #[test]
+        fn composes_dejson() {
+            let _: Vec<Compose> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+        }
+        """
+    )
+
+    contents = (
+            "use std::fs::read_to_string;\n\nuse bodhi::Compose;" +
+            "\n\n" +
+            import_string +
+            "\n\n" +
+            test_string
+    )
+
+    with open("composes.rs", "w") as file:
+        file.write(contents)
+
+
 def do_overrides():
     import_template = "const JSON_{release}: &str = " + \
                       "concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/tests/data/overrides_{release_lower}.json\");"
@@ -190,6 +215,7 @@ def do_users():
 
 def main() -> int:
     do_builds()
+    do_composes()
     do_overrides()
     do_packages()
     do_releases()

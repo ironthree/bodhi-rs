@@ -1,5 +1,47 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
+
+/// This enum represents the two possible values of compose checkpoints:
+/// - the empty object (`{}`), which does not correctly deserialize into an empty `HashMap`, and
+/// - a map of Strings to booleans.
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum Checkpoints {
+    /// This value represents an empty map (`{}`).
+    None(String),
+    /// This value represents a non-empty map of checkpoints.
+    Map(HashMap<String, bool>),
+}
+
+/// This enum represents the possible request values for composes.
+#[allow(missing_docs)]
+#[derive(Debug, Deserialize)]
+pub enum ComposeRequest {
+    #[serde(rename = "stable")]
+    Stable,
+    #[serde(rename = "testing")]
+    Testing,
+}
+
+/// This enum represents the possible status values for composes.
+#[allow(missing_docs)]
+#[derive(Debug, Deserialize)]
+pub enum ComposeStatus {
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "initializing")]
+    Initializing,
+    #[serde(rename = "pending")]
+    Pending,
+    #[serde(rename = "punging")]
+    Punging,
+    #[serde(rename = "syncing_repo")]
+    SyncingRepo,
+    #[serde(rename = "updateinfo")]
+    UpdateInfo,
+}
 
 /// This enum represents a "Karma" value, which is either a positive (+1), neutral (±0), or negative
 /// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and

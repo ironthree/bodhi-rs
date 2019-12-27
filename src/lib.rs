@@ -55,9 +55,9 @@
 //! let packages = bodhi.query(&package_query).unwrap();
 //! ```
 
-#![deny(missing_docs)]
-#![deny(missing_debug_implementations)]
-#![deny(clippy::result_unwrap_used)]
+#![warn(missing_docs)]
+#![warn(missing_debug_implementations)]
+#![warn(clippy::result_unwrap_used)]
 
 pub mod data;
 pub use data::*;
@@ -71,7 +71,8 @@ pub mod create;
 pub use create::*;
 
 pub mod edit;
-pub use edit::*;
+// TODO
+//pub use edit::*;
 
 pub mod query;
 pub use query::*;

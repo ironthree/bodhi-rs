@@ -84,6 +84,35 @@ pub struct Comment {
     pub user_id: u32,
 }
 
+/// This struct represents a currently running compose.
+#[derive(Debug, Deserialize)]
+pub struct Compose {
+    /// map of active checkpoints for the compose
+    pub checkpoints: Checkpoints,
+    /// type of the contained contents (RPMs, containers, flatpaks, modules)
+    pub content_type: Option<ContentType>,
+    /// date & time this compose was triggered
+    #[serde(with = "bodhi_date_format")]
+    pub date_created: DateTime<Utc>,
+    /// error message in case of failure, else empty string
+    pub error_message: String,
+    /// release this compose is running for
+    pub release: Release,
+    /// ID of the release this compose is running for
+    pub release_id: u32,
+    /// request for the compose (stable or testing)
+    pub request: ComposeRequest,
+    /// flag to indicate whether a compose contains security updates
+    pub security: bool,
+    /// state of the compose
+    pub state: ComposeStatus,
+    /// date & time the compose status was last updated
+    #[serde(with = "bodhi_date_format")]
+    pub state_date: DateTime<Utc>,
+    /// list of summaries for the contained updates (with update alias and title)
+    pub update_summary: Vec<UpdateSummary>,
+}
+
 /// This struct represents a group from the fedora accounts system (FAS).
 #[derive(Debug, Deserialize)]
 pub struct Group {
@@ -285,6 +314,16 @@ pub struct Update {
     pub url: String,
     /// user who created this update
     pub user: User,
+}
+
+/// This struct wraps the short update summaries that are included in running
+/// [`Compose`](struct.Compose.html)s.
+#[derive(Debug, Deserialize)]
+pub struct UpdateSummary {
+    /// unique update alias identifying the update
+    pub alias: String,
+    /// user-defined, descriptive update title
+    pub title: String,
 }
 
 /// This struct represents one fedora user that bodhi is aware of.

@@ -56,15 +56,8 @@ Note that the API is not finalized yet, and minor changes will still happen befo
 
 ## Test coverage
 
-Tests should pass for every commit that gets pushed to master. By default, only "fast" tests are run by `cargo test`,
-where "fast" means that they should finish within a minute or so.
-
-Before pushing, the "slow" tests are also run once with `cargo test --features slow_tests`. These make sure that this
-library can still successfully deserialize all JSON server responses. These tests take more than an hour to complete.
-
-There are also some "ignored" tests, which cannot ever feasibly be run regularly, since they basically read the complete
-database of the bodhi instance, which takes *ages*. These tests are also set up to run against the staging instance
-of bodhi, so the production instance isn't DOSed.
+Tests should pass for every commit that gets pushed to master. However, currently tests either require internet access
+to check some assumptions for server behaviour, or require test data which is too big to be committed into git.
 
 
 ## Examples

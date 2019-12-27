@@ -139,6 +139,28 @@ def do_builds() -> int:
     return 0
 
 
+def do_composes() -> int:
+    print(f"Composes ...")
+    ret = try_request(f"{API_URL}/composes/")
+    data = ret.json()
+
+    new_composes = data["composes"]
+
+    try:
+        with open(f"data/composes.json") as file:
+            old_composes = json.loads(file.read())
+    except FileNotFoundError or json.JSONDecodeError:
+        old_composes = []
+
+    # for composes, there's no old data on the server, so keep it locally
+    composes = old_composes + new_composes
+
+    with open(f"data/composes.json", "w") as file:
+        file.write(json.dumps(composes, indent=2))
+
+    return 0
+
+
 def do_overrides() -> int:
     def per_release(release: str):
         overrides = []
@@ -280,6 +302,7 @@ def do_users() -> int:
 
 def main() -> int:
     do_builds()
+    do_composes()
     do_overrides()
     do_packages()
     do_releases()
