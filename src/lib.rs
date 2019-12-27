@@ -71,8 +71,7 @@ pub mod create;
 pub use create::*;
 
 pub mod edit;
-// TODO
-//pub use edit::*;
+pub use edit::*;
 
 pub mod query;
 pub use query::*;

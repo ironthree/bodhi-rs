@@ -11,7 +11,7 @@ use url::Url;
 
 use crate::data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 use crate::error::{QueryError, ServiceError};
-use crate::{Create, Query};
+use crate::{Create, Edit, Query};
 
 /// This constant defines how many items are queried every time for multi-page queries. The
 /// server-side maximum is usually 100, the default is 20, and 50 seems a good compromise for speed.
@@ -314,10 +314,8 @@ impl BodhiService {
         Create::create(creator, self)
     }
 
-    /*
     /// This method is used for POST methods to edit existing things on the bodhi instance.
     pub fn edit<T>(&self, editor: &dyn Edit<T>) -> Result<T, QueryError> {
-        todo!()
+        Edit::edit(editor, self)
     }
-    */
 }

@@ -1,8 +1,7 @@
 #![allow(missing_docs)]
 
 mod traits;
-// TODO
-//pub(crate) use traits::Edit;
+pub(crate) use traits::Edit;
 
 mod overrides;
 //pub use overrides::{EditedOverride, OverrideEditor};
