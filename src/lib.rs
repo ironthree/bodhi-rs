@@ -45,7 +45,7 @@
 //! ```
 //! let bodhi = bodhi::BodhiServiceBuilder::default().build().unwrap();
 //!
-//! let package_query = bodhi::query::PackageQuery::new().name("rust".to_string());
+//! let package_query = bodhi::PackageQuery::new().name("rust".to_string());
 //!
 //! let packages = bodhi.query(&package_query).unwrap();
 //! ```
@@ -55,6 +55,7 @@
 #![warn(clippy::result_unwrap_used)]
 
 pub mod data;
+pub use data::*;
 
 pub mod service;
 pub use service::{BodhiService, BodhiServiceBuilder};
@@ -62,8 +63,13 @@ pub use service::{BodhiService, BodhiServiceBuilder};
 pub mod error;
 
 pub mod create;
+pub use create::*;
+
 pub mod edit;
+pub use edit::*;
+
 pub mod query;
+pub use query::*;
 
 #[cfg(test)]
 mod tests;
