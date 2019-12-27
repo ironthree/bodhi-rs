@@ -11,6 +11,7 @@ readme = "README.md"
 categories = ["api-bindings"]
 keywords = ["fedora", "bodhi", "REST", "client"]
 repository = "https://github.com/ironthree/bodhi-rs"
+exclude = ["tests"]
 
 [features]
 default = []
@@ -28,3 +29,8 @@ serde_repr = "^0.1.5"
 serde_json = "^1.0.44"
 serde_url_params = "^0.1.1"
 url = "^2.1.0"
+
+[profile.release]
+codegen-units = 1
+lto = true
+
