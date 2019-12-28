@@ -226,6 +226,8 @@ pub struct Update {
     pub alias: String,
     /// flag to indicate whether this update can be pushed to stable automatically based on karma
     pub autokarma: bool,
+    /// flag to indicate whether this update can be pushed to stable automatically based on time
+    pub autotime: bool,
     /// bugs associated with this update
     pub bugs: Vec<Bug>,
     /// builds associated with this update
@@ -287,6 +289,8 @@ pub struct Update {
     pub requirements: Option<String>,
     /// severity of this update
     pub severity: UpdateSeverity,
+    /// minimum of days this update has to stay in testing
+    pub stable_days: Option<u32>,
     /// stable karma threshold set for this update
     pub stable_karma: Option<i32>,
     /// current status of this update

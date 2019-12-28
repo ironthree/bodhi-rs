@@ -1,54 +1,19 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use crate::error::{BodhiError, QueryError};
-use crate::{BodhiService, Build, CSRFQuery, Create, UpdateRequest, UpdateSeverity, UpdateSuggestion, UpdateType};
-
-/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2-POST>
-#[derive(Debug, Serialize)]
-pub struct UpdateData<'a> {
-    /// list of builds to include in the update
-    builds: Option<Vec<&'a String>>,
-    /// koji side tag to take builds from (if this is specified, builds must be `None` or `[]`)
-    from_tag: Option<&'a String>,
-    /// bugs associated with the update (default: `[]`)
-    bugs: Option<&'a Vec<u32>>,
-    /// user-visible update title (default: `""`)
-    display_name: Option<&'a String>,
-    /// close bugs when update is pushed to stable (default: `true`)
-    close_bugs: Option<bool>,
-    /// update type: one of `unspecified`, `bugfix`, `enhancement`, `newpackage`, `security`
-    r#type: UpdateType,
-    /// update status request (default: `testing`)
-    request: Option<UpdateRequest>,
-    /// update severity: one of `unspecified` (default), `low`, `medium`, `high`, `urgent`
-    severity: Option<UpdateSeverity>,
-    /// update notes
-    notes: &'a String,
-    /// push to stable once `stable_karma` is reached (default: `true`)
-    autokarma: Option<bool>,
-    /// stable karma threshold (default: `3`)
-    stable_karma: Option<i32>,
-    /// unstable karma threshold (default: `-3`)
-    unstable_karma: Option<i32>,
-    /// suggestion after package installation: one of `unspecified` (default), `logout`, `reboot`
-    suggest: Option<UpdateSuggestion>,
-    /// alias of the edited update if this is an edit request (default: `""`)
-    edited: Option<&'a String>,
-    /// required testcases (comma-separated or space-separated list: default: `""`)
-    requirements: Option<&'a String>,
-    /// require bug feedback for karma to be counted (default: `true`)
-    require_bugs: Option<bool>,
-    /// require testcase feedback for karma to be counted (default: `true`)
-    require_testcases: Option<bool>,
-    /// push update to stable based on time (default: `true`)
-    autotime: Option<bool>,
-    /// number of days in testing before the update is pushed to stable automatically (default: `0`)
-    stable_days: Option<u32>,
-    /// CSRF token
-    csrf_token: &'a String,
-}
+use crate::{
+    BodhiService,
+    Build,
+    CSRFQuery,
+    Create,
+    UpdateData,
+    UpdateRequest,
+    UpdateSeverity,
+    UpdateSuggestion,
+    UpdateType,
+};
 
 /// This struct contains the values that are returned when creating a new update.
 #[derive(Debug, Deserialize)]
@@ -83,7 +48,6 @@ pub struct UpdateBuilder<'a> {
     stable_karma: Option<i32>,
     unstable_karma: Option<i32>,
     suggest: Option<UpdateSuggestion>,
-    edited: Option<bool>,
     requirements: Option<String>,
     require_bugs: Option<bool>,
     require_testcases: Option<bool>,
@@ -108,7 +72,6 @@ impl<'a> UpdateBuilder<'a> {
             stable_karma: None,
             unstable_karma: None,
             suggest: None,
-            edited: None,
             requirements: None,
             require_bugs: None,
             require_testcases: None,
@@ -133,7 +96,6 @@ impl<'a> UpdateBuilder<'a> {
             stable_karma: None,
             unstable_karma: None,
             suggest: None,
-            edited: None,
             requirements: None,
             require_bugs: None,
             require_testcases: None,
@@ -287,7 +249,7 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 bugs: self.bugs.as_ref(),
                 display_name: self.title.as_ref(),
                 close_bugs: self.close_bugs,
-                r#type: match self.update_type {
+                update_type: match self.update_type {
                     Some(t) => t,
                     None => UpdateType::Unspecified,
                 },
@@ -312,7 +274,7 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 bugs: self.bugs.as_ref(),
                 display_name: self.title.as_ref(),
                 close_bugs: self.close_bugs,
-                r#type: match self.update_type {
+                update_type: match self.update_type {
                     Some(t) => t,
                     None => UpdateType::Unspecified,
                 },

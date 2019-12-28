@@ -30,7 +30,6 @@ caller, but this library does not implement any retry logic itself (yet).
 
 - All `GET` requests are implemented, and all actual API responses should successfully deserialize.
 - `POST` requests are work-in-progress.
-- refactoring around common traits with common logic is constantly happening
 
 Note that the API is not finalized yet, and minor changes will still happen before the `1.0.0` release.
 
@@ -38,20 +37,15 @@ Note that the API is not finalized yet, and minor changes will still happen befo
 ## TODO
 
 - POST requests for creating things
+    - comments (DONE)
     - overrides (WIP)
-    - releases (REALLY?)
-    - updates (NSY)
-    - updates/request (NSY)
-    - updates/waive-test-results (NSY)
-    - updates/get-test-results (NSY)
+    - updates (WIP)
 
 - POST requests for editing things
     - overrides (NSY)
-    - releases (REALLY?)
-    - updates (NSY)
-
-- use `chrono` for date/time handling and conversions from/to strings instead of supplying date
-  arguments as strings (with `chrono/serde` feature)
+    - updates (WIP)
+    - updates/request (WIP)
+    - updates/waive-test-results (WIP)
 
 
 ## Test coverage
