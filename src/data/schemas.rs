@@ -1,6 +1,26 @@
 use serde::Serialize;
 
-use crate::{UpdateRequest, UpdateSeverity, UpdateSuggestion, UpdateType};
+use crate::{BodhiDate, UpdateRequest, UpdateSeverity, UpdateSuggestion, UpdateType};
+
+/// Schema for POST requests for creating and editing buildroot overrides.
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1-POST>
+#[derive(Debug, Serialize)]
+pub struct OverrideData<'a> {
+    /// NVR this buildroot override is filed for
+    pub nvr: &'a String,
+    /// user-visible notes associated with this buildroot override
+    pub notes: &'a String,
+    /// expiration date of this override
+    #[serde(with = "crate::data::bodhi_date_format")]
+    pub expiration_date: &'a BodhiDate,
+    /// flag whether this buildroot override is to be expired or not
+    pub expired: Option<bool>,
+    /// NVR of the edited buildroot override if this is an edit request
+    pub edited: Option<&'a String>,
+    /// CSRF token
+    pub csrf_token: &'a String,
+}
 
 /// Schema for POST requests for creating and editing updates.
 ///

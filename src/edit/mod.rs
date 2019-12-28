@@ -5,7 +5,7 @@ mod traits;
 pub(crate) use traits::Edit;
 
 mod overrides;
-//pub use overrides::{EditedOverride, OverrideEditor};
+pub use overrides::{EditedOverride, OverrideEditor};
 
 mod updates;
 pub use updates::{EditedUpdate, UpdateEditor, UpdateStatusRequester, UpdateTestResultWaiver};

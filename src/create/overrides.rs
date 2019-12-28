@@ -1,19 +1,9 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use crate::error::{BodhiError, QueryError};
-use crate::{BodhiDate, BodhiService, CSRFQuery, Create};
-
-/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1-POST>
-#[derive(Debug, Serialize)]
-pub struct OverrideData<'a> {
-    nvr: &'a String,
-    notes: &'a String,
-    #[serde(with = "crate::data::bodhi_date_format")]
-    expiration_date: &'a BodhiDate,
-    csrf_token: &'a String,
-}
+use crate::{BodhiDate, BodhiService, CSRFQuery, Create, OverrideData};
 
 /// This struct contains the values that are returned when creating a new comment.
 #[derive(Debug, Deserialize)]
@@ -54,6 +44,8 @@ impl Create<NewOverride> for OverrideBuilder {
             nvr: &self.nvr,
             notes: &self.notes,
             expiration_date: &self.expiration_date,
+            expired: None,
+            edited: None,
             csrf_token: &csrf_token,
         };
 
