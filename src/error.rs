@@ -68,6 +68,12 @@ pub enum QueryError {
         /// This inner error contains the deserialization error.
         error: String,
     },
+    /// This error represents some input data validation error.
+    #[fail(display = "Invalid data: {}", error)]
+    InvalidDataError {
+        /// This inner error contains a the reason why the data was considered invalid.
+        error: String,
+    },
 }
 
 impl From<serde_json::Error> for QueryError {

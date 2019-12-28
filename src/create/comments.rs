@@ -1,5 +1,3 @@
-#![allow(missing_docs)]
-
 use serde::{Deserialize, Serialize};
 
 use crate::error::{BodhiError, QueryError};
@@ -7,7 +5,7 @@ use crate::{BodhiService, CSRFQuery, Comment, Create, Karma, SinglePageQuery};
 
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST>
 #[derive(Debug, Serialize)]
-struct CommentData<'a> {
+pub struct CommentData<'a> {
     /// alias of the update for which this is a comment
     update: &'a String,
     /// comment text (default: `""`)
@@ -24,12 +22,17 @@ struct CommentData<'a> {
     csrf_token: &'a String,
 }
 
+/// This struct contains the values that are returned when creating a new comment.
 #[derive(Debug, Deserialize)]
 pub struct NewComment {
-    comment: Comment,
-    caveats: Vec<String>,
+    /// the newly created comment
+    pub comment: Comment,
+    /// additional server messages
+    pub caveats: Vec<String>,
 }
 
+/// This struct contains all the values that are necessary for creating a new comment. Methods to
+/// supply optional arguments are also available.
 #[derive(Debug)]
 pub struct CommentBuilder {
     // TODO: take &Update instead
@@ -42,6 +45,7 @@ pub struct CommentBuilder {
 }
 
 impl CommentBuilder {
+    /// This method has to be used to create and initialize a new `CommentBuilder`.
     pub fn new(update: String) -> Self {
         CommentBuilder {
             update,
@@ -53,26 +57,31 @@ impl CommentBuilder {
         }
     }
 
+    /// Add optional text to the comment.
     pub fn text(mut self, text: String) -> Self {
         self.text = Some(text);
         self
     }
 
+    /// Add optional general karma feedback to the comment.
     pub fn karma(mut self, karma: Karma) -> Self {
         self.karma = Some(karma);
         self
     }
 
+    /// Add optional critpath karma feedback to the comment.
     pub fn karma_critpath(mut self, karma: Karma) -> Self {
         self.karma_critpath = Some(karma);
         self
     }
 
+    /// Add optional bug feedback to the comment.
     pub fn bug_feedback(mut self, feedback: Vec<Karma>) -> Self {
         self.bug_feedback = Some(feedback);
         self
     }
 
+    /// Add optional test case feedback to the comment.
     pub fn testcase_feedback(mut self, feedback: Vec<Karma>) -> Self {
         self.testcase_feedback = Some(feedback);
         self
@@ -112,8 +121,8 @@ impl Create<NewComment> for CommentBuilder {
         };
 
         let result = response.text()?;
-        let comment: NewComment = serde_json::from_str(&result)?;
+        let new_comment: NewComment = serde_json::from_str(&result)?;
 
-        Ok(comment)
+        Ok(new_comment)
     }
 }

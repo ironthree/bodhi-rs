@@ -1,7 +1,8 @@
+use std::convert::TryFrom;
 use std::io::{stdin, stdout, Write};
 use std::time::Duration;
 
-use bodhi::{BodhiServiceBuilder, OverrideBuilder};
+use bodhi::{BodhiDate, BodhiServiceBuilder, OverrideBuilder};
 
 fn main() -> Result<(), String> {
     // get username and password from standard input
@@ -34,7 +35,7 @@ fn main() -> Result<(), String> {
     let new_override = OverrideBuilder::new(
         String::from("libcloudproviders-0.3.0-1.fc30"),
         String::from("Test buildroot override created by bodhi-rs."),
-        String::from("2019-12-31"),
+        BodhiDate::try_from("2019-12-31").unwrap(),
     );
 
     let response = bodhi.create(&new_override);

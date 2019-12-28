@@ -1,33 +1,40 @@
-#![allow(missing_docs)]
+use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
 use crate::error::{BodhiError, QueryError};
-use crate::{BodhiService, CSRFQuery, Create, SinglePageQuery};
+use crate::{BodhiDate, BodhiService, CSRFQuery, Create};
 
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1-POST>
 #[derive(Debug, Serialize)]
-struct OverrideData {
-    nvr: String,
-    notes: String,
-    expiration_date: String,
-    csrf_token: String,
+pub struct OverrideData<'a> {
+    nvr: &'a String,
+    notes: &'a String,
+    #[serde(with = "crate::data::bodhi_date_format")]
+    expiration_date: &'a BodhiDate,
+    csrf_token: &'a String,
 }
 
+/// This struct contains the values that are returned when creating a new comment.
 #[derive(Debug, Deserialize)]
 pub struct NewOverride {
-    comment: u32,
+    // TODO: determine actual fields
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
+/// This struct contains all the values that are necessary for creating a new buildroot override.
+/// There are no optional arguments, so everything has to be supplied with the `new()` method.
 #[derive(Debug)]
 pub struct OverrideBuilder {
     nvr: String,
     notes: String,
-    expiration_date: String,
+    expiration_date: BodhiDate,
 }
 
 impl OverrideBuilder {
-    pub fn new(nvr: String, notes: String, expiration_date: String) -> Self {
+    /// This method has to be used to create and initialize a new `OverrideBuilder`.
+    pub fn new(nvr: String, notes: String, expiration_date: BodhiDate) -> Self {
         OverrideBuilder {
             nvr,
             notes,
@@ -38,15 +45,16 @@ impl OverrideBuilder {
 
 impl Create<NewOverride> for OverrideBuilder {
     fn create(&self, bodhi: &BodhiService) -> Result<NewOverride, QueryError> {
+        // TODO: check if build exists
         let path = String::from("/overrides/");
 
-        let csrf_token = CSRFQuery::new().query(bodhi)?;
+        let csrf_token = bodhi.query(&CSRFQuery::new())?;
 
         let new_override = OverrideData {
-            nvr: self.nvr.clone(),
-            notes: self.notes.clone(),
-            expiration_date: self.expiration_date.clone(),
-            csrf_token,
+            nvr: &self.nvr,
+            notes: &self.notes,
+            expiration_date: &self.expiration_date,
+            csrf_token: &csrf_token,
         };
 
         let data = match serde_json::to_string(&new_override) {
@@ -59,16 +67,12 @@ impl Create<NewOverride> for OverrideBuilder {
 
         if !status.is_success() {
             let text = response.text().unwrap_or_else(|_| String::from(""));
-            println!("{}", &text); // TODO: remove this print once the response contents are clear
 
             let error: BodhiError = serde_json::from_str(&text)?;
             return Err(QueryError::BodhiError { error });
         };
 
         let result = response.text()?;
-
-        // TODO
-        println!("{}", &result);
 
         let new_override: NewOverride = serde_json::from_str(&result)?;
 

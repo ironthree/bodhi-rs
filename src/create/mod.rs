@@ -1,4 +1,6 @@
-#![allow(missing_docs)]
+//! This module contains implementations for creating **Comments**, **Overrides**, and **Updates**
+//! on a bodhi instance. Creating **Releases** is possible with the REST API, but not implemented
+//! yet.
 
 mod traits;
 pub(crate) use traits::Create;
@@ -9,8 +11,5 @@ pub use comments::{CommentBuilder, NewComment};
 mod overrides;
 pub use overrides::{NewOverride, OverrideBuilder};
 
-mod releases;
-//pub use releases::{NewRelease, ReleaseBuilder};
-
 mod updates;
-//pub use updates::{NewUpdate, UpdateBuilder};
+pub use updates::{NewUpdate, UpdateBuilder};
