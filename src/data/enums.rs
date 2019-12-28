@@ -1,3 +1,4 @@
+use std::cmp::PartialEq;
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
@@ -17,7 +18,7 @@ pub enum Checkpoints {
 
 /// This enum represents the possible request values for composes.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
 pub enum ComposeRequest {
     #[serde(rename = "stable")]
     Stable,
@@ -27,7 +28,7 @@ pub enum ComposeRequest {
 
 /// This enum represents the possible status values for composes.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
 pub enum ComposeStatus {
     #[serde(rename = "failed")]
     Failed,
@@ -47,7 +48,7 @@ pub enum ComposeStatus {
 /// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and
 /// possibly also a [`TestCaseFeedback`](struct.TestCase.html) or a
 /// [`BugFeedback`](struct.BugFeedback.html).
-#[derive(Debug, Clone, Deserialize_repr, Serialize_repr)]
+#[derive(Clone, Copy, Debug, Deserialize_repr, PartialEq, Serialize_repr)]
 #[repr(i8)]
 pub enum Karma {
     /// positive feedback
@@ -60,7 +61,7 @@ pub enum Karma {
 
 /// This enum represents a fedora release.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum FedoraRelease {
     F32,
     F32C,
@@ -100,7 +101,7 @@ pub enum FedoraRelease {
 }
 
 /// This enum represents the type of a bodhi update, of a package, and of builds.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum ContentType {
     /// tag for container image updates
     #[serde(rename = "container")]
@@ -117,7 +118,7 @@ pub enum ContentType {
 }
 
 /// This enum represents a requested state change of an update.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateRequest {
     /// request for an update to get "batched" for the next stable push (no longer used)
     #[serde(rename = "batched")]
@@ -142,7 +143,7 @@ pub enum UpdateRequest {
 /// This enum represents the associated severity of a bodhi update. This field is required to not be
 /// unspecified for updates with [`UpdateType::Security`](enum.UpdateType.html).
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateSeverity {
     #[serde(rename = "high")]
     High,
@@ -157,7 +158,7 @@ pub enum UpdateSeverity {
 }
 
 /// This enum represents the current state of a bodhi update.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateStatus {
     /// tag for updates that have been obsoleted by another update
     #[serde(rename = "obsolete")]
@@ -186,7 +187,7 @@ pub enum UpdateStatus {
 }
 
 /// This enum represents the associated suggested action for a bodhi update.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateSuggestion {
     /// recommendation to log out for the update to get applied
     #[serde(rename = "logout")]
@@ -201,7 +202,7 @@ pub enum UpdateSuggestion {
 
 /// This enum represents the type of a bodhi update.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateType {
     #[serde(rename = "bugfix")]
     BugFix,
@@ -216,7 +217,7 @@ pub enum UpdateType {
 }
 
 /// This enum represents the state of a release.
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
 pub enum ReleaseState {
     /// release has been archived after it has reached its EOL
     #[serde(rename = "archived")]
@@ -231,7 +232,7 @@ pub enum ReleaseState {
 
 /// This enum represents the test gating status from `greenwave`.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
 pub enum TestGatingStatus {
     #[serde(rename = "failed")]
     Failed,

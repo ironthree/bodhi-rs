@@ -1,5 +1,3 @@
-use chrono::{DateTime, Utc};
-
 use serde::Deserialize;
 
 use super::dates::*;
@@ -71,7 +69,7 @@ pub struct Comment {
     pub text: String,
     /// date & time this comment was published
     #[serde(with = "bodhi_date_format")]
-    pub timestamp: DateTime<Utc>,
+    pub timestamp: BodhiDate,
     /// update this comment is associated with
     pub update: Option<Update>,
     /// ID of the update this comment is associated with
@@ -93,7 +91,7 @@ pub struct Compose {
     pub content_type: Option<ContentType>,
     /// date & time this compose was triggered
     #[serde(with = "bodhi_date_format")]
-    pub date_created: DateTime<Utc>,
+    pub date_created: BodhiDate,
     /// error message in case of failure, else empty string
     pub error_message: String,
     /// release this compose is running for
@@ -108,7 +106,7 @@ pub struct Compose {
     pub state: ComposeStatus,
     /// date & time the compose status was last updated
     #[serde(with = "bodhi_date_format")]
-    pub state_date: DateTime<Utc>,
+    pub state_date: BodhiDate,
     /// list of summaries for the contained updates (with update alias and title)
     pub update_summary: Vec<UpdateSummary>,
 }
@@ -129,17 +127,17 @@ pub struct Override {
     pub build_id: u32,
     /// date & time this buildroot override will expire
     #[serde(with = "bodhi_date_format")]
-    pub expiration_date: DateTime<Utc>,
+    pub expiration_date: BodhiDate,
     /// date & time this buildroot override has expired
     #[serde(with = "option_bodhi_date_format")]
-    pub expired_date: Option<DateTime<Utc>>,
+    pub expired_date: Option<BodhiDate>,
     /// public notes associated with this buildroot override
     pub notes: String,
     /// value of (Name-Version-Release) of the build associated with this buildroot override
     pub nvr: String,
     /// date & time this buildroot override was submitted
     #[serde(with = "bodhi_date_format")]
-    pub submission_date: DateTime<Utc>,
+    pub submission_date: BodhiDate,
     /// user who submitted this buildroot override
     pub submitter: User,
     /// user ID of the user who submitted this buildroot override
@@ -166,6 +164,7 @@ pub struct Release {
     pub candidate_tag: String,
     /// flag to indicate whether this release is composed by bodhi
     pub composed_by_bodhi: bool,
+    /// optional list of running composes for this release
     pub composes: Option<Vec<Compose>>,
     /// value of the RPM `%{?dist}` tag on this release
     pub dist_tag: String,
@@ -241,22 +240,22 @@ pub struct Update {
     pub critpath: bool,
     /// date & time when this update has last been approved
     #[serde(with = "option_bodhi_date_format")]
-    pub date_approved: Option<DateTime<Utc>>,
+    pub date_approved: Option<BodhiDate>,
     /// date & time when this update has last been modified
     #[serde(with = "option_bodhi_date_format")]
-    pub date_modified: Option<DateTime<Utc>>,
+    pub date_modified: Option<BodhiDate>,
     /// date & time when this update has last been pushed
     #[serde(with = "option_bodhi_date_format")]
-    pub date_pushed: Option<DateTime<Utc>>,
+    pub date_pushed: Option<BodhiDate>,
     /// date & time when this update has last been pushed to stable
     #[serde(with = "option_bodhi_date_format")]
-    pub date_stable: Option<DateTime<Utc>>,
+    pub date_stable: Option<BodhiDate>,
     /// date & time when this update has last been submitted
     #[serde(with = "option_bodhi_date_format")]
-    pub date_submitted: Option<DateTime<Utc>>,
+    pub date_submitted: Option<BodhiDate>,
     /// date & time when this update has last been pushed to testing
     #[serde(with = "option_bodhi_date_format")]
-    pub date_testing: Option<DateTime<Utc>>,
+    pub date_testing: Option<BodhiDate>,
     /// displayed name of this update
     pub display_name: String,
     /// greenwave status summary string
