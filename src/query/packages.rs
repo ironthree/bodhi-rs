@@ -18,18 +18,18 @@ use crate::{BodhiService, Package, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, PackageQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let packages = bodhi.query(&PackageQuery::new().search(String::from("rust*"))).unwrap();
+/// let packages = bodhi.query(&PackageQuery::new().search("rust*")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/packages.html#service-0>
 #[derive(Debug, Default)]
-pub struct PackageQuery {
-    like: Option<String>,
-    name: Option<String>,
-    search: Option<String>,
+pub struct PackageQuery<'a> {
+    like: Option<&'a str>,
+    name: Option<&'a str>,
+    search: Option<&'a str>,
 }
 
-impl PackageQuery {
+impl<'a> PackageQuery<'a> {
     /// This method returns a new [`PackageQuery`](struct.PackageQuery.html) with *no* filters set.
     pub fn new() -> Self {
         PackageQuery {
@@ -40,19 +40,19 @@ impl PackageQuery {
     }
 
     /// Restrict search to packages *like* the given argument (in the SQL sense).
-    pub fn like(mut self, like: String) -> Self {
+    pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
     }
 
     /// Restrict the returned results to packages matching the given name.
-    pub fn name(mut self, name: String) -> Self {
+    pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
     }
 
     /// Restrict search to packages containing the given argument.
-    pub fn search(mut self, search: String) -> Self {
+    pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
@@ -79,16 +79,16 @@ impl PackageQuery {
 
     fn page_query(&self, page: u32, rows_per_page: u32) -> PackagePageQuery {
         PackagePageQuery {
-            like: self.like.as_ref(),
-            name: self.name.as_ref(),
-            search: self.search.as_ref(),
+            like: self.like,
+            name: self.name,
+            search: self.search,
             page,
             rows_per_page,
         }
     }
 }
 
-impl Query<Vec<Package>> for PackageQuery {
+impl<'a> Query<Vec<Package>> for PackageQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
         PackageQuery::query(self, bodhi)
     }
@@ -105,9 +105,9 @@ struct PackageListPage {
 
 #[derive(Debug, Serialize)]
 struct PackagePageQuery<'a> {
-    like: Option<&'a String>,
-    name: Option<&'a String>,
-    search: Option<&'a String>,
+    like: Option<&'a str>,
+    name: Option<&'a str>,
+    search: Option<&'a str>,
 
     page: u32,
     rows_per_page: u32,
@@ -118,8 +118,8 @@ impl<'a> SinglePageQuery<PackageListPage> for PackagePageQuery<'a> {
         Ok(format!("/packages/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn parse(string: String) -> Result<PackageListPage, QueryError> {
-        let package_page: PackageListPage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<PackageListPage, QueryError> {
+        let package_page: PackageListPage = serde_json::from_str(string)?;
         Ok(package_page)
     }
 

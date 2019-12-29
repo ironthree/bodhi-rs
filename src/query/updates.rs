@@ -23,15 +23,13 @@ use crate::{BodhiService, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, UpdateIDQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let update = bodhi
-///     .query(&UpdateIDQuery::new(String::from("FEDORA-2019-3dd0cf468e")))
-///     .unwrap();
+/// let update = bodhi.query(&UpdateIDQuery::new("FEDORA-2019-3dd0cf468e")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-0>
 #[derive(Debug)]
-pub struct UpdateIDQuery {
-    id: String,
+pub struct UpdateIDQuery<'a> {
+    id: &'a str,
 }
 
 #[derive(Debug, Deserialize)]
@@ -40,20 +38,20 @@ struct UpdatePage {
     can_edit: bool,
 }
 
-impl UpdateIDQuery {
+impl<'a> UpdateIDQuery<'a> {
     /// This method is the only way to create a new `UpdateIDQuery` instance.
-    pub fn new(id: String) -> Self {
+    pub fn new(id: &'a str) -> Self {
         UpdateIDQuery { id }
     }
 }
 
-impl SinglePageQuery<Option<Update>> for UpdateIDQuery {
+impl<'a> SinglePageQuery<Option<Update>> for UpdateIDQuery<'a> {
     fn path(&self) -> Result<String, QueryError> {
         Ok(format!("/updates/{}", self.id))
     }
 
-    fn parse(string: String) -> Result<Option<Update>, QueryError> {
-        let update_page: UpdatePage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<Option<Update>, QueryError> {
+        let update_page: UpdatePage = serde_json::from_str(string)?;
         Ok(Some(update_page.update))
     }
 
@@ -62,7 +60,7 @@ impl SinglePageQuery<Option<Update>> for UpdateIDQuery {
     }
 }
 
-impl Query<Option<Update>> for UpdateIDQuery {
+impl<'a> Query<Option<Update>> for UpdateIDQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Option<Update>, QueryError> {
         <Self as SinglePageQuery<Option<Update>>>::query(self, bodhi)
     }
@@ -80,7 +78,7 @@ impl Query<Option<Update>> for UpdateIDQuery {
 /// let updates = bodhi
 ///     .query(
 ///         &UpdateQuery::new()
-///             .users(String::from("decathorpe"))
+///             .users("decathorpe")
 ///             .releases(FedoraRelease::F30)
 ///             .request(UpdateRequest::Testing),
 ///     )
@@ -89,38 +87,38 @@ impl Query<Option<Update>> for UpdateIDQuery {
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2>
 #[derive(Debug, Default)]
-pub struct UpdateQuery {
+pub struct UpdateQuery<'a> {
     active_releases: Option<bool>,
-    aliases: Option<Vec<String>>,
-    approved_before: Option<String>,
-    approved_since: Option<String>,
-    bugs: Option<Vec<String>>,
-    builds: Option<Vec<String>>,
+    aliases: Option<Vec<&'a str>>,
+    approved_before: Option<&'a BodhiDate>,
+    approved_since: Option<&'a BodhiDate>,
+    bugs: Option<Vec<u32>>,
+    builds: Option<Vec<&'a str>>,
     content_type: Option<ContentType>,
     critpath: Option<bool>,
-    cves: Option<Vec<String>>,
-    like: Option<String>,
+    cves: Option<Vec<&'a str>>,
+    like: Option<&'a str>,
     locked: Option<bool>,
-    modified_before: Option<String>,
-    modified_since: Option<String>,
-    packages: Option<Vec<String>>,
+    modified_before: Option<&'a BodhiDate>,
+    modified_since: Option<&'a BodhiDate>,
+    packages: Option<Vec<&'a str>>,
     pushed: Option<bool>,
-    pushed_before: Option<String>,
-    pushed_since: Option<String>,
+    pushed_before: Option<&'a BodhiDate>,
+    pushed_since: Option<&'a BodhiDate>,
     releases: Option<Vec<FedoraRelease>>,
     request: Option<UpdateRequest>,
-    search: Option<String>,
+    search: Option<&'a str>,
     severity: Option<UpdateSeverity>,
     status: Option<UpdateStatus>,
-    submitted_before: Option<String>,
-    submitted_since: Option<String>,
+    submitted_before: Option<&'a BodhiDate>,
+    submitted_since: Option<&'a BodhiDate>,
     suggest: Option<UpdateSuggestion>,
-    update_ids: Option<Vec<String>>,
+    update_ids: Option<Vec<&'a str>>,
     update_type: Option<UpdateType>,
-    users: Option<Vec<String>>,
+    users: Option<Vec<&'a str>>,
 }
 
-impl UpdateQuery {
+impl<'a> UpdateQuery<'a> {
     /// This method returns a new `UpdateQuery` with *no* filters set.
     pub fn new() -> Self {
         UpdateQuery {
@@ -164,7 +162,7 @@ impl UpdateQuery {
     /// Restrict results to updates matching the given alias(es).
     ///
     /// Can be specified multiple times.
-    pub fn aliases(mut self, alias: String) -> Self {
+    pub fn aliases(mut self, alias: &'a str) -> Self {
         match &mut self.aliases {
             Some(aliases) => aliases.push(alias),
             None => self.aliases = Some(vec![alias]),
@@ -175,14 +173,14 @@ impl UpdateQuery {
 
     /// Restrict the returned results to updates which were approved
     /// before the given date and time.
-    pub fn approved_before(mut self, approved_before: String) -> Self {
+    pub fn approved_before(mut self, approved_before: &'a BodhiDate) -> Self {
         self.approved_before = Some(approved_before);
         self
     }
 
     /// Restrict the returned results to updates which were approved
     /// since the given date and time.
-    pub fn approved_since(mut self, approved_since: String) -> Self {
+    pub fn approved_since(mut self, approved_since: &'a BodhiDate) -> Self {
         self.approved_since = Some(approved_since);
         self
     }
@@ -190,7 +188,7 @@ impl UpdateQuery {
     /// Restrict results to updates associated with the given bug(s).
     ///
     /// Can be specified multiple times.
-    pub fn bugs(mut self, bug: String) -> Self {
+    pub fn bugs(mut self, bug: u32) -> Self {
         match &mut self.bugs {
             Some(bugs) => bugs.push(bug),
             None => self.bugs = Some(vec![bug]),
@@ -202,7 +200,7 @@ impl UpdateQuery {
     /// Restrict results to updates associated with the given build(s).
     ///
     /// Can be specified multiple times.
-    pub fn builds(mut self, build: String) -> Self {
+    pub fn builds(mut self, build: &'a str) -> Self {
         match &mut self.builds {
             Some(builds) => builds.push(build),
             None => self.builds = Some(vec![build]),
@@ -226,7 +224,7 @@ impl UpdateQuery {
     /// Restrict results to updates associated with the given CVE(s).
     ///
     /// Can be specified multiple times.
-    pub fn cves(mut self, cve: String) -> Self {
+    pub fn cves(mut self, cve: &'a str) -> Self {
         match &mut self.cves {
             Some(cves) => cves.push(cve),
             None => self.cves = Some(vec![cve]),
@@ -236,7 +234,7 @@ impl UpdateQuery {
     }
 
     /// Restrict search to updates *like* the given argument (in the SQL sense).
-    pub fn like(mut self, like: String) -> Self {
+    pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
     }
@@ -249,14 +247,14 @@ impl UpdateQuery {
 
     /// Restrict the returned results to updates which were modified
     /// before the given date and time.
-    pub fn modified_before(mut self, modified_before: String) -> Self {
+    pub fn modified_before(mut self, modified_before: &'a BodhiDate) -> Self {
         self.modified_before = Some(modified_before);
         self
     }
 
     /// Restrict the returned results to updates which were modified
     /// since the given date and time.
-    pub fn modified_since(mut self, modified_since: String) -> Self {
+    pub fn modified_since(mut self, modified_since: &'a BodhiDate) -> Self {
         self.modified_since = Some(modified_since);
         self
     }
@@ -264,7 +262,7 @@ impl UpdateQuery {
     /// Restrict results to updates associated for the given package(s).
     ///
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> Self {
+    pub fn packages(mut self, package: &'a str) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -281,14 +279,14 @@ impl UpdateQuery {
 
     /// Restrict the returned results to updates which were pushed
     /// before the given date and time.
-    pub fn pushed_before(mut self, pushed_before: String) -> Self {
+    pub fn pushed_before(mut self, pushed_before: &'a BodhiDate) -> Self {
         self.pushed_before = Some(pushed_before);
         self
     }
 
     /// Restrict the returned results to updates which were pushed
     /// since the given date and time.
-    pub fn pushed_since(mut self, pushed_since: String) -> Self {
+    pub fn pushed_since(mut self, pushed_since: &'a BodhiDate) -> Self {
         self.pushed_since = Some(pushed_since);
         self
     }
@@ -312,7 +310,7 @@ impl UpdateQuery {
     }
 
     /// Restrict search to updates containing the given argument.
-    pub fn search(mut self, search: String) -> Self {
+    pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
@@ -331,14 +329,14 @@ impl UpdateQuery {
 
     /// Restrict the returned results to updates which were submitted
     /// before the given date and time.
-    pub fn submitted_before(mut self, submitted_before: String) -> Self {
+    pub fn submitted_before(mut self, submitted_before: &'a BodhiDate) -> Self {
         self.submitted_before = Some(submitted_before);
         self
     }
 
     /// Restrict the returned results to updates which were submitted
     /// since the given date and time.
-    pub fn submitted_since(mut self, submitted_since: String) -> Self {
+    pub fn submitted_since(mut self, submitted_since: &'a BodhiDate) -> Self {
         self.submitted_since = Some(submitted_since);
         self
     }
@@ -352,7 +350,7 @@ impl UpdateQuery {
     /// Restrict results to updates matching the given update ID(s).
     ///
     /// Can be specified multiple times.
-    pub fn update_ids(mut self, update_id: String) -> Self {
+    pub fn update_ids(mut self, update_id: &'a str) -> Self {
         match &mut self.update_ids {
             Some(update_ids) => update_ids.push(update_id),
             None => self.update_ids = Some(vec![update_id]),
@@ -370,7 +368,7 @@ impl UpdateQuery {
     /// Restrict results to updates associated with the given user(s).
     ///
     /// Can be specified multiple times.
-    pub fn users(mut self, user: String) -> Self {
+    pub fn users(mut self, user: &'a str) -> Self {
         match &mut self.users {
             Some(users) => users.push(user),
             None => self.users = Some(vec![user]),
@@ -403,28 +401,28 @@ impl UpdateQuery {
         UpdatePageQuery {
             active_releases: self.active_releases,
             aliases: self.aliases.as_ref(),
-            approved_before: self.approved_before.as_ref(),
-            approved_since: self.approved_since.as_ref(),
+            approved_before: self.approved_before,
+            approved_since: self.approved_since,
             bugs: self.bugs.as_ref(),
             builds: self.builds.as_ref(),
             content_type: self.content_type.as_ref(),
             critpath: self.critpath,
             cves: self.cves.as_ref(),
-            like: self.like.as_ref(),
+            like: self.like,
             locked: self.locked,
-            modified_before: self.modified_before.as_ref(),
-            modified_since: self.modified_since.as_ref(),
+            modified_before: self.modified_before,
+            modified_since: self.modified_since,
             packages: self.packages.as_ref(),
             pushed: self.pushed,
-            pushed_before: self.pushed_before.as_ref(),
-            pushed_since: self.pushed_since.as_ref(),
+            pushed_before: self.pushed_before,
+            pushed_since: self.pushed_since,
             releases: self.releases.as_ref(),
             request: self.request.as_ref(),
-            search: self.search.as_ref(),
+            search: self.search,
             severity: self.severity.as_ref(),
             status: self.status.as_ref(),
-            submitted_before: self.submitted_before.as_ref(),
-            submitted_since: self.submitted_since.as_ref(),
+            submitted_before: self.submitted_before,
+            submitted_since: self.submitted_since,
             suggest: self.suggest.as_ref(),
             update_ids: self.update_ids.as_ref(),
             update_type: self.update_type.as_ref(),
@@ -435,7 +433,7 @@ impl UpdateQuery {
     }
 }
 
-impl Query<Vec<Update>> for UpdateQuery {
+impl<'a> Query<Vec<Update>> for UpdateQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
         UpdateQuery::query(self, bodhi)
     }
@@ -453,33 +451,41 @@ struct UpdateListPage {
 #[derive(Debug, Serialize)]
 struct UpdatePageQuery<'a> {
     active_releases: Option<bool>,
-    aliases: Option<&'a Vec<String>>,
-    approved_before: Option<&'a String>,
-    approved_since: Option<&'a String>,
-    bugs: Option<&'a Vec<String>>,
-    builds: Option<&'a Vec<String>>,
+    aliases: Option<&'a Vec<&'a str>>,
+    #[serde(with = "crate::option_bodhi_date_format")]
+    approved_before: Option<&'a BodhiDate>,
+    #[serde(with = "crate::option_bodhi_date_format")]
+    approved_since: Option<&'a BodhiDate>,
+    bugs: Option<&'a Vec<u32>>,
+    builds: Option<&'a Vec<&'a str>>,
     content_type: Option<&'a ContentType>,
     critpath: Option<bool>,
-    cves: Option<&'a Vec<String>>,
-    like: Option<&'a String>,
+    cves: Option<&'a Vec<&'a str>>,
+    like: Option<&'a str>,
     locked: Option<bool>,
-    modified_before: Option<&'a String>,
-    modified_since: Option<&'a String>,
-    packages: Option<&'a Vec<String>>,
+    #[serde(with = "crate::option_bodhi_date_format")]
+    modified_before: Option<&'a BodhiDate>,
+    #[serde(with = "crate::option_bodhi_date_format")]
+    modified_since: Option<&'a BodhiDate>,
+    packages: Option<&'a Vec<&'a str>>,
     pushed: Option<bool>,
-    pushed_before: Option<&'a String>,
-    pushed_since: Option<&'a String>,
+    #[serde(with = "crate::option_bodhi_date_format")]
+    pushed_before: Option<&'a BodhiDate>,
+    #[serde(with = "crate::option_bodhi_date_format")]
+    pushed_since: Option<&'a BodhiDate>,
     releases: Option<&'a Vec<FedoraRelease>>,
     request: Option<&'a UpdateRequest>,
-    search: Option<&'a String>,
+    search: Option<&'a str>,
     severity: Option<&'a UpdateSeverity>,
     status: Option<&'a UpdateStatus>,
-    submitted_before: Option<&'a String>,
-    submitted_since: Option<&'a String>,
+    #[serde(with = "crate::option_bodhi_date_format")]
+    submitted_before: Option<&'a BodhiDate>,
+    #[serde(with = "crate::option_bodhi_date_format")]
+    submitted_since: Option<&'a BodhiDate>,
     suggest: Option<&'a UpdateSuggestion>,
-    update_ids: Option<&'a Vec<String>>,
+    update_ids: Option<&'a Vec<&'a str>>,
     update_type: Option<&'a UpdateType>,
-    users: Option<&'a Vec<String>>,
+    users: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
@@ -490,8 +496,8 @@ impl<'a> SinglePageQuery<UpdateListPage> for UpdatePageQuery<'a> {
         Ok(format!("/updates/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn parse(string: String) -> Result<UpdateListPage, QueryError> {
-        let update_page: UpdateListPage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<UpdateListPage, QueryError> {
+        let update_page: UpdateListPage = serde_json::from_str(string)?;
         Ok(update_page)
     }
 

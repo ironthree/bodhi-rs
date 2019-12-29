@@ -8,18 +8,18 @@ use crate::{BodhiDate, UpdateRequest, UpdateSeverity, UpdateSuggestion, UpdateTy
 #[derive(Debug, Serialize)]
 pub struct OverrideData<'a> {
     /// NVR this buildroot override is filed for
-    pub nvr: &'a String,
+    pub nvr: &'a str,
     /// user-visible notes associated with this buildroot override
-    pub notes: &'a String,
+    pub notes: &'a str,
     /// expiration date of this override
     #[serde(with = "crate::data::bodhi_date_format")]
     pub expiration_date: &'a BodhiDate,
     /// flag whether this buildroot override is to be expired or not
     pub expired: Option<bool>,
     /// NVR of the edited buildroot override if this is an edit request
-    pub edited: Option<&'a String>,
+    pub edited: Option<&'a str>,
     /// CSRF token
-    pub csrf_token: &'a String,
+    pub csrf_token: &'a str,
 }
 
 /// Schema for POST requests for creating and editing updates.
@@ -28,13 +28,13 @@ pub struct OverrideData<'a> {
 #[derive(Debug, Serialize)]
 pub struct UpdateData<'a> {
     /// list of builds to include in the update
-    pub builds: Option<Vec<&'a String>>,
+    pub builds: Option<Vec<&'a str>>,
     /// koji side tag to take builds from (if this is specified, builds must be `None` or `[]`)
-    pub from_tag: Option<&'a String>,
+    pub from_tag: Option<&'a str>,
     /// bugs associated with the update (default: `[]`)
     pub bugs: Option<&'a Vec<u32>>,
     /// user-visible update title (default: `""`)
-    pub display_name: Option<&'a String>,
+    pub display_name: Option<&'a str>,
     /// close bugs when update is pushed to stable (default: `true`)
     pub close_bugs: Option<bool>,
     /// update type: one of `unspecified`, `bugfix`, `enhancement`, `newpackage`, `security`
@@ -45,7 +45,7 @@ pub struct UpdateData<'a> {
     /// update severity: one of `unspecified` (default), `low`, `medium`, `high`, `urgent`
     pub severity: Option<UpdateSeverity>,
     /// update notes
-    pub notes: &'a String,
+    pub notes: &'a str,
     /// push to stable once `stable_karma` is reached (default: `true`)
     pub autokarma: Option<bool>,
     /// stable karma threshold (default: `3`)
@@ -55,9 +55,9 @@ pub struct UpdateData<'a> {
     /// suggestion after package installation: one of `unspecified` (default), `logout`, `reboot`
     pub suggest: Option<UpdateSuggestion>,
     /// alias of the edited update if this is an edit request (default: `""`)
-    pub edited: Option<&'a String>,
+    pub edited: Option<&'a str>,
     /// required testcases (comma-separated or space-separated list: default: `""`)
-    pub requirements: Option<&'a String>,
+    pub requirements: Option<&'a str>,
     /// require bug feedback for karma to be counted (default: `true`)
     pub require_bugs: Option<bool>,
     /// require testcase feedback for karma to be counted (default: `true`)
@@ -67,5 +67,5 @@ pub struct UpdateData<'a> {
     /// number of days in testing before the update is pushed to stable automatically (default: `0`)
     pub stable_days: Option<u32>,
     /// CSRF token
-    pub csrf_token: &'a String,
+    pub csrf_token: &'a str,
 }

@@ -27,15 +27,17 @@ fn main() -> Result<(), String> {
 
     // TODO: looks like the staging instance can't create buildroot overrides
     let bodhi = BodhiServiceBuilder::staging()
-        .authentication(username, password)
+        .authentication(&username, &password)
         .timeout(Duration::from_secs(300))
         .build()
         .unwrap();
 
+    let expiration_date = BodhiDate::try_from("2019-12-31").unwrap();
+
     let new_override = OverrideBuilder::new(
-        String::from("libcloudproviders-0.3.0-1.fc30"),
-        String::from("Test buildroot override created by bodhi-rs."),
-        BodhiDate::try_from("2019-12-31").unwrap(),
+        "libcloudproviders-0.3.0-1.fc30",
+        "Test buildroot override created by bodhi-rs.",
+        &expiration_date,
     );
 
     let response = bodhi.create(&new_override);

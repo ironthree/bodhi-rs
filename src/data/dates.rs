@@ -3,6 +3,9 @@ use std::convert::TryFrom;
 use chrono::{DateTime, TimeZone, Utc};
 
 /// human-readable date format internally used by bodhi
+pub const BODHI_DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+
+/// convenience format for date-only timestamps
 pub const BODHI_DATE_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 
 /// This struct wraps a `chrono::DateTime<chrono::Utc>` instance with implementations for converting
@@ -16,15 +19,19 @@ impl TryFrom<&str> for BodhiDate {
     type Error = chrono::ParseError;
 
     fn try_from(string: &str) -> Result<Self, Self::Error> {
+        // try the format containing date *and* time first, and if that fails,
+        // then try the format containing only the date.
         Ok(BodhiDate {
-            date: Utc.datetime_from_str(string, BODHI_DATE_FORMAT)?,
+            date: Utc
+                .datetime_from_str(string, BODHI_DATETIME_FORMAT)
+                .or_else(|_| Utc.datetime_from_str(string, BODHI_DATE_FORMAT))?,
         })
     }
 }
 
 impl Into<String> for BodhiDate {
     fn into(self) -> String {
-        self.date.format(BODHI_DATE_FORMAT).to_string()
+        self.date.format(BODHI_DATETIME_FORMAT).to_string()
     }
 }
 
@@ -40,7 +47,7 @@ pub(crate) mod bodhi_date_format {
     where
         S: Serializer,
     {
-        let string = date.date.format(super::BODHI_DATE_FORMAT).to_string();
+        let string = date.date.format(super::BODHI_DATETIME_FORMAT).to_string();
         serializer.serialize_str(&string)
     }
 
@@ -50,7 +57,7 @@ pub(crate) mod bodhi_date_format {
     {
         let string = String::deserialize(deserializer)?;
 
-        match Utc.datetime_from_str(&string, super::BODHI_DATE_FORMAT) {
+        match Utc.datetime_from_str(&string, super::BODHI_DATETIME_FORMAT) {
             Ok(result) => Ok(BodhiDate { date: result }),
             Err(error) => Err(error).map_err(serde::de::Error::custom),
         }
@@ -64,7 +71,7 @@ pub(crate) mod option_bodhi_date_format {
 
     use serde::{self, Deserialize, Deserializer, Serializer};
 
-    pub fn serialize<S>(date: &Option<BodhiDate>, serializer: S) -> Result<S::Ok, S::Error>
+    pub fn serialize<S>(date: &Option<&BodhiDate>, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {

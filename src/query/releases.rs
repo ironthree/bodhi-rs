@@ -22,30 +22,30 @@ use crate::{BodhiService, Query, Release, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, FedoraRelease, ReleaseNameQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let release = bodhi.query(&ReleaseNameQuery::new(String::from("F30"))).unwrap();
+/// let release = bodhi.query(&ReleaseNameQuery::new("F30")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-0>
 #[derive(Debug)]
-pub struct ReleaseNameQuery {
-    name: String,
+pub struct ReleaseNameQuery<'a> {
+    name: &'a str,
 }
 
-impl ReleaseNameQuery {
+impl<'a> ReleaseNameQuery<'a> {
     /// This method is the only way to create a new
     /// [`ReleaseNameQuery`](struct.ReleaseNameQuery.html) instance.
-    pub fn new(name: String) -> Self {
+    pub fn new(name: &'a str) -> Self {
         ReleaseNameQuery { name }
     }
 }
 
-impl SinglePageQuery<Option<Release>> for ReleaseNameQuery {
+impl<'a> SinglePageQuery<Option<Release>> for ReleaseNameQuery<'a> {
     fn path(&self) -> Result<String, QueryError> {
         Ok(format!("/releases/{}", self.name))
     }
 
-    fn parse(string: String) -> Result<Option<Release>, QueryError> {
-        let release: Release = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<Option<Release>, QueryError> {
+        let release: Release = serde_json::from_str(string)?;
         Ok(Some(release))
     }
 
@@ -54,7 +54,7 @@ impl SinglePageQuery<Option<Release>> for ReleaseNameQuery {
     }
 }
 
-impl Query<Option<Release>> for ReleaseNameQuery {
+impl<'a> Query<Option<Release>> for ReleaseNameQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Option<Release>, QueryError> {
         <Self as SinglePageQuery<Option<Release>>>::query(self, bodhi)
     }
@@ -75,15 +75,15 @@ impl Query<Option<Release>> for ReleaseNameQuery {
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-1>
 #[derive(Debug, Default)]
 
-pub struct ReleaseQuery {
+pub struct ReleaseQuery<'a> {
     exclude_archived: Option<bool>,
-    ids: Option<Vec<String>>,
-    name: Option<String>,
-    packages: Option<Vec<String>>,
-    updates: Option<Vec<String>>,
+    ids: Option<Vec<&'a str>>,
+    name: Option<&'a str>,
+    packages: Option<Vec<&'a str>>,
+    updates: Option<Vec<&'a str>>,
 }
 
-impl ReleaseQuery {
+impl<'a> ReleaseQuery<'a> {
     /// This method returns a new [`ReleaseQuery`](struct.ReleaseQuery.html) with *no* filters set.
     pub fn new() -> Self {
         ReleaseQuery {
@@ -104,7 +104,7 @@ impl ReleaseQuery {
     /// Restrict results to releases with the given ID.
     ///
     /// Can be specified multiple times.
-    pub fn ids(mut self, id: String) -> Self {
+    pub fn ids(mut self, id: &'a str) -> Self {
         match &mut self.ids {
             Some(ids) => ids.push(id),
             None => self.ids = Some(vec![id]),
@@ -115,7 +115,7 @@ impl ReleaseQuery {
 
     /// Restrict results to a release with the given name. If this is the only required filter,
     /// consider using a [`ReleaseNameQuery`](struct.ReleaseNameQuery.html) instead.
-    pub fn name(mut self, name: String) -> Self {
+    pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
     }
@@ -123,7 +123,7 @@ impl ReleaseQuery {
     /// Restrict the returned results to releases containing the given package(s).
     ///
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> Self {
+    pub fn packages(mut self, package: &'a str) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -135,7 +135,7 @@ impl ReleaseQuery {
     /// Restrict the returned results to releases matching the given updates(s).
     ///
     /// Can be specified multiple times.
-    pub fn updates(mut self, update: String) -> Self {
+    pub fn updates(mut self, update: &'a str) -> Self {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -177,7 +177,7 @@ impl ReleaseQuery {
     }
 }
 
-impl Query<Vec<Release>> for ReleaseQuery {
+impl<'a> Query<Vec<Release>> for ReleaseQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
         ReleaseQuery::query(self, bodhi)
     }
@@ -195,10 +195,10 @@ struct ReleaseListPage {
 #[derive(Debug, Serialize)]
 struct ReleasePageQuery<'a> {
     exclude_archived: Option<bool>,
-    ids: Option<&'a Vec<String>>,
-    name: Option<&'a String>,
-    packages: Option<&'a Vec<String>>,
-    updates: Option<&'a Vec<String>>,
+    ids: Option<&'a Vec<&'a str>>,
+    name: Option<&'a &'a str>,
+    packages: Option<&'a Vec<&'a str>>,
+    updates: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
@@ -209,8 +209,8 @@ impl<'a> SinglePageQuery<ReleaseListPage> for ReleasePageQuery<'a> {
         Ok(format!("/releases/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn parse(string: String) -> Result<ReleaseListPage, QueryError> {
-        let release_page: ReleaseListPage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<ReleaseListPage, QueryError> {
+        let release_page: ReleaseListPage = serde_json::from_str(string)?;
         Ok(release_page)
     }
 

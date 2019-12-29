@@ -12,9 +12,7 @@ fn nvr_query_some() {
         .build()
         .unwrap();
 
-    let build: Option<Build> = bodhi
-        .query(&BuildNVRQuery::new(String::from("rust-1.34.2-1.fc30")))
-        .unwrap();
+    let build: Option<Build> = bodhi.query(&BuildNVRQuery::new("rust-1.34.2-1.fc30")).unwrap();
 
     assert!(build.is_some());
 }
@@ -27,9 +25,7 @@ fn nvr_query_none() {
         .build()
         .unwrap();
 
-    let build: Option<Build> = bodhi
-        .query(&BuildNVRQuery::new(String::from("this-doesnt-exist-1-1.fc30")))
-        .unwrap();
+    let build: Option<Build> = bodhi.query(&BuildNVRQuery::new("this-doesnt-exist-1-1.fc30")).unwrap();
 
     assert!(build.is_none());
 }

@@ -11,7 +11,7 @@ pub trait SinglePageQuery<T> {
 
     /// This associated method is expected to return the result that was parsed from the JSON
     /// response, or an error.
-    fn parse(string: String) -> Result<T, QueryError>;
+    fn parse(string: &str) -> Result<T, QueryError>;
 
     /// This associated method returns the item that represents the "missing" state (when getting a
     /// 404 error from the server).
@@ -31,7 +31,7 @@ pub trait SinglePageQuery<T> {
 
         if status.is_success() {
             let string = response.text()?;
-            <Self as SinglePageQuery<T>>::parse(string)
+            <Self as SinglePageQuery<T>>::parse(&string)
         } else if status == 404 {
             <Self as SinglePageQuery<T>>::missing()
         } else {

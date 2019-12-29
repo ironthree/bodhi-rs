@@ -8,7 +8,7 @@ use crate::{BodhiDate, BodhiService, CSRFQuery, Create, OverrideData};
 /// This struct contains the values that are returned when creating a new comment.
 #[derive(Debug, Deserialize)]
 pub struct NewOverride {
-    // TODO: determine actual fields
+    /// TODO: determine actual fields
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
 }
@@ -16,15 +16,15 @@ pub struct NewOverride {
 /// This struct contains all the values that are necessary for creating a new buildroot override.
 /// There are no optional arguments, so everything has to be supplied with the `new()` method.
 #[derive(Debug)]
-pub struct OverrideBuilder {
-    nvr: String,
-    notes: String,
-    expiration_date: BodhiDate,
+pub struct OverrideBuilder<'a> {
+    nvr: &'a str,
+    notes: &'a str,
+    expiration_date: &'a BodhiDate,
 }
 
-impl OverrideBuilder {
+impl<'a> OverrideBuilder<'a> {
     /// This method has to be used to create and initialize a new `OverrideBuilder`.
-    pub fn new(nvr: String, notes: String, expiration_date: BodhiDate) -> Self {
+    pub fn new(nvr: &'a str, notes: &'a str, expiration_date: &'a BodhiDate) -> Self {
         OverrideBuilder {
             nvr,
             notes,
@@ -33,7 +33,7 @@ impl OverrideBuilder {
     }
 }
 
-impl Create<NewOverride> for OverrideBuilder {
+impl<'a> Create<NewOverride> for OverrideBuilder<'a> {
     fn create(&self, bodhi: &BodhiService) -> Result<NewOverride, QueryError> {
         // TODO: check if build exists
         let path = String::from("/overrides/");

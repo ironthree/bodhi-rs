@@ -18,7 +18,7 @@ use crate::{
 /// This struct contains the values that are returned when creating a new update.
 #[derive(Debug, Deserialize)]
 pub struct NewUpdate {
-    // TODO: determine actual fields
+    /// TODO: determine actual fields
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
 }
@@ -26,7 +26,7 @@ pub struct NewUpdate {
 #[derive(Debug)]
 enum UpdateSource<'a> {
     Builds { builds: &'a [Build] },
-    Tag { tag: &'a String },
+    Tag { tag: &'a str },
 }
 
 /// This struct contains all the values that are necessary for creating a new update. Methods to
@@ -81,7 +81,7 @@ impl<'a> UpdateBuilder<'a> {
     }
 
     /// Use this method when creating an update for a side tag.
-    pub fn from_tag(tag: &'a String, notes: String) -> Self {
+    pub fn from_tag(tag: &'a str, notes: String) -> Self {
         UpdateBuilder {
             source: UpdateSource::Tag { tag },
             notes,
@@ -244,10 +244,13 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
 
         let new_update = match self.source {
             UpdateSource::Builds { builds } => UpdateData {
-                builds: Some(builds.iter().map(|b| &b.nvr).collect()),
+                builds: Some(builds.iter().map(|b| b.nvr.as_str()).collect()),
                 from_tag: None,
                 bugs: self.bugs.as_ref(),
-                display_name: self.title.as_ref(),
+                display_name: match &self.title {
+                    Some(string) => Some(&string),
+                    None => None,
+                },
                 close_bugs: self.close_bugs,
                 update_type: match self.update_type {
                     Some(t) => t,
@@ -261,7 +264,10 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 unstable_karma: self.unstable_karma,
                 suggest: self.suggest,
                 edited: None,
-                requirements: self.requirements.as_ref(),
+                requirements: match &self.requirements {
+                    Some(string) => Some(&string),
+                    None => None,
+                },
                 require_bugs: self.require_bugs,
                 require_testcases: self.require_testcases,
                 autotime: self.autotime,
@@ -272,7 +278,10 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 builds: None,
                 from_tag: Some(tag),
                 bugs: self.bugs.as_ref(),
-                display_name: self.title.as_ref(),
+                display_name: match &self.title {
+                    Some(string) => Some(&string),
+                    None => None,
+                },
                 close_bugs: self.close_bugs,
                 update_type: match self.update_type {
                     Some(t) => t,
@@ -286,7 +295,10 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 unstable_karma: self.unstable_karma,
                 suggest: self.suggest,
                 edited: None,
-                requirements: self.requirements.as_ref(),
+                requirements: match &self.requirements {
+                    Some(string) => Some(&string),
+                    None => None,
+                },
                 require_bugs: self.require_bugs,
                 require_testcases: self.require_testcases,
                 autotime: self.autotime,

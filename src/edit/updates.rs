@@ -19,7 +19,7 @@ use crate::{
 /// This struct contains the values that are returned when editing an update.
 #[derive(Debug, Deserialize)]
 pub struct EditedUpdate {
-    // TODO: determine actual fields
+    /// TODO: determine actual fields
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
 }
@@ -30,11 +30,11 @@ pub struct EditedUpdate {
 pub struct UpdateEditor<'a> {
     // mandatory fields
     builds: &'a [Build],
-    notes: &'a String,
+    notes: &'a str,
 
     // optional fields
     bugs: Vec<u32>,
-    title: Option<&'a String>,
+    title: Option<&'a str>,
     close_bugs: Option<bool>,
     update_type: Option<UpdateType>,
     request: Option<UpdateRequest>,
@@ -43,8 +43,8 @@ pub struct UpdateEditor<'a> {
     stable_karma: Option<i32>,
     unstable_karma: Option<i32>,
     suggest: Option<UpdateSuggestion>,
-    edited: Option<&'a String>,
-    requirements: Option<&'a String>,
+    edited: Option<&'a str>,
+    requirements: Option<&'a str>,
     require_bugs: Option<bool>,
     require_testcases: Option<bool>,
     autotime: Option<bool>,
@@ -70,7 +70,10 @@ impl<'a> UpdateEditor<'a> {
             unstable_karma: update.unstable_karma,
             suggest: Some(update.suggest),
             edited: Some(&update.alias),
-            requirements: update.requirements.as_ref(),
+            requirements: match &update.requirements {
+                Some(string) => Some(string),
+                None => None,
+            },
             require_bugs: Some(update.require_bugs),
             require_testcases: Some(update.require_testcases),
             autotime: Some(update.autotime),
@@ -91,7 +94,7 @@ impl<'a> UpdateEditor<'a> {
     }
 
     /// Change the custom, user-visible title of the update.
-    pub fn set_title(mut self, title: &'a String) -> Self {
+    pub fn set_title(mut self, title: &'a str) -> Self {
         self.title = Some(title);
         self
     }
@@ -142,7 +145,7 @@ impl<'a> UpdateEditor<'a> {
     }
 
     /// Set custom taskotron requirements.
-    pub fn requirements(mut self, requirements: &'a String) -> Self {
+    pub fn requirements(mut self, requirements: &'a str) -> Self {
         self.requirements = Some(requirements);
         self
     }
@@ -217,7 +220,7 @@ impl<'a> Edit<EditedUpdate> for UpdateEditor<'a> {
         let csrf_token = bodhi.query(&CSRFQuery::new())?;
 
         let update_edit = UpdateData {
-            builds: Some(self.builds.iter().map(|b| &b.nvr).collect()),
+            builds: Some(self.builds.iter().map(|b| b.nvr.as_str()).collect()),
             from_tag: None,
             bugs: Some(&self.bugs),
             display_name: self.title,
@@ -233,7 +236,10 @@ impl<'a> Edit<EditedUpdate> for UpdateEditor<'a> {
             stable_karma: self.stable_karma,
             unstable_karma: self.unstable_karma,
             suggest: self.suggest,
-            edited: self.edited,
+            edited: match &self.edited {
+                Some(string) => Some(&string),
+                None => None,
+            },
             requirements: self.requirements,
             require_bugs: self.require_bugs,
             require_testcases: self.require_testcases,
@@ -273,7 +279,7 @@ struct RequestedUpdate {
 /// This struct contains all the arguments for changing the update status request.
 #[derive(Debug)]
 pub struct UpdateStatusRequester<'a> {
-    alias: &'a String,
+    alias: &'a str,
     request: UpdateRequest,
 }
 
@@ -296,7 +302,7 @@ impl<'a> Edit<Update> for UpdateStatusRequester<'a> {
         #[derive(Serialize)]
         struct RequestEdit<'a> {
             request: UpdateRequest,
-            csrf_token: &'a String,
+            csrf_token: &'a str,
         }
 
         let request_edit = RequestEdit {
@@ -335,13 +341,13 @@ struct WaivedUpdate {
 /// This struct contains all the arguments for waiving test results for an update.
 #[derive(Debug)]
 pub struct UpdateTestResultWaiver<'a> {
-    alias: &'a String,
-    comment: String,
+    alias: &'a str,
+    comment: &'a str,
 }
 
 impl<'a> UpdateTestResultWaiver<'a> {
     /// Use this method when creating the waive request.
-    pub fn from_update(update: &'a Update, comment: String) -> Self {
+    pub fn from_update(update: &'a Update, comment: &'a str) -> Self {
         UpdateTestResultWaiver {
             alias: &update.alias,
             comment,
@@ -357,13 +363,13 @@ impl<'a> Edit<Update> for UpdateTestResultWaiver<'a> {
 
         #[derive(Serialize)]
         struct RequestWaiver<'a> {
-            comment: &'a String,
+            comment: &'a str,
             // tests: ?
-            csrf_token: &'a String,
+            csrf_token: &'a str,
         }
 
         let request_waiver = RequestWaiver {
-            comment: &self.comment,
+            comment: self.comment,
             // tests: ?
             csrf_token: &csrf_token,
         };

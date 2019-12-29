@@ -23,15 +23,13 @@ use crate::{BodhiService, FedoraRelease, Override, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, OverrideNVRQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let over_ride = bodhi
-///     .query(&OverrideNVRQuery::new(String::from("wingpanel-2.2.1-1.fc28")))
-///     .unwrap();
+/// let over_ride = bodhi.query(&OverrideNVRQuery::new("wingpanel-2.2.1-1.fc28")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-0>
 #[derive(Debug)]
-pub struct OverrideNVRQuery {
-    nvr: String,
+pub struct OverrideNVRQuery<'a> {
+    nvr: &'a str,
 }
 
 #[derive(Debug, Deserialize)]
@@ -39,21 +37,21 @@ struct OverridePage {
     r#override: Override,
 }
 
-impl OverrideNVRQuery {
+impl<'a> OverrideNVRQuery<'a> {
     /// This method is the only way to create a new
     /// [`OverrideNVRQuery`](struct.OverrideNVRQuery.html) instance.
-    pub fn new(nvr: String) -> Self {
+    pub fn new(nvr: &'a str) -> Self {
         OverrideNVRQuery { nvr }
     }
 }
 
-impl SinglePageQuery<Option<Override>> for OverrideNVRQuery {
+impl<'a> SinglePageQuery<Option<Override>> for OverrideNVRQuery<'a> {
     fn path(&self) -> Result<String, QueryError> {
         Ok(format!("/overrides/{}", self.nvr))
     }
 
-    fn parse(string: String) -> Result<Option<Override>, QueryError> {
-        let override_page: OverridePage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<Option<Override>, QueryError> {
+        let override_page: OverridePage = serde_json::from_str(string)?;
         Ok(Some(override_page.r#override))
     }
 
@@ -62,7 +60,7 @@ impl SinglePageQuery<Option<Override>> for OverrideNVRQuery {
     }
 }
 
-impl Query<Option<Override>> for OverrideNVRQuery {
+impl<'a> Query<Option<Override>> for OverrideNVRQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Option<Override>, QueryError> {
         <Self as SinglePageQuery<Option<Override>>>::query(self, bodhi)
     }
@@ -78,27 +76,23 @@ impl Query<Option<Override>> for OverrideNVRQuery {
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let overrides = bodhi
-///     .query(
-///         &OverrideQuery::new()
-///             .releases(FedoraRelease::F29)
-///             .users(String::from("decathorpe")),
-///     )
+///     .query(&OverrideQuery::new().releases(FedoraRelease::F29).users("decathorpe"))
 ///     .unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1>
 #[derive(Debug, Default)]
-pub struct OverrideQuery {
-    builds: Option<Vec<String>>,
+pub struct OverrideQuery<'a> {
+    builds: Option<Vec<&'a str>>,
     expired: Option<bool>,
-    like: Option<String>,
-    packages: Option<Vec<String>>,
+    like: Option<&'a str>,
+    packages: Option<Vec<&'a str>>,
     releases: Option<Vec<FedoraRelease>>,
-    search: Option<String>,
-    users: Option<Vec<String>>,
+    search: Option<&'a str>,
+    users: Option<Vec<&'a str>>,
 }
 
-impl OverrideQuery {
+impl<'a> OverrideQuery<'a> {
     /// This method returns a new [`OverrideQuery`](struct.OverrideQuery.html) with *no* filters
     /// set.
     pub fn new() -> Self {
@@ -116,7 +110,7 @@ impl OverrideQuery {
     /// Restrict the returned results to overrides for the given build(s).
     ///
     /// Can be specified multiple times.
-    pub fn builds(mut self, build: String) -> Self {
+    pub fn builds(mut self, build: &'a str) -> Self {
         match &mut self.builds {
             Some(builds) => builds.push(build),
             None => self.builds = Some(vec![build]),
@@ -132,7 +126,7 @@ impl OverrideQuery {
     }
 
     /// Restrict search to overrides *like* the given argument (in the SQL sense).
-    pub fn like(mut self, like: String) -> Self {
+    pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
     }
@@ -140,7 +134,7 @@ impl OverrideQuery {
     /// Restrict the returned results to overrides for the given package(s).
     ///
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> Self {
+    pub fn packages(mut self, package: &'a str) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -162,7 +156,7 @@ impl OverrideQuery {
     }
 
     /// Restrict search to overrides containing the given argument.
-    pub fn search(mut self, search: String) -> Self {
+    pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
@@ -170,7 +164,7 @@ impl OverrideQuery {
     /// Restrict the returned results to overrides created by the given user(s).
     ///
     /// Can be specified multiple times.
-    pub fn users(mut self, user: String) -> Self {
+    pub fn users(mut self, user: &'a str) -> Self {
         match &mut self.users {
             Some(users) => users.push(user),
             None => self.users = Some(vec![user]),
@@ -203,7 +197,7 @@ impl OverrideQuery {
         OverridePageQuery {
             builds: self.builds.as_ref(),
             expired: self.expired,
-            like: self.like.as_ref(),
+            like: self.like,
             packages: self.packages.as_ref(),
             releases: self.releases.as_ref(),
             search: self.search.as_ref(),
@@ -214,7 +208,7 @@ impl OverrideQuery {
     }
 }
 
-impl Query<Vec<Override>> for OverrideQuery {
+impl<'a> Query<Vec<Override>> for OverrideQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
         OverrideQuery::query(self, bodhi)
     }
@@ -231,13 +225,13 @@ struct OverrideListPage {
 
 #[derive(Debug, Serialize)]
 struct OverridePageQuery<'a> {
-    builds: Option<&'a Vec<String>>,
+    builds: Option<&'a Vec<&'a str>>,
     expired: Option<bool>,
-    like: Option<&'a String>,
-    packages: Option<&'a Vec<String>>,
+    like: Option<&'a str>,
+    packages: Option<&'a Vec<&'a str>>,
     releases: Option<&'a Vec<FedoraRelease>>,
-    search: Option<&'a String>,
-    users: Option<&'a Vec<String>>,
+    search: Option<&'a &'a str>,
+    users: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
@@ -248,8 +242,8 @@ impl<'a> SinglePageQuery<OverrideListPage> for OverridePageQuery<'a> {
         Ok(format!("/overrides/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn parse(string: String) -> Result<OverrideListPage, QueryError> {
-        let override_page: OverrideListPage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<OverrideListPage, QueryError> {
+        let override_page: OverrideListPage = serde_json::from_str(string)?;
         Ok(override_page)
     }
 

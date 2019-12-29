@@ -7,9 +7,9 @@ use crate::{BodhiService, CSRFQuery, Comment, Create, Karma, SinglePageQuery};
 #[derive(Debug, Serialize)]
 pub struct CommentData<'a> {
     /// alias of the update for which this is a comment
-    update: &'a String,
+    update: &'a str,
     /// comment text (default: `""`)
-    text: Option<&'a String>,
+    text: Option<&'a str>,
     /// comment karma (default: `0`)
     karma: Option<&'a Karma>,
     /// critpath karma (default: `0`)
@@ -19,7 +19,7 @@ pub struct CommentData<'a> {
     /// testcase feedback vector (default: `[]`)
     testcase_feedback: Option<&'a Vec<Karma>>,
     /// CSRF token
-    csrf_token: &'a String,
+    csrf_token: &'a str,
 }
 
 /// This struct contains the values that are returned when creating a new comment.
@@ -34,19 +34,19 @@ pub struct NewComment {
 /// This struct contains all the values that are necessary for creating a new comment. Methods to
 /// supply optional arguments are also available.
 #[derive(Debug)]
-pub struct CommentBuilder {
+pub struct CommentBuilder<'a> {
     // TODO: take &Update instead
-    update: String,
-    text: Option<String>,
+    update: &'a str,
+    text: Option<&'a str>,
     karma: Option<Karma>,
     karma_critpath: Option<Karma>,
     bug_feedback: Option<Vec<Karma>>,
     testcase_feedback: Option<Vec<Karma>>,
 }
 
-impl CommentBuilder {
+impl<'a> CommentBuilder<'a> {
     /// This method has to be used to create and initialize a new `CommentBuilder`.
-    pub fn new(update: String) -> Self {
+    pub fn new(update: &'a str) -> Self {
         CommentBuilder {
             update,
             text: None,
@@ -58,7 +58,7 @@ impl CommentBuilder {
     }
 
     /// Add optional text to the comment.
-    pub fn text(mut self, text: String) -> Self {
+    pub fn text(mut self, text: &'a str) -> Self {
         self.text = Some(text);
         self
     }
@@ -88,7 +88,7 @@ impl CommentBuilder {
     }
 }
 
-impl Create<NewComment> for CommentBuilder {
+impl<'a> Create<NewComment> for CommentBuilder<'a> {
     fn create(&self, bodhi: &BodhiService) -> Result<NewComment, QueryError> {
         // TODO: check if lengths of feedback vectors is good
         let path = String::from("/comments/");
@@ -97,7 +97,10 @@ impl Create<NewComment> for CommentBuilder {
 
         let new_comment = CommentData {
             update: &self.update,
-            text: self.text.as_ref(),
+            text: match &self.text {
+                Some(text) => Some(&text),
+                None => None,
+            },
             karma: self.karma.as_ref(),
             karma_critpath: self.karma_critpath.as_ref(),
             bug_feedback: self.bug_feedback.as_ref(),

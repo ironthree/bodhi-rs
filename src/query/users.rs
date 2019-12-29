@@ -23,13 +23,13 @@ use crate::{BodhiService, Query, SinglePageQuery, User};
 /// # use bodhi::{BodhiServiceBuilder, UserNameQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comment = bodhi.query(&UserNameQuery::new(String::from("decathorpe"))).unwrap();
+/// let comment = bodhi.query(&UserNameQuery::new("decathorpe")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-0>
 #[derive(Debug)]
-pub struct UserNameQuery {
-    name: String,
+pub struct UserNameQuery<'a> {
+    name: &'a str,
 }
 
 #[derive(Debug, Deserialize)]
@@ -37,20 +37,20 @@ struct UserPage {
     user: User,
 }
 
-impl UserNameQuery {
+impl<'a> UserNameQuery<'a> {
     /// This method is the only way to create a new `UserNameQuery` instance.
-    pub fn new(name: String) -> Self {
+    pub fn new(name: &'a str) -> Self {
         UserNameQuery { name }
     }
 }
 
-impl SinglePageQuery<Option<User>> for UserNameQuery {
+impl<'a> SinglePageQuery<Option<User>> for UserNameQuery<'a> {
     fn path(&self) -> Result<String, QueryError> {
         Ok(format!("/users/{}", self.name))
     }
 
-    fn parse(string: String) -> Result<Option<User>, QueryError> {
-        let user_page: UserPage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<Option<User>, QueryError> {
+        let user_page: UserPage = serde_json::from_str(string)?;
         Ok(Some(user_page.user))
     }
 
@@ -59,7 +59,7 @@ impl SinglePageQuery<Option<User>> for UserNameQuery {
     }
 }
 
-impl Query<Option<User>> for UserNameQuery {
+impl<'a> Query<Option<User>> for UserNameQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Option<User>, QueryError> {
         <Self as SinglePageQuery<Option<User>>>::query(self, bodhi)
     }
@@ -74,23 +74,21 @@ impl Query<Option<User>> for UserNameQuery {
 /// # use bodhi::{BodhiServiceBuilder, UserQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let users = bodhi
-///     .query(&UserQuery::new().groups(String::from("provenpackager")))
-///     .unwrap();
+/// let users = bodhi.query(&UserQuery::new().groups("provenpackager")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-1>
 #[derive(Debug, Default)]
-pub struct UserQuery {
-    groups: Option<Vec<String>>,
-    like: Option<String>,
-    name: Option<String>,
-    packages: Option<Vec<String>>,
-    search: Option<String>,
-    updates: Option<Vec<String>>,
+pub struct UserQuery<'a> {
+    groups: Option<Vec<&'a str>>,
+    like: Option<&'a str>,
+    name: Option<&'a str>,
+    packages: Option<Vec<&'a str>>,
+    search: Option<&'a str>,
+    updates: Option<Vec<&'a str>>,
 }
 
-impl UserQuery {
+impl<'a> UserQuery<'a> {
     /// This method returns a new `UserQuery` with *no* filters set.
     pub fn new() -> Self {
         UserQuery {
@@ -106,7 +104,7 @@ impl UserQuery {
     /// Restrict the returned results to members of the given group(s).
     ///
     /// Can be specified multiple times.
-    pub fn groups(mut self, group: String) -> Self {
+    pub fn groups(mut self, group: &'a str) -> Self {
         match &mut self.groups {
             Some(groups) => groups.push(group),
             None => self.groups = Some(vec![group]),
@@ -116,7 +114,7 @@ impl UserQuery {
     }
 
     /// Restrict search to users *like* the given argument (in the SQL sense).
-    pub fn like(mut self, like: String) -> Self {
+    pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
     }
@@ -125,7 +123,7 @@ impl UserQuery {
     ///
     /// If this is the only required filter, consider using a
     /// [`UserNameQuery`](struct.UserNameQuery.html) instead.
-    pub fn name(mut self, name: String) -> Self {
+    pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
     }
@@ -133,7 +131,7 @@ impl UserQuery {
     /// Restrict the returned results to users associated with the given package(s).
     ///
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> Self {
+    pub fn packages(mut self, package: &'a str) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -143,7 +141,7 @@ impl UserQuery {
     }
 
     /// Restrict search to users containing the given argument.
-    pub fn search(mut self, search: String) -> Self {
+    pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
@@ -151,7 +149,7 @@ impl UserQuery {
     /// Restrict the returned results to users associated with the given update(s).
     ///
     /// Can be specified multiple times.
-    pub fn updates(mut self, update: String) -> Self {
+    pub fn updates(mut self, update: &'a str) -> Self {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -194,7 +192,7 @@ impl UserQuery {
     }
 }
 
-impl Query<Vec<User>> for UserQuery {
+impl<'a> Query<Vec<User>> for UserQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
         UserQuery::query(self, bodhi)
     }
@@ -211,12 +209,12 @@ struct UserListPage {
 
 #[derive(Debug, Serialize)]
 struct UserPageQuery<'a> {
-    groups: Option<&'a Vec<String>>,
-    like: Option<&'a String>,
-    name: Option<&'a String>,
-    packages: Option<&'a Vec<String>>,
-    search: Option<&'a String>,
-    updates: Option<&'a Vec<String>>,
+    groups: Option<&'a Vec<&'a str>>,
+    like: Option<&'a &'a str>,
+    name: Option<&'a &'a str>,
+    packages: Option<&'a Vec<&'a str>>,
+    search: Option<&'a &'a str>,
+    updates: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
@@ -227,8 +225,8 @@ impl<'a> SinglePageQuery<UserListPage> for UserPageQuery<'a> {
         Ok(format!("/users/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn parse(string: String) -> Result<UserListPage, QueryError> {
-        let user_page: UserListPage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<UserListPage, QueryError> {
+        let user_page: UserListPage = serde_json::from_str(string)?;
         Ok(user_page)
     }
 

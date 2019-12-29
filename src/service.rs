@@ -55,22 +55,22 @@ enum BodhiServiceType {
 /// let builder = bodhi::BodhiServiceBuilder::staging()
 ///     .timeout(std::time::Duration::from_secs(120))
 ///     .retries(2)
-///     .authentication(String::from("bodhi-rs"), String::from("password1"));
+///     .authentication("bodhi-rs", "password1");
 /// // builder.build();
 /// ```
 #[derive(Debug)]
-pub struct BodhiServiceBuilder {
+pub struct BodhiServiceBuilder<'a> {
     service_type: BodhiServiceType,
-    authentication: Option<Authentication>,
+    authentication: Option<Authentication<'a>>,
     url: String,
     timeout: Option<Duration>,
     retries: Option<usize>,
 }
 
 #[derive(Debug)]
-struct Authentication {
-    username: String,
-    password: String,
+struct Authentication<'a> {
+    username: &'a str,
+    password: &'a str,
 }
 
 /// This enum contains variants for all the ways in which constructing a
@@ -118,7 +118,7 @@ impl From<fedora::anonymous::InitialisationError> for BuilderError {
     }
 }
 
-impl BodhiServiceBuilder {
+impl<'a> BodhiServiceBuilder<'a> {
     /// This method creates a new builder for the "production" instances of the fedora services.
     pub fn default() -> Self {
         BodhiServiceBuilder {
@@ -168,7 +168,7 @@ impl BodhiServiceBuilder {
     /// This method can be used to set credentials for authenticating with the fedora OpenID
     /// endpoint, so the resulting [`BodhiService`](struct.BodhiService.html) can be used to
     /// send authenticated requests for creating and editing things on the server.
-    pub fn authentication(mut self, username: String, password: String) -> Self {
+    pub fn authentication(mut self, username: &'a str, password: &'a str) -> Self {
         self.authentication = Some(Authentication { username, password });
         self
     }
@@ -197,13 +197,13 @@ impl BodhiServiceBuilder {
             match self.service_type {
                 BodhiServiceType::DEFAULT => Box::new(
                     OpenIDSessionBuilder::default(login_url, auth.username, auth.password)
-                        .user_agent(user_agent)
+                        .user_agent(&user_agent)
                         .timeout(timeout)
                         .build()?,
                 ),
                 BodhiServiceType::STAGING => Box::new(
                     OpenIDSessionBuilder::staging(login_url, auth.username, auth.password)
-                        .user_agent(user_agent)
+                        .user_agent(&user_agent)
                         .timeout(timeout)
                         .build()?,
                 ),
@@ -212,7 +212,7 @@ impl BodhiServiceBuilder {
 
                     Box::new(
                         OpenIDSessionBuilder::custom(url, login_url, auth.username, auth.password)
-                            .user_agent(user_agent)
+                            .user_agent(&user_agent)
                             .timeout(timeout)
                             .build()?,
                     )
@@ -221,7 +221,7 @@ impl BodhiServiceBuilder {
         } else {
             Box::new(
                 AnonymousSessionBuilder::new()
-                    .user_agent(user_agent)
+                    .user_agent(&user_agent)
                     .timeout(timeout)
                     .build()?,
             )

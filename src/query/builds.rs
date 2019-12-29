@@ -22,33 +22,31 @@ use crate::{BodhiService, Build, FedoraRelease, Query, SinglePageQuery};
 /// # use bodhi::{BuildNVRQuery, BodhiServiceBuilder};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let build = bodhi
-///     .query(&BuildNVRQuery::new(String::from("rust-1.34.1-1.fc29")))
-///     .unwrap();
+/// let build = bodhi.query(&BuildNVRQuery::new("rust-1.34.1-1.fc29")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-0>
 #[derive(Debug)]
-pub struct BuildNVRQuery {
+pub struct BuildNVRQuery<'a> {
     /// NVR of the build to query (Name-Version-Release format, without Epoch)
-    nvr: String,
+    nvr: &'a str,
 }
 
-impl BuildNVRQuery {
+impl<'a> BuildNVRQuery<'a> {
     /// This method is the only way to create a new [`BuildNVRQuery`](struct.BuildNVRQuery.html)
     /// instance.
-    pub fn new(nvr: String) -> Self {
+    pub fn new(nvr: &'a str) -> Self {
         BuildNVRQuery { nvr }
     }
 }
 
-impl SinglePageQuery<Option<Build>> for BuildNVRQuery {
+impl<'a> SinglePageQuery<Option<Build>> for BuildNVRQuery<'a> {
     fn path(&self) -> Result<String, QueryError> {
         Ok(format!("/builds/{}", self.nvr))
     }
 
-    fn parse(string: String) -> Result<Option<Build>, QueryError> {
-        let build: Build = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<Option<Build>, QueryError> {
+        let build: Build = serde_json::from_str(string)?;
         Ok(Some(build))
     }
 
@@ -57,7 +55,7 @@ impl SinglePageQuery<Option<Build>> for BuildNVRQuery {
     }
 }
 
-impl Query<Option<Build>> for BuildNVRQuery {
+impl<'a> Query<Option<Build>> for BuildNVRQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Option<Build>, QueryError> {
         <Self as SinglePageQuery<Option<Build>>>::query(self, bodhi)
     }
@@ -77,27 +75,27 @@ impl Query<Option<Build>> for BuildNVRQuery {
 ///         &BuildQuery::new()
 ///             .releases(FedoraRelease::F30)
 ///             .releases(FedoraRelease::F29)
-///             .packages(String::from("rust")),
+///             .packages("rust"),
 ///     )
 ///     .unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-1>
 #[derive(Debug, Default)]
-pub struct BuildQuery {
+pub struct BuildQuery<'a> {
     /// NVR of the build to query (Name-Version-Release format, without Epoch)
-    nvr: Option<String>,
+    nvr: Option<&'a str>,
     /// list of packages to request builds for
-    packages: Option<Vec<String>>,
+    packages: Option<Vec<&'a str>>,
     /// list of releases to request builds for
     releases: Option<Vec<FedoraRelease>>,
     /// list of updates to request builds for
-    updates: Option<Vec<String>>,
+    updates: Option<Vec<&'a str>>,
 }
 
-impl BuildQuery {
+impl<'a> BuildQuery<'a> {
     /// This method returns a new [`BuildQuery`](struct.BuildQuery.html) with *no* filters set.
-    pub fn new() -> BuildQuery {
+    pub fn new() -> Self {
         BuildQuery {
             nvr: None,
             packages: None,
@@ -108,7 +106,7 @@ impl BuildQuery {
 
     /// Restrict the returned results to builds with the given NVR. If this is the only required
     /// filter, consider using a [`BuildNVRQuery`](struct.BuildNVRQuery.html) instead.
-    pub fn nvr(mut self, nvr: String) -> Self {
+    pub fn nvr(mut self, nvr: &'a str) -> Self {
         self.nvr = Some(nvr);
         self
     }
@@ -116,7 +114,7 @@ impl BuildQuery {
     /// Restrict the returned results to builds of the given package(s).
     ///
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> Self {
+    pub fn packages(mut self, package: &'a str) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -140,7 +138,7 @@ impl BuildQuery {
     /// Restrict the returned results to builds for the given update(s).
     ///
     /// Can be specified multiple times.
-    pub fn updates(mut self, update: String) -> Self {
+    pub fn updates(mut self, update: &'a str) -> Self {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -171,7 +169,7 @@ impl BuildQuery {
 
     fn page_query(&self, page: u32, rows_per_page: u32) -> BuildPageQuery {
         BuildPageQuery {
-            nvr: self.nvr.as_ref(),
+            nvr: self.nvr,
             packages: self.packages.as_ref(),
             releases: self.releases.as_ref(),
             updates: self.updates.as_ref(),
@@ -181,7 +179,7 @@ impl BuildQuery {
     }
 }
 
-impl Query<Vec<Build>> for BuildQuery {
+impl<'a> Query<Vec<Build>> for BuildQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
         BuildQuery::query(self, bodhi)
     }
@@ -198,10 +196,10 @@ struct BuildListPage {
 
 #[derive(Debug, Serialize)]
 struct BuildPageQuery<'a> {
-    nvr: Option<&'a String>,
-    packages: Option<&'a Vec<String>>,
+    nvr: Option<&'a str>,
+    packages: Option<&'a Vec<&'a str>>,
     releases: Option<&'a Vec<FedoraRelease>>,
-    updates: Option<&'a Vec<String>>,
+    updates: Option<&'a Vec<&'a str>>,
     page: u32,
     rows_per_page: u32,
 }
@@ -211,8 +209,8 @@ impl<'a> SinglePageQuery<BuildListPage> for BuildPageQuery<'a> {
         Ok(format!("/builds/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn parse(string: String) -> Result<BuildListPage, QueryError> {
-        let build_page: BuildListPage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<BuildListPage, QueryError> {
+        let build_page: BuildListPage = serde_json::from_str(string)?;
         Ok(build_page)
     }
 

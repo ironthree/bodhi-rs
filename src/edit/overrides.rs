@@ -8,7 +8,7 @@ use crate::{BodhiDate, BodhiService, CSRFQuery, Edit, Override, OverrideData};
 /// This struct contains the values that are returned when editing a buildroot override.
 #[derive(Debug, Deserialize)]
 pub struct EditedOverride {
-    // TODO: determine actual fields
+    /// TODO: determine actual fields
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
 }
@@ -16,11 +16,11 @@ pub struct EditedOverride {
 /// This struct contains all the possible arguments for editing a buildroot override.
 #[derive(Debug)]
 pub struct OverrideEditor<'a> {
-    notes: &'a String,
+    notes: &'a str,
     expiration_date: &'a BodhiDate,
     expired: Option<bool>,
     /// NVR of the existing buildroot override to edit
-    edited: &'a String,
+    edited: &'a str,
 }
 
 impl<'a> OverrideEditor<'a> {
@@ -36,7 +36,7 @@ impl<'a> OverrideEditor<'a> {
     }
 
     /// Change the buildroot override notes.
-    pub fn notes(mut self, notes: &'a String) -> Self {
+    pub fn notes(mut self, notes: &'a str) -> Self {
         self.notes = notes;
         self
     }

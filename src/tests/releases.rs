@@ -12,7 +12,7 @@ fn name_query_some() {
         .build()
         .unwrap();
 
-    let release: Option<Release> = bodhi.query(&ReleaseNameQuery::new(String::from("F30"))).unwrap();
+    let release: Option<Release> = bodhi.query(&ReleaseNameQuery::new("F30")).unwrap();
 
     assert!(release.is_some());
 }
@@ -25,7 +25,7 @@ fn name_query_none() {
         .build()
         .unwrap();
 
-    let release: Option<Release> = bodhi.query(&ReleaseNameQuery::new(String::from("X12"))).unwrap();
+    let release: Option<Release> = bodhi.query(&ReleaseNameQuery::new("X12")).unwrap();
 
     assert!(release.is_none());
 }

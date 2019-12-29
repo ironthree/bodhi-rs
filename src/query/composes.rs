@@ -35,8 +35,8 @@ impl SinglePageQuery<Vec<Compose>> for ComposeQuery {
         Ok(String::from("/composes/"))
     }
 
-    fn parse(string: String) -> Result<Vec<Compose>, QueryError> {
-        let page: ComposePage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<Vec<Compose>, QueryError> {
+        let page: ComposePage = serde_json::from_str(string)?;
         Ok(page.composes)
     }
 

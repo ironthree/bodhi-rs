@@ -26,14 +26,14 @@ fn main() -> Result<(), String> {
     // construct bodhi client for the staging instance, and
     // authenticate with the supplied username and password
     let bodhi = BodhiServiceBuilder::staging()
-        .authentication(username, password)
+        .authentication(&username, &password)
         .build()
         .unwrap();
 
     // build a new comment for an update that's still in "testing" state,
     // and add some boilerplate text and a karma value
-    let new_comment = CommentBuilder::new(String::from("FEDORA-2019-e7f463674c"))
-        .text(String::from("Test comment from bodhi-rs."))
+    let new_comment = CommentBuilder::new("FEDORA-2019-e7f463674c")
+        .text("Test comment from bodhi-rs.")
         .karma(Karma::Positive);
 
     // create the update on the service

@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::{QueryError, ServiceError};
 use crate::service::DEFAULT_ROWS;
-use crate::{BodhiService, Comment, Query, SinglePageQuery};
+use crate::{BodhiDate, BodhiService, Comment, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific comment by its ID. It will either return an
 /// `Ok(Some(Comment))` matching the specified ID, return `Ok(None)` if it doesn't exist, or return
@@ -49,8 +49,8 @@ impl SinglePageQuery<Option<Comment>> for CommentIDQuery {
         Ok(format!("/comments/{}", self.id))
     }
 
-    fn parse(string: String) -> Result<Option<Comment>, QueryError> {
-        let comment: CommentPage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<Option<Comment>, QueryError> {
+        let comment: CommentPage = serde_json::from_str(string)?;
         Ok(Some(comment.comment))
     }
 
@@ -75,29 +75,25 @@ impl Query<Option<Comment>> for CommentIDQuery {
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let comments = bodhi
-///     .query(
-///         &CommentQuery::new()
-///             .users(String::from("decathorpe"))
-///             .packages(String::from("rust")),
-///     )
+///     .query(&CommentQuery::new().users("decathorpe").packages("rust"))
 ///     .unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1>
 #[derive(Debug, Default)]
-pub struct CommentQuery {
+pub struct CommentQuery<'a> {
     anonymous: Option<bool>,
-    ignore_users: Option<Vec<String>>,
-    like: Option<String>,
-    packages: Option<Vec<String>>,
-    search: Option<String>,
-    since: Option<String>,
-    update_owners: Option<Vec<String>>,
-    updates: Option<Vec<String>>,
-    users: Option<Vec<String>>,
+    ignore_users: Option<Vec<&'a str>>,
+    like: Option<&'a str>,
+    packages: Option<Vec<&'a str>>,
+    search: Option<&'a str>,
+    since: Option<&'a BodhiDate>,
+    update_owners: Option<Vec<&'a str>>,
+    updates: Option<Vec<&'a str>>,
+    users: Option<Vec<&'a str>>,
 }
 
-impl CommentQuery {
+impl<'a> CommentQuery<'a> {
     /// This method returns a new [`CommentQuery`](struct.CommentQuery.html) with *no* filters set.
     pub fn new() -> Self {
         CommentQuery {
@@ -124,7 +120,7 @@ impl CommentQuery {
     /// Restrict results to ignore comments by certain users.
     ///
     /// Can be specified multiple times.
-    pub fn ignore_users(mut self, ignore_user: String) -> Self {
+    pub fn ignore_users(mut self, ignore_user: &'a str) -> Self {
         match &mut self.ignore_users {
             Some(ignore_users) => ignore_users.push(ignore_user),
             None => self.ignore_users = Some(vec![ignore_user]),
@@ -134,7 +130,7 @@ impl CommentQuery {
     }
 
     /// Restrict search to comments *like* the given argument (in the SQL sense).
-    pub fn like(mut self, like: String) -> CommentQuery {
+    pub fn like(mut self, like: &'a str) -> CommentQuery {
         self.like = Some(like);
         self
     }
@@ -142,7 +138,7 @@ impl CommentQuery {
     /// Restrict the returned results to comments filed against updates for the given package(s).
     ///
     /// Can be specified multiple times.
-    pub fn packages(mut self, package: String) -> Self {
+    pub fn packages(mut self, package: &'a str) -> Self {
         match &mut self.packages {
             Some(packages) => packages.push(package),
             None => self.packages = Some(vec![package]),
@@ -152,13 +148,13 @@ impl CommentQuery {
     }
 
     /// Restrict search to comments containing the given argument.
-    pub fn search(mut self, search: String) -> Self {
+    pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
 
     /// Restrict the returned results to comments filed since the given date and time.
-    pub fn since(mut self, since: String) -> Self {
+    pub fn since(mut self, since: &'a BodhiDate) -> Self {
         self.since = Some(since);
         self
     }
@@ -167,7 +163,7 @@ impl CommentQuery {
     /// user(s).
     ///
     /// Can be specified multiple times.
-    pub fn update_owners(mut self, update_owner: String) -> Self {
+    pub fn update_owners(mut self, update_owner: &'a str) -> Self {
         match &mut self.update_owners {
             Some(update_owners) => update_owners.push(update_owner),
             None => self.update_owners = Some(vec![update_owner]),
@@ -179,7 +175,7 @@ impl CommentQuery {
     /// Restrict the returned results to comments filed against the given update(s).
     ///
     /// Can be specified multiple times.
-    pub fn updates(mut self, update: String) -> Self {
+    pub fn updates(mut self, update: &'a str) -> Self {
         match &mut self.updates {
             Some(updates) => updates.push(update),
             None => self.updates = Some(vec![update]),
@@ -191,7 +187,7 @@ impl CommentQuery {
     /// Restrict the returned results to comments filed by the given user(s).
     ///
     /// Can be specified multiple times.
-    pub fn users(mut self, user: String) -> Self {
+    pub fn users(mut self, user: &'a str) -> Self {
         match &mut self.users {
             Some(users) => users.push(user),
             None => self.users = Some(vec![user]),
@@ -224,10 +220,10 @@ impl CommentQuery {
         CommentPageQuery {
             anonymous: self.anonymous,
             ignore_users: self.ignore_users.as_ref(),
-            like: self.like.as_ref(),
+            like: self.like,
             packages: self.packages.as_ref(),
-            search: self.search.as_ref(),
-            since: self.since.as_ref(),
+            search: self.search,
+            since: self.since,
             update_owners: self.update_owners.as_ref(),
             updates: self.updates.as_ref(),
             users: self.users.as_ref(),
@@ -237,7 +233,7 @@ impl CommentQuery {
     }
 }
 
-impl Query<Vec<Comment>> for CommentQuery {
+impl<'a> Query<Vec<Comment>> for CommentQuery<'a> {
     fn query(&self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
         CommentQuery::query(self, bodhi)
     }
@@ -255,14 +251,15 @@ struct CommentListPage {
 #[derive(Debug, Serialize)]
 struct CommentPageQuery<'a> {
     anonymous: Option<bool>,
-    ignore_users: Option<&'a Vec<String>>,
-    like: Option<&'a String>,
-    packages: Option<&'a Vec<String>>,
-    search: Option<&'a String>,
-    since: Option<&'a String>,
-    update_owners: Option<&'a Vec<String>>,
-    updates: Option<&'a Vec<String>>,
-    users: Option<&'a Vec<String>>,
+    ignore_users: Option<&'a Vec<&'a str>>,
+    like: Option<&'a str>,
+    packages: Option<&'a Vec<&'a str>>,
+    search: Option<&'a str>,
+    #[serde(with = "crate::option_bodhi_date_format")]
+    since: Option<&'a BodhiDate>,
+    update_owners: Option<&'a Vec<&'a str>>,
+    updates: Option<&'a Vec<&'a str>>,
+    users: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
@@ -273,8 +270,8 @@ impl<'a> SinglePageQuery<CommentListPage> for CommentPageQuery<'a> {
         Ok(format!("/comments/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn parse(string: String) -> Result<CommentListPage, QueryError> {
-        let comment_page: CommentListPage = serde_json::from_str(&string)?;
+    fn parse(string: &str) -> Result<CommentListPage, QueryError> {
+        let comment_page: CommentListPage = serde_json::from_str(string)?;
         Ok(comment_page)
     }
 

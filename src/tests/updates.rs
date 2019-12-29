@@ -12,9 +12,7 @@ fn id_query_some() {
         .build()
         .unwrap();
 
-    let update: Option<Update> = bodhi
-        .query(&UpdateIDQuery::new(String::from("FEDORA-2019-227c137c3f")))
-        .unwrap();
+    let update: Option<Update> = bodhi.query(&UpdateIDQuery::new("FEDORA-2019-227c137c3f")).unwrap();
 
     assert!(update.is_some());
 }
@@ -27,7 +25,7 @@ fn id_query_none() {
         .build()
         .unwrap();
 
-    let update: Option<Update> = bodhi.query(&UpdateIDQuery::new(String::from("NOPE"))).unwrap();
+    let update: Option<Update> = bodhi.query(&UpdateIDQuery::new("NOPE")).unwrap();
 
     assert!(update.is_none());
 }

@@ -20,8 +20,7 @@ debug = []
 [dependencies]
 chrono = { version = "^0.4.10", features = ["serde"] }
 failure = "^0.1.6"
-fedora = "^0.1.0"
-#fedora = { path = "../fedora-rs", features = ["debug"] }
+fedora = "^0.2.0"
 reqwest = { version = "^0.10.0-alpha.2", features = ["blocking", "cookies"] }
 retry = "^0.5.1"
 serde = { version = "^1.0.104", features = ["derive"] }

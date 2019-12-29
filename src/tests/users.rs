@@ -12,7 +12,7 @@ fn name_query_some() {
         .build()
         .unwrap();
 
-    let user: Option<User> = bodhi.query(&UserNameQuery::new(String::from("decathorpe"))).unwrap();
+    let user: Option<User> = bodhi.query(&UserNameQuery::new("decathorpe")).unwrap();
 
     assert!(user.is_some());
 }
@@ -25,7 +25,7 @@ fn name_query_none() {
         .build()
         .unwrap();
 
-    let user: Option<User> = bodhi.query(&UserNameQuery::new(String::from("nobody"))).unwrap();
+    let user: Option<User> = bodhi.query(&UserNameQuery::new("nobody")).unwrap();
 
     assert!(user.is_none());
 }
