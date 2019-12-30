@@ -16,7 +16,7 @@ use crate::{BodhiService, Query, Release, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific release by its name. It will either return an
 /// `Ok(Some(Release))` matching the specified name, return `Ok(None)` if it doesn't exist, or
-/// return an `Err(String)` if another error occurred.
+/// return an `Err(QueryError)` if another error occurred.
 ///
 /// ```
 /// # use bodhi::{BodhiServiceBuilder, FedoraRelease, ReleaseNameQuery};

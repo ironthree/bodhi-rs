@@ -16,7 +16,7 @@ use crate::{BodhiDate, BodhiService, Comment, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific comment by its ID. It will either return an
 /// `Ok(Some(Comment))` matching the specified ID, return `Ok(None)` if it doesn't exist, or return
-/// an `Err(String)` if another error occurred.
+/// an `Err(QueryError)` if another error occurred.
 ///
 /// ```
 /// # use bodhi::{BodhiServiceBuilder, CommentIDQuery};

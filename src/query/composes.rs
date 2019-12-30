@@ -5,6 +5,16 @@ use serde::Deserialize;
 use crate::error::{QueryError, ServiceError};
 use crate::{BodhiService, Compose, ComposeRequest, FedoraRelease, Query, SinglePageQuery};
 
+/// Use this for querying bodhi for a specific compose by its release and request. It will either
+/// return an `Ok(Some(Compose))` matching the specified values, return `Ok(None)` if it doesn't
+/// currently exist, or return an `Err(QueryError)` if another error occurred.
+///
+/// ```
+/// # use bodhi::{BodhiServiceBuilder, CommentIDQuery};
+/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
+///
+/// let comment = bodhi.query(&CommentIDQuery::new(19999)).unwrap();
+/// ```
 #[derive(Debug)]
 pub struct ComposeReleaseRequestQuery {
     release: FedoraRelease,
@@ -17,6 +27,8 @@ struct ComposePage {
 }
 
 impl ComposeReleaseRequestQuery {
+    /// This method is the only way to create a new
+    /// [`ComposeReleaseRequestQuery`](struct.ComposeReleaseRequestQuery.html) instance.
     pub fn new(release: FedoraRelease, request: ComposeRequest) -> Self {
         ComposeReleaseRequestQuery { release, request }
     }

@@ -6,7 +6,7 @@ use crate::error::{QueryError, ServiceError};
 use crate::{BodhiService, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a new CSRF token. It will return either an `Ok(String)` with the
-/// new token, or an `Err(String)` if an error occurred.
+/// new token, or an `Err(QueryError)` if an error occurred.
 ///
 /// ```
 /// # use bodhi::{BodhiServiceBuilder, CSRFQuery};

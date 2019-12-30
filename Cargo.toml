@@ -20,8 +20,8 @@ debug = []
 [dependencies]
 chrono = { version = "^0.4.10", features = ["serde"] }
 failure = "^0.1.6"
-fedora = "^0.2.0"
-reqwest = { version = "^0.10.0-alpha.2", features = ["blocking", "cookies"] }
+fedora = "^0.2.1"
+reqwest = { version = "^0.10.0", features = ["blocking", "cookies"] }
 retry = "^0.5.1"
 serde = { version = "^1.0.104", features = ["derive"] }
 serde_repr = "^0.1.5"
@@ -32,4 +32,3 @@ url = "^2.1.0"
 [profile.release]
 codegen-units = 1
 lto = true
-

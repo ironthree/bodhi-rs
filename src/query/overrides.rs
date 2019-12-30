@@ -17,7 +17,7 @@ use crate::{BodhiService, FedoraRelease, Override, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific override, by its NVR (Name-Version-Release) string.
 /// It will return either an `Ok(Some(Override))` matching the specified NVR, return `Ok(None)` if
-/// it doesn't exist, or return an `Err(String)` if another error occurred.
+/// it doesn't exist, or return an `Err(QueryError)` if another error occurred.
 ///
 /// ```
 /// # use bodhi::{BodhiServiceBuilder, OverrideNVRQuery};

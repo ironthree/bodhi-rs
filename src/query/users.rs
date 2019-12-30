@@ -17,7 +17,7 @@ use crate::{BodhiService, Query, SinglePageQuery, User};
 
 /// Use this for querying bodhi for a specific user by their name. It will either return an
 /// `Ok(User)` matching the specified name, return `Ok(None)` if it doesn't exist, or return an
-/// `Err(String)` if another error occurred.
+/// `Err(QueryError)` if another error occurred.
 ///
 /// ```
 /// # use bodhi::{BodhiServiceBuilder, UserNameQuery};

@@ -17,7 +17,7 @@ use crate::{BodhiService, Query, SinglePageQuery};
 
 /// Use this for querying bodhi for a specific update by its ID or alias. It will either return an
 /// `Ok(Some(Update))` matching the specified ID or alias, return `Ok(None)` if it doesn't exist, or
-/// return an `Err(String)` if another error occurred.
+/// return an `Err(QueryError)` if another error occurred.
 ///
 /// ```
 /// # use bodhi::{BodhiServiceBuilder, UpdateIDQuery};
