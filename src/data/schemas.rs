@@ -32,7 +32,7 @@ pub struct UpdateData<'a> {
     /// koji side tag to take builds from (if this is specified, builds must be `None` or `[]`)
     pub from_tag: Option<&'a str>,
     /// bugs associated with the update (default: `[]`)
-    pub bugs: Option<&'a Vec<u32>>,
+    pub bugs: Option<&'a Vec<String>>,
     /// user-visible update title (default: `""`)
     pub display_name: Option<&'a str>,
     /// close bugs when update is pushed to stable (default: `true`)

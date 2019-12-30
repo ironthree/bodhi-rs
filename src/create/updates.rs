@@ -244,11 +244,16 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
 
         let csrf_token = bodhi.query(&CSRFQuery::new())?;
 
+        let bugs: Option<Vec<String>> = match &self.bugs {
+            Some(bugs) => Some(bugs.iter().map(|b| format!("{}", b)).collect()),
+            None => None,
+        };
+
         let new_update = match self.source {
             UpdateSource::Builds { builds } => UpdateData {
                 builds: Some(builds),
                 from_tag: None,
-                bugs: self.bugs.as_ref(),
+                bugs: bugs.as_ref(),
                 display_name: match &self.title {
                     Some(string) => Some(&string),
                     None => None,
@@ -279,7 +284,7 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
             UpdateSource::Tag { tag } => UpdateData {
                 builds: None,
                 from_tag: Some(tag),
-                bugs: self.bugs.as_ref(),
+                bugs: bugs.as_ref(),
                 display_name: match &self.title {
                     Some(string) => Some(&string),
                     None => None,

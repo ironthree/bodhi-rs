@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use crate::error::{BodhiError, QueryError};
 use crate::{
     BodhiService,
-    Build,
     CSRFQuery,
     Edit,
     Update,
@@ -19,9 +18,11 @@ use crate::{
 /// This struct contains the values that are returned when editing an update.
 #[derive(Debug, Deserialize)]
 pub struct EditedUpdate {
-    /// TODO: determine actual fields
+    /// the edited update
     #[serde(flatten)]
-    pub extra: HashMap<String, serde_json::Value>,
+    pub update: Update,
+    /// additional server messages
+    pub caveats: Vec<HashMap<String, String>>,
 }
 
 /// This struct contains all the possible arguments for editing an update. Methods to supply
@@ -29,7 +30,7 @@ pub struct EditedUpdate {
 #[derive(Debug)]
 pub struct UpdateEditor<'a> {
     // mandatory fields
-    builds: &'a [Build],
+    builds: Vec<&'a str>,
     notes: &'a str,
 
     // optional fields
@@ -56,7 +57,7 @@ impl<'a> UpdateEditor<'a> {
     /// fields with the current values.
     pub fn from_update(update: &'a Update) -> Self {
         UpdateEditor {
-            builds: &update.builds,
+            builds: update.builds.iter().map(|b| b.nvr.as_str()).collect(),
             notes: &update.notes,
 
             bugs: update.bugs.iter().map(|bug| bug.bug_id).collect(),
@@ -79,6 +80,24 @@ impl<'a> UpdateEditor<'a> {
             autotime: Some(update.autotime),
             stable_days: update.stable_days,
         }
+    }
+
+    /// Add a build to the update.
+    pub fn add_build(mut self, build: &'a str) -> Self {
+        self.builds.push(build);
+        self
+    }
+
+    /// Remove a build to the update.
+    pub fn remove_build(mut self, build: &'a str) -> Self {
+        self.builds.retain(|b| *b != build);
+        self
+    }
+
+    /// Change the update notes.
+    pub fn notes(mut self, notes: &'a str) -> Self {
+        self.notes = notes;
+        self
     }
 
     /// Add a related bug to the update.
@@ -219,12 +238,12 @@ impl<'a> Edit<EditedUpdate> for UpdateEditor<'a> {
 
         let csrf_token = bodhi.query(&CSRFQuery::new())?;
 
-        let builds: Vec<&str> = self.builds.iter().map(|b| b.nvr.as_str()).collect();
+        let bugs: Vec<String> = self.bugs.iter().map(|b| format!("{}", b)).collect();
 
         let update_edit = UpdateData {
-            builds: Some(&builds),
+            builds: Some(&self.builds),
             from_tag: None,
-            bugs: Some(&self.bugs),
+            bugs: Some(&bugs),
             display_name: self.title,
             close_bugs: self.close_bugs,
             update_type: match self.update_type {
