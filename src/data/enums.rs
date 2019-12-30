@@ -30,14 +30,24 @@ pub enum ComposeRequest {
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
 pub enum ComposeStatus {
+    #[serde(rename = "cleaning")]
+    Cleaning,
     #[serde(rename = "failed")]
     Failed,
     #[serde(rename = "initializing")]
     Initializing,
+    #[serde(rename = "notifying")]
+    Notifying,
     #[serde(rename = "pending")]
     Pending,
     #[serde(rename = "punging")]
     Punging,
+    #[serde(rename = "requested")]
+    Requested,
+    #[serde(rename = "signing_repo")]
+    SigningRepo,
+    #[serde(rename = "success")]
+    Success,
     #[serde(rename = "syncing_repo")]
     SyncingRepo,
     #[serde(rename = "updateinfo")]
@@ -120,9 +130,6 @@ pub enum ContentType {
 /// This enum represents a requested state change of an update.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateRequest {
-    /// request for an update to get "batched" for the next stable push (no longer used)
-    #[serde(rename = "batched")]
-    Batched,
     /// request for an update to be marked as "obsolete" (usually when another update supersedes it)
     #[serde(rename = "obsolete")]
     Obsolete,
@@ -166,9 +173,6 @@ pub enum UpdateStatus {
     /// tag for updates that are pending for either testing or stable
     #[serde(rename = "pending")]
     Pending,
-    /// tag for updates that are still being processed
-    #[serde(rename = "processing")]
-    Processing,
     /// tag for updates that are associated with an active side tag
     #[serde(rename = "side_tag_active")]
     SideTagActive,
@@ -225,6 +229,12 @@ pub enum ReleaseState {
     /// release is currently supported
     #[serde(rename = "current")]
     Current,
+    /// release is disabled
+    #[serde(rename = "disabled")]
+    Disabled,
+    /// release is frozen
+    #[serde(rename = "frozen")]
+    Frozen,
     /// release is in development
     #[serde(rename = "pending")]
     Pending,
@@ -242,6 +252,10 @@ pub enum TestGatingStatus {
     Ignored,
     #[serde(rename = "passed")]
     Passed,
+    #[serde(rename = "queued")]
+    Queued,
+    #[serde(rename = "running")]
+    Running,
     #[serde(rename = "waiting")]
     Waiting,
 }
