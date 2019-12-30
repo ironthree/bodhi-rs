@@ -35,7 +35,6 @@ pub struct NewComment {
 /// supply optional arguments are also available.
 #[derive(Debug)]
 pub struct CommentBuilder<'a> {
-    // TODO: take &Update instead
     update: &'a str,
     text: Option<&'a str>,
     karma: Option<Karma>,
@@ -90,6 +89,7 @@ impl<'a> CommentBuilder<'a> {
 
 impl<'a> Create<NewComment> for CommentBuilder<'a> {
     fn create(&self, bodhi: &BodhiService) -> Result<NewComment, QueryError> {
+        // TODO: check if the update exists
         // TODO: check if lengths of feedback vectors is good
         let path = String::from("/comments/");
 

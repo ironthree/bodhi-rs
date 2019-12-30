@@ -5,9 +5,9 @@ use serde::Deserialize;
 use crate::error::{BodhiError, QueryError};
 use crate::{
     BodhiService,
-    Build,
     CSRFQuery,
     Create,
+    Update,
     UpdateData,
     UpdateRequest,
     UpdateSeverity,
@@ -18,14 +18,16 @@ use crate::{
 /// This struct contains the values that are returned when creating a new update.
 #[derive(Debug, Deserialize)]
 pub struct NewUpdate {
-    /// TODO: determine actual fields
+    /// the newly created update
     #[serde(flatten)]
-    pub extra: HashMap<String, serde_json::Value>,
+    pub update: Update,
+    /// additional server messages
+    pub caveats: Vec<HashMap<String, String>>,
 }
 
 #[derive(Debug)]
 enum UpdateSource<'a> {
-    Builds { builds: &'a [Build] },
+    Builds { builds: &'a [&'a str] },
     Tag { tag: &'a str },
 }
 
@@ -35,7 +37,7 @@ enum UpdateSource<'a> {
 pub struct UpdateBuilder<'a> {
     // mandatory fields
     source: UpdateSource<'a>,
-    notes: String,
+    notes: &'a str,
 
     // optional fields
     bugs: Option<Vec<u32>>,
@@ -57,7 +59,7 @@ pub struct UpdateBuilder<'a> {
 
 impl<'a> UpdateBuilder<'a> {
     /// Use this method when creating an update for a list of builds.
-    pub fn from_builds(builds: &'a [Build], notes: String) -> Self {
+    pub fn from_builds(builds: &'a [&str], notes: &'a str) -> Self {
         UpdateBuilder {
             source: UpdateSource::Builds { builds },
             notes,
@@ -81,7 +83,7 @@ impl<'a> UpdateBuilder<'a> {
     }
 
     /// Use this method when creating an update for a side tag.
-    pub fn from_tag(tag: &'a str, notes: String) -> Self {
+    pub fn from_tag(tag: &'a str, notes: &'a str) -> Self {
         UpdateBuilder {
             source: UpdateSource::Tag { tag },
             notes,
@@ -244,7 +246,7 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
 
         let new_update = match self.source {
             UpdateSource::Builds { builds } => UpdateData {
-                builds: Some(builds.iter().map(|b| b.nvr.as_str()).collect()),
+                builds: Some(builds),
                 from_tag: None,
                 bugs: self.bugs.as_ref(),
                 display_name: match &self.title {
@@ -323,6 +325,9 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
         };
 
         let result = response.text()?;
+
+        println!("{:#?}", &result);
+
         let new_update: NewUpdate = serde_json::from_str(&result)?;
 
         Ok(new_update)

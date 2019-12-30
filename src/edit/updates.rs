@@ -219,8 +219,10 @@ impl<'a> Edit<EditedUpdate> for UpdateEditor<'a> {
 
         let csrf_token = bodhi.query(&CSRFQuery::new())?;
 
+        let builds: Vec<&str> = self.builds.iter().map(|b| b.nvr.as_str()).collect();
+
         let update_edit = UpdateData {
-            builds: Some(self.builds.iter().map(|b| b.nvr.as_str()).collect()),
+            builds: Some(&builds),
             from_tag: None,
             bugs: Some(&self.bugs),
             display_name: self.title,

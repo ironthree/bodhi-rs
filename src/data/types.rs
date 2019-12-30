@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
 
 use super::dates::*;
@@ -16,6 +18,10 @@ pub struct Bug {
     pub security: bool,
     /// title of the bug in BugZilla
     pub title: Option<String>,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents an update feedback item associated with a specific bug.
@@ -29,6 +35,10 @@ pub struct BugFeedback {
     pub comment_id: Option<u32>,
     /// feedback (positive, neutral, negative)
     pub karma: Karma,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents a specific koji build that bodhi is aware of.
@@ -47,6 +57,10 @@ pub struct Build {
     pub release_id: Option<u32>,
     /// flag to indicate whether this build has been signed yet
     pub signed: bool,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents one comment against a specific update, along with its associated bug and
@@ -80,6 +94,10 @@ pub struct Comment {
     pub user: User,
     /// user ID of the user who submitted this comment
     pub user_id: u32,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents a currently running compose.
@@ -109,6 +127,10 @@ pub struct Compose {
     pub state_date: BodhiDate,
     /// list of summaries for the contained updates (with update alias and title)
     pub update_summary: Vec<UpdateSummary>,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents a group from the fedora accounts system (FAS).
@@ -116,6 +138,10 @@ pub struct Compose {
 pub struct Group {
     /// name of the group
     pub name: String,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents a buildroot override, along with the associated build.
@@ -142,6 +168,10 @@ pub struct Override {
     pub submitter: User,
     /// user ID of the user who submitted this buildroot override
     pub submitter_id: u32,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents a specific fedora package (or another distributable unit)
@@ -152,6 +182,10 @@ pub struct Package {
     /// content type; one of: `rpm`, `container`, `flatpak`, `module`
     #[serde(rename = "type")]
     pub package_type: ContentType,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents a fedora release as present in the bodhi database. This includes variants
@@ -192,6 +226,10 @@ pub struct Release {
     pub testing_tag: String,
     /// version string of this release
     pub version: String,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents a specific test case as associated with a package.
@@ -203,6 +241,10 @@ pub struct TestCase {
     pub package: Option<Package>,
     /// ID of the package this test case is associated with
     pub package_id: u32,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents an update feedback item associated with a specific test case.
@@ -216,6 +258,10 @@ pub struct TestCaseFeedback {
     pub testcase: TestCase,
     /// ID of the test case this feedback is associated with
     pub testcase_id: u32,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct represents a bodhi update, with associated items: bugs, builds, comments, release,
@@ -236,6 +282,8 @@ pub struct Update {
     pub close_bugs: bool,
     /// list of comments associated with this update
     pub comments: Option<Vec<Comment>>,
+    /// compose this update is currently part of
+    pub compose: Option<Compose>,
     /// content type of this update (RPM, Module, Flatpak, Container)
     pub content_type: Option<ContentType>,
     /// flag to indicate whether this update contains packages from the "critical path"
@@ -260,6 +308,8 @@ pub struct Update {
     pub date_testing: Option<BodhiDate>,
     /// displayed name of this update
     pub display_name: String,
+    /// side tag this update was created from
+    pub from_tag: Option<String>,
     /// greenwave status summary string
     pub greenwave_summary_string: Option<String>,
     /// comma- or space-separated list of unsatisfied greenwave gating requirements
@@ -278,7 +328,7 @@ pub struct Update {
     /// flag indicating whether this update has already been pushed
     pub pushed: bool,
     /// release this update was submitted for
-    pub release: Release,
+    pub release: Option<Release>,
     /// currently requested new update status
     pub request: Option<UpdateRequest>,
     /// flag to specify whether feedback for bugs is required when counting karma
@@ -318,6 +368,10 @@ pub struct Update {
     pub url: String,
     /// user who created this update
     pub user: User,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }
 
 /// This struct wraps the short update summaries that are included in running
@@ -334,7 +388,7 @@ pub struct UpdateSummary {
 #[derive(Debug, Deserialize)]
 pub struct User {
     /// URL of the [libravatar](https://www.libravatar.org/) avatar for this user
-    pub avatar: String,
+    pub avatar: Option<String>,
     /// E-Mail address associated with this user (if set to public)
     pub email: Option<String>,
     /// group memberships for this user
@@ -344,5 +398,9 @@ pub struct User {
     /// username identifying this user
     pub name: String,
     /// OpenID identity associated with the user
-    pub openid: String,
+    pub openid: Option<String>,
+
+    /// catch-all for fields that are not explicitly deserialized
+    #[serde(flatten)]
+    pub extra: HashMap<String, serde_json::Value>,
 }

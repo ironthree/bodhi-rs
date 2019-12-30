@@ -3,7 +3,45 @@
 use serde::Deserialize;
 
 use crate::error::{QueryError, ServiceError};
-use crate::{BodhiService, Compose, Query, SinglePageQuery};
+use crate::{BodhiService, Compose, ComposeRequest, FedoraRelease, Query, SinglePageQuery};
+
+#[derive(Debug)]
+pub struct ComposeReleaseRequestQuery {
+    release: FedoraRelease,
+    request: ComposeRequest,
+}
+
+#[derive(Debug, Deserialize)]
+struct ComposePage {
+    compose: Compose,
+}
+
+impl ComposeReleaseRequestQuery {
+    pub fn new(release: FedoraRelease, request: ComposeRequest) -> Self {
+        ComposeReleaseRequestQuery { release, request }
+    }
+}
+
+impl SinglePageQuery<Option<Compose>> for ComposeReleaseRequestQuery {
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/composes/{}/{}", self.release, self.request))
+    }
+
+    fn parse(string: &str) -> Result<Option<Compose>, QueryError> {
+        let page: ComposePage = serde_json::from_str(string)?;
+        Ok(Some(page.compose))
+    }
+
+    fn missing() -> Result<Option<Compose>, QueryError> {
+        Ok(None)
+    }
+}
+
+impl Query<Option<Compose>> for ComposeReleaseRequestQuery {
+    fn query(&self, bodhi: &BodhiService) -> Result<Option<Compose>, QueryError> {
+        <Self as SinglePageQuery<Option<Compose>>>::query(self, bodhi)
+    }
+}
 
 /// This query can be used to fetch information about currently running composes from bodhi.
 ///
@@ -19,7 +57,7 @@ use crate::{BodhiService, Compose, Query, SinglePageQuery};
 pub struct ComposeQuery {}
 
 #[derive(Debug, Deserialize)]
-struct ComposePage {
+struct ComposeListPage {
     composes: Vec<Compose>,
 }
 
@@ -36,7 +74,7 @@ impl SinglePageQuery<Vec<Compose>> for ComposeQuery {
     }
 
     fn parse(string: &str) -> Result<Vec<Compose>, QueryError> {
-        let page: ComposePage = serde_json::from_str(string)?;
+        let page: ComposeListPage = serde_json::from_str(string)?;
         Ok(page.composes)
     }
 

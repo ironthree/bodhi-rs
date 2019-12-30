@@ -28,7 +28,7 @@ pub struct OverrideData<'a> {
 #[derive(Debug, Serialize)]
 pub struct UpdateData<'a> {
     /// list of builds to include in the update
-    pub builds: Option<Vec<&'a str>>,
+    pub builds: Option<&'a [&'a str]>,
     /// koji side tag to take builds from (if this is specified, builds must be `None` or `[]`)
     pub from_tag: Option<&'a str>,
     /// bugs associated with the update (default: `[]`)

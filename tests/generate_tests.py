@@ -2,8 +2,6 @@
 
 import textwrap
 
-# TODO: get releases from bodhi
-
 RELEASES = [
     "F32",
     "F32C",

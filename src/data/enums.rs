@@ -1,5 +1,6 @@
 use std::cmp::PartialEq;
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
@@ -18,12 +19,24 @@ pub enum Checkpoints {
 
 /// This enum represents the possible request values for composes.
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum ComposeRequest {
     #[serde(rename = "stable")]
     Stable,
     #[serde(rename = "testing")]
     Testing,
+}
+
+impl Display for ComposeRequest {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match serde_json::to_string(&self) {
+            Ok(value) => {
+                write!(f, "{}", value)?;
+                Ok(())
+            },
+            Err(_) => Err(std::fmt::Error),
+        }
+    }
 }
 
 /// This enum represents the possible status values for composes.
@@ -108,6 +121,18 @@ pub enum FedoraRelease {
     EL6,
     #[serde(rename = "EL-5")]
     EL5,
+}
+
+impl Display for FedoraRelease {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match serde_json::to_string(&self) {
+            Ok(value) => {
+                write!(f, "{}", value)?;
+                Ok(())
+            },
+            Err(_) => Err(std::fmt::Error),
+        }
+    }
 }
 
 /// This enum represents the type of a bodhi update, of a package, and of builds.
@@ -210,11 +235,11 @@ pub enum UpdateSuggestion {
 pub enum UpdateType {
     #[serde(rename = "bugfix")]
     BugFix,
-    #[serde(rename = "security")]
+    #[serde(rename = "enhancement")]
     Enhancement,
     #[serde(rename = "newpackage")]
     NewPackage,
-    #[serde(rename = "enhancement")]
+    #[serde(rename = "security")]
     Security,
     #[serde(rename = "unspecified")]
     Unspecified,
