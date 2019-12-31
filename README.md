@@ -5,7 +5,7 @@
 [![crates.io](https://img.shields.io/crates/l/bodhi.svg)](https://crates.io/crates/bodhi/)
 [![docs.rs](https://docs.rs/bodhi/badge.svg)](https://docs.rs/bodhi/)
 
-This package contains WIP rust bindings for the [bodhi] REST API as documented [here][bodhi-api].
+This crate contains rust bindings for the [bodhi] REST API as documented [here][bodhi-api].
 
 [bodhi]: https://github.com/fedora-infra/bodhi
 [bodhi-api]: https://bodhi.fedoraproject.org/docs/server_api/index.html#rest-api
@@ -21,31 +21,16 @@ It uses the awesome [`reqwest`][reqwest] and [`serde`][serde] packages, and is b
 
 This library tries to do error handling where reasonable, but passes server- or network-related errors through to the
 caller. For example, if bodhi is under heavy load, it sometimes returns garbage responses with empty bodies. On the
-other hand, there might just be a transient network issue that makes a server request fail or time out. These are not
+other hand, there might just be a persistent network issue that makes a server request fail or time out. These are not
 handled by the library, but are transparently wrapped and returned. If necessary, the request can be retried by the
-caller, but this library does not implement any retry logic itself (yet).
+caller. This library only implements a simple retry logic for network-related failures, not for server issues.
 
 
 ## Current status
 
 - All `GET` requests are implemented, and all actual API responses should successfully deserialize.
-- `POST` requests are work-in-progress.
-
-Note that the API is not finalized yet, and minor changes will still happen before the `0.1.0` release.
-
-
-## TODO
-
-- POST requests for creating things
-    - comments (DONE)
-    - overrides (DONE)
-    - updates (DONE)
-
-- POST requests for editing things
-    - overrides (DONE)
-    - updates (DONE)
-    - updates/request (WIP)
-    - updates/waive-test-results (WIP)
+- All `POST` requests are implemented for creating and editing items, except for interacting with releases (since I have
+  no way of testing that).
 
 
 ## Test coverage
@@ -56,8 +41,7 @@ to check some assumptions for server behaviour, or require test data which is to
 
 ## Examples
 
-The `examples` directory contains a few example applications to test and showcase some library functionality. Currently,
-this includes a simple program to file a comment or create a buildroot override in the staging instance of bodhi.
+The `examples` directory contains a few example applications to test and showcase some of the crate's functionality.
 
 
 ## Development
