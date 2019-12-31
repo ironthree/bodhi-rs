@@ -3,6 +3,7 @@
 import argparse
 import requests
 import json
+import os
 import threading
 import time
 
@@ -134,6 +135,42 @@ def do_builds() -> int:
 
     for thread in threads:
         thread.join()
+
+    return 0
+
+
+def do_comments() -> int:
+    pages = try_request(f"{API_URL}/comments/?rows_per_page=100&page=1").json()["pages"]
+    # cpages = range(1, pages + 1)
+    cpages = range(1, pages, 50)
+
+    def per_page(page: int):
+        print(f"Comments: page {page} / {pages}")
+        ret = try_request(f"{API_URL}/comments/?rows_per_page=100&page={page}")
+
+        with open(f"data/comments_p{page}.json", "w") as file:
+            file.write(json.dumps(ret.json()["comments"], indent=2))
+
+    threads = []
+    for cpage in cpages:
+        thread = threading.Thread(name=f"comments-p{cpage}", target=per_page, args=(cpage,))
+        threads.append(thread)
+        thread.start()
+
+        # do not DOS bodhi
+        time.sleep(5)
+
+    for thread in threads:
+        thread.join()
+
+    comments = []
+    for cpage in cpages:
+        with open(f"data/comments_p{cpage}.json") as file:
+            comments.extend(json.loads(file.read()))
+        os.remove(f"data/comments_p{cpage}.json")
+
+    with open(f"data/comments.json", "w") as file:
+        file.write(json.dumps(comments, indent=2))
 
     return 0
 
@@ -302,7 +339,7 @@ def do_users() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("action", action="store", choices=[
-        "all", "builds", "composes", "overrides", "packages", "releases", "updates", "users"
+        "all", "builds", "comments", "composes", "overrides", "packages", "releases", "updates", "users"
     ])
     parser.add_argument("--include-archived", action="store_const", const=True, default=False)
 
@@ -317,6 +354,7 @@ def main() -> int:
 
     actions = {
         "builds": do_builds,
+        "comments": do_comments,
         "composes": do_composes,
         "overrides": do_overrides,
         "packages": do_packages,

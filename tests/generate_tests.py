@@ -61,6 +61,31 @@ def do_builds():
         file.write(contents)
 
 
+def do_comments():
+    import_string = "const JSON: &str = " + \
+                    "concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/tests/data/comments.json\");"
+
+    test_string = textwrap.dedent(
+        """\
+        #[test]
+        fn comments_dejson() {
+            let _: Vec<Comment> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+        }
+        """
+    )
+
+    contents = (
+            "use std::fs::read_to_string;\n\nuse bodhi::Comment;" +
+            "\n\n" +
+            import_string +
+            "\n\n" +
+            test_string
+    )
+
+    with open("comments.rs", "w") as file:
+        file.write(contents)
+
+
 def do_composes():
     import_string = "const JSON: &str = " + \
                     "concat!(env!(\"CARGO_MANIFEST_DIR\"), \"/tests/data/composes.json\");"
@@ -213,6 +238,7 @@ def do_users():
 
 def main() -> int:
     do_builds()
+    do_comments()
     do_composes()
     do_overrides()
     do_packages()
