@@ -6,9 +6,6 @@ use chrono::{DateTime, TimeZone, Utc};
 /// human-readable date format internally used by bodhi
 pub const BODHI_DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 
-/// convenience format for date-only timestamps
-pub const BODHI_DATE_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
-
 /// This struct wraps a `chrono::DateTime<chrono::Utc>` instance with implementations for converting
 /// to and from the string format that bodhi expects and returns for dates and times.
 #[derive(Debug)]
@@ -20,25 +17,23 @@ impl TryFrom<&str> for BodhiDate {
     type Error = chrono::ParseError;
 
     fn try_from(string: &str) -> Result<Self, Self::Error> {
-        // try the format containing date *and* time first, and if that fails,
-        // then try the format containing only the date.
-        Ok(BodhiDate {
-            date: Utc
-                .datetime_from_str(string, BODHI_DATETIME_FORMAT)
-                .or_else(|_| Utc.datetime_from_str(string, BODHI_DATE_FORMAT))?,
-        })
-    }
-}
+        // if the string is too short for the full format, pad it with 00:00:00 time.
 
-impl From<&BodhiDate> for String {
-    fn from(date: &BodhiDate) -> Self {
-        date.date.format(BODHI_DATETIME_FORMAT).to_string()
+        let string = if string.len() == 10 {
+            format!("{} 00:00:00", string)
+        } else {
+            string.to_owned()
+        };
+
+        Ok(BodhiDate {
+            date: Utc.datetime_from_str(&string, BODHI_DATETIME_FORMAT)?,
+        })
     }
 }
 
 impl Display for BodhiDate {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", String::from(self))
+        write!(f, "{}", self.date.format(BODHI_DATETIME_FORMAT).to_string())
     }
 }
 

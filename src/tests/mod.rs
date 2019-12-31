@@ -12,6 +12,7 @@ mod builds;
 mod comments;
 mod composes;
 mod csrf;
+mod dates;
 mod overrides;
 mod releases;
 mod updates;
