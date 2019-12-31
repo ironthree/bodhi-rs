@@ -11,8 +11,6 @@ use super::enums::*;
 pub struct Bug {
     /// bug ID in the BugZilla system: <https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}>
     pub bug_id: u32,
-    /// list of [`BugFeedback`](struct.BugFeedback.html) items associated with this bug
-    pub feedback: Option<Vec<BugFeedback>>,
     /// flag to indicate whether this bug has been tagged as a parent / tracking bug
     pub parent: bool,
     /// flag to indicate whether this bug has been tagged as a `Security` issue
@@ -67,11 +65,6 @@ impl Display for BugFeedback {
 /// This struct represents a specific koji build that bodhi is aware of.
 #[derive(Debug, Deserialize)]
 pub struct Build {
-    /// type of this build; one of: `container`, `flatpak`, `module`, `rpm`
-    #[serde(rename = "type")]
-    pub build_type: ContentType,
-    /// URL pointing to the results of CI tests
-    pub ci_url: Option<String>,
     /// epoch associated with this build
     pub epoch: Option<u32>,
     /// (Name-Version-Release) value for this build
@@ -80,6 +73,9 @@ pub struct Build {
     pub release_id: Option<u32>,
     /// flag to indicate whether this build has been signed yet
     pub signed: bool,
+    /// type of this build; one of: `container`, `flatpak`, `module`, `rpm`
+    #[serde(rename = "type")]
+    pub build_type: ContentType,
 
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
@@ -108,16 +104,16 @@ impl Display for Build {
 /// test case feedback.
 #[derive(Debug, Deserialize)]
 pub struct Comment {
-    /// author of the comment (username)
-    pub author: Option<String>,
+    /// author of the comment (username), only provided for backwards compatibility
+    author: Option<String>,
     /// list of bug feedback items
     pub bug_feedback: Vec<BugFeedback>,
     /// numerical ID of this comment
     pub id: u32,
     /// feedback associated with this comment
     pub karma: Karma,
-    /// feedback associated with "critpath" checks
-    pub karma_critpath: Karma,
+    /// feedback associated with "critpath" checks (deprecated)
+    karma_critpath: Karma,
     /// list of test case feedback items
     pub testcase_feedback: Vec<TestCaseFeedback>,
     /// text of the comment
@@ -129,8 +125,8 @@ pub struct Comment {
     pub update: Option<Update>,
     /// ID of the update this comment is associated with
     pub update_id: u32,
-    /// title of the update this comment is associated with
-    pub update_title: Option<String>,
+    /// alias of the update this comment is for, only provided for backwards compatibility
+    update_alias: Option<String>,
     /// user who submitted this comment
     pub user: User,
     /// user ID of the user who submitted this comment
@@ -149,16 +145,11 @@ impl Display for Comment {
              {text}\n\
              \n\
              Submitted:      {timestamp}\n\
-             Karma:          {karma}\n\
-             Critpath Karma: {karma_critpath}",
-            author = match &self.author {
-                Some(author) => author,
-                None => "(anonymous)",
-            },
+             Karma:          {karma}",
+            author = &self.user.name,
             text = &self.text,
             timestamp = &self.timestamp,
             karma = self.karma,
-            karma_critpath = self.karma_critpath,
         )
     }
 }
@@ -432,10 +423,6 @@ pub struct Update {
     pub display_name: String,
     /// side tag this update was created from
     pub from_tag: Option<String>,
-    /// greenwave status summary string
-    pub greenwave_summary_string: Option<String>,
-    /// comma- or space-separated list of unsatisfied greenwave gating requirements
-    pub greenwave_unsatisfied_requirements: Option<String>,
     /// current karma total
     pub karma: Option<i32>,
     /// flag indicating whether this update can be edited
@@ -444,13 +431,10 @@ pub struct Update {
     pub meets_testing_requirements: bool,
     /// public notes associated with this update
     pub notes: String,
-    /// when editing an existing update, this ID has to be specified
-    #[serde(rename = "old_updateid")]
-    pub old_update_id: Option<UpdateID>,
     /// flag indicating whether this update has already been pushed
     pub pushed: bool,
     /// release this update was submitted for
-    pub release: Option<Release>,
+    pub release: Release,
     /// currently requested new update status
     pub request: Option<UpdateRequest>,
     /// flag to specify whether feedback for bugs is required when counting karma
@@ -467,22 +451,21 @@ pub struct Update {
     pub stable_karma: Option<i32>,
     /// current status of this update
     pub status: UpdateStatus,
-    /// username of the update submitter
-    pub submitter: Option<String>,
     /// suggested action to take after installing this update
     pub suggest: UpdateSuggestion,
     /// list test cases associated with this update
     pub test_cases: Option<Vec<TestCase>>,
     /// greenwave gating status; one of:
     /// `failed`, `greenwave_failed`, `ignored`, `passed`, `waiting`
+    /// If this value is `None`, greenwave was not yet enabled when this update was created.
     pub test_gating_status: Option<TestGatingStatus>,
     /// title of this update
     pub title: String,
     /// unstable karma threshold set for this update
     pub unstable_karma: Option<i32>,
-    /// update ID associated with this update (either alias or numeric ID)
+    /// updateid is only provided for backwards compatibility with bodhi 1
     #[serde(rename = "updateid")]
-    pub update_id: Option<UpdateID>,
+    update_id: Option<UpdateID>,
     /// type of this update
     #[serde(rename = "type")]
     pub update_type: UpdateType,
