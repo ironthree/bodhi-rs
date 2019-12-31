@@ -1,4 +1,5 @@
 use std::convert::TryFrom;
+use std::fmt::{Display, Formatter};
 
 use chrono::{DateTime, TimeZone, Utc};
 
@@ -29,9 +30,15 @@ impl TryFrom<&str> for BodhiDate {
     }
 }
 
-impl Into<String> for BodhiDate {
-    fn into(self) -> String {
-        self.date.format(BODHI_DATETIME_FORMAT).to_string()
+impl From<&BodhiDate> for String {
+    fn from(date: &BodhiDate) -> Self {
+        date.date.format(BODHI_DATETIME_FORMAT).to_string()
+    }
+}
+
+impl Display for BodhiDate {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", String::from(self))
     }
 }
 

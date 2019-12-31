@@ -39,11 +39,11 @@ Note that the API is not finalized yet, and minor changes will still happen befo
 - POST requests for creating things
     - comments (DONE)
     - overrides (WIP)
-    - updates (WIP)
+    - updates (DONE)
 
 - POST requests for editing things
     - overrides (NSY)
-    - updates (WIP)
+    - updates (DONE)
     - updates/request (WIP)
     - updates/waive-test-results (WIP)
 

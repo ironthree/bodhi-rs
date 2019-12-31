@@ -5,6 +5,8 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
+const INTERNAL_ERROR: &str = "This should never happen, since all hard-coded values for enums are sane.";
+
 /// This enum represents the two possible values of compose checkpoints:
 /// - the empty object (`{}`), which does not correctly deserialize into an empty `HashMap`, and
 /// - a map of Strings to booleans.
@@ -16,6 +18,7 @@ pub enum Checkpoints {
     /// This value represents a non-empty map of checkpoints.
     Map(HashMap<String, bool>),
 }
+
 
 /// This enum represents the possible request values for composes.
 #[allow(missing_docs)]
@@ -29,19 +32,14 @@ pub enum ComposeRequest {
 
 impl Display for ComposeRequest {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        match serde_json::to_string(&self) {
-            Ok(value) => {
-                write!(f, "{}", value)?;
-                Ok(())
-            },
-            Err(_) => Err(std::fmt::Error),
-        }
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
     }
 }
 
+
 /// This enum represents the possible status values for composes.
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum ComposeStatus {
     #[serde(rename = "cleaning")]
     Cleaning,
@@ -67,20 +65,36 @@ pub enum ComposeStatus {
     UpdateInfo,
 }
 
-/// This enum represents a "Karma" value, which is either a positive (+1), neutral (±0), or negative
-/// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and
-/// possibly also a [`TestCaseFeedback`](struct.TestCase.html) or a
-/// [`BugFeedback`](struct.BugFeedback.html).
-#[derive(Clone, Copy, Debug, Deserialize_repr, PartialEq, Serialize_repr)]
-#[repr(i8)]
-pub enum Karma {
-    /// positive feedback
-    Positive = 1,
-    /// neutral / informational feedback
-    Neutral = 0,
-    /// negative feedback
-    Negative = -1,
+impl Display for ComposeStatus {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
 }
+
+
+/// This enum represents the type of a bodhi update, of a package, and of builds.
+#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+pub enum ContentType {
+    /// tag for container image updates
+    #[serde(rename = "container")]
+    Container,
+    /// tag for flatpak updates
+    #[serde(rename = "flatpak")]
+    Flatpak,
+    /// tag for module updates
+    #[serde(rename = "module")]
+    Module,
+    /// tag for traditional RPM package updates
+    #[serde(rename = "rpm")]
+    RPM,
+}
+
+impl Display for ContentType {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
+}
+
 
 /// This enum represents a fedora release.
 #[allow(missing_docs)]
@@ -125,32 +139,40 @@ pub enum FedoraRelease {
 
 impl Display for FedoraRelease {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        match serde_json::to_string(&self) {
-            Ok(value) => {
-                write!(f, "{}", value)?;
-                Ok(())
-            },
-            Err(_) => Err(std::fmt::Error),
-        }
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
     }
 }
 
-/// This enum represents the type of a bodhi update, of a package, and of builds.
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
-pub enum ContentType {
-    /// tag for container image updates
-    #[serde(rename = "container")]
-    Container,
-    /// tag for flatpak updates
-    #[serde(rename = "flatpak")]
-    Flatpak,
-    /// tag for module updates
-    #[serde(rename = "module")]
-    Module,
-    /// tag for traditional RPM package updates
-    #[serde(rename = "rpm")]
-    RPM,
+
+/// This enum represents a "Karma" value, which is either a positive (+1), neutral (±0), or negative
+/// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and
+/// possibly also a [`TestCaseFeedback`](struct.TestCase.html) or a
+/// [`BugFeedback`](struct.BugFeedback.html).
+#[derive(Clone, Copy, Debug, Deserialize_repr, PartialEq, Serialize_repr)]
+#[repr(i8)]
+pub enum Karma {
+    /// positive feedback
+    Positive = 1,
+    /// neutral / informational feedback
+    Neutral = 0,
+    /// negative feedback
+    Negative = -1,
 }
+
+impl Display for Karma {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Karma::Positive => String::from("+1"),
+                Karma::Neutral => String::from("±0"),
+                Karma::Negative => String::from("-1"),
+            }
+        )
+    }
+}
+
 
 /// This enum represents a requested state change of an update.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
@@ -172,6 +194,13 @@ pub enum UpdateRequest {
     Unpush,
 }
 
+impl Display for UpdateRequest {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
+}
+
+
 /// This enum represents the associated severity of a bodhi update. This field is required to not be
 /// unspecified for updates with [`UpdateType::Security`](enum.UpdateType.html).
 #[allow(missing_docs)]
@@ -188,6 +217,13 @@ pub enum UpdateSeverity {
     #[serde(rename = "urgent")]
     Urgent,
 }
+
+impl Display for UpdateSeverity {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
+}
+
 
 /// This enum represents the current state of a bodhi update.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
@@ -215,6 +251,13 @@ pub enum UpdateStatus {
     Unpushed,
 }
 
+impl Display for UpdateStatus {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
+}
+
+
 /// This enum represents the associated suggested action for a bodhi update.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateSuggestion {
@@ -228,6 +271,13 @@ pub enum UpdateSuggestion {
     #[serde(rename = "unspecified")]
     Unspecified,
 }
+
+impl Display for UpdateSuggestion {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
+}
+
 
 /// This enum represents the type of a bodhi update.
 #[allow(missing_docs)]
@@ -245,8 +295,15 @@ pub enum UpdateType {
     Unspecified,
 }
 
+impl Display for UpdateType {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
+}
+
+
 /// This enum represents the state of a release.
-#[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
 pub enum ReleaseState {
     /// release has been archived after it has reached its EOL
     #[serde(rename = "archived")]
@@ -265,9 +322,16 @@ pub enum ReleaseState {
     Pending,
 }
 
+impl Display for ReleaseState {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
+}
+
+
 /// This enum represents the test gating status from `greenwave`.
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
 pub enum TestGatingStatus {
     #[serde(rename = "failed")]
     Failed,
@@ -285,14 +349,27 @@ pub enum TestGatingStatus {
     Waiting,
 }
 
+impl Display for TestGatingStatus {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
+}
+
+
 /// This enum represents the two possible ways to identify a fedora update:
 /// - internal, numerical ID
 /// - public, human-readable "alias" (`FEDORA-2019-1A2BB23E`)
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum UpdateID {
     /// identified via numerical update ID
     ID(u32),
     /// identified via update alias
     Alias(String),
+}
+
+impl Display for UpdateID {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
 }
