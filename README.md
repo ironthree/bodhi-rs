@@ -31,18 +31,18 @@ caller, but this library does not implement any retry logic itself (yet).
 - All `GET` requests are implemented, and all actual API responses should successfully deserialize.
 - `POST` requests are work-in-progress.
 
-Note that the API is not finalized yet, and minor changes will still happen before the `1.0.0` release.
+Note that the API is not finalized yet, and minor changes will still happen before the `0.1.0` release.
 
 
 ## TODO
 
 - POST requests for creating things
     - comments (DONE)
-    - overrides (WIP)
+    - overrides (DONE)
     - updates (DONE)
 
 - POST requests for editing things
-    - overrides (NSY)
+    - overrides (DONE)
     - updates (DONE)
     - updates/request (WIP)
     - updates/waive-test-results (WIP)
