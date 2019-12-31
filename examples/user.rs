@@ -1,3 +1,5 @@
+//! Query bodhi for all users given as arguments on the command line, and print their details.
+
 use std::env::args;
 
 use bodhi::{BodhiServiceBuilder, UserNameQuery};
@@ -12,14 +14,20 @@ fn main() -> Result<(), String> {
     arguments.next();
 
     for argument in arguments {
-        println!("User: {}", argument);
-
         let user = match bodhi.query(&UserNameQuery::new(&argument)) {
-            Ok(user) => user,
             Err(error) => return Err(format!("{}", error)),
+            Ok(user) => match user {
+                Some(user) => user,
+                None => {
+                    println!("User '{}' not found.", &argument);
+                    println!();
+                    continue;
+                },
+            },
         };
 
-        println!("{:#?}", user);
+        println!("{}", user);
+        println!();
     }
 
     Ok(())

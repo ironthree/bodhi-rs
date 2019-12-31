@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::{Display, Formatter};
 
 use serde::Deserialize;
 
@@ -24,6 +25,20 @@ pub struct Bug {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
+impl Display for Bug {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Bug {bug_id}: {title}",
+            bug_id = self.bug_id,
+            title = match &self.title {
+                Some(title) => title.as_str(),
+                None => "(None)",
+            }
+        )
+    }
+}
+
 /// This struct represents an update feedback item associated with a specific bug.
 #[derive(Debug, Deserialize)]
 pub struct BugFeedback {
@@ -39,6 +54,12 @@ pub struct BugFeedback {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+}
+
+impl Display for BugFeedback {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{bug_id}: {karma}", bug_id = self.bug_id, karma = self.karma)
+    }
 }
 
 /// This struct represents a specific koji build that bodhi is aware of.
@@ -61,6 +82,23 @@ pub struct Build {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+}
+
+impl Display for Build {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Build {nvr}:\n\
+             Type:  {build_type}\n\
+             Epoch: {epoch}",
+            nvr = &self.nvr,
+            build_type = self.build_type,
+            epoch = match self.epoch {
+                Some(epoch) => epoch.to_string(),
+                None => "(None)".to_string(),
+            }
+        )
+    }
 }
 
 /// This struct represents one comment against a specific update, along with its associated bug and
@@ -100,6 +138,28 @@ pub struct Comment {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
+impl Display for Comment {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Comment by {author}:\n\
+             {text}\n\
+             \n\
+             Submitted:      {timestamp}\n\
+             Karma:          {karma}\n\
+             Critpath Karma: {karma_critpath}",
+            author = match &self.author {
+                Some(author) => author,
+                None => "(anonymous)",
+            },
+            text = &self.text,
+            timestamp = &self.timestamp,
+            karma = self.karma,
+            karma_critpath = self.karma_critpath,
+        )
+    }
+}
+
 /// This struct represents a currently running compose.
 #[derive(Debug, Deserialize)]
 pub struct Compose {
@@ -133,6 +193,8 @@ pub struct Compose {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
+// TODO: impl Display for Compose
+
 /// This struct represents a group from the fedora accounts system (FAS).
 #[derive(Debug, Deserialize)]
 pub struct Group {
@@ -142,6 +204,12 @@ pub struct Group {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+}
+
+impl Display for Group {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{name}", name = &self.name)
+    }
 }
 
 /// This struct represents a buildroot override, along with the associated build.
@@ -174,6 +242,8 @@ pub struct Override {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
+// TODO: impl Display for Override
+
 /// This struct represents a specific fedora package (or another distributable unit)
 #[derive(Debug, Deserialize)]
 pub struct Package {
@@ -186,6 +256,17 @@ pub struct Package {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+}
+
+impl Display for Package {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{name} ({package_type})",
+            name = &self.name,
+            package_type = self.package_type
+        )
+    }
 }
 
 /// This struct represents a fedora release as present in the bodhi database. This includes variants
@@ -232,6 +313,8 @@ pub struct Release {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
+// TODO: impl Display for Release
+
 /// This struct represents a specific test case as associated with a package.
 #[derive(Debug, Deserialize)]
 pub struct TestCase {
@@ -245,6 +328,20 @@ pub struct TestCase {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+}
+
+impl Display for TestCase {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Test Case '{name}' for package {package}",
+            name = &self.name,
+            package = match &self.package {
+                Some(package) => &package.name,
+                None => "(None)",
+            }
+        )
+    }
 }
 
 /// This struct represents an update feedback item associated with a specific test case.
@@ -262,6 +359,12 @@ pub struct TestCaseFeedback {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+}
+
+impl Display for TestCaseFeedback {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{name}: {karma}", name = &self.testcase.name, karma = self.karma)
+    }
 }
 
 /// This struct represents a bodhi update, with associated items: bugs, builds, comments, release,
@@ -374,6 +477,8 @@ pub struct Update {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
+// TODO: impl Display for Update
+
 /// This struct wraps the short update summaries that are included in running
 /// [`Compose`](struct.Compose.html)s.
 #[derive(Debug, Deserialize)]
@@ -382,6 +487,12 @@ pub struct UpdateSummary {
     pub alias: String,
     /// user-defined, descriptive update title
     pub title: String,
+}
+
+impl Display for UpdateSummary {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}: {}", self.alias, self.title)
+    }
 }
 
 /// This struct represents one fedora user that bodhi is aware of.
@@ -403,4 +514,26 @@ pub struct User {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+}
+
+impl Display for User {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let groups: Vec<&str> = self.groups.iter().map(|g| g.name.as_str()).collect();
+
+        write!(
+            f,
+            "User {name}:\n\
+             E-Mail: {email}\n\
+             Groups: {groups}",
+            name = &self.name,
+            email = match &self.email {
+                Some(email) => email,
+                None => "(None)",
+            },
+            groups = match groups.len() {
+                0 => "(None)".to_string(),
+                _ => groups.join(", "),
+            },
+        )
+    }
 }
