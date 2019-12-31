@@ -39,6 +39,7 @@ impl Display for Bug {
     }
 }
 
+
 /// This struct represents an update feedback item associated with a specific bug.
 #[derive(Debug, Deserialize)]
 pub struct BugFeedback {
@@ -61,6 +62,7 @@ impl Display for BugFeedback {
         write!(f, "{bug_id}: {karma}", bug_id = self.bug_id, karma = self.karma)
     }
 }
+
 
 /// This struct represents a specific koji build that bodhi is aware of.
 #[derive(Debug, Deserialize)]
@@ -100,6 +102,7 @@ impl Display for Build {
         )
     }
 }
+
 
 /// This struct represents one comment against a specific update, along with its associated bug and
 /// test case feedback.
@@ -160,6 +163,7 @@ impl Display for Comment {
     }
 }
 
+
 /// This struct represents a currently running compose.
 #[derive(Debug, Deserialize)]
 pub struct Compose {
@@ -195,6 +199,7 @@ pub struct Compose {
 
 // TODO: impl Display for Compose
 
+
 /// This struct represents a group from the fedora accounts system (FAS).
 #[derive(Debug, Deserialize)]
 pub struct Group {
@@ -211,6 +216,7 @@ impl Display for Group {
         write!(f, "{name}", name = &self.name)
     }
 }
+
 
 /// This struct represents a buildroot override, along with the associated build.
 #[derive(Debug, Deserialize)]
@@ -244,6 +250,7 @@ pub struct Override {
 
 // TODO: impl Display for Override
 
+
 /// This struct represents a specific fedora package (or another distributable unit)
 #[derive(Debug, Deserialize)]
 pub struct Package {
@@ -252,6 +259,8 @@ pub struct Package {
     /// content type; one of: `rpm`, `container`, `flatpak`, `module`
     #[serde(rename = "type")]
     pub package_type: ContentType,
+    /// test case requirements associated with this package
+    pub requirements: Option<String>,
 
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
@@ -269,6 +278,7 @@ impl Display for Package {
     }
 }
 
+
 /// This struct represents a fedora release as present in the bodhi database. This includes variants
 /// (Modular, Container, Flatpak), identified with the "C", "F", and "M" suffixes.
 #[derive(Debug, Deserialize)]
@@ -281,6 +291,8 @@ pub struct Release {
     pub composed_by_bodhi: bool,
     /// optional list of running composes for this release
     pub composes: Option<Vec<Compose>>,
+    /// flag to indicate whether updates are automatically created for this release
+    pub create_automatic_updates: Option<bool>,
     /// value of the RPM `%{?dist}` tag on this release
     pub dist_tag: String,
     /// prefix for update aliases: one of `FEDORA{-EPEL,}{-CONTAINER,-FLATPAK,-MODULAR,}`
@@ -291,6 +303,8 @@ pub struct Release {
     pub mail_template: String,
     /// short name of this release
     pub name: FedoraRelease,
+    /// package manager in use on this release
+    pub package_manager: PackageManager,
     /// name of the tag for builds in buildroot overrides
     pub override_tag: String,
     /// name of the tag for builds that are pending to be signed
@@ -303,6 +317,8 @@ pub struct Release {
     pub stable_tag: String,
     /// current state of this release; one of: `archived`, `current`, `pending`
     pub state: ReleaseState,
+    /// name of the repository used for testing updates
+    pub testing_repository: Option<String>,
     /// name of the tag for builds that have been pushed to testing
     pub testing_tag: String,
     /// version string of this release
@@ -314,6 +330,7 @@ pub struct Release {
 }
 
 // TODO: impl Display for Release
+
 
 /// This struct represents a specific test case as associated with a package.
 #[derive(Debug, Deserialize)]
@@ -344,6 +361,7 @@ impl Display for TestCase {
     }
 }
 
+
 /// This struct represents an update feedback item associated with a specific test case.
 #[derive(Debug, Deserialize)]
 pub struct TestCaseFeedback {
@@ -366,6 +384,7 @@ impl Display for TestCaseFeedback {
         write!(f, "{name}: {karma}", name = &self.testcase.name, karma = self.karma)
     }
 }
+
 
 /// This struct represents a bodhi update, with associated items: bugs, builds, comments, release,
 /// status, submitter, etc.
@@ -471,6 +490,8 @@ pub struct Update {
     pub url: String,
     /// user who created this update
     pub user: User,
+    /// SHA-1 hash of the sorted, space-separated NVRs of the included builds
+    pub version_hash: String,
 
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
@@ -478,6 +499,7 @@ pub struct Update {
 }
 
 // TODO: impl Display for Update
+
 
 /// This struct wraps the short update summaries that are included in running
 /// [`Compose`](struct.Compose.html)s.
@@ -494,6 +516,7 @@ impl Display for UpdateSummary {
         write!(f, "{}: {}", self.alias, self.title)
     }
 }
+
 
 /// This struct represents one fedora user that bodhi is aware of.
 #[derive(Debug, Deserialize)]

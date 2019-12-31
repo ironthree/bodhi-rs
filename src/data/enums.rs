@@ -174,6 +174,25 @@ impl Display for Karma {
 }
 
 
+/// This enum represents the name of the package manager that's in use on a release.
+#[allow(missing_docs)]
+#[derive(Debug, Deserialize, Serialize)]
+pub enum PackageManager {
+    #[serde(rename = "dnf")]
+    DNF,
+    #[serde(rename = "unspecified")]
+    Unspecified,
+    #[serde(rename = "yum")]
+    YUM,
+}
+
+impl Display for PackageManager {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+    }
+}
+
+
 /// This enum represents a requested state change of an update.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateRequest {
