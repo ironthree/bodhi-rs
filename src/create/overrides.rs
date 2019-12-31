@@ -3,14 +3,16 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::error::{BodhiError, QueryError};
-use crate::{BodhiDate, BodhiService, CSRFQuery, Create, OverrideData};
+use crate::{BodhiDate, BodhiService, CSRFQuery, Create, Override, OverrideData};
 
 /// This struct contains the values that are returned when creating a new comment.
 #[derive(Debug, Deserialize)]
 pub struct NewOverride {
-    /// TODO: determine actual fields
+    /// the newly created buildroot override
     #[serde(flatten)]
-    pub extra: HashMap<String, serde_json::Value>,
+    pub over_ride: Override,
+    /// additional server messages
+    pub caveats: Vec<HashMap<String, String>>,
 }
 
 /// This struct contains all the values that are necessary for creating a new buildroot override.
@@ -35,7 +37,6 @@ impl<'a> OverrideBuilder<'a> {
 
 impl<'a> Create<NewOverride> for OverrideBuilder<'a> {
     fn create(&self, bodhi: &BodhiService) -> Result<NewOverride, QueryError> {
-        // TODO: check if build exists
         let path = String::from("/overrides/");
 
         let csrf_token = bodhi.query(&CSRFQuery::new())?;

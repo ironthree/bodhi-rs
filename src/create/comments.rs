@@ -89,8 +89,6 @@ impl<'a> CommentBuilder<'a> {
 
 impl<'a> Create<NewComment> for CommentBuilder<'a> {
     fn create(&self, bodhi: &BodhiService) -> Result<NewComment, QueryError> {
-        // TODO: check if the update exists
-        // TODO: check if lengths of feedback vectors is good
         let path = String::from("/comments/");
 
         let csrf_token = CSRFQuery::new().query(bodhi)?;

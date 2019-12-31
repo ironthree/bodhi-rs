@@ -1,7 +1,6 @@
-use std::convert::TryFrom;
 use std::io::{stdin, stdout, Write};
 
-use bodhi::{BodhiDate, BodhiServiceBuilder, OverrideBuilder};
+use bodhi::{BodhiServiceBuilder, OverrideEditor, OverrideNVRQuery};
 
 fn main() -> Result<(), String> {
     // get username and password from standard input
@@ -30,15 +29,21 @@ fn main() -> Result<(), String> {
         .build()
         .unwrap();
 
-    let expiration_date = BodhiDate::try_from("2020-01-01").unwrap();
+    let over_ride = match bodhi.query(&OverrideNVRQuery::new("elementary-theme-5.4.0-1.fc30")) {
+        Ok(o) => match o {
+            Some(o) => o,
+            None => {
+                return Err(String::from("Buildroot override not found."));
+            },
+        },
+        Err(_) => {
+            return Err(String::from("Buildroot override not found."));
+        },
+    };
 
-    let new_override = OverrideBuilder::new(
-        "elementary-theme-5.4.0-1.fc30",
-        "Test buildroot override.",
-        &expiration_date,
-    );
+    let override_edit = OverrideEditor::from_override(&over_ride).expired(true);
 
-    let response = bodhi.create(&new_override);
+    let response = bodhi.edit(&override_edit);
 
     match response {
         Ok(value) => Ok(println!("{:#?}", value)),
