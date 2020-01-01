@@ -10,11 +10,21 @@ This crate contains rust bindings for the [bodhi] REST API as documented [here][
 [bodhi]: https://github.com/fedora-infra/bodhi
 [bodhi-api]: https://bodhi.fedoraproject.org/docs/server_api/index.html#rest-api
 
-It uses the awesome [`reqwest`][reqwest] and [`serde`][serde] packages, and is based on [`fedora-rs`][fedora-rs].
+It uses the awesome [`reqwest`][reqwest] and [`serde`][serde] packages, and uses [`fedora-rs`][fedora-rs] for
+authenticated requests.
 
 [reqwest]: https://github.com/seanmonstar/reqwest
 [serde]: https://github.com/serde-rs/serde
 [fedora-rs]: https://github.com/ironthree/fedora-rs
+
+
+## Reporting bugs
+
+The code makes some assumptions around the behaviour of bodhi servers. If those are wrong (either because the
+implementation is wrong, or because the behaviour changed), then that is a bug. Also, there have been instances where
+the schemas of responses and accepted requests has changed. If that's the case, then that's also a bug. If you
+encounter (de)serialization issues, please open a bug noting the bodhi server version, and paste the failure message
+(which should contain the reason for the (de)serialization failure, e.g. missing / renamed fields).
 
 
 ## Library design
@@ -23,14 +33,14 @@ This library tries to do error handling where reasonable, but passes server- or 
 caller. For example, if bodhi is under heavy load, it sometimes returns garbage responses with empty bodies. On the
 other hand, there might just be a persistent network issue that makes a server request fail or time out. These are not
 handled by the library, but are transparently wrapped and returned. If necessary, the request can be retried by the
-caller. This library only implements a simple retry logic for network-related failures, not for server issues.
+caller. This library only implements a simple retry logic for network-related failures, not for client or server issues.
 
 
 ## Current status
 
 - All `GET` requests are implemented, and all actual API responses should successfully deserialize.
-- All `POST` requests are implemented for creating and editing items, except for interacting with releases (since I have
-  no way of testing that).
+- All `POST` requests are implemented for creating and editing items, except for creating and editing releases (since I
+  have no way of testing that).
 
 
 ## Test coverage

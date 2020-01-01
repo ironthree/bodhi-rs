@@ -13,7 +13,7 @@
 //!   a Rust-y API
 //! - a set of `Create` implementations for creating new data on bodhi
 //! - a set of `Edit` implementations for editing data on bodhi
-//! - data type definitions, used for deserializing JSON responses with [serde]
+//! - data type and enum definitions, used for (de)serializing JSON values with [serde]
 //!
 //! [serde]: https://docs.rs/serde
 //!
