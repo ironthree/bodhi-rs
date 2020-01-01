@@ -188,7 +188,27 @@ pub struct Compose {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
-// TODO: impl Display for Compose
+impl Display for Compose {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Compose for {release} / {request} ({content_type}):\n\
+             Created: {created}\n\
+             Status:  {status}",
+            release = match &self.release {
+                Some(release) => release.name.to_string(),
+                None => "(None)".to_string(),
+            },
+            request = &self.request,
+            content_type = match &self.content_type {
+                Some(content_type) => content_type.to_string(),
+                None => "(None)".to_string(),
+            },
+            created = &self.date_created,
+            status = &self.state,
+        )
+    }
+}
 
 
 /// This struct represents a group from the fedora accounts system (FAS).
@@ -239,7 +259,29 @@ pub struct Override {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
-// TODO: impl Display for Override
+impl Display for Override {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Buildroot override for {nvr}:\n\
+             {notes}\n\
+             \n\
+             Submitter:       {submitter}\n\
+             Submission date: {submitted}\n\
+             Expiration date: {expiration}\n\
+             Expired:         {expired}",
+            nvr = &self.nvr,
+            notes = &self.notes,
+            submitter = &self.submitter.name,
+            submitted = &self.submission_date,
+            expiration = &self.expiration_date,
+            expired = match &self.expired_date {
+                Some(date) => date.to_string(),
+                None => "no".to_string(),
+            },
+        )
+    }
+}
 
 
 /// This struct represents a specific fedora package (or another distributable unit)
@@ -320,7 +362,33 @@ pub struct Release {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
-// TODO: impl Display for Release
+impl Display for Release {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "Release {name}:\n\
+             State:               {state}\n\
+             Branch:              {branch}\n\
+             Candidate tag:       {candidate_tag}\n\
+             Override tag:        {override_tag}\n\
+             Pending signing tag: {pending_signing_tag}\n\
+             Pending stable tag:  {pending_stable_tag}\n\
+             Pending testing tag: {pending_testing_tag}\n\
+             Stable tag:          {stable_tag}\n\
+             Testing tag:         {testing_tag}",
+            name = &self.name,
+            state = &self.state,
+            branch = &self.branch,
+            candidate_tag = &self.candidate_tag,
+            override_tag = &self.override_tag,
+            pending_signing_tag = &self.pending_signing_tag,
+            pending_stable_tag = &self.pending_stable_tag,
+            pending_testing_tag = &self.pending_testing_tag,
+            stable_tag = &self.stable_tag,
+            testing_tag = &self.testing_tag,
+        )
+    }
+}
 
 
 /// This struct represents a specific test case as associated with a package.
@@ -459,7 +527,7 @@ pub struct Update {
     /// `failed`, `greenwave_failed`, `ignored`, `passed`, `waiting`
     /// If this value is `None`, greenwave was not yet enabled when this update was created.
     pub test_gating_status: Option<TestGatingStatus>,
-    /// title of this update
+    /// title of this update (automatically computed from build NVRs if `display_name` is not set)
     pub title: String,
     /// unstable karma threshold set for this update
     pub unstable_karma: Option<i32>,
@@ -481,7 +549,55 @@ pub struct Update {
     pub extra: HashMap<String, serde_json::Value>,
 }
 
-// TODO: impl Display for Update
+impl Display for Update {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let builds = &self
+            .builds
+            .iter()
+            .map(|b| b.nvr.as_str())
+            .collect::<Vec<&str>>()
+            .join("\n");
+
+        let bugs = &self
+            .bugs
+            .iter()
+            .map(|b| b.bug_id.to_string())
+            .collect::<Vec<String>>()
+            .join(" ");
+
+        let test_cases = match &self.test_cases {
+            Some(test_cases) => test_cases
+                .iter()
+                .map(|t| t.name.as_str())
+                .collect::<Vec<&str>>()
+                .join(" "),
+            None => "(None)".to_string(),
+        };
+
+        write!(
+            f,
+            "Update {alias}:\n\
+             {notes}\n\
+             \n\
+             State:         {state}\n\
+             Submitter:     {submitter}\n\
+             \n\
+             Builds:\n\
+             {builds}\n\
+             \n\
+             Bugs: {bugs}\n\
+             Test Cases: {test_cases}\n\
+             ",
+            alias = &self.alias,
+            notes = &self.notes,
+            state = &self.status,
+            submitter = &self.user.name,
+            builds = &builds,
+            bugs = &bugs,
+            test_cases = &test_cases,
+        )
+    }
+}
 
 
 /// This struct wraps the short update summaries that are included in running
