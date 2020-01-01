@@ -259,6 +259,7 @@ struct CommentPageQuery<'a> {
     since: Option<&'a BodhiDate>,
     update_owners: Option<&'a Vec<&'a str>>,
     updates: Option<&'a Vec<&'a str>>,
+    #[serde(rename = "user")]
     users: Option<&'a Vec<&'a str>>,
 
     page: u32,

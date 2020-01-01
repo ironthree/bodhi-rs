@@ -231,6 +231,7 @@ struct OverridePageQuery<'a> {
     packages: Option<&'a Vec<&'a str>>,
     releases: Option<&'a Vec<FedoraRelease>>,
     search: Option<&'a &'a str>,
+    #[serde(rename = "user")]
     users: Option<&'a Vec<&'a str>>,
 
     page: u32,

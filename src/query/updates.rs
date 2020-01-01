@@ -451,6 +451,7 @@ struct UpdateListPage {
 #[derive(Debug, Serialize)]
 struct UpdatePageQuery<'a> {
     active_releases: Option<bool>,
+    #[serde(rename = "alias")]
     aliases: Option<&'a Vec<&'a str>>,
     #[serde(with = "crate::option_bodhi_date_format")]
     approved_before: Option<&'a BodhiDate>,
@@ -483,8 +484,11 @@ struct UpdatePageQuery<'a> {
     #[serde(with = "crate::option_bodhi_date_format")]
     submitted_since: Option<&'a BodhiDate>,
     suggest: Option<&'a UpdateSuggestion>,
+    #[serde(rename = "updateid")]
     update_ids: Option<&'a Vec<&'a str>>,
+    #[serde(rename = "type")]
     update_type: Option<&'a UpdateType>,
+    #[serde(rename = "user")]
     users: Option<&'a Vec<&'a str>>,
 
     page: u32,

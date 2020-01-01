@@ -7,7 +7,7 @@
 //!
 //! The [`UserQuery`](struct.UserQuery.html) can be used to execute more complex queries, for
 //! example filtering users by the groups they are members of, or querying for users that are
-//! associated with a given set of updates or packages.
+//! associated with a given set of updates.
 
 use serde::{Deserialize, Serialize};
 
@@ -83,7 +83,6 @@ pub struct UserQuery<'a> {
     groups: Option<Vec<&'a str>>,
     like: Option<&'a str>,
     name: Option<&'a str>,
-    packages: Option<Vec<&'a str>>,
     search: Option<&'a str>,
     updates: Option<Vec<&'a str>>,
 }
@@ -95,7 +94,6 @@ impl<'a> UserQuery<'a> {
             groups: None,
             like: None,
             name: None,
-            packages: None,
             search: None,
             updates: None,
         }
@@ -125,18 +123,6 @@ impl<'a> UserQuery<'a> {
     /// [`UserNameQuery`](struct.UserNameQuery.html) instead.
     pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
-        self
-    }
-
-    /// Restrict the returned results to users associated with the given package(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn packages(mut self, package: &'a str) -> Self {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
         self
     }
 
@@ -183,7 +169,6 @@ impl<'a> UserQuery<'a> {
             groups: self.groups.as_ref(),
             like: self.like.as_ref(),
             name: self.name.as_ref(),
-            packages: self.packages.as_ref(),
             search: self.search.as_ref(),
             updates: self.updates.as_ref(),
             page,
@@ -212,7 +197,6 @@ struct UserPageQuery<'a> {
     groups: Option<&'a Vec<&'a str>>,
     like: Option<&'a &'a str>,
     name: Option<&'a &'a str>,
-    packages: Option<&'a Vec<&'a str>>,
     search: Option<&'a &'a str>,
     updates: Option<&'a Vec<&'a str>>,
 
