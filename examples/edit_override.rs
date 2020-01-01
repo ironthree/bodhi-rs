@@ -23,7 +23,7 @@ fn main() -> Result<(), String> {
     }
     let password = password.trim().to_string();
 
-    // TODO: looks like the staging instance can't create buildroot overrides
+    // beware: it looks like the staging instance can't create buildroot overrides
     let bodhi = BodhiServiceBuilder::staging()
         .authentication(&username, &password)
         .build()
