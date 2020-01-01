@@ -1,16 +1,32 @@
-use super::{TEST_RETRIES, TEST_TIMEOUT};
+use super::bodhi_init;
 
-use crate::{BodhiServiceBuilder, User, UserNameQuery};
+use crate::{User, UserNameQuery, UserQuery};
 
-// TODO: make sure the new serde_url_params code works as expected
+#[test]
+fn query_sanity_updates() {
+    let bodhi = bodhi_init();
+
+    let users_one: Vec<User> = bodhi
+        .query(&UserQuery::new().updates("FEDORA-2019-ac2a21ff07"))
+        .unwrap();
+    let users_two: Vec<User> = bodhi
+        .query(&UserQuery::new().updates("FEDORA-2019-ac3dc27f26"))
+        .unwrap();
+
+    let users_both: Vec<User> = bodhi
+        .query(
+            &UserQuery::new()
+                .updates("FEDORA-2019-ac2a21ff07")
+                .updates("FEDORA-2019-ac3dc27f26"),
+        )
+        .unwrap();
+
+    assert_eq!(users_both.len(), users_one.len() + users_two.len())
+}
 
 #[test]
 fn name_query_some() {
-    let bodhi = BodhiServiceBuilder::default()
-        .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES)
-        .build()
-        .unwrap();
+    let bodhi = bodhi_init();
 
     let user: Option<User> = bodhi.query(&UserNameQuery::new("decathorpe")).unwrap();
 
@@ -19,11 +35,7 @@ fn name_query_some() {
 
 #[test]
 fn name_query_none() {
-    let bodhi = BodhiServiceBuilder::default()
-        .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES)
-        .build()
-        .unwrap();
+    let bodhi = bodhi_init();
 
     let user: Option<User> = bodhi.query(&UserNameQuery::new("nobody")).unwrap();
 

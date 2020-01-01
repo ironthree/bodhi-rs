@@ -1,16 +1,10 @@
-use super::{TEST_RETRIES, TEST_TIMEOUT};
+use super::bodhi_init;
 
-use crate::{BodhiServiceBuilder, Release, ReleaseNameQuery};
-
-// TODO: make sure the new serde_url_params code works as expected
+use crate::{Release, ReleaseNameQuery};
 
 #[test]
 fn name_query_some() {
-    let bodhi = BodhiServiceBuilder::default()
-        .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES)
-        .build()
-        .unwrap();
+    let bodhi = bodhi_init();
 
     let release: Option<Release> = bodhi.query(&ReleaseNameQuery::new("F30")).unwrap();
 
@@ -19,11 +13,7 @@ fn name_query_some() {
 
 #[test]
 fn name_query_none() {
-    let bodhi = BodhiServiceBuilder::default()
-        .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES)
-        .build()
-        .unwrap();
+    let bodhi = bodhi_init();
 
     let release: Option<Release> = bodhi.query(&ReleaseNameQuery::new("X12")).unwrap();
 

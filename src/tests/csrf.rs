@@ -1,14 +1,10 @@
-use super::{TEST_RETRIES, TEST_TIMEOUT};
+use super::bodhi_init;
 
-use crate::{BodhiServiceBuilder, CSRFQuery};
+use crate::CSRFQuery;
 
 #[test]
 fn deserialize() {
-    let bodhi = BodhiServiceBuilder::default()
-        .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES)
-        .build()
-        .unwrap();
+    let bodhi = bodhi_init();
 
     // query and deserialize a new CSRF token
     bodhi.query(&CSRFQuery::new()).unwrap();

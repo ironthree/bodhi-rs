@@ -1,14 +1,10 @@
-use super::{TEST_RETRIES, TEST_TIMEOUT};
+use super::bodhi_init;
 
-use crate::{BodhiServiceBuilder, ComposeQuery, ComposeReleaseRequestQuery, ComposeRequest, FedoraRelease};
+use crate::{ComposeQuery, ComposeReleaseRequestQuery, ComposeRequest, FedoraRelease};
 
 #[test]
 fn deserialize() {
-    let bodhi = BodhiServiceBuilder::default()
-        .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES)
-        .build()
-        .unwrap();
+    let bodhi = bodhi_init();
 
     // query and deserialize currently active composes
     bodhi.query(&ComposeQuery::new()).unwrap();
@@ -16,11 +12,7 @@ fn deserialize() {
 
 #[test]
 fn query() {
-    let bodhi = BodhiServiceBuilder::default()
-        .timeout(TEST_TIMEOUT)
-        .retries(TEST_RETRIES)
-        .build()
-        .unwrap();
+    let bodhi = bodhi_init();
 
     // query and deserialize currently active composes
     bodhi
