@@ -73,6 +73,8 @@ pub(crate) mod option_bodhi_date_format {
 
     use serde::{self, Deserialize, Deserializer, Serializer};
 
+    // this &Option reference is intentional, the API requires it
+    #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn serialize<S>(date: &Option<&BodhiDate>, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
