@@ -23,6 +23,7 @@ mod comments;
 mod composes;
 mod csrf;
 mod dates;
+mod enums;
 mod overrides;
 mod releases;
 mod updates;
