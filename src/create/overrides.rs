@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 use crate::error::{BodhiError, QueryError};
-use crate::{BodhiDate, BodhiService, CSRFQuery, Create, Override, OverrideData};
+use crate::{BodhiDate, BodhiService, Build, CSRFQuery, Create, Override, OverrideData};
 
 /// This struct contains the values that are returned when creating a new comment.
 #[derive(Debug, Deserialize)]
@@ -70,5 +70,12 @@ impl<'a> Create<NewOverride> for OverrideBuilder<'a> {
         let new_override: NewOverride = serde_json::from_str(&result)?;
 
         Ok(new_override)
+    }
+}
+
+impl Build {
+    /// This method creates a new `OverrideBuilder` for this `Build`.
+    pub fn buildroot_override<'a>(&'a self, notes: &'a str, expiration_date: &'a BodhiDate) -> OverrideBuilder<'a> {
+        OverrideBuilder::new(self.nvr.as_str(), notes, expiration_date)
     }
 }

@@ -416,3 +416,10 @@ impl<'a> Edit<Update> for UpdateTestResultWaiver<'a> {
         Ok(waived_update.update)
     }
 }
+
+impl Update {
+    /// This method creates a new `UpdateEditor` for editing this `Update`.
+    pub fn edit(&self) -> UpdateEditor {
+        UpdateEditor::from_update(self)
+    }
+}

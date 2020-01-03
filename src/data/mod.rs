@@ -13,7 +13,7 @@ mod enums;
 pub use enums::*;
 
 mod schemas;
-pub use schemas::*;
+pub(crate) use schemas::*;
 
 mod types;
 pub use types::*;

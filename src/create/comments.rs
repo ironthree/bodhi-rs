@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::error::{BodhiError, QueryError};
-use crate::{BodhiService, CSRFQuery, Comment, Create, Karma, SinglePageQuery};
+use crate::{BodhiService, CSRFQuery, Comment, Create, Karma, SinglePageQuery, Update};
 
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST>
 #[derive(Debug, Serialize)]
@@ -125,5 +125,12 @@ impl<'a> Create<NewComment> for CommentBuilder<'a> {
         let new_comment: NewComment = serde_json::from_str(&result)?;
 
         Ok(new_comment)
+    }
+}
+
+impl Update {
+    /// This method creates a new `CommentBuilder` for commenting on this `Update`.
+    pub fn comment(&self) -> CommentBuilder {
+        CommentBuilder::new(self.alias.as_str())
     }
 }

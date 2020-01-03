@@ -141,7 +141,40 @@ pub enum FedoraRelease {
 
 impl Display for FedoraRelease {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        let value = match self {
+            FedoraRelease::F32 => "F32",
+            FedoraRelease::F32C => "F32C",
+            FedoraRelease::F31 => "F31",
+            FedoraRelease::F31C => "F31C",
+            FedoraRelease::F31F => "F31F",
+            FedoraRelease::F31M => "F31M",
+            FedoraRelease::F30 => "F30",
+            FedoraRelease::F30C => "F30C",
+            FedoraRelease::F30F => "F30F",
+            FedoraRelease::F30M => "F30M",
+            FedoraRelease::F29 => "F29",
+            FedoraRelease::F29C => "F29C",
+            FedoraRelease::F29F => "F29F",
+            FedoraRelease::F29M => "F29M",
+            FedoraRelease::F28 => "F28",
+            FedoraRelease::F28C => "F28C",
+            FedoraRelease::F28M => "F28M",
+            FedoraRelease::F27 => "F27",
+            FedoraRelease::F27M => "F27M",
+            FedoraRelease::F26 => "F26",
+            FedoraRelease::F25 => "F25",
+            FedoraRelease::F24 => "F24",
+            FedoraRelease::F23 => "F23",
+            FedoraRelease::F22 => "F22",
+            FedoraRelease::F21 => "F21",
+            FedoraRelease::EPEL8 => "EPEL-8",
+            FedoraRelease::EPEL8M => "EPEL-8M",
+            FedoraRelease::EPEL7 => "EPEL-7",
+            FedoraRelease::EL6 => "EL-6",
+            FedoraRelease::EL5 => "EL-5",
+        };
+
+        write!(f, "{}", value)
     }
 }
 
@@ -422,7 +455,7 @@ impl Display for TestGatingStatus {
 /// - public, human-readable "alias" (`FEDORA-2019-1A2BB23E`)
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
-pub enum UpdateID {
+pub(crate) enum UpdateID {
     /// identified via numerical update ID
     ID(u32),
     /// identified via update alias

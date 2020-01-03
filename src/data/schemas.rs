@@ -6,7 +6,7 @@ use crate::{BodhiDate, UpdateRequest, UpdateSeverity, UpdateSuggestion, UpdateTy
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1-POST>
 #[derive(Debug, Serialize)]
-pub struct OverrideData<'a> {
+pub(crate) struct OverrideData<'a> {
     /// NVR this buildroot override is filed for
     pub nvr: &'a str,
     /// user-visible notes associated with this buildroot override
@@ -26,7 +26,7 @@ pub struct OverrideData<'a> {
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2-POST>
 #[derive(Debug, Serialize)]
-pub struct UpdateData<'a> {
+pub(crate) struct UpdateData<'a> {
     /// list of builds to include in the update
     pub builds: Option<&'a [&'a str]>,
     /// koji side tag to take builds from (if this is specified, builds must be `None` or `[]`)

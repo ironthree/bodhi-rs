@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 
 use serde::Deserialize;
+use url::Url;
 
 use super::dates::*;
 use super::enums::*;
@@ -27,16 +28,26 @@ impl Display for Bug {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(
             f,
-            "Bug {bug_id}: {title}",
+            "Bug {bug_id}:\n\
+             Title: {title}\n\
+             URL:   {url}",
             bug_id = self.bug_id,
             title = match &self.title {
                 Some(title) => title.as_str(),
                 None => "(None)",
-            }
+            },
+            url = self.url().to_string(),
         )
     }
 }
 
+impl Bug {
+    /// This method constructs the URL of the bug on Red Hat BugZilla.
+    pub fn url(&self) -> Url {
+        Url::parse(&format!("https://bugzilla.redhat.com/show_bug.cgi?id={}", self.bug_id))
+            .expect("Failed to parse the hard-coded URL, this should not happen.")
+    }
+}
 
 /// This struct represents an update feedback item associated with a specific bug.
 #[derive(Debug, Deserialize)]

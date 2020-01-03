@@ -92,3 +92,10 @@ impl<'a> Edit<EditedOverride> for OverrideEditor<'a> {
         Ok(edited_override)
     }
 }
+
+impl Override {
+    /// This method creates a new `OverrideEditor` for editing this `Override`.
+    pub fn edit(&self) -> OverrideEditor {
+        OverrideEditor::from_override(self)
+    }
+}
