@@ -6,7 +6,6 @@ use std::fmt::{Display, Formatter};
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-const INTERNAL_ERROR: &str = "This should never happen, since all hard-coded values for enums are sane.";
 
 /// This enum represents the two possible values of compose checkpoints:
 /// - the empty object (`{}`), which does not correctly deserialize into an empty `HashMap`, and
@@ -33,7 +32,12 @@ pub enum ComposeRequest {
 
 impl Display for ComposeRequest {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        let value = match self {
+            ComposeRequest::Stable => "stable",
+            ComposeRequest::Testing => "testing",
+        };
+
+        write!(f, "{}", value)
     }
 }
 
@@ -68,7 +72,21 @@ pub enum ComposeStatus {
 
 impl Display for ComposeStatus {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        let value = match self {
+            ComposeStatus::Cleaning => "cleaning",
+            ComposeStatus::Failed => "failed",
+            ComposeStatus::Initializing => "initializing",
+            ComposeStatus::Notifying => "notifying",
+            ComposeStatus::Pending => "pending",
+            ComposeStatus::Punging => "punging",
+            ComposeStatus::Requested => "requested",
+            ComposeStatus::SigningRepo => "signing_repo",
+            ComposeStatus::Success => "success",
+            ComposeStatus::SyncingRepo => "syncing_repo",
+            ComposeStatus::UpdateInfo => "updateinfo",
+        };
+
+        write!(f, "{}", value)
     }
 }
 
@@ -92,7 +110,14 @@ pub enum ContentType {
 
 impl Display for ContentType {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        let value = match self {
+            ContentType::Container => "container",
+            ContentType::Flatpak => "flatpak",
+            ContentType::Module => "module",
+            ContentType::RPM => "rpm",
+        };
+
+        write!(f, "{}", value)
     }
 }
 
@@ -263,7 +288,109 @@ pub enum PackageManager {
 
 impl Display for PackageManager {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        let value = match self {
+            PackageManager::DNF => "dnf",
+            PackageManager::Unspecified => "unspecified",
+            PackageManager::YUM => "yum",
+        };
+
+        write!(f, "{}", value)
+    }
+}
+
+
+/// This enum represents the state of a release.
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
+pub enum ReleaseState {
+    /// release has been archived after it has reached its EOL
+    #[serde(rename = "archived")]
+    Archived,
+    /// release is currently supported
+    #[serde(rename = "current")]
+    Current,
+    /// release is disabled
+    #[serde(rename = "disabled")]
+    Disabled,
+    /// release is frozen
+    #[serde(rename = "frozen")]
+    Frozen,
+    /// release is in development
+    #[serde(rename = "pending")]
+    Pending,
+}
+
+impl Display for ReleaseState {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let value = match self {
+            ReleaseState::Archived => "archived",
+            ReleaseState::Current => "current",
+            ReleaseState::Disabled => "disabled",
+            ReleaseState::Frozen => "frozen",
+            ReleaseState::Pending => "pending",
+        };
+
+        write!(f, "{}", value)
+    }
+}
+
+
+/// This enum represents the test gating status from `greenwave`.
+#[allow(missing_docs)]
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
+pub enum TestGatingStatus {
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "greenwave_failed")]
+    GreenwaveFailed,
+    #[serde(rename = "ignored")]
+    Ignored,
+    #[serde(rename = "passed")]
+    Passed,
+    #[serde(rename = "queued")]
+    Queued,
+    #[serde(rename = "running")]
+    Running,
+    #[serde(rename = "waiting")]
+    Waiting,
+}
+
+impl Display for TestGatingStatus {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let value = match self {
+            TestGatingStatus::Failed => "failed",
+            TestGatingStatus::GreenwaveFailed => "greenwave_failed",
+            TestGatingStatus::Ignored => "ignored",
+            TestGatingStatus::Passed => "passed",
+            TestGatingStatus::Queued => "queued",
+            TestGatingStatus::Running => "running",
+            TestGatingStatus::Waiting => "waiting",
+        };
+
+        write!(f, "{}", value)
+    }
+}
+
+
+/// This enum represents the two possible ways to identify a fedora update:
+/// - internal, numerical ID
+/// - public, human-readable "alias" (`FEDORA-2019-1A2BB23E`)
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(untagged)]
+pub(crate) enum UpdateID {
+    /// identified via numerical update ID
+    ID(u32),
+    /// identified via update alias
+    Alias(String),
+}
+
+impl Display for UpdateID {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let value = match self {
+            UpdateID::ID(number) => number.to_string(),
+            UpdateID::Alias(string) => string.to_owned(),
+        };
+
+        write!(f, "{}", value)
     }
 }
 
@@ -290,7 +417,15 @@ pub enum UpdateRequest {
 
 impl Display for UpdateRequest {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        let value = match self {
+            UpdateRequest::Obsolete => "obsolete",
+            UpdateRequest::Revoke => "revoke",
+            UpdateRequest::Stable => "stable",
+            UpdateRequest::Testing => "testing",
+            UpdateRequest::Unpush => "unpush",
+        };
+
+        write!(f, "{}", value)
     }
 }
 
@@ -314,7 +449,15 @@ pub enum UpdateSeverity {
 
 impl Display for UpdateSeverity {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        let value = match self {
+            UpdateSeverity::High => "high",
+            UpdateSeverity::Low => "low",
+            UpdateSeverity::Medium => "medium",
+            UpdateSeverity::Unspecified => "unspecified",
+            UpdateSeverity::Urgent => "urgent",
+        };
+
+        write!(f, "{}", value)
     }
 }
 
@@ -347,7 +490,17 @@ pub enum UpdateStatus {
 
 impl Display for UpdateStatus {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        let value = match self {
+            UpdateStatus::Obsolete => "obsolete",
+            UpdateStatus::Pending => "pending",
+            UpdateStatus::SideTagActive => "side_tag_active",
+            UpdateStatus::SideTagExpired => "side_tag_expired",
+            UpdateStatus::Stable => "stable",
+            UpdateStatus::Testing => "testing",
+            UpdateStatus::Unpushed => "unpushed",
+        };
+
+        write!(f, "{}", value)
     }
 }
 
@@ -368,7 +521,13 @@ pub enum UpdateSuggestion {
 
 impl Display for UpdateSuggestion {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        let value = match self {
+            UpdateSuggestion::Logout => "logout",
+            UpdateSuggestion::Reboot => "reboot",
+            UpdateSuggestion::Unspecified => "unspecified",
+        };
+
+        write!(f, "{}", value)
     }
 }
 
@@ -391,79 +550,14 @@ pub enum UpdateType {
 
 impl Display for UpdateType {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
-    }
-}
+        let value = match self {
+            UpdateType::BugFix => "bugfix",
+            UpdateType::Enhancement => "enhancement",
+            UpdateType::NewPackage => "newpackage",
+            UpdateType::Security => "security",
+            UpdateType::Unspecified => "unspecified",
+        };
 
-
-/// This enum represents the state of a release.
-#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
-pub enum ReleaseState {
-    /// release has been archived after it has reached its EOL
-    #[serde(rename = "archived")]
-    Archived,
-    /// release is currently supported
-    #[serde(rename = "current")]
-    Current,
-    /// release is disabled
-    #[serde(rename = "disabled")]
-    Disabled,
-    /// release is frozen
-    #[serde(rename = "frozen")]
-    Frozen,
-    /// release is in development
-    #[serde(rename = "pending")]
-    Pending,
-}
-
-impl Display for ReleaseState {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
-    }
-}
-
-
-/// This enum represents the test gating status from `greenwave`.
-#[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
-pub enum TestGatingStatus {
-    #[serde(rename = "failed")]
-    Failed,
-    #[serde(rename = "greenwave_failed")]
-    GreenwaveFailed,
-    #[serde(rename = "ignored")]
-    Ignored,
-    #[serde(rename = "passed")]
-    Passed,
-    #[serde(rename = "queued")]
-    Queued,
-    #[serde(rename = "running")]
-    Running,
-    #[serde(rename = "waiting")]
-    Waiting,
-}
-
-impl Display for TestGatingStatus {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
-    }
-}
-
-
-/// This enum represents the two possible ways to identify a fedora update:
-/// - internal, numerical ID
-/// - public, human-readable "alias" (`FEDORA-2019-1A2BB23E`)
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(untagged)]
-pub(crate) enum UpdateID {
-    /// identified via numerical update ID
-    ID(u32),
-    /// identified via update alias
-    Alias(String),
-}
-
-impl Display for UpdateID {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", serde_json::to_string(self).expect(INTERNAL_ERROR))
+        write!(f, "{}", value)
     }
 }

@@ -1,6 +1,6 @@
 use super::bodhi_init;
 
-use crate::{ComposeQuery, ComposeReleaseRequestQuery, ComposeRequest, FedoraRelease};
+use crate::ComposeQuery;
 
 #[test]
 fn deserialize() {
@@ -8,17 +8,4 @@ fn deserialize() {
 
     // query and deserialize currently active composes
     bodhi.query(&ComposeQuery::new()).unwrap();
-}
-
-#[test]
-fn query() {
-    let bodhi = bodhi_init();
-
-    // query and deserialize currently active composes
-    bodhi
-        .query(&ComposeReleaseRequestQuery::new(
-            FedoraRelease::F31,
-            ComposeRequest::Stable,
-        ))
-        .unwrap();
 }
