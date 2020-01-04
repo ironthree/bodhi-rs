@@ -2,26 +2,19 @@ use std::io::{stdin, stdout, Write};
 
 use bodhi::{BodhiServiceBuilder, Karma, Update, UpdateIDQuery};
 
-fn main() -> Result<(), String> {
-    // get username and password from standard input
-    let mut username = String::new();
-    let mut password = String::new();
-
+fn read_username() -> String {
     print!("FAS username: ");
     stdout().flush().unwrap();
 
-    if let Err(error) = stdin().read_line(&mut username) {
-        return Err(error.to_string());
-    }
-    let username = username.trim().to_string();
+    let mut username = String::new();
+    stdin().read_line(&mut username).unwrap();
 
-    print!("FAS password: ");
-    stdout().flush().unwrap();
+    username.trim().to_string()
+}
 
-    if let Err(error) = stdin().read_line(&mut password) {
-        return Err(error.to_string());
-    }
-    let password = password.trim().to_string();
+fn main() -> Result<(), String> {
+    let username = read_username();
+    let password = rpassword::prompt_password_stdout("FAS password: ").unwrap();
 
     // construct bodhi client for the staging instance, and
     // authenticate with the supplied username and password
