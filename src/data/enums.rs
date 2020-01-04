@@ -1,23 +1,9 @@
 use std::cmp::PartialEq;
-use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-
-
-/// This enum represents the two possible values of compose checkpoints:
-/// - the empty object (`{}`), which does not correctly deserialize into an empty `HashMap`, and
-/// - a map of Strings to booleans.
-#[derive(Debug, Deserialize)]
-#[serde(untagged)]
-pub enum Checkpoints {
-    /// This value represents an empty map (`{}`).
-    None(String),
-    /// This value represents a non-empty map of checkpoints.
-    Map(HashMap<String, bool>),
-}
 
 
 /// This enum represents the possible request values for composes.

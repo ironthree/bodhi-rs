@@ -26,18 +26,17 @@ pub struct Bug {
 
 impl Display for Bug {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(
+        writeln!(f, "Bug {}:", self.bug_id)?;
+        writeln!(
             f,
-            "Bug {bug_id}:\n\
-             Title: {title}\n\
-             URL:   {url}",
-            bug_id = self.bug_id,
-            title = match &self.title {
+            "Title: {}",
+            match &self.title {
                 Some(title) => title.as_str(),
                 None => "(None)",
-            },
-            url = self.url().to_string(),
-        )
+            }
+        )?;
+        writeln!(f, "URL:   {}", self.url().to_string())?;
+        Ok(())
     }
 }
 
@@ -95,18 +94,17 @@ pub struct Build {
 
 impl Display for Build {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(
+        writeln!(f, "Build {}", &self.nvr)?;
+        writeln!(f, "Type:  {}", self.build_type)?;
+        writeln!(
             f,
-            "Build {nvr}:\n\
-             Type:  {build_type}\n\
-             Epoch: {epoch}",
-            nvr = &self.nvr,
-            build_type = self.build_type,
-            epoch = match self.epoch {
+            "Epoch: {}",
+            match self.epoch {
                 Some(epoch) => epoch.to_string(),
                 None => "(None)".to_string(),
             }
-        )
+        )?;
+        Ok(())
     }
 }
 
@@ -150,18 +148,12 @@ pub struct Comment {
 
 impl Display for Comment {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "Comment by {author}:\n\
-             {text}\n\
-             \n\
-             Submitted:      {timestamp}\n\
-             Karma:          {karma}",
-            author = &self.user.name,
-            text = &self.text,
-            timestamp = &self.timestamp,
-            karma = self.karma,
-        )
+        writeln!(f, "Comment by {}", &self.user.name)?;
+        writeln!(f, "{}", &self.text)?;
+        writeln!(f, "Submitted: {}", &self.timestamp)?;
+        writeln!(f, "Karma:     {}", self.karma)?;
+
+        Ok(())
     }
 }
 
@@ -169,15 +161,15 @@ impl Display for Comment {
 /// This struct represents a currently running compose.
 #[derive(Debug, Deserialize)]
 pub struct Compose {
-    /// map of active checkpoints for the compose
-    pub checkpoints: Checkpoints,
+    /// string of JSON-formatted checkpoint data for the compose
+    pub checkpoints: String,
     /// type of the contained contents (RPMs, containers, flatpaks, modules)
     pub content_type: Option<ContentType>,
     /// date & time this compose was triggered
     #[serde(with = "bodhi_date_format")]
     pub date_created: BodhiDate,
     /// error message in case of failure, else empty string
-    pub error_message: String,
+    pub error_message: Option<String>,
     /// release this compose is running for
     pub release: Option<Release>,
     /// ID of the release this compose is running for
@@ -201,11 +193,9 @@ pub struct Compose {
 
 impl Display for Compose {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(
+        writeln!(
             f,
-            "Compose for {release} / {request} ({content_type}):\n\
-             Created: {created}\n\
-             Status:  {status}",
+            "Compose for {release} / {request} ({content_type})",
             release = match &self.release {
                 Some(release) => release.name.to_string(),
                 None => "(None)".to_string(),
@@ -214,10 +204,13 @@ impl Display for Compose {
             content_type = match &self.content_type {
                 Some(content_type) => content_type.to_string(),
                 None => "(None)".to_string(),
-            },
-            created = &self.date_created,
-            status = &self.state,
-        )
+            }
+        )?;
+
+        writeln!(f, "Created: {}", &self.date_created)?;
+        writeln!(f, "Status:  {}", self.state)?;
+
+        Ok(())
     }
 }
 
@@ -235,7 +228,7 @@ pub struct Group {
 
 impl Display for Group {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{name}", name = &self.name)
+        write!(f, "{}", &self.name)
     }
 }
 
@@ -272,25 +265,19 @@ pub struct Override {
 
 impl Display for Override {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "Buildroot override for {nvr}:\n\
-             {notes}\n\
-             \n\
-             Submitter:       {submitter}\n\
-             Submission date: {submitted}\n\
-             Expiration date: {expiration}\n\
-             Expired:         {expired}",
-            nvr = &self.nvr,
-            notes = &self.notes,
-            submitter = &self.submitter.name,
-            submitted = &self.submission_date,
-            expiration = &self.expiration_date,
-            expired = match &self.expired_date {
-                Some(date) => date.to_string(),
-                None => "no".to_string(),
-            },
-        )
+        let expired_date = match &self.expired_date {
+            Some(date) => date.to_string(),
+            None => "no".to_string(),
+        };
+
+        writeln!(f, "Buildroot override for {}", &self.nvr)?;
+        writeln!(f, "{}", &self.notes)?;
+        writeln!(f, "Submitter:       {}", &self.submitter.name)?;
+        writeln!(f, "Submission date: {}", &self.submission_date)?;
+        writeln!(f, "Expiration date: {}", &self.expiration_date)?;
+        writeln!(f, "Expired:         {}", &expired_date)?;
+
+        Ok(())
     }
 }
 
@@ -375,29 +362,18 @@ pub struct Release {
 
 impl Display for Release {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "Release {name}:\n\
-             State:               {state}\n\
-             Branch:              {branch}\n\
-             Candidate tag:       {candidate_tag}\n\
-             Override tag:        {override_tag}\n\
-             Pending signing tag: {pending_signing_tag}\n\
-             Pending stable tag:  {pending_stable_tag}\n\
-             Pending testing tag: {pending_testing_tag}\n\
-             Stable tag:          {stable_tag}\n\
-             Testing tag:         {testing_tag}",
-            name = &self.name,
-            state = &self.state,
-            branch = &self.branch,
-            candidate_tag = &self.candidate_tag,
-            override_tag = &self.override_tag,
-            pending_signing_tag = &self.pending_signing_tag,
-            pending_stable_tag = &self.pending_stable_tag,
-            pending_testing_tag = &self.pending_testing_tag,
-            stable_tag = &self.stable_tag,
-            testing_tag = &self.testing_tag,
-        )
+        writeln!(f, "Release {}:", &self.name)?;
+        writeln!(f, "State               {}:", &self.state)?;
+        writeln!(f, "Branch              {}:", &self.branch)?;
+        writeln!(f, "Candidate tag       {}:", &self.candidate_tag)?;
+        writeln!(f, "Override tag        {}:", &self.override_tag)?;
+        writeln!(f, "Pending signing tag {}:", &self.pending_signing_tag)?;
+        writeln!(f, "Pending stable tag  {}:", &self.pending_stable_tag)?;
+        writeln!(f, "Pending testing tag {}:", &self.pending_testing_tag)?;
+        writeln!(f, "Stable tag          {}:", &self.stable_tag)?;
+        writeln!(f, "Testing tag         {}:", &self.testing_tag)?;
+
+        Ok(())
     }
 }
 
@@ -419,14 +395,16 @@ pub struct TestCase {
 
 impl Display for TestCase {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let package = match &self.package {
+            Some(package) => &package.name,
+            None => "(None)",
+        };
+
         write!(
             f,
             "Test Case '{name}' for package {package}",
             name = &self.name,
-            package = match &self.package {
-                Some(package) => &package.name,
-                None => "(None)",
-            }
+            package = &package
         )
     }
 }
@@ -562,51 +540,55 @@ pub struct Update {
 
 impl Display for Update {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        let builds = &self
-            .builds
-            .iter()
-            .map(|b| b.nvr.as_str())
-            .collect::<Vec<&str>>()
-            .join("\n");
+        let builds = if self.builds.len() > 0 {
+            self.builds
+                .iter()
+                .map(|b| b.nvr.as_str())
+                .collect::<Vec<&str>>()
+                .join("\n")
+        } else {
+            String::from("(None)")
+        };
 
-        let bugs = &self
-            .bugs
-            .iter()
-            .map(|b| b.bug_id.to_string())
-            .collect::<Vec<String>>()
-            .join(" ");
+        let bugs = if self.bugs.len() > 0 {
+            self.bugs
+                .iter()
+                .map(|b| b.bug_id.to_string())
+                .collect::<Vec<String>>()
+                .join(" ")
+        } else {
+            String::from("(None)")
+        };
 
         let test_cases = match &self.test_cases {
-            Some(test_cases) => test_cases
-                .iter()
-                .map(|t| t.name.as_str())
-                .collect::<Vec<&str>>()
-                .join(" "),
+            Some(test_cases) => {
+                if test_cases.len() > 0 {
+                    test_cases
+                        .iter()
+                        .map(|t| t.name.as_str())
+                        .collect::<Vec<&str>>()
+                        .join(" ")
+                } else {
+                    "(None)".to_string()
+                }
+            },
             None => "(None)".to_string(),
         };
 
-        write!(
-            f,
-            "Update {alias}:\n\
-             {notes}\n\
-             \n\
-             State:         {state}\n\
-             Submitter:     {submitter}\n\
-             \n\
-             Builds:\n\
-             {builds}\n\
-             \n\
-             Bugs: {bugs}\n\
-             Test Cases: {test_cases}\n\
-             ",
-            alias = &self.alias,
-            notes = &self.notes,
-            state = &self.status,
-            submitter = &self.user.name,
-            builds = &builds,
-            bugs = &bugs,
-            test_cases = &test_cases,
-        )
+        writeln!(f, "Update {}:", &self.alias)?;
+        writeln!(f, "{}", &self.notes)?;
+        writeln!(f, "")?;
+        writeln!(f, "State:         {}", self.status)?;
+        writeln!(f, "Submitter:     {}", &self.user.name)?;
+        writeln!(f, "")?;
+        writeln!(f, "Builds:")?;
+        writeln!(f, "{}:", &builds)?;
+        writeln!(f, "")?;
+        writeln!(f, "Bugs:       {}", &bugs)?;
+        writeln!(f, "Test Cases: {}", &test_cases)?;
+        writeln!(f, "{}:", &bugs)?;
+
+        Ok(())
     }
 }
 
@@ -651,22 +633,22 @@ pub struct User {
 
 impl Display for User {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        let groups: Vec<&str> = self.groups.iter().map(|g| g.name.as_str()).collect();
+        let email = match &self.email {
+            Some(email) => email.as_str(),
+            None => "(None)",
+        };
 
-        write!(
-            f,
-            "User {name}:\n\
-             E-Mail: {email}\n\
-             Groups: {groups}",
-            name = &self.name,
-            email = match &self.email {
-                Some(email) => email,
-                None => "(None)",
-            },
-            groups = match groups.len() {
-                0 => "(None)".to_string(),
-                _ => groups.join(", "),
-            },
-        )
+        let groups: String = self
+            .groups
+            .iter()
+            .map(|g| g.name.as_str())
+            .collect::<Vec<&str>>()
+            .join(", ");
+
+        writeln!(f, "User {}:", &self.name)?;
+        writeln!(f, "E-Mail: {}", email)?;
+        writeln!(f, "Groups: {}", &groups)?;
+
+        Ok(())
     }
 }
