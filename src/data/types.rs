@@ -26,16 +26,15 @@ pub struct Bug {
 
 impl Display for Bug {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        let title = match &self.title {
+            Some(title) => title.as_str(),
+            None => "(None)",
+        };
+
         writeln!(f, "Bug {}:", self.bug_id)?;
-        writeln!(
-            f,
-            "Title: {}",
-            match &self.title {
-                Some(title) => title.as_str(),
-                None => "(None)",
-            }
-        )?;
-        writeln!(f, "URL:   {}", self.url().to_string())?;
+        writeln!(f, "Title: {}", title)?;
+        writeln!(f, "URL:   {}", self.url())?;
+
         Ok(())
     }
 }
@@ -363,15 +362,15 @@ pub struct Release {
 impl Display for Release {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         writeln!(f, "Release {}:", &self.name)?;
-        writeln!(f, "State               {}:", &self.state)?;
-        writeln!(f, "Branch              {}:", &self.branch)?;
-        writeln!(f, "Candidate tag       {}:", &self.candidate_tag)?;
-        writeln!(f, "Override tag        {}:", &self.override_tag)?;
-        writeln!(f, "Pending signing tag {}:", &self.pending_signing_tag)?;
-        writeln!(f, "Pending stable tag  {}:", &self.pending_stable_tag)?;
-        writeln!(f, "Pending testing tag {}:", &self.pending_testing_tag)?;
-        writeln!(f, "Stable tag          {}:", &self.stable_tag)?;
-        writeln!(f, "Testing tag         {}:", &self.testing_tag)?;
+        writeln!(f, "State:               {}", &self.state)?;
+        writeln!(f, "Branch:              {}", &self.branch)?;
+        writeln!(f, "Candidate tag:       {}", &self.candidate_tag)?;
+        writeln!(f, "Override tag:        {}", &self.override_tag)?;
+        writeln!(f, "Pending signing tag: {}", &self.pending_signing_tag)?;
+        writeln!(f, "Pending stable tag:  {}", &self.pending_stable_tag)?;
+        writeln!(f, "Pending testing tag: {}", &self.pending_testing_tag)?;
+        writeln!(f, "Stable tag:          {}", &self.stable_tag)?;
+        writeln!(f, "Testing tag:         {}", &self.testing_tag)?;
 
         Ok(())
     }
@@ -582,11 +581,10 @@ impl Display for Update {
         writeln!(f, "Submitter:     {}", &self.user.name)?;
         writeln!(f, "")?;
         writeln!(f, "Builds:")?;
-        writeln!(f, "{}:", &builds)?;
+        writeln!(f, "{}", &builds)?;
         writeln!(f, "")?;
         writeln!(f, "Bugs:       {}", &bugs)?;
         writeln!(f, "Test Cases: {}", &test_cases)?;
-        writeln!(f, "{}:", &bugs)?;
 
         Ok(())
     }
