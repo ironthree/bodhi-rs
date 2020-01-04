@@ -422,4 +422,14 @@ impl Update {
     pub fn edit(&self) -> UpdateEditor {
         UpdateEditor::from_update(self)
     }
+
+    /// This method creates a new `UpdateStatusRequester` for editing this `Update`.
+    pub fn request(&self, request: UpdateRequest) -> UpdateStatusRequester {
+        UpdateStatusRequester::from_update(self, request)
+    }
+
+    /// This method creates a new `UpdateTestResultWaiver` for editing this `Update`.
+    pub fn waive<'a>(&'a self, comment: &'a str) -> UpdateTestResultWaiver<'a> {
+        UpdateTestResultWaiver::from_update(self, comment)
+    }
 }
