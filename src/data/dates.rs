@@ -1,3 +1,4 @@
+use std::cmp::{Ord, Ordering};
 use std::convert::TryFrom;
 use std::fmt::{Display, Formatter};
 
@@ -8,7 +9,7 @@ pub const BODHI_DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 
 /// This struct wraps a `chrono::DateTime<chrono::Utc>` instance with implementations for converting
 /// to and from the string format that bodhi expects and returns for dates and times.
-#[derive(Debug)]
+#[derive(Debug, Eq)]
 pub struct BodhiDate {
     date: DateTime<Utc>,
 }
@@ -34,6 +35,24 @@ impl TryFrom<&str> for BodhiDate {
 impl Display for BodhiDate {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "{}", self.date.format(BODHI_DATETIME_FORMAT).to_string())
+    }
+}
+
+impl PartialEq for BodhiDate {
+    fn eq(&self, other: &Self) -> bool {
+        self.date.eq(&other.date)
+    }
+}
+
+impl PartialOrd for BodhiDate {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.date.partial_cmp(&other.date)
+    }
+}
+
+impl Ord for BodhiDate {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.date.cmp(&other.date)
     }
 }
 

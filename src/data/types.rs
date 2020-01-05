@@ -539,7 +539,7 @@ pub struct Update {
 
 impl Display for Update {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        let builds = if self.builds.len() > 0 {
+        let builds = if !self.builds.is_empty() {
             self.builds
                 .iter()
                 .map(|b| b.nvr.as_str())
@@ -549,7 +549,7 @@ impl Display for Update {
             String::from("(None)")
         };
 
-        let bugs = if self.bugs.len() > 0 {
+        let bugs = if !self.bugs.is_empty() {
             self.bugs
                 .iter()
                 .map(|b| b.bug_id.to_string())
@@ -561,7 +561,7 @@ impl Display for Update {
 
         let test_cases = match &self.test_cases {
             Some(test_cases) => {
-                if test_cases.len() > 0 {
+                if !test_cases.is_empty() {
                     test_cases
                         .iter()
                         .map(|t| t.name.as_str())
@@ -576,13 +576,13 @@ impl Display for Update {
 
         writeln!(f, "Update {}:", &self.alias)?;
         writeln!(f, "{}", &self.notes)?;
-        writeln!(f, "")?;
+        writeln!(f)?;
         writeln!(f, "State:         {}", self.status)?;
         writeln!(f, "Submitter:     {}", &self.user.name)?;
-        writeln!(f, "")?;
+        writeln!(f)?;
         writeln!(f, "Builds:")?;
         writeln!(f, "{}", &builds)?;
-        writeln!(f, "")?;
+        writeln!(f)?;
         writeln!(f, "Bugs:       {}", &bugs)?;
         writeln!(f, "Test Cases: {}", &test_cases)?;
 

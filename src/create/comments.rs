@@ -3,23 +3,28 @@ use serde::{Deserialize, Serialize};
 use crate::error::{BodhiError, QueryError};
 use crate::{BodhiService, CSRFQuery, Comment, Create, Karma, SinglePageQuery, Update};
 
-/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST>
+// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST>
 #[derive(Debug, Serialize)]
-pub struct CommentData<'a> {
-    /// alias of the update for which this is a comment
+struct CommentData<'a> {
     update: &'a str,
-    /// comment text (default: `""`)
     text: Option<&'a str>,
-    /// comment karma (default: `0`)
     karma: Option<&'a Karma>,
-    /// critpath karma (default: `0`)
     karma_critpath: Option<&'a Karma>,
-    /// bug feedback vector (default: `[]`)
-    bug_feedback: Option<&'a Vec<Karma>>,
-    /// testcase feedback vector (default: `[]`)
-    testcase_feedback: Option<&'a Vec<Karma>>,
-    /// CSRF token
+    bug_feedback: Option<&'a Vec<BugFeedbackData>>,
+    testcase_feedback: Option<&'a Vec<TestCaseFeedbackData>>,
     csrf_token: &'a str,
+}
+
+#[derive(Debug, Serialize)]
+struct BugFeedbackData {
+    bug_id: u32,
+    karma: Karma,
+}
+
+#[derive(Debug, Serialize)]
+struct TestCaseFeedbackData {
+    karma: Karma,
+    testcase_id: u32,
 }
 
 /// This struct contains the values that are returned when creating a new comment.
@@ -39,8 +44,8 @@ pub struct CommentBuilder<'a> {
     text: Option<&'a str>,
     karma: Option<Karma>,
     karma_critpath: Option<Karma>,
-    bug_feedback: Option<Vec<Karma>>,
-    testcase_feedback: Option<Vec<Karma>>,
+    bug_feedback: Option<Vec<BugFeedbackData>>,
+    testcase_feedback: Option<Vec<TestCaseFeedbackData>>,
 }
 
 impl<'a> CommentBuilder<'a> {
@@ -75,14 +80,26 @@ impl<'a> CommentBuilder<'a> {
     }
 
     /// Add optional bug feedback to the comment.
-    pub fn bug_feedback(mut self, feedback: Vec<Karma>) -> Self {
-        self.bug_feedback = Some(feedback);
+    pub fn bug_feedback(mut self, bug_id: u32, karma: Karma) -> Self {
+        let feedback = BugFeedbackData { bug_id, karma };
+
+        match &mut self.bug_feedback {
+            Some(bug_feedback) => bug_feedback.push(feedback),
+            None => self.bug_feedback = Some(vec![feedback]),
+        }
+
         self
     }
 
     /// Add optional test case feedback to the comment.
-    pub fn testcase_feedback(mut self, feedback: Vec<Karma>) -> Self {
-        self.testcase_feedback = Some(feedback);
+    pub fn testcase_feedback(mut self, testcase_id: u32, karma: Karma) -> Self {
+        let feedback = TestCaseFeedbackData { karma, testcase_id };
+
+        match &mut self.testcase_feedback {
+            Some(testcase_feedback) => testcase_feedback.push(feedback),
+            None => self.testcase_feedback = Some(vec![feedback]),
+        }
+
         self
     }
 }
