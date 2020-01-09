@@ -11,7 +11,7 @@ struct CommentData<'a> {
     karma: Option<&'a Karma>,
     karma_critpath: Option<&'a Karma>,
     bug_feedback: Option<&'a Vec<BugFeedbackData>>,
-    testcase_feedback: Option<&'a Vec<TestCaseFeedbackData>>,
+    testcase_feedback: Option<&'a Vec<TestCaseFeedbackData<'a>>>,
     csrf_token: &'a str,
 }
 
@@ -22,9 +22,9 @@ struct BugFeedbackData {
 }
 
 #[derive(Debug, Serialize)]
-struct TestCaseFeedbackData {
+struct TestCaseFeedbackData<'a> {
     karma: Karma,
-    testcase_id: u32,
+    testcase_name: &'a str,
 }
 
 /// This struct contains the values that are returned when creating a new comment.
@@ -45,7 +45,7 @@ pub struct CommentBuilder<'a> {
     karma: Option<Karma>,
     karma_critpath: Option<Karma>,
     bug_feedback: Option<Vec<BugFeedbackData>>,
-    testcase_feedback: Option<Vec<TestCaseFeedbackData>>,
+    testcase_feedback: Option<Vec<TestCaseFeedbackData<'a>>>,
 }
 
 impl<'a> CommentBuilder<'a> {
@@ -92,8 +92,8 @@ impl<'a> CommentBuilder<'a> {
     }
 
     /// Add optional test case feedback to the comment.
-    pub fn testcase_feedback(mut self, testcase_id: u32, karma: Karma) -> Self {
-        let feedback = TestCaseFeedbackData { karma, testcase_id };
+    pub fn testcase_feedback(mut self, testcase_name: &'a str, karma: Karma) -> Self {
+        let feedback = TestCaseFeedbackData { karma, testcase_name };
 
         match &mut self.testcase_feedback {
             Some(testcase_feedback) => testcase_feedback.push(feedback),
