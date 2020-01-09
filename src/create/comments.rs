@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 use crate::error::{BodhiError, QueryError};
@@ -8,8 +10,7 @@ use crate::{BodhiService, CSRFQuery, Comment, Create, Karma, SinglePageQuery, Up
 struct CommentData<'a> {
     update: &'a str,
     text: Option<&'a str>,
-    karma: Option<&'a Karma>,
-    karma_critpath: Option<&'a Karma>,
+    karma: Karma,
     bug_feedback: Option<&'a Vec<BugFeedbackData>>,
     testcase_feedback: Option<&'a Vec<TestCaseFeedbackData<'a>>>,
     csrf_token: &'a str,
@@ -33,7 +34,7 @@ pub struct NewComment {
     /// the newly created comment
     pub comment: Comment,
     /// additional server messages
-    pub caveats: Vec<String>,
+    pub caveats: Vec<HashMap<String, String>>,
 }
 
 /// This struct contains all the values that are necessary for creating a new comment. Methods to
@@ -43,7 +44,6 @@ pub struct CommentBuilder<'a> {
     update: &'a str,
     text: Option<&'a str>,
     karma: Option<Karma>,
-    karma_critpath: Option<Karma>,
     bug_feedback: Option<Vec<BugFeedbackData>>,
     testcase_feedback: Option<Vec<TestCaseFeedbackData<'a>>>,
 }
@@ -55,7 +55,6 @@ impl<'a> CommentBuilder<'a> {
             update,
             text: None,
             karma: None,
-            karma_critpath: None,
             bug_feedback: None,
             testcase_feedback: None,
         }
@@ -70,12 +69,6 @@ impl<'a> CommentBuilder<'a> {
     /// Add optional general karma feedback to the comment.
     pub fn karma(mut self, karma: Karma) -> Self {
         self.karma = Some(karma);
-        self
-    }
-
-    /// Add optional critpath karma feedback to the comment.
-    pub fn karma_critpath(mut self, karma: Karma) -> Self {
-        self.karma_critpath = Some(karma);
         self
     }
 
@@ -116,8 +109,10 @@ impl<'a> Create<NewComment> for CommentBuilder<'a> {
                 Some(text) => Some(&text),
                 None => None,
             },
-            karma: self.karma.as_ref(),
-            karma_critpath: self.karma_critpath.as_ref(),
+            karma: match self.karma {
+                Some(karma) => karma,
+                None => Karma::Neutral,
+            },
             bug_feedback: self.bug_feedback.as_ref(),
             testcase_feedback: self.testcase_feedback.as_ref(),
             csrf_token: &csrf_token,
