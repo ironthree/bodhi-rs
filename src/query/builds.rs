@@ -95,7 +95,7 @@ pub struct BuildQuery<'a> {
     updates: Option<Vec<&'a str>>,
 
     /// optional callback function for reporting progress
-    callback: Option<Box<dyn Fn(u32, u32) -> () + 'a>>,
+    callback: Option<Box<dyn FnMut(u32, u32) -> () + 'a>>,
 }
 
 impl<'a> Debug for BuildQuery<'a> {
@@ -123,7 +123,7 @@ impl<'a> BuildQuery<'a> {
     /// Add a callback function for reporting back query progress for long-running queries.
     /// The function will be called with the current page and the total number of pages for
     /// paginated queries.
-    pub fn callback(mut self, fun: impl Fn(u32, u32) -> () + 'a) -> Self {
+    pub fn callback(mut self, fun: impl FnMut(u32, u32) -> () + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
@@ -172,7 +172,7 @@ impl<'a> BuildQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
+    fn query(mut self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
         let mut builds: Vec<Build> = Vec::new();
         let mut page = 1;
 
@@ -180,7 +180,7 @@ impl<'a> BuildQuery<'a> {
             let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
 
-            if let Some(fun) = &self.callback {
+            if let Some(ref mut fun) = self.callback {
                 fun(page, result.pages);
             }
 

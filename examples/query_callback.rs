@@ -7,8 +7,11 @@ fn main() -> Result<(), String> {
         .build()
         .expect("Failed to initialize bodhi client.");
 
+    let mut progress = 0f64;
+
     let query = BuildQuery::new().releases(FedoraRelease::F31).callback(|p, ps| {
-        print!("\rProgress: {:02}%", ((p as f64) / (ps as f64) * 100f64) as i32);
+        progress = (p as f64) / (ps as f64);
+        print!("\rProgress: {:02}%", (progress * 100f64) as i32);
         std::io::stdout().flush().expect("Failed to flush stdout.");
     });
 

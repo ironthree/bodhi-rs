@@ -24,7 +24,10 @@ pub trait SinglePageQuery<T> {
     /// This method executes a single-page query, but delegates execution of some things to the
     /// individual trait implementations (such as deserializing JSON, handling 404 errors, or
     /// getting API paths and arguments).
-    fn query(self, bodhi: &BodhiService) -> Result<T, QueryError> where Self: Sized {
+    fn query(self, bodhi: &BodhiService) -> Result<T, QueryError>
+    where
+        Self: Sized,
+    {
         let path = self.path()?;
         let response = bodhi.get(&path)?;
         let status = response.status();
