@@ -24,7 +24,7 @@ use crate::{BodhiService, Build, FedoraRelease, Query, SinglePageQuery};
 /// # use bodhi::{BuildNVRQuery, BodhiServiceBuilder};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let build = bodhi.query(&BuildNVRQuery::new("rust-1.34.1-1.fc29")).unwrap();
+/// let build = bodhi.query(BuildNVRQuery::new("rust-1.34.1-1.fc29")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-0>
@@ -58,7 +58,7 @@ impl<'a> SinglePageQuery<Option<Build>> for BuildNVRQuery<'a> {
 }
 
 impl<'a> Query<Option<Build>> for BuildNVRQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Option<Build>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Option<Build>, QueryError> {
         <Self as SinglePageQuery<Option<Build>>>::query(self, bodhi)
     }
 }
@@ -74,7 +74,7 @@ impl<'a> Query<Option<Build>> for BuildNVRQuery<'a> {
 ///
 /// let builds = bodhi
 ///     .query(
-///         &BuildQuery::new()
+///         BuildQuery::new()
 ///             .releases(FedoraRelease::F30)
 ///             .releases(FedoraRelease::F29)
 ///             .packages("rust"),
@@ -172,7 +172,7 @@ impl<'a> BuildQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
         let mut builds: Vec<Build> = Vec::new();
         let mut page = 1;
 
@@ -208,7 +208,7 @@ impl<'a> BuildQuery<'a> {
 }
 
 impl<'a> Query<Vec<Build>> for BuildQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Build>, QueryError> {
         BuildQuery::query(self, bodhi)
     }
 }

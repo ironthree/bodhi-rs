@@ -52,7 +52,7 @@
 //!
 //! let package_query = bodhi::PackageQuery::new().name("rust");
 //!
-//! let packages = bodhi.query(&package_query).unwrap();
+//! let packages = bodhi.query(package_query).unwrap();
 //! ```
 
 #![warn(missing_docs)]

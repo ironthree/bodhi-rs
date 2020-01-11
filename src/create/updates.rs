@@ -242,7 +242,7 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
             }
         }
 
-        let csrf_token = bodhi.query(&CSRFQuery::new())?;
+        let csrf_token = bodhi.query(CSRFQuery::new())?;
 
         let bugs: Option<Vec<String>> = match &self.bugs {
             Some(bugs) => Some(bugs.iter().map(|b| format!("{}", b)).collect()),

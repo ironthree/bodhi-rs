@@ -12,7 +12,7 @@ use crate::{BodhiService, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, CSRFQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let token = bodhi.query(&CSRFQuery::new()).unwrap();
+/// let token = bodhi.query(CSRFQuery::new()).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/csrf.html>
@@ -49,7 +49,7 @@ impl SinglePageQuery<String> for CSRFQuery {
 }
 
 impl Query<String> for CSRFQuery {
-    fn query(&self, bodhi: &BodhiService) -> Result<String, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<String, QueryError> {
         <Self as SinglePageQuery<String>>::query(self, bodhi)
     }
 }

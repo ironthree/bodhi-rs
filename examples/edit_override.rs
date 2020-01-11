@@ -22,7 +22,7 @@ fn main() -> Result<(), String> {
         .build()
         .unwrap();
 
-    let over_ride = match bodhi.query(&OverrideNVRQuery::new("elementary-theme-5.4.0-1.fc30")) {
+    let over_ride = match bodhi.query(OverrideNVRQuery::new("elementary-theme-5.4.0-1.fc30")) {
         Ok(o) => match o {
             Some(o) => o,
             None => {

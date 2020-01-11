@@ -305,7 +305,7 @@ impl BodhiService {
     }
 
     /// This method is used for GET methods to query things on the bodhi instance.
-    pub fn query<T>(&self, query: &dyn Query<T>) -> Result<T, QueryError> {
+    pub fn query<T>(&self, query: impl Query<T>) -> Result<T, QueryError> {
         Query::query(query, self)
     }
 

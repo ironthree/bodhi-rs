@@ -22,7 +22,7 @@ use crate::{BodhiService, Query, Release, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, FedoraRelease, ReleaseNameQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let release = bodhi.query(&ReleaseNameQuery::new("F30")).unwrap();
+/// let release = bodhi.query(ReleaseNameQuery::new("F30")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-0>
@@ -55,7 +55,7 @@ impl<'a> SinglePageQuery<Option<Release>> for ReleaseNameQuery<'a> {
 }
 
 impl<'a> Query<Option<Release>> for ReleaseNameQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Option<Release>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Option<Release>, QueryError> {
         <Self as SinglePageQuery<Option<Release>>>::query(self, bodhi)
     }
 }
@@ -69,7 +69,7 @@ impl<'a> Query<Option<Release>> for ReleaseNameQuery<'a> {
 /// # use bodhi::{BodhiServiceBuilder, ReleaseQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let releases = bodhi.query(&ReleaseQuery::new().exclude_archived(true)).unwrap();
+/// let releases = bodhi.query(ReleaseQuery::new().exclude_archived(true)).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-1>
@@ -145,7 +145,7 @@ impl<'a> ReleaseQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
         let mut overrides: Vec<Release> = Vec::new();
         let mut page = 1;
 
@@ -178,7 +178,7 @@ impl<'a> ReleaseQuery<'a> {
 }
 
 impl<'a> Query<Vec<Release>> for ReleaseQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
         ReleaseQuery::query(self, bodhi)
     }
 }

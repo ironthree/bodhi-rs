@@ -24,7 +24,7 @@ use crate::{BodhiDate, BodhiService, Comment, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, CommentIDQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comment = bodhi.query(&CommentIDQuery::new(19999)).unwrap();
+/// let comment = bodhi.query(CommentIDQuery::new(19999)).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-0>
@@ -62,7 +62,7 @@ impl SinglePageQuery<Option<Comment>> for CommentIDQuery {
 }
 
 impl Query<Option<Comment>> for CommentIDQuery {
-    fn query(&self, bodhi: &BodhiService) -> Result<Option<Comment>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Option<Comment>, QueryError> {
         <Self as SinglePageQuery<Option<Comment>>>::query(self, bodhi)
     }
 }
@@ -77,7 +77,7 @@ impl Query<Option<Comment>> for CommentIDQuery {
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let comments = bodhi
-///     .query(&CommentQuery::new().users("decathorpe").packages("rust"))
+///     .query(CommentQuery::new().users("decathorpe").packages("rust"))
 ///     .unwrap();
 /// ```
 ///
@@ -229,7 +229,7 @@ impl<'a> CommentQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
         let mut comments: Vec<Comment> = Vec::new();
         let mut page = 1;
 
@@ -270,7 +270,7 @@ impl<'a> CommentQuery<'a> {
 }
 
 impl<'a> Query<Vec<Comment>> for CommentQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
         CommentQuery::query(self, bodhi)
     }
 }

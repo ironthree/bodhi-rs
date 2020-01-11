@@ -20,7 +20,7 @@ use crate::{BodhiService, Package, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, PackageQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let packages = bodhi.query(&PackageQuery::new().search("rust*")).unwrap();
+/// let packages = bodhi.query(PackageQuery::new().search("rust*")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/packages.html#service-0>
@@ -82,7 +82,7 @@ impl<'a> PackageQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
         let mut packages: Vec<Package> = Vec::new();
         let mut page = 1;
 
@@ -117,7 +117,7 @@ impl<'a> PackageQuery<'a> {
 }
 
 impl<'a> Query<Vec<Package>> for PackageQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
         PackageQuery::query(self, bodhi)
     }
 }

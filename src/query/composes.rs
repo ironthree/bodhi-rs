@@ -13,7 +13,7 @@ use crate::{BodhiService, Compose, ComposeRequest, FedoraRelease, Query, SingleP
 /// # use bodhi::{BodhiServiceBuilder, CommentIDQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comment = bodhi.query(&CommentIDQuery::new(19999)).unwrap();
+/// let comment = bodhi.query(CommentIDQuery::new(19999)).unwrap();
 /// ```
 #[derive(Debug)]
 pub struct ComposeReleaseRequestQuery {
@@ -50,7 +50,7 @@ impl SinglePageQuery<Option<Compose>> for ComposeReleaseRequestQuery {
 }
 
 impl Query<Option<Compose>> for ComposeReleaseRequestQuery {
-    fn query(&self, bodhi: &BodhiService) -> Result<Option<Compose>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Option<Compose>, QueryError> {
         <Self as SinglePageQuery<Option<Compose>>>::query(self, bodhi)
     }
 }
@@ -61,7 +61,7 @@ impl Query<Option<Compose>> for ComposeReleaseRequestQuery {
 /// # use bodhi::{BodhiServiceBuilder, ComposeQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let composes = bodhi.query(&ComposeQuery::new()).unwrap();
+/// let composes = bodhi.query(ComposeQuery::new()).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/composes.html>
@@ -98,7 +98,7 @@ impl SinglePageQuery<Vec<Compose>> for ComposeQuery {
 }
 
 impl Query<Vec<Compose>> for ComposeQuery {
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Compose>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Compose>, QueryError> {
         <Self as SinglePageQuery<Vec<Compose>>>::query(self, bodhi)
     }
 }

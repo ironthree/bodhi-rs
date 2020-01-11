@@ -7,5 +7,5 @@ fn deserialize() {
     let bodhi = bodhi_init();
 
     // query and deserialize currently active composes
-    bodhi.query(&ComposeQuery::new()).unwrap();
+    bodhi.query(ComposeQuery::new()).unwrap();
 }

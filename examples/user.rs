@@ -14,7 +14,7 @@ fn main() -> Result<(), String> {
     arguments.next();
 
     for argument in arguments {
-        let user = match bodhi.query(&UserNameQuery::new(&argument)) {
+        let user = match bodhi.query(UserNameQuery::new(&argument)) {
             Err(error) => return Err(format!("{}", error)),
             Ok(user) => match user {
                 Some(user) => user,

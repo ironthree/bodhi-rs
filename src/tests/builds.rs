@@ -6,11 +6,11 @@ use crate::{Build, BuildNVRQuery, BuildQuery, FedoraRelease};
 fn query_sanity_packages() {
     let bodhi = bodhi_init();
 
-    let rs_builds: Vec<Build> = bodhi.query(&BuildQuery::new().packages("rust")).unwrap();
-    let go_builds: Vec<Build> = bodhi.query(&BuildQuery::new().packages("golang")).unwrap();
+    let rs_builds: Vec<Build> = bodhi.query(BuildQuery::new().packages("rust")).unwrap();
+    let go_builds: Vec<Build> = bodhi.query(BuildQuery::new().packages("golang")).unwrap();
 
     let both_builds: Vec<Build> = bodhi
-        .query(&BuildQuery::new().packages("rust").packages("golang"))
+        .query(BuildQuery::new().packages("rust").packages("golang"))
         .unwrap();
 
     assert_eq!(both_builds.len(), rs_builds.len() + go_builds.len())
@@ -20,12 +20,12 @@ fn query_sanity_packages() {
 fn query_sanity_releases() {
     let bodhi = bodhi_init();
 
-    let f31c_builds: Vec<Build> = bodhi.query(&BuildQuery::new().releases(FedoraRelease::F31C)).unwrap();
-    let f30c_builds: Vec<Build> = bodhi.query(&BuildQuery::new().releases(FedoraRelease::F30C)).unwrap();
+    let f31c_builds: Vec<Build> = bodhi.query(BuildQuery::new().releases(FedoraRelease::F31C)).unwrap();
+    let f30c_builds: Vec<Build> = bodhi.query(BuildQuery::new().releases(FedoraRelease::F30C)).unwrap();
 
     let both_builds: Vec<Build> = bodhi
         .query(
-            &BuildQuery::new()
+            BuildQuery::new()
                 .releases(FedoraRelease::F31C)
                 .releases(FedoraRelease::F30C),
         )
@@ -39,15 +39,15 @@ fn query_sanity_updates() {
     let bodhi = bodhi_init();
 
     let builds_one: Vec<Build> = bodhi
-        .query(&BuildQuery::new().updates("FEDORA-2019-cf87377f5f"))
+        .query(BuildQuery::new().updates("FEDORA-2019-cf87377f5f"))
         .unwrap();
     let builds_two: Vec<Build> = bodhi
-        .query(&BuildQuery::new().updates("FEDORA-2019-24c9d17287"))
+        .query(BuildQuery::new().updates("FEDORA-2019-24c9d17287"))
         .unwrap();
 
     let both_builds: Vec<Build> = bodhi
         .query(
-            &BuildQuery::new()
+            BuildQuery::new()
                 .updates("FEDORA-2019-cf87377f5f")
                 .updates("FEDORA-2019-24c9d17287"),
         )
@@ -60,7 +60,7 @@ fn query_sanity_updates() {
 fn nvr_query_some() {
     let bodhi = bodhi_init();
 
-    let build: Option<Build> = bodhi.query(&BuildNVRQuery::new("rust-1.34.2-1.fc30")).unwrap();
+    let build: Option<Build> = bodhi.query(BuildNVRQuery::new("rust-1.34.2-1.fc30")).unwrap();
 
     assert!(build.is_some());
 }
@@ -69,7 +69,7 @@ fn nvr_query_some() {
 fn nvr_query_none() {
     let bodhi = bodhi_init();
 
-    let build: Option<Build> = bodhi.query(&BuildNVRQuery::new("this-doesnt-exist-1-1.fc30")).unwrap();
+    let build: Option<Build> = bodhi.query(BuildNVRQuery::new("this-doesnt-exist-1-1.fc30")).unwrap();
 
     assert!(build.is_none());
 }

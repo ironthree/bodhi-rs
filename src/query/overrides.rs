@@ -25,7 +25,7 @@ use crate::{BodhiService, FedoraRelease, Override, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, OverrideNVRQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let over_ride = bodhi.query(&OverrideNVRQuery::new("wingpanel-2.2.1-1.fc28")).unwrap();
+/// let over_ride = bodhi.query(OverrideNVRQuery::new("wingpanel-2.2.1-1.fc28")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-0>
@@ -63,7 +63,7 @@ impl<'a> SinglePageQuery<Option<Override>> for OverrideNVRQuery<'a> {
 }
 
 impl<'a> Query<Option<Override>> for OverrideNVRQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Option<Override>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Option<Override>, QueryError> {
         <Self as SinglePageQuery<Option<Override>>>::query(self, bodhi)
     }
 }
@@ -78,7 +78,7 @@ impl<'a> Query<Option<Override>> for OverrideNVRQuery<'a> {
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// let overrides = bodhi
-///     .query(&OverrideQuery::new().releases(FedoraRelease::F29).users("decathorpe"))
+///     .query(OverrideQuery::new().releases(FedoraRelease::F29).users("decathorpe"))
 ///     .unwrap();
 /// ```
 ///
@@ -198,7 +198,7 @@ impl<'a> OverrideQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
         let mut overrides: Vec<Override> = Vec::new();
         let mut page = 1;
 
@@ -237,7 +237,7 @@ impl<'a> OverrideQuery<'a> {
 }
 
 impl<'a> Query<Vec<Override>> for OverrideQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
         OverrideQuery::query(self, bodhi)
     }
 }

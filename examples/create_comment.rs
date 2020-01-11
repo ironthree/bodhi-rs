@@ -23,7 +23,7 @@ fn main() -> Result<(), String> {
         .build()
         .unwrap();
 
-    let update: Update = match bodhi.query(&UpdateIDQuery::new("FEDORA-2019-e7f463674c")) {
+    let update: Update = match bodhi.query(UpdateIDQuery::new("FEDORA-2019-e7f463674c")) {
         Ok(ok) => match ok {
             Some(update) => update,
             None => {

@@ -23,7 +23,7 @@ fn main() -> Result<(), String> {
         .build()
         .unwrap();
 
-    let update: Update = match bodhi.query(&UpdateIDQuery::new("FEDORA-2019-586c873435")) {
+    let update: Update = match bodhi.query(UpdateIDQuery::new("FEDORA-2019-586c873435")) {
         Err(_) => {
             return Err(String::from("Failed to fetch update."));
         },

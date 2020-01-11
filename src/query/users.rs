@@ -25,7 +25,7 @@ use crate::{BodhiService, Query, SinglePageQuery, User};
 /// # use bodhi::{BodhiServiceBuilder, UserNameQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comment = bodhi.query(&UserNameQuery::new("decathorpe")).unwrap();
+/// let comment = bodhi.query(UserNameQuery::new("decathorpe")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-0>
@@ -62,7 +62,7 @@ impl<'a> SinglePageQuery<Option<User>> for UserNameQuery<'a> {
 }
 
 impl<'a> Query<Option<User>> for UserNameQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Option<User>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Option<User>, QueryError> {
         <Self as SinglePageQuery<Option<User>>>::query(self, bodhi)
     }
 }
@@ -76,7 +76,7 @@ impl<'a> Query<Option<User>> for UserNameQuery<'a> {
 /// # use bodhi::{BodhiServiceBuilder, UserQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let users = bodhi.query(&UserQuery::new().groups("provenpackager")).unwrap();
+/// let users = bodhi.query(UserQuery::new().groups("provenpackager")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-1>
@@ -169,7 +169,7 @@ impl<'a> UserQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
         let mut users: Vec<User> = Vec::new();
         let mut page = 1;
 
@@ -206,7 +206,7 @@ impl<'a> UserQuery<'a> {
 }
 
 impl<'a> Query<Vec<User>> for UserQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
         UserQuery::query(self, bodhi)
     }
 }

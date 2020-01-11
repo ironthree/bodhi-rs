@@ -7,15 +7,15 @@ fn query_sanity_updates() {
     let bodhi = bodhi_init();
 
     let users_one: Vec<User> = bodhi
-        .query(&UserQuery::new().updates("FEDORA-2019-ac2a21ff07"))
+        .query(UserQuery::new().updates("FEDORA-2019-ac2a21ff07"))
         .unwrap();
     let users_two: Vec<User> = bodhi
-        .query(&UserQuery::new().updates("FEDORA-2019-ac3dc27f26"))
+        .query(UserQuery::new().updates("FEDORA-2019-ac3dc27f26"))
         .unwrap();
 
     let users_both: Vec<User> = bodhi
         .query(
-            &UserQuery::new()
+            UserQuery::new()
                 .updates("FEDORA-2019-ac2a21ff07")
                 .updates("FEDORA-2019-ac3dc27f26"),
         )
@@ -28,7 +28,7 @@ fn query_sanity_updates() {
 fn name_query_some() {
     let bodhi = bodhi_init();
 
-    let user: Option<User> = bodhi.query(&UserNameQuery::new("decathorpe")).unwrap();
+    let user: Option<User> = bodhi.query(UserNameQuery::new("decathorpe")).unwrap();
 
     assert!(user.is_some());
 }
@@ -37,7 +37,7 @@ fn name_query_some() {
 fn name_query_none() {
     let bodhi = bodhi_init();
 
-    let user: Option<User> = bodhi.query(&UserNameQuery::new("nobody")).unwrap();
+    let user: Option<User> = bodhi.query(UserNameQuery::new("nobody")).unwrap();
 
     assert!(user.is_none());
 }

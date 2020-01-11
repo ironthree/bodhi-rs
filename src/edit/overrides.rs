@@ -60,7 +60,7 @@ impl<'a> Edit<EditedOverride> for OverrideEditor<'a> {
     fn edit(&self, bodhi: &BodhiService) -> Result<EditedOverride, QueryError> {
         let path = String::from("/overrides/");
 
-        let csrf_token = bodhi.query(&CSRFQuery::new())?;
+        let csrf_token = bodhi.query(CSRFQuery::new())?;
 
         let override_edit = OverrideData {
             nvr: self.edited,

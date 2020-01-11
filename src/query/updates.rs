@@ -25,7 +25,7 @@ use crate::{BodhiService, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, UpdateIDQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let update = bodhi.query(&UpdateIDQuery::new("FEDORA-2019-3dd0cf468e")).unwrap();
+/// let update = bodhi.query(UpdateIDQuery::new("FEDORA-2019-3dd0cf468e")).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-0>
@@ -63,7 +63,7 @@ impl<'a> SinglePageQuery<Option<Update>> for UpdateIDQuery<'a> {
 }
 
 impl<'a> Query<Option<Update>> for UpdateIDQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Option<Update>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Option<Update>, QueryError> {
         <Self as SinglePageQuery<Option<Update>>>::query(self, bodhi)
     }
 }
@@ -79,7 +79,7 @@ impl<'a> Query<Option<Update>> for UpdateIDQuery<'a> {
 ///
 /// let updates = bodhi
 ///     .query(
-///         &UpdateQuery::new()
+///         UpdateQuery::new()
 ///             .users("decathorpe")
 ///             .releases(FedoraRelease::F30)
 ///             .request(UpdateRequest::Testing),
@@ -423,7 +423,7 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
         let mut updates: Vec<Update> = Vec::new();
         let mut page = 1;
 
@@ -483,7 +483,7 @@ impl<'a> UpdateQuery<'a> {
 }
 
 impl<'a> Query<Vec<Update>> for UpdateQuery<'a> {
-    fn query(&self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
+    fn query(self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
         UpdateQuery::query(self, bodhi)
     }
 }

@@ -39,7 +39,7 @@ impl<'a> Create<NewOverride> for OverrideBuilder<'a> {
     fn create(&self, bodhi: &BodhiService) -> Result<NewOverride, QueryError> {
         let path = String::from("/overrides/");
 
-        let csrf_token = bodhi.query(&CSRFQuery::new())?;
+        let csrf_token = bodhi.query(CSRFQuery::new())?;
 
         let new_override = OverrideData {
             nvr: &self.nvr,
