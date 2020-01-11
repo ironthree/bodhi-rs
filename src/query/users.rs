@@ -9,6 +9,8 @@
 //! example filtering users by the groups they are members of, or querying for users that are
 //! associated with a given set of updates.
 
+use std::fmt::{Debug, Formatter};
+
 use serde::{Deserialize, Serialize};
 
 use crate::error::{QueryError, ServiceError};
@@ -78,13 +80,26 @@ impl<'a> Query<Option<User>> for UserNameQuery<'a> {
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-1>
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct UserQuery<'a> {
     groups: Option<Vec<&'a str>>,
     like: Option<&'a str>,
     name: Option<&'a str>,
     search: Option<&'a str>,
     updates: Option<Vec<&'a str>>,
+
+    /// optional callback function for reporting progress
+    callback: Option<Box<dyn Fn(u32, u32) -> ()>>,
+}
+
+impl<'a> Debug for UserQuery<'a> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "UserQuery {{ groups: {:?}, like: {:?}, name: {:?}, search: {:?}, updates: {:?} }}",
+            &self.groups, &self.like, &self.name, &self.search, &self.updates,
+        )
+    }
 }
 
 impl<'a> UserQuery<'a> {
@@ -96,7 +111,16 @@ impl<'a> UserQuery<'a> {
             name: None,
             search: None,
             updates: None,
+            callback: None,
         }
+    }
+
+    /// Add a callback function for reporting back query progress for long-running queries.
+    /// The function will be called with the current page and the total number of pages for
+    /// paginated queries.
+    pub fn callback(mut self, fun: impl Fn(u32, u32) -> () + 'static) -> Self {
+        self.callback = Some(Box::new(fun));
+        self
     }
 
     /// Restrict the returned results to members of the given group(s).
@@ -152,6 +176,10 @@ impl<'a> UserQuery<'a> {
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
+
+            if let Some(fun) = &self.callback {
+                fun(page, result.pages)
+            }
 
             users.extend(result.users);
             page += 1;

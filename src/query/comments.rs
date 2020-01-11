@@ -8,6 +8,8 @@
 //! example filtering comments that are associated with a set of updates or packages, or query
 //! comments made by certain users, or filed against updates that were created by specific users.
 
+use std::fmt::{Debug, Formatter};
+
 use serde::{Deserialize, Serialize};
 
 use crate::error::{QueryError, ServiceError};
@@ -80,7 +82,7 @@ impl Query<Option<Comment>> for CommentIDQuery {
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1>
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct CommentQuery<'a> {
     anonymous: Option<bool>,
     ignore_users: Option<Vec<&'a str>>,
@@ -91,6 +93,27 @@ pub struct CommentQuery<'a> {
     update_owners: Option<Vec<&'a str>>,
     updates: Option<Vec<&'a str>>,
     users: Option<Vec<&'a str>>,
+
+    /// optional callback function for reporting progress
+    callback: Option<Box<dyn Fn(u32, u32) -> ()>>,
+}
+
+impl<'a> Debug for CommentQuery<'a> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "CommentQuery {{ anonymous: {:?}, ignore_users: {:?}, like: {:?}, packages: {:?}, search: {:?}, since: {:?}, update_owners: {:?}, updates: {:?}, users: {:?} }}",
+            self.anonymous,
+            self.ignore_users,
+            self.like,
+            self.packages,
+            self.search,
+            self.since,
+            self.update_owners,
+            self.updates,
+            self.users,
+        )
+    }
 }
 
 impl<'a> CommentQuery<'a> {
@@ -106,7 +129,16 @@ impl<'a> CommentQuery<'a> {
             update_owners: None,
             updates: None,
             users: None,
+            callback: None,
         }
+    }
+
+    /// Add a callback function for reporting back query progress for long-running queries.
+    /// The function will be called with the current page and the total number of pages for
+    /// paginated queries.
+    pub fn callback(mut self, fun: impl Fn(u32, u32) -> () + 'static) -> Self {
+        self.callback = Some(Box::new(fun));
+        self
     }
 
     /// Restrict the returned results to (not) anonymous comments.
@@ -204,6 +236,10 @@ impl<'a> CommentQuery<'a> {
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
+
+            if let Some(fun) = &self.callback {
+                fun(page, result.pages)
+            }
 
             comments.extend(result.comments);
             page += 1;

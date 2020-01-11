@@ -8,6 +8,8 @@
 //! querying builds of certain packages, builds for certain releases, or builds associated with a
 //! given set of updates is possible.
 
+use std::fmt::{Debug, Formatter};
+
 use serde::{Deserialize, Serialize};
 
 use crate::error::{QueryError, ServiceError};
@@ -81,7 +83,7 @@ impl<'a> Query<Option<Build>> for BuildNVRQuery<'a> {
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-1>
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct BuildQuery<'a> {
     /// NVR of the build to query (Name-Version-Release format, without Epoch)
     nvr: Option<&'a str>,
@@ -91,6 +93,19 @@ pub struct BuildQuery<'a> {
     releases: Option<Vec<FedoraRelease>>,
     /// list of updates to request builds for
     updates: Option<Vec<&'a str>>,
+
+    /// optional callback function for reporting progress
+    callback: Option<Box<dyn Fn(u32, u32) -> () + 'a>>,
+}
+
+impl<'a> Debug for BuildQuery<'a> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "BuildQuery {{ nvr: {:?}, packages: {:?}, releases: {:?}, updates: {:?} }}",
+            &self.nvr, &self.packages, &self.releases, &self.updates,
+        )
+    }
 }
 
 impl<'a> BuildQuery<'a> {
@@ -101,7 +116,16 @@ impl<'a> BuildQuery<'a> {
             packages: None,
             releases: None,
             updates: None,
+            callback: None,
         }
+    }
+
+    /// Add a callback function for reporting back query progress for long-running queries.
+    /// The function will be called with the current page and the total number of pages for
+    /// paginated queries.
+    pub fn callback(mut self, fun: impl Fn(u32, u32) -> () + 'a) -> Self {
+        self.callback = Some(Box::new(fun));
+        self
     }
 
     /// Restrict the returned results to builds with the given NVR. If this is the only required
@@ -155,6 +179,10 @@ impl<'a> BuildQuery<'a> {
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
+
+            if let Some(fun) = &self.callback {
+                fun(page, result.pages);
+            }
 
             builds.extend(result.builds);
             page += 1;

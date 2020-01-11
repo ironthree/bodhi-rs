@@ -3,6 +3,8 @@
 //! The [`PackageQuery`](struct.PackageQuery.html) can be used to execute complex queries, for
 //! example query packages by name, or filter packages matching a certain search string.
 
+use std::fmt::{Debug, Formatter};
+
 use serde::{Deserialize, Serialize};
 
 use crate::error::{QueryError, ServiceError};
@@ -22,11 +24,24 @@ use crate::{BodhiService, Package, Query, SinglePageQuery};
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/packages.html#service-0>
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct PackageQuery<'a> {
     like: Option<&'a str>,
     name: Option<&'a str>,
     search: Option<&'a str>,
+
+    /// optional callback function for reporting progress
+    callback: Option<Box<dyn Fn(u32, u32) -> ()>>,
+}
+
+impl<'a> Debug for PackageQuery<'a> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "PackageQuery {{ like: {:?}, name: {:?}, search: {:?} }}",
+            &self.like, &self.name, &self.search,
+        )
+    }
 }
 
 impl<'a> PackageQuery<'a> {
@@ -36,7 +51,16 @@ impl<'a> PackageQuery<'a> {
             like: None,
             name: None,
             search: None,
+            callback: None,
         }
+    }
+
+    /// Add a callback function for reporting back query progress for long-running queries.
+    /// The function will be called with the current page and the total number of pages for
+    /// paginated queries.
+    pub fn callback(mut self, fun: impl Fn(u32, u32) -> () + 'static) -> Self {
+        self.callback = Some(Box::new(fun));
+        self
     }
 
     /// Restrict search to packages *like* the given argument (in the SQL sense).
@@ -65,6 +89,10 @@ impl<'a> PackageQuery<'a> {
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
+
+            if let Some(fun) = &self.callback {
+                fun(page, result.pages)
+            }
 
             packages.extend(result.packages);
             page += 1;

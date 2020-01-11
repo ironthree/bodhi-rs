@@ -8,6 +8,8 @@
 //! example filtering updates by release, status, security impact, reboot suggestion, or for updates
 //! that are associated with a given set of packages.
 
+use std::fmt::{Debug, Formatter};
+
 use serde::{Deserialize, Serialize};
 
 use crate::data::*;
@@ -86,7 +88,7 @@ impl<'a> Query<Option<Update>> for UpdateIDQuery<'a> {
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2>
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct UpdateQuery<'a> {
     active_releases: Option<bool>,
     aliases: Option<Vec<&'a str>>,
@@ -116,6 +118,40 @@ pub struct UpdateQuery<'a> {
     update_ids: Option<Vec<&'a str>>,
     update_type: Option<UpdateType>,
     users: Option<Vec<&'a str>>,
+
+    /// optional callback function for reporting progress
+    callback: Option<Box<dyn Fn(u32, u32) -> ()>>,
+}
+
+impl<'a> Debug for UpdateQuery<'a> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "UpdateQuery {{ active_releases: {:?}, aliases: {:?}, approved_before: {:?}, approved_since: {:?}, ",
+            &self.active_releases, &self.aliases, &self.approved_before, &self.approved_since,
+        )?;
+        write!(
+            f,
+            "bugs: {:?}, builds: {:?}, content_type: {:?}, critpath: {:?}, cves: {:?}, like: {:?}, locked: {:?}, ",
+            &self.bugs, &self.builds, &self.content_type, &self.critpath, &self.cves, &self.like, &self.locked,
+        )?;
+        write!(
+            f,
+            "modified_before: {:?}, modified_since: {:?}, packages: {:?}, pushed: {:?}, pushed_before: {:?}, ",
+            &self.modified_before, &self.modified_since, &self.packages, &self.pushed, &self.pushed_before,
+        )?;
+        write!(
+            f,
+            "pushed_since: {:?}, releases: {:?}, request: {:?}, search: {:?}, severity: {:?}, status: {:?}, ",
+            &self.pushed_since, &self.releases, &self.request, &self.search, &self.severity, &self.status,
+        )?;
+        write!(
+            f,
+            "submitted_before: {:?}, submitted_since: {:?}, suggest: {:?}, update_ids: {:?}, update_type: {:?}, ",
+            &self.submitted_before, &self.submitted_since, &self.suggest, &self.update_ids, &self.update_type,
+        )?;
+        write!(f, "users: {:?} }}", &self.users)
+    }
 }
 
 impl<'a> UpdateQuery<'a> {
@@ -150,7 +186,16 @@ impl<'a> UpdateQuery<'a> {
             update_ids: None,
             update_type: None,
             users: None,
+            callback: None,
         }
+    }
+
+    /// Add a callback function for reporting back query progress for long-running queries.
+    /// The function will be called with the current page and the total number of pages for
+    /// paginated queries.
+    pub fn callback(mut self, fun: impl Fn(u32, u32) -> () + 'static) -> Self {
+        self.callback = Some(Box::new(fun));
+        self
     }
 
     /// Restrict the returned results to (not) active releases.
@@ -385,6 +430,10 @@ impl<'a> UpdateQuery<'a> {
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
+
+            if let Some(fun) = &self.callback {
+                fun(page, result.pages)
+            }
 
             updates.extend(result.updates);
             page += 1;

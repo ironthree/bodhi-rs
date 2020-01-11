@@ -9,6 +9,8 @@
 //! for example filtering overrides by status, sets of overrides for certain packages, or overrides
 //! filed by a given list of users.
 
+use std::fmt::{Debug, Formatter};
+
 use serde::{Deserialize, Serialize};
 
 use crate::error::{QueryError, ServiceError};
@@ -81,7 +83,7 @@ impl<'a> Query<Option<Override>> for OverrideNVRQuery<'a> {
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1>
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct OverrideQuery<'a> {
     builds: Option<Vec<&'a str>>,
     expired: Option<bool>,
@@ -90,6 +92,19 @@ pub struct OverrideQuery<'a> {
     releases: Option<Vec<FedoraRelease>>,
     search: Option<&'a str>,
     users: Option<Vec<&'a str>>,
+
+    /// optional callback function for reporting progress
+    callback: Option<Box<dyn Fn(u32, u32) -> ()>>,
+}
+
+impl<'a> Debug for OverrideQuery<'a> {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "OverrideQuery {{ builds: {:?}, expired: {:?}, like: {:?}, packages: {:?}, releases: {:?}, search: {:?}, users: {:?} }}",
+            &self.builds, &self.expired, &self.like, &self.packages, &self.releases, &self.search, &self.users,
+        )
+    }
 }
 
 impl<'a> OverrideQuery<'a> {
@@ -104,7 +119,16 @@ impl<'a> OverrideQuery<'a> {
             releases: None,
             search: None,
             users: None,
+            callback: None,
         }
+    }
+
+    /// Add a callback function for reporting back query progress for long-running queries.
+    /// The function will be called with the current page and the total number of pages for
+    /// paginated queries.
+    pub fn callback(mut self, fun: impl Fn(u32, u32) -> () + 'static) -> Self {
+        self.callback = Some(Box::new(fun));
+        self
     }
 
     /// Restrict the returned results to overrides for the given build(s).
@@ -181,6 +205,10 @@ impl<'a> OverrideQuery<'a> {
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
+
+            if let Some(fun) = &self.callback {
+                fun(page, result.pages)
+            }
 
             overrides.extend(result.r#overrides);
             page += 1;
