@@ -202,6 +202,11 @@ impl<'a> OverrideQuery<'a> {
         let mut overrides: Vec<Override> = Vec::new();
         let mut page = 1;
 
+        // initial progress: 0 out of some
+        if let Some(ref mut fun) = self.callback {
+            fun(0, 1);
+        }
+
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;

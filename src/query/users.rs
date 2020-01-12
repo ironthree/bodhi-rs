@@ -173,6 +173,11 @@ impl<'a> UserQuery<'a> {
         let mut users: Vec<User> = Vec::new();
         let mut page = 1;
 
+        // initial progress: 0 out of some
+        if let Some(ref mut fun) = self.callback {
+            fun(0, 1);
+        }
+
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
             let result = query.query(bodhi)?;
