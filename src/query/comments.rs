@@ -296,7 +296,7 @@ struct CommentPageQuery<'a> {
     like: Option<&'a str>,
     packages: Option<&'a Vec<&'a str>>,
     search: Option<&'a str>,
-    #[serde(with = "crate::option_bodhi_date_format")]
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
     since: Option<&'a BodhiDate>,
     update_owners: Option<&'a Vec<&'a str>>,
     updates: Option<&'a Vec<&'a str>>,

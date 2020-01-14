@@ -507,9 +507,9 @@ struct UpdatePageQuery<'a> {
     active_releases: Option<bool>,
     #[serde(rename = "alias")]
     aliases: Option<&'a Vec<&'a str>>,
-    #[serde(with = "crate::option_bodhi_date_format")]
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
     approved_before: Option<&'a BodhiDate>,
-    #[serde(with = "crate::option_bodhi_date_format")]
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
     approved_since: Option<&'a BodhiDate>,
     bugs: Option<&'a Vec<u32>>,
     builds: Option<&'a Vec<&'a str>>,
@@ -518,24 +518,24 @@ struct UpdatePageQuery<'a> {
     cves: Option<&'a Vec<&'a str>>,
     like: Option<&'a str>,
     locked: Option<bool>,
-    #[serde(with = "crate::option_bodhi_date_format")]
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
     modified_before: Option<&'a BodhiDate>,
-    #[serde(with = "crate::option_bodhi_date_format")]
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
     modified_since: Option<&'a BodhiDate>,
     packages: Option<&'a Vec<&'a str>>,
     pushed: Option<bool>,
-    #[serde(with = "crate::option_bodhi_date_format")]
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
     pushed_before: Option<&'a BodhiDate>,
-    #[serde(with = "crate::option_bodhi_date_format")]
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
     pushed_since: Option<&'a BodhiDate>,
     releases: Option<&'a Vec<FedoraRelease>>,
     request: Option<&'a UpdateRequest>,
     search: Option<&'a str>,
     severity: Option<&'a UpdateSeverity>,
     status: Option<&'a UpdateStatus>,
-    #[serde(with = "crate::option_bodhi_date_format")]
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
     submitted_before: Option<&'a BodhiDate>,
-    #[serde(with = "crate::option_bodhi_date_format")]
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
     submitted_since: Option<&'a BodhiDate>,
     suggest: Option<&'a UpdateSuggestion>,
     #[serde(rename = "updateid")]

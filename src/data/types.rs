@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use url::Url;
 
 use super::dates::*;
 use super::enums::*;
 
 /// This struct represents a specific BugZilla bug that is associated with an update.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Bug {
     /// bug ID in the BugZilla system: <https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}>
     pub bug_id: u32,
@@ -48,7 +48,7 @@ impl Bug {
 }
 
 /// This struct represents an update feedback item associated with a specific bug.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct BugFeedback {
     /// bug this feedback is associated with
     pub bug: Option<Bug>,
@@ -72,7 +72,7 @@ impl Display for BugFeedback {
 
 
 /// This struct represents a specific koji build that bodhi is aware of.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Build {
     /// epoch associated with this build
     pub epoch: Option<u32>,
@@ -110,7 +110,7 @@ impl Display for Build {
 
 /// This struct represents one comment against a specific update, along with its associated bug and
 /// test case feedback.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Comment {
     /// author of the comment (username), only provided for backwards compatibility
     author: Option<String>,
@@ -158,7 +158,7 @@ impl Display for Comment {
 
 
 /// This struct represents a currently running compose.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Compose {
     /// string of JSON-formatted checkpoint data for the compose
     pub checkpoints: String,
@@ -215,7 +215,7 @@ impl Display for Compose {
 
 
 /// This struct represents a group from the fedora accounts system (FAS).
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Group {
     /// name of the group
     pub name: String,
@@ -233,7 +233,7 @@ impl Display for Group {
 
 
 /// This struct represents a buildroot override, along with the associated build.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Override {
     /// build associated with this buildroot override
     pub build: Build,
@@ -282,7 +282,7 @@ impl Display for Override {
 
 
 /// This struct represents a specific fedora package (or another distributable unit)
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Package {
     /// unique name of the (source) package (or container, flatpak, or module, as appropriate)
     pub name: String,
@@ -311,7 +311,7 @@ impl Display for Package {
 
 /// This struct represents a fedora release as present in the bodhi database. This includes variants
 /// (Modular, Container, Flatpak), identified with the "C", "F", and "M" suffixes.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Release {
     /// dist-git branch for this release
     pub branch: String,
@@ -378,7 +378,7 @@ impl Display for Release {
 
 
 /// This struct represents a specific test case as associated with a package.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct TestCase {
     /// name of this test case
     pub name: String,
@@ -410,7 +410,7 @@ impl Display for TestCase {
 
 
 /// This struct represents an update feedback item associated with a specific test case.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct TestCaseFeedback {
     /// ID of the comment this feedback is associated with
     pub comment_id: Option<u32>,
@@ -435,7 +435,7 @@ impl Display for TestCaseFeedback {
 
 /// This struct represents a bodhi update, with associated items: bugs, builds, comments, release,
 /// status, submitter, etc.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Update {
     /// user-visible, human-readable update alias (`FEDORA-2019-1A2BB23E`)
     pub alias: String,
@@ -593,7 +593,7 @@ impl Display for Update {
 
 /// This struct wraps the short update summaries that are included in running
 /// [`Compose`](struct.Compose.html)s.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct UpdateSummary {
     /// unique update alias identifying the update
     pub alias: String,
@@ -609,7 +609,7 @@ impl Display for UpdateSummary {
 
 
 /// This struct represents one fedora user that bodhi is aware of.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct User {
     /// URL of the [libravatar](https://www.libravatar.org/) avatar for this user
     pub avatar: Option<String>,

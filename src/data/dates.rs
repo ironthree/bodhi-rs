@@ -87,7 +87,7 @@ pub(crate) mod bodhi_date_format {
 
 // https://github.com/serde-rs/serde/issues/1444#issuecomment-447546415
 #[allow(dead_code)]
-pub(crate) mod option_bodhi_date_format {
+pub(crate) mod option_bodhi_date_format_ref {
     use super::BodhiDate;
 
     use serde::{self, Deserialize, Deserializer, Serializer};
@@ -95,6 +95,37 @@ pub(crate) mod option_bodhi_date_format {
     // this &Option reference is intentional, the API requires it
     #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn serialize<S>(date: &Option<&BodhiDate>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match date {
+            Some(ref dt) => super::bodhi_date_format::serialize(dt, serializer),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<BodhiDate>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct Wrapper(#[serde(with = "super::bodhi_date_format")] BodhiDate);
+
+        let v: Option<Wrapper> = Deserialize::deserialize(deserializer)?;
+        Ok(v.map(|Wrapper(a)| a))
+    }
+}
+
+// https://github.com/serde-rs/serde/issues/1444#issuecomment-447546415
+#[allow(dead_code)]
+pub(crate) mod option_bodhi_date_format {
+    use super::BodhiDate;
+
+    use serde::{self, Deserialize, Deserializer, Serializer};
+
+    // this &Option reference is intentional, the API requires it
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub fn serialize<S>(date: &Option<BodhiDate>, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
