@@ -3,7 +3,7 @@ name = "bodhi"
 description = "bodhi REST API client"
 license = "MIT OR Apache-2.0"
 
-version = "0.2.3"
+version = "0.3.0"
 edition = "2018"
 
 authors = ["Fabio Valentini <decathorpe@gmail.com>"]
@@ -36,3 +36,4 @@ rpassword = "^4.0.3"
 [profile.release]
 codegen-units = 1
 lto = true
+
