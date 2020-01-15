@@ -14,6 +14,12 @@ pub struct BodhiDate {
     date: DateTime<Utc>,
 }
 
+impl From<DateTime<Utc>> for BodhiDate {
+    fn from(date: DateTime<Utc>) -> Self {
+        BodhiDate { date }
+    }
+}
+
 impl TryFrom<&str> for BodhiDate {
     type Error = chrono::ParseError;
 
