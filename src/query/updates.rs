@@ -92,8 +92,8 @@ impl<'a> Query<Option<Update>> for UpdateIDQuery<'a> {
 pub struct UpdateQuery<'a> {
     active_releases: Option<bool>,
     aliases: Option<Vec<&'a str>>,
-    approved_before: Option<BodhiDate>,
-    approved_since: Option<BodhiDate>,
+    approved_before: Option<&'a BodhiDate>,
+    approved_since: Option<&'a BodhiDate>,
     bugs: Option<Vec<u32>>,
     builds: Option<Vec<&'a str>>,
     content_type: Option<ContentType>,
@@ -101,19 +101,19 @@ pub struct UpdateQuery<'a> {
     cves: Option<Vec<&'a str>>,
     like: Option<&'a str>,
     locked: Option<bool>,
-    modified_before: Option<BodhiDate>,
-    modified_since: Option<BodhiDate>,
+    modified_before: Option<&'a BodhiDate>,
+    modified_since: Option<&'a BodhiDate>,
     packages: Option<Vec<&'a str>>,
     pushed: Option<bool>,
-    pushed_before: Option<BodhiDate>,
-    pushed_since: Option<BodhiDate>,
+    pushed_before: Option<&'a BodhiDate>,
+    pushed_since: Option<&'a BodhiDate>,
     releases: Option<Vec<FedoraRelease>>,
     request: Option<UpdateRequest>,
     search: Option<&'a str>,
     severity: Option<UpdateSeverity>,
     status: Option<UpdateStatus>,
-    submitted_before: Option<BodhiDate>,
-    submitted_since: Option<BodhiDate>,
+    submitted_before: Option<&'a BodhiDate>,
+    submitted_since: Option<&'a BodhiDate>,
     suggest: Option<UpdateSuggestion>,
     update_ids: Option<Vec<&'a str>>,
     update_type: Option<UpdateType>,
@@ -218,14 +218,14 @@ impl<'a> UpdateQuery<'a> {
 
     /// Restrict the returned results to updates which were approved
     /// before the given date and time.
-    pub fn approved_before(mut self, approved_before: BodhiDate) -> Self {
+    pub fn approved_before(mut self, approved_before: &'a BodhiDate) -> Self {
         self.approved_before = Some(approved_before);
         self
     }
 
     /// Restrict the returned results to updates which were approved
     /// since the given date and time.
-    pub fn approved_since(mut self, approved_since: BodhiDate) -> Self {
+    pub fn approved_since(mut self, approved_since: &'a BodhiDate) -> Self {
         self.approved_since = Some(approved_since);
         self
     }
@@ -292,14 +292,14 @@ impl<'a> UpdateQuery<'a> {
 
     /// Restrict the returned results to updates which were modified
     /// before the given date and time.
-    pub fn modified_before(mut self, modified_before: BodhiDate) -> Self {
+    pub fn modified_before(mut self, modified_before: &'a BodhiDate) -> Self {
         self.modified_before = Some(modified_before);
         self
     }
 
     /// Restrict the returned results to updates which were modified
     /// since the given date and time.
-    pub fn modified_since(mut self, modified_since: BodhiDate) -> Self {
+    pub fn modified_since(mut self, modified_since: &'a BodhiDate) -> Self {
         self.modified_since = Some(modified_since);
         self
     }
@@ -324,14 +324,14 @@ impl<'a> UpdateQuery<'a> {
 
     /// Restrict the returned results to updates which were pushed
     /// before the given date and time.
-    pub fn pushed_before(mut self, pushed_before: BodhiDate) -> Self {
+    pub fn pushed_before(mut self, pushed_before: &'a BodhiDate) -> Self {
         self.pushed_before = Some(pushed_before);
         self
     }
 
     /// Restrict the returned results to updates which were pushed
     /// since the given date and time.
-    pub fn pushed_since(mut self, pushed_since: BodhiDate) -> Self {
+    pub fn pushed_since(mut self, pushed_since: &'a BodhiDate) -> Self {
         self.pushed_since = Some(pushed_since);
         self
     }
@@ -374,14 +374,14 @@ impl<'a> UpdateQuery<'a> {
 
     /// Restrict the returned results to updates which were submitted
     /// before the given date and time.
-    pub fn submitted_before(mut self, submitted_before: BodhiDate) -> Self {
+    pub fn submitted_before(mut self, submitted_before: &'a BodhiDate) -> Self {
         self.submitted_before = Some(submitted_before);
         self
     }
 
     /// Restrict the returned results to updates which were submitted
     /// since the given date and time.
-    pub fn submitted_since(mut self, submitted_since: BodhiDate) -> Self {
+    pub fn submitted_since(mut self, submitted_since: &'a BodhiDate) -> Self {
         self.submitted_since = Some(submitted_since);
         self
     }
@@ -455,8 +455,8 @@ impl<'a> UpdateQuery<'a> {
         UpdatePageQuery {
             active_releases: self.active_releases,
             aliases: self.aliases.as_ref(),
-            approved_before: self.approved_before.as_ref(),
-            approved_since: self.approved_since.as_ref(),
+            approved_before: self.approved_before,
+            approved_since: self.approved_since,
             bugs: self.bugs.as_ref(),
             builds: self.builds.as_ref(),
             content_type: self.content_type.as_ref(),
@@ -464,19 +464,19 @@ impl<'a> UpdateQuery<'a> {
             cves: self.cves.as_ref(),
             like: self.like,
             locked: self.locked,
-            modified_before: self.modified_before.as_ref(),
-            modified_since: self.modified_since.as_ref(),
+            modified_before: self.modified_before,
+            modified_since: self.modified_since,
             packages: self.packages.as_ref(),
             pushed: self.pushed,
-            pushed_before: self.pushed_before.as_ref(),
-            pushed_since: self.pushed_since.as_ref(),
+            pushed_before: self.pushed_before,
+            pushed_since: self.pushed_since,
             releases: self.releases.as_ref(),
             request: self.request.as_ref(),
             search: self.search,
             severity: self.severity.as_ref(),
             status: self.status.as_ref(),
-            submitted_before: self.submitted_before.as_ref(),
-            submitted_since: self.submitted_since.as_ref(),
+            submitted_before: self.submitted_before,
+            submitted_since: self.submitted_since,
             suggest: self.suggest.as_ref(),
             update_ids: self.update_ids.as_ref(),
             update_type: self.update_type.as_ref(),
