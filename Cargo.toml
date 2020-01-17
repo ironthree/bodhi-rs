@@ -14,8 +14,14 @@ repository = "https://github.com/ironthree/bodhi-rs"
 exclude = ["tests"]
 
 [features]
-default = []
+default = ["offline-tests"]
 debug = []
+# feature flag for offline tests without prerequisites
+offline-tests = []
+# feature flag for tests requiring internet connection
+online-tests = []
+# feature flag for tests requiring big data files
+data-tests = []
 
 [dependencies]
 chrono = { version = "^0.4.10", features = ["serde"] }

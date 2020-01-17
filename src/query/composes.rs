@@ -10,10 +10,16 @@ use crate::{BodhiService, Compose, ComposeRequest, FedoraRelease, Query, SingleP
 /// currently exist, or return an `Err(QueryError)` if another error occurred.
 ///
 /// ```
-/// # use bodhi::{BodhiServiceBuilder, CommentIDQuery};
+/// # use bodhi::{BodhiServiceBuilder, ComposeReleaseRequestQuery, FedoraRelease, ComposeRequest};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
-/// let comment = bodhi.query(CommentIDQuery::new(19999)).unwrap();
+/// # #[cfg(feature = "online-tests")]
+/// let compose = bodhi
+///     .query(ComposeReleaseRequestQuery::new(
+///         FedoraRelease::F31,
+///         ComposeRequest::Stable,
+///     ))
+///     .unwrap();
 /// ```
 #[derive(Debug)]
 pub struct ComposeReleaseRequestQuery {
@@ -61,6 +67,7 @@ impl Query<Option<Compose>> for ComposeReleaseRequestQuery {
 /// # use bodhi::{BodhiServiceBuilder, ComposeQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let composes = bodhi.query(ComposeQuery::new()).unwrap();
 /// ```
 ///

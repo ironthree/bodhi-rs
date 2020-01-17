@@ -12,6 +12,7 @@ use crate::{BodhiService, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, CSRFQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let token = bodhi.query(CSRFQuery::new()).unwrap();
 /// ```
 ///

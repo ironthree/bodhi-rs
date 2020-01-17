@@ -25,6 +25,7 @@ use crate::{BodhiService, Query, SinglePageQuery, User};
 /// # use bodhi::{BodhiServiceBuilder, UserNameQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let comment = bodhi.query(UserNameQuery::new("decathorpe")).unwrap();
 /// ```
 ///
@@ -76,6 +77,7 @@ impl<'a> Query<Option<User>> for UserNameQuery<'a> {
 /// # use bodhi::{BodhiServiceBuilder, UserQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let users = bodhi.query(UserQuery::new().groups("provenpackager")).unwrap();
 /// ```
 ///

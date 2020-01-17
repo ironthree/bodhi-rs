@@ -25,6 +25,7 @@ use crate::{BodhiService, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, UpdateIDQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let update = bodhi.query(UpdateIDQuery::new("FEDORA-2019-3dd0cf468e")).unwrap();
 /// ```
 ///
@@ -77,6 +78,7 @@ impl<'a> Query<Option<Update>> for UpdateIDQuery<'a> {
 /// # use bodhi::{BodhiServiceBuilder, FedoraRelease, UpdateRequest, UpdateQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let updates = bodhi
 ///     .query(
 ///         UpdateQuery::new()

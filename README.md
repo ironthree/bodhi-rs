@@ -48,6 +48,12 @@ caller. This library only implements a simple retry logic for network-related fa
 Tests should pass for every commit that gets pushed to master. However, currently tests either require internet access
 to check some assumptions for server behaviour, or require test data which is too big to be committed into git.
 
+Tests are controlled with the following feature flags:
+
+- `offline-tests`: tests able to run offline, without prerequisites (enabled by default)
+- `online-tests`: tests that require internet access (for checking bodhi server behavior)
+- `data-tests`: tests that require data files (data needs to be downloaded separately, but tests can run offline)
+
 
 ## Examples
 

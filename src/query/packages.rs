@@ -20,6 +20,7 @@ use crate::{BodhiService, Package, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, PackageQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let packages = bodhi.query(PackageQuery::new().search("rust*")).unwrap();
 /// ```
 ///

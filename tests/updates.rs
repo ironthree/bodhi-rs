@@ -1,3 +1,6 @@
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
 use std::fs::read_to_string;
 
 use bodhi::Update;
@@ -33,151 +36,181 @@ const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/update
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_el5.json");
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f32() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F32).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f32c() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F32C).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f31() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F31).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f31c() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F31C).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f31f() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F31F).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f31m() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F31M).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f30() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F30).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f30c() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F30C).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f30f() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F30F).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f30m() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F30M).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f29() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F29).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f29c() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F29C).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f29f() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F29F).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f29m() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F29M).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f28() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F28).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f28c() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F28C).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f28m() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F28M).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f27() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F27).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f27m() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F27M).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f26() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F26).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f25() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F25).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f24() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F24).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f23() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F23).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f22() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F22).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_f21() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F21).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_epel8() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_EPEL8).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_epel8m() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_EPEL8M).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_epel7() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_EPEL7).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_el6() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_EL6).unwrap()).unwrap();
 }
 
+#[cfg(feature = "data-tests")]
 #[test]
 fn updates_dejson_el5() {
     let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_EL5).unwrap()).unwrap();

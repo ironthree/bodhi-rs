@@ -25,6 +25,7 @@ use crate::{BodhiService, FedoraRelease, Override, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, OverrideNVRQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let over_ride = bodhi.query(OverrideNVRQuery::new("wingpanel-2.2.1-1.fc28")).unwrap();
 /// ```
 ///
@@ -77,6 +78,7 @@ impl<'a> Query<Option<Override>> for OverrideNVRQuery<'a> {
 /// # use bodhi::{BodhiServiceBuilder, FedoraRelease, OverrideQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let overrides = bodhi
 ///     .query(OverrideQuery::new().releases(FedoraRelease::F29).users("decathorpe"))
 ///     .unwrap();

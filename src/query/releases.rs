@@ -22,6 +22,7 @@ use crate::{BodhiService, Query, Release, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, FedoraRelease, ReleaseNameQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let release = bodhi.query(ReleaseNameQuery::new("F30")).unwrap();
 /// ```
 ///
@@ -69,6 +70,7 @@ impl<'a> Query<Option<Release>> for ReleaseNameQuery<'a> {
 /// # use bodhi::{BodhiServiceBuilder, ReleaseQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let releases = bodhi.query(ReleaseQuery::new().exclude_archived(true)).unwrap();
 /// ```
 ///

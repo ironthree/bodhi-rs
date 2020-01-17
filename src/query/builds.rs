@@ -24,6 +24,7 @@ use crate::{BodhiService, Build, FedoraRelease, Query, SinglePageQuery};
 /// # use bodhi::{BuildNVRQuery, BodhiServiceBuilder};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let build = bodhi.query(BuildNVRQuery::new("rust-1.34.1-1.fc29")).unwrap();
 /// ```
 ///
@@ -72,6 +73,7 @@ impl<'a> Query<Option<Build>> for BuildNVRQuery<'a> {
 /// # use bodhi::{BuildQuery, FedoraRelease, BodhiServiceBuilder};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let builds = bodhi
 ///     .query(
 ///         BuildQuery::new()

@@ -24,6 +24,7 @@ use crate::{BodhiDate, BodhiService, Comment, Query, SinglePageQuery};
 /// # use bodhi::{BodhiServiceBuilder, CommentIDQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let comment = bodhi.query(CommentIDQuery::new(19999)).unwrap();
 /// ```
 ///
@@ -76,6 +77,7 @@ impl Query<Option<Comment>> for CommentIDQuery {
 /// # use bodhi::{BodhiServiceBuilder, CommentQuery};
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
+/// # #[cfg(feature = "online-tests")]
 /// let comments = bodhi
 ///     .query(CommentQuery::new().users("decathorpe").packages("rust"))
 ///     .unwrap();

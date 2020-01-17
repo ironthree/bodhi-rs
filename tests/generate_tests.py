@@ -42,6 +42,7 @@ def do_builds():
 
     test_template = textwrap.dedent(
         """\
+        #[cfg(feature = "data-tests")]
         #[test]
         fn builds_dejson_{release_lower}() {{
             let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
@@ -50,8 +51,8 @@ def do_builds():
     )
 
     contents = (
-            "use std::fs::read_to_string;\n\nuse bodhi::Build;" +
-            "\n\n" +
+            "#![allow(unused_imports)]\n#![allow(dead_code)]\n\n" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Build;\n\n" +
             "\n".join(import_template.format(release=release, release_lower=release.lower()) for release in RELEASES) +
             "\n\n" +
             "\n".join(test_template.format(release=release, release_lower=release.lower()) for release in RELEASES)
@@ -67,6 +68,7 @@ def do_comments():
 
     test_string = textwrap.dedent(
         """\
+        #[cfg(feature = "data-tests")]
         #[test]
         fn comments_dejson() {
             let _: Vec<Comment> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
@@ -75,8 +77,8 @@ def do_comments():
     )
 
     contents = (
-            "use std::fs::read_to_string;\n\nuse bodhi::Comment;" +
-            "\n\n" +
+            "#![allow(unused_imports)]\n#![allow(dead_code)]\n\n" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Comment;\n\n" +
             import_string +
             "\n\n" +
             test_string
@@ -92,6 +94,7 @@ def do_composes():
 
     test_string = textwrap.dedent(
         """\
+        #[cfg(feature = "data-tests")]
         #[test]
         fn composes_dejson() {
             let _: Vec<Compose> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
@@ -100,8 +103,8 @@ def do_composes():
     )
 
     contents = (
-            "use std::fs::read_to_string;\n\nuse bodhi::Compose;" +
-            "\n\n" +
+            "#![allow(unused_imports)]\n#![allow(dead_code)]\n\n" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Compose;\n\n" +
             import_string +
             "\n\n" +
             test_string
@@ -117,6 +120,7 @@ def do_overrides():
 
     test_template = textwrap.dedent(
         """\
+        #[cfg(feature = "data-tests")]
         #[test]
         fn overrides_dejson_{release_lower}() {{
             let _: Vec<Override> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
@@ -125,8 +129,8 @@ def do_overrides():
     )
 
     contents = (
-            "use std::fs::read_to_string;\n\nuse bodhi::Override;" +
-            "\n\n" +
+            "#![allow(unused_imports)]\n#![allow(dead_code)]\n\n" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Override;\n\n" +
             "\n".join(import_template.format(release=release, release_lower=release.lower()) for release in RELEASES) +
             "\n\n" +
             "\n".join(test_template.format(release=release, release_lower=release.lower()) for release in RELEASES)
@@ -142,6 +146,7 @@ def do_packages():
 
     test_string = textwrap.dedent(
         """\
+        #[cfg(feature = "data-tests")]
         #[test]
         fn packages_dejson() {
             let _: Vec<Package> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
@@ -150,8 +155,8 @@ def do_packages():
     )
 
     contents = (
-            "use std::fs::read_to_string;\n\nuse bodhi::Package;" +
-            "\n\n" +
+            "#![allow(unused_imports)]\n#![allow(dead_code)]\n\n" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Package;\n\n" +
             import_string +
             "\n\n" +
             test_string
@@ -167,6 +172,7 @@ def do_releases():
 
     test_string = textwrap.dedent(
         """\
+        #[cfg(feature = "data-tests")]
         #[test]
         fn releases_dejson() {
             let _: Vec<Release> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
@@ -175,8 +181,8 @@ def do_releases():
     )
 
     contents = (
-            "use std::fs::read_to_string;\n\nuse bodhi::Release;" +
-            "\n\n" +
+            "#![allow(unused_imports)]\n#![allow(dead_code)]\n\n" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Release;\n\n" +
             import_string +
             "\n\n" +
             test_string
@@ -192,6 +198,7 @@ def do_updates():
 
     test_template = textwrap.dedent(
         """\
+        #[cfg(feature = "data-tests")]
         #[test]
         fn updates_dejson_{release_lower}() {{
             let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
@@ -200,8 +207,8 @@ def do_updates():
     )
 
     contents = (
-            "use std::fs::read_to_string;\n\nuse bodhi::Update;" +
-            "\n\n" +
+            "#![allow(unused_imports)]\n#![allow(dead_code)]\n\n" +
+            "use std::fs::read_to_string;\n\nuse bodhi::Update;\n\n" +
             "\n".join(import_template.format(release=release, release_lower=release.lower()) for release in RELEASES) +
             "\n\n" +
             "\n".join(test_template.format(release=release, release_lower=release.lower()) for release in RELEASES)
@@ -217,6 +224,7 @@ def do_users():
 
     test_string = textwrap.dedent(
         """\
+        #[cfg(feature = "data-tests")]
         #[test]
         fn users_dejson() {
             let _: Vec<User> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
@@ -225,8 +233,8 @@ def do_users():
     )
 
     contents = (
-            "use std::fs::read_to_string;\n\nuse bodhi::User;" +
-            "\n\n" +
+            "#![allow(unused_imports)]\n#![allow(dead_code)]\n\n" +
+            "use std::fs::read_to_string;\n\nuse bodhi::User;\n\n" +
             import_string +
             "\n\n" +
             test_string
