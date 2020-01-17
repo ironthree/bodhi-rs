@@ -1,6 +1,7 @@
 use std::cmp::{Ord, Ordering};
 use std::convert::TryFrom;
 use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 use chrono::{DateTime, TimeZone, Utc};
 
@@ -35,6 +36,14 @@ impl TryFrom<&str> for BodhiDate {
         Ok(BodhiDate {
             date: Utc.datetime_from_str(&string, BODHI_DATETIME_FORMAT)?,
         })
+    }
+}
+
+impl FromStr for BodhiDate {
+    type Err = chrono::ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
     }
 }
 

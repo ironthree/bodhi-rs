@@ -1,10 +1,37 @@
 use std::cmp::PartialEq;
 use std::convert::TryFrom;
+use std::error::Error;
 use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
+/// This error is returned when a string fails to be parsed into an enumerated value.
+#[derive(Debug)]
+pub struct InvalidValueError {
+    /// This field contains the name of the enum.
+    pub name: &'static str,
+    /// This field contains the invalid value.
+    pub value: String,
+}
+
+impl InvalidValueError {
+    fn new(name: &'static str, value: &str) -> Self {
+        InvalidValueError {
+            name,
+            value: value.to_owned(),
+        }
+    }
+}
+
+impl Display for InvalidValueError {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), std::fmt::Error> {
+        write!(f, "Invalid value for {}: {}", self.name, self.value)
+    }
+}
+
+impl Error for InvalidValueError {}
 
 /// This enum represents the possible request values for composes.
 #[allow(missing_docs)]
@@ -24,6 +51,26 @@ impl Display for ComposeRequest {
         };
 
         write!(f, "{}", value)
+    }
+}
+
+impl TryFrom<&str> for ComposeRequest {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "stable" => Ok(ComposeRequest::Stable),
+            "testing" => Ok(ComposeRequest::Testing),
+            _ => Err(InvalidValueError::new("ComposeRequest", value)),
+        }
+    }
+}
+
+impl FromStr for ComposeRequest {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
     }
 }
 
@@ -76,6 +123,34 @@ impl Display for ComposeStatus {
     }
 }
 
+impl TryFrom<&str> for ComposeStatus {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "cleaning" => Ok(ComposeStatus::Cleaning),
+            "failed" => Ok(ComposeStatus::Failed),
+            "initializing" => Ok(ComposeStatus::Initializing),
+            "notifying" => Ok(ComposeStatus::Notifying),
+            "pending" => Ok(ComposeStatus::Pending),
+            "punging" => Ok(ComposeStatus::Punging),
+            "requested" => Ok(ComposeStatus::Requested),
+            "signing_repo" => Ok(ComposeStatus::SigningRepo),
+            "success" => Ok(ComposeStatus::Success),
+            "syncing_repo" => Ok(ComposeStatus::SyncingRepo),
+            "updateinfo" => Ok(ComposeStatus::UpdateInfo),
+            _ => Err(InvalidValueError::new("ComposeStatus", value)),
+        }
+    }
+}
+
+impl FromStr for ComposeStatus {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
+    }
+}
 
 /// This enum represents the type of a bodhi update, of a package, and of builds.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
@@ -104,6 +179,28 @@ impl Display for ContentType {
         };
 
         write!(f, "{}", value)
+    }
+}
+
+impl TryFrom<&str> for ContentType {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "container" => Ok(ContentType::Container),
+            "flatpak" => Ok(ContentType::Flatpak),
+            "module" => Ok(ContentType::Module),
+            "rpm" => Ok(ContentType::RPM),
+            _ => Err(InvalidValueError::new("ContentType", value)),
+        }
+    }
+}
+
+impl FromStr for ContentType {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
     }
 }
 
@@ -190,7 +287,7 @@ impl Display for FedoraRelease {
 }
 
 impl TryFrom<&str> for FedoraRelease {
-    type Error = &'static str;
+    type Error = InvalidValueError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
@@ -224,8 +321,16 @@ impl TryFrom<&str> for FedoraRelease {
             "EPEL-7" => Ok(FedoraRelease::EPEL7),
             "EL-6" => Ok(FedoraRelease::EL6),
             "EL-5" => Ok(FedoraRelease::EL5),
-            _ => Err("Unrecognised release."),
+            _ => Err(InvalidValueError::new("FedoraRelease", value)),
         }
+    }
+}
+
+impl FromStr for FedoraRelease {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
     }
 }
 
@@ -259,6 +364,27 @@ impl Display for Karma {
     }
 }
 
+impl TryFrom<&str> for Karma {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "+1" | "1" => Ok(Karma::Positive),
+            "0" | "±0" => Ok(Karma::Neutral),
+            "-1" => Ok(Karma::Negative),
+            _ => Err(InvalidValueError::new("Karma", value)),
+        }
+    }
+}
+
+impl FromStr for Karma {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
+    }
+}
+
 
 /// This enum represents the name of the package manager that's in use on a release.
 #[allow(missing_docs)]
@@ -281,6 +407,26 @@ impl Display for PackageManager {
         };
 
         write!(f, "{}", value)
+    }
+}
+
+impl TryFrom<&str> for PackageManager {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "dnf" => Ok(PackageManager::DNF),
+            "yum" => Ok(PackageManager::YUM),
+            _ => Err(InvalidValueError::new("PackageManager", value)),
+        }
+    }
+}
+
+impl FromStr for PackageManager {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
     }
 }
 
@@ -319,6 +465,29 @@ impl Display for ReleaseState {
     }
 }
 
+impl TryFrom<&str> for ReleaseState {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "archived" => Ok(ReleaseState::Archived),
+            "current" => Ok(ReleaseState::Current),
+            "disabled" => Ok(ReleaseState::Disabled),
+            "frozen" => Ok(ReleaseState::Frozen),
+            "pending" => Ok(ReleaseState::Pending),
+            _ => Err(InvalidValueError::new("ReleaseState", value)),
+        }
+    }
+}
+
+impl FromStr for ReleaseState {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
+    }
+}
+
 
 /// This enum represents the test gating status from `greenwave`.
 #[allow(missing_docs)]
@@ -353,6 +522,31 @@ impl Display for TestGatingStatus {
         };
 
         write!(f, "{}", value)
+    }
+}
+
+impl TryFrom<&str> for TestGatingStatus {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "failed" => Ok(TestGatingStatus::Failed),
+            "greenwave_failed" => Ok(TestGatingStatus::GreenwaveFailed),
+            "ignored" => Ok(TestGatingStatus::Ignored),
+            "passed" => Ok(TestGatingStatus::Passed),
+            "queued" => Ok(TestGatingStatus::Queued),
+            "running" => Ok(TestGatingStatus::Running),
+            "waiting" => Ok(TestGatingStatus::Waiting),
+            _ => Err(InvalidValueError::new("TestGatingStatus", value)),
+        }
+    }
+}
+
+impl FromStr for TestGatingStatus {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
     }
 }
 
@@ -415,6 +609,29 @@ impl Display for UpdateRequest {
     }
 }
 
+impl TryFrom<&str> for UpdateRequest {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "obsolete" => Ok(UpdateRequest::Obsolete),
+            "revoke" => Ok(UpdateRequest::Revoke),
+            "stable" => Ok(UpdateRequest::Stable),
+            "testing" => Ok(UpdateRequest::Testing),
+            "unpush" => Ok(UpdateRequest::Unpush),
+            _ => Err(InvalidValueError::new("UpdateRequest", value)),
+        }
+    }
+}
+
+impl FromStr for UpdateRequest {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
+    }
+}
+
 
 /// This enum represents the associated severity of a bodhi update. This field is required to not be
 /// unspecified for updates with [`UpdateType::Security`](enum.UpdateType.html).
@@ -444,6 +661,29 @@ impl Display for UpdateSeverity {
         };
 
         write!(f, "{}", value)
+    }
+}
+
+impl TryFrom<&str> for UpdateSeverity {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "high" => Ok(UpdateSeverity::High),
+            "low" => Ok(UpdateSeverity::Low),
+            "medium" => Ok(UpdateSeverity::Medium),
+            "unspecified" => Ok(UpdateSeverity::Unspecified),
+            "urgent" => Ok(UpdateSeverity::Urgent),
+            _ => Err(InvalidValueError::new("UpdateSeverity", value)),
+        }
+    }
+}
+
+impl FromStr for UpdateSeverity {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
     }
 }
 
@@ -490,6 +730,31 @@ impl Display for UpdateStatus {
     }
 }
 
+impl TryFrom<&str> for UpdateStatus {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "obsolete" => Ok(UpdateStatus::Obsolete),
+            "pending" => Ok(UpdateStatus::Pending),
+            "side_tag_active" => Ok(UpdateStatus::SideTagActive),
+            "side_tag_expired" => Ok(UpdateStatus::SideTagExpired),
+            "stable" => Ok(UpdateStatus::Stable),
+            "testing" => Ok(UpdateStatus::Testing),
+            "unpushed" => Ok(UpdateStatus::Unpushed),
+            _ => Err(InvalidValueError::new("UpdateStatus", value)),
+        }
+    }
+}
+
+impl FromStr for UpdateStatus {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
+    }
+}
+
 
 /// This enum represents the associated suggested action for a bodhi update.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
@@ -514,6 +779,27 @@ impl Display for UpdateSuggestion {
         };
 
         write!(f, "{}", value)
+    }
+}
+
+impl TryFrom<&str> for UpdateSuggestion {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "logout" => Ok(UpdateSuggestion::Logout),
+            "reboot" => Ok(UpdateSuggestion::Reboot),
+            "unspecified" => Ok(UpdateSuggestion::Unspecified),
+            _ => Err(InvalidValueError::new("UpdateSuggestion", value)),
+        }
+    }
+}
+
+impl FromStr for UpdateSuggestion {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
     }
 }
 
@@ -545,5 +831,28 @@ impl Display for UpdateType {
         };
 
         write!(f, "{}", value)
+    }
+}
+
+impl TryFrom<&str> for UpdateType {
+    type Error = InvalidValueError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value.to_lowercase().as_str() {
+            "bugfix" => Ok(UpdateType::BugFix),
+            "enhancement" => Ok(UpdateType::Enhancement),
+            "newpackage" => Ok(UpdateType::NewPackage),
+            "security" => Ok(UpdateType::Security),
+            "unspecified" => Ok(UpdateType::Unspecified),
+            _ => Err(InvalidValueError::new("UpdateType", value)),
+        }
+    }
+}
+
+impl FromStr for UpdateType {
+    type Err = InvalidValueError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        TryFrom::try_from(s)
     }
 }
