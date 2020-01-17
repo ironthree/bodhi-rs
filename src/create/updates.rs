@@ -331,8 +331,6 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
 
         let result = response.text()?;
 
-        println!("{:#?}", &result);
-
         let new_update: NewUpdate = serde_json::from_str(&result)?;
 
         Ok(new_update)
