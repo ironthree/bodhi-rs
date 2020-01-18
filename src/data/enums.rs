@@ -388,7 +388,7 @@ impl FromStr for Karma {
 
 /// This enum represents the name of the package manager that's in use on a release.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, PartialEq, Serialize)]
 pub enum PackageManager {
     #[serde(rename = "dnf")]
     DNF,
