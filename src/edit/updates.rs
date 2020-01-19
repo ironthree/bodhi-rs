@@ -35,7 +35,7 @@ pub struct UpdateEditor<'a> {
 
     // optional fields
     bugs: Vec<u32>,
-    title: Option<&'a str>,
+    display_name: Option<&'a str>,
     close_bugs: Option<bool>,
     update_type: Option<UpdateType>,
     request: Option<UpdateRequest>,
@@ -61,7 +61,7 @@ impl<'a> UpdateEditor<'a> {
             notes: &update.notes,
 
             bugs: update.bugs.iter().map(|bug| bug.bug_id).collect(),
-            title: Some(&update.title),
+            display_name: Some(&update.display_name),
             close_bugs: Some(update.close_bugs),
             update_type: Some(update.update_type),
             request: update.request,
@@ -113,8 +113,8 @@ impl<'a> UpdateEditor<'a> {
     }
 
     /// Change the custom, user-visible title of the update.
-    pub fn set_title(mut self, title: &'a str) -> Self {
-        self.title = Some(title);
+    pub fn display_name(mut self, display_name: &'a str) -> Self {
+        self.display_name = Some(display_name);
         self
     }
 
@@ -244,7 +244,7 @@ impl<'a> Edit<EditedUpdate> for UpdateEditor<'a> {
             builds: Some(&self.builds),
             from_tag: None,
             bugs: Some(&bugs),
-            display_name: self.title,
+            display_name: self.display_name,
             close_bugs: self.close_bugs,
             update_type: match self.update_type {
                 Some(t) => t,

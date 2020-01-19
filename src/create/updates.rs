@@ -41,7 +41,7 @@ pub struct UpdateBuilder<'a> {
 
     // optional fields
     bugs: Option<Vec<u32>>,
-    title: Option<String>,
+    display_name: Option<String>,
     close_bugs: Option<bool>,
     update_type: Option<UpdateType>,
     request: Option<UpdateRequest>,
@@ -65,7 +65,7 @@ impl<'a> UpdateBuilder<'a> {
             notes,
 
             bugs: None,
-            title: None,
+            display_name: None,
             close_bugs: None,
             update_type: None,
             request: None,
@@ -89,7 +89,7 @@ impl<'a> UpdateBuilder<'a> {
             notes,
 
             bugs: None,
-            title: None,
+            display_name: None,
             close_bugs: None,
             update_type: None,
             request: None,
@@ -118,15 +118,15 @@ impl<'a> UpdateBuilder<'a> {
         self
     }
 
-    /// Add a custom user-visible title to the update.
-    pub fn title(mut self, title: String) -> Self {
-        self.title = Some(title);
-        self
-    }
-
     /// Set the flag whether bugs will be closed when the update is pushed to stable.
     pub fn close_bugs(mut self, close_bugs: bool) -> Self {
         self.close_bugs = Some(close_bugs);
+        self
+    }
+
+    /// Add a custom user-visible title to the update.
+    pub fn display_name(mut self, display_name: String) -> Self {
+        self.display_name = Some(display_name);
         self
     }
 
@@ -254,7 +254,7 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 builds: Some(builds),
                 from_tag: None,
                 bugs: bugs.as_ref(),
-                display_name: match &self.title {
+                display_name: match &self.display_name {
                     Some(string) => Some(&string),
                     None => None,
                 },
@@ -285,7 +285,7 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 builds: None,
                 from_tag: Some(tag),
                 bugs: bugs.as_ref(),
-                display_name: match &self.title {
+                display_name: match &self.display_name {
                     Some(string) => Some(&string),
                     None => None,
                 },
