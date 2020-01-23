@@ -11,9 +11,10 @@ struct CommentData<'a> {
     update: &'a str,
     text: Option<&'a str>,
     karma: Karma,
-    bug_feedback: Option<&'a Vec<BugFeedbackData>>,
-    testcase_feedback: Option<&'a Vec<TestCaseFeedbackData<'a>>>,
     csrf_token: &'a str,
+
+    #[serde(flatten)]
+    feedback: HashMap<String, String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -24,8 +25,8 @@ struct BugFeedbackData {
 
 #[derive(Debug, Serialize)]
 struct TestCaseFeedbackData<'a> {
-    karma: Karma,
     testcase_name: &'a str,
+    karma: Karma,
 }
 
 /// This struct contains the values that are returned when creating a new comment.
@@ -73,6 +74,8 @@ impl<'a> CommentBuilder<'a> {
     }
 
     /// Add optional bug feedback to the comment.
+    ///
+    /// If the specified bug is not associated with the update, this is discarded server-side.
     pub fn bug_feedback(mut self, bug_id: u32, karma: Karma) -> Self {
         let feedback = BugFeedbackData { bug_id, karma };
 
@@ -85,6 +88,8 @@ impl<'a> CommentBuilder<'a> {
     }
 
     /// Add optional test case feedback to the comment.
+    ///
+    /// If the specified test case is not associated with the update, this is discarded server-side.
     pub fn testcase_feedback(mut self, testcase_name: &'a str, karma: Karma) -> Self {
         let feedback = TestCaseFeedbackData { karma, testcase_name };
 
@@ -103,6 +108,33 @@ impl<'a> Create<NewComment> for CommentBuilder<'a> {
 
         let csrf_token = CSRFQuery::new().query(bodhi)?;
 
+        let mut feedback: HashMap<String, String> = HashMap::new();
+
+        let karma_string = |k: Karma| match k {
+            Karma::Positive => String::from("1"),
+            Karma::Neutral => String::from("0"),
+            Karma::Negative => String::from("-1"),
+        };
+
+        // bug and testcase feedback is expected in a really weird format, see:
+        // https://github.com/fedora-infra/bodhi/issues/3888#issuecomment-577793271
+        if let Some(items) = &self.bug_feedback {
+            for (pos, item) in items.iter().enumerate() {
+                feedback.insert(format!("bug_feedback.{}.bug_id", pos), item.bug_id.to_string());
+                feedback.insert(format!("bug_feedback.{}.karma", pos), karma_string(item.karma));
+            }
+        };
+
+        if let Some(items) = &self.testcase_feedback {
+            for (pos, item) in items.iter().enumerate() {
+                feedback.insert(
+                    format!("testcase_feedback.{}.testcase_name", pos),
+                    item.testcase_name.to_string(),
+                );
+                feedback.insert(format!("testcase_feedback.{}.karma", pos), karma_string(item.karma));
+            }
+        };
+
         let new_comment = CommentData {
             update: &self.update,
             text: match &self.text {
@@ -113,8 +145,7 @@ impl<'a> Create<NewComment> for CommentBuilder<'a> {
                 Some(karma) => karma,
                 None => Karma::Neutral,
             },
-            bug_feedback: self.bug_feedback.as_ref(),
-            testcase_feedback: self.testcase_feedback.as_ref(),
+            feedback,
             csrf_token: &csrf_token,
         };
 
