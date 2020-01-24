@@ -11,7 +11,7 @@ readme = "README.md"
 categories = ["api-bindings"]
 keywords = ["fedora", "bodhi", "REST", "client"]
 repository = "https://github.com/ironthree/bodhi-rs"
-exclude = ["tests"]
+exclude = ["/tests"]
 
 [features]
 default = ["offline-tests"]
