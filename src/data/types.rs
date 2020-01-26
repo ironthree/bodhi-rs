@@ -408,6 +408,17 @@ impl Display for TestCase {
     }
 }
 
+impl TestCase {
+    /// This method constructs the URL of the test case on the fedora wiki.
+    pub fn url(&self) -> Url {
+        Url::parse(&format!(
+            "https://fedoraproject.org/wiki/{}",
+            self.name.replace(" ", "_")
+        ))
+        .expect("Failed to parse the hard-coded URL, this should not happen.")
+    }
+}
+
 
 /// This struct represents an update feedback item associated with a specific test case.
 #[derive(Debug, Deserialize, Serialize)]

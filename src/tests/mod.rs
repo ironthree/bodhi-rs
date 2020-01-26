@@ -28,6 +28,8 @@ fn bodhi_init() -> BodhiService {
 mod dates;
 #[cfg(feature = "offline-tests")]
 mod enums;
+#[cfg(feature = "offline-tests")]
+mod types;
 
 // tests requiring internet access
 #[cfg(feature = "online-tests")]
