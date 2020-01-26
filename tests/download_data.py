@@ -100,7 +100,7 @@ def retry(message: str = None, times: int = None, delay: int = 0):
 
 @retry(message=None, times=3, delay=5)
 def try_request(url: str):
-    ret = requests.get(url, timeout=120)
+    ret = requests.get(url, timeout=120).json()
     return ret
 
 
@@ -112,8 +112,7 @@ def do_builds() -> int:
 
         while True:
             print(f"Builds: {release} page {page} / {pages}")
-            ret = try_request(f"{API_URL}/builds/?releases={release}&rows_per_page=100&page={page}")
-            data = ret.json()
+            data = try_request(f"{API_URL}/builds/?releases={release}&rows_per_page=100&page={page}")
 
             builds.extend(data["builds"])
 
@@ -140,16 +139,17 @@ def do_builds() -> int:
 
 
 def do_comments() -> int:
-    pages = try_request(f"{API_URL}/comments/?rows_per_page=100&page=1").json()["pages"]
-    # cpages = range(1, pages + 1)
-    cpages = range(1, pages, 50)
+    pages = try_request(f"{API_URL}/comments/?rows_per_page=100&page=1")["pages"]
+    cpages = range(1, pages + 1)
 
     def per_page(page: int):
+        time.sleep(10)
+
         print(f"Comments: page {page} / {pages}")
-        ret = try_request(f"{API_URL}/comments/?rows_per_page=100&page={page}")
+        data = try_request(f"{API_URL}/comments/?rows_per_page=100&page={page}")
 
         with open(f"data/comments_p{page}.json", "w") as file:
-            file.write(json.dumps(ret.json()["comments"], indent=2))
+            file.write(json.dumps(data["comments"], indent=2))
 
     threads = []
     for cpage in cpages:
@@ -158,7 +158,7 @@ def do_comments() -> int:
         thread.start()
 
         # do not DOS bodhi
-        time.sleep(5)
+        time.sleep(10)
 
     for thread in threads:
         thread.join()
@@ -177,8 +177,7 @@ def do_comments() -> int:
 
 def do_composes() -> int:
     print(f"Composes ...")
-    ret = try_request(f"{API_URL}/composes/")
-    data = ret.json()
+    data = try_request(f"{API_URL}/composes/")
 
     new_composes = data["composes"]
 
@@ -205,8 +204,7 @@ def do_overrides() -> int:
 
         while True:
             print(f"Overrides: {release} page {page} / {pages}")
-            ret = try_request(f"{API_URL}/overrides/?releases={release}&rows_per_page=100&page={page}")
-            data = ret.json()
+            data = try_request(f"{API_URL}/overrides/?releases={release}&rows_per_page=100&page={page}")
 
             overrides.extend(data["overrides"])
 
@@ -239,8 +237,7 @@ def do_packages() -> int:
 
     while True:
         print(f"Packages: page {page} / {pages}")
-        ret = try_request(f"{API_URL}/packages/?rows_per_page=100&page={page}")
-        data = ret.json()
+        data = try_request(f"{API_URL}/packages/?rows_per_page=100&page={page}")
 
         packages.extend(data["packages"])
 
@@ -262,8 +259,7 @@ def do_releases() -> int:
 
     while True:
         print(f"Releases: page {page} / {pages}")
-        ret = try_request(f"{API_URL}/releases/?rows_per_page=100&page={page}")
-        data = ret.json()
+        data = try_request(f"{API_URL}/releases/?rows_per_page=100&page={page}")
 
         releases.extend(data["releases"])
 
@@ -286,8 +282,7 @@ def do_updates() -> int:
 
         while True:
             print(f"Updates: {release} page {page} / {pages}")
-            ret = try_request(f"{API_URL}/updates/?releases={release}&rows_per_page=100&page={page}")
-            data = ret.json()
+            data = try_request(f"{API_URL}/updates/?releases={release}&rows_per_page=100&page={page}")
 
             updates.extend(data["updates"])
 
@@ -320,8 +315,7 @@ def do_users() -> int:
 
     while True:
         print(f"Users: page {page} / {pages}")
-        ret = try_request(f"{API_URL}/users/?rows_per_page=100&page={page}")
-        data = ret.json()
+        data = try_request(f"{API_URL}/users/?rows_per_page=100&page={page}")
 
         users.extend(data["users"])
 
