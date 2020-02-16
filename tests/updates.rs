@@ -5,6 +5,7 @@ use std::fs::read_to_string;
 
 use bodhi::Update;
 
+const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33.json");
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f32.json");
 const JSON_F32C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f32c.json");
 const JSON_F31: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f31.json");
@@ -35,6 +36,12 @@ const JSON_EPEL8M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updat
 const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel7.json");
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_el5.json");
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn updates_dejson_f33() {
+    let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F33).unwrap()).unwrap();
+}
 
 #[cfg(feature = "data-tests")]
 #[test]

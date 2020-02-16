@@ -10,6 +10,7 @@ import time
 API_URL = "https://bodhi.fedoraproject.org"
 
 ALL_RELEASES = [
+    "F33",
     "F32",
     "F32C",
     "F31",
@@ -43,6 +44,7 @@ ALL_RELEASES = [
 ]
 
 ACTIVE_RELEASES = [
+    "F33",
     "F32",
     "F32C",
     "F31",
