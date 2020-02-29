@@ -8,6 +8,7 @@ use bodhi::Build;
 const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33.json");
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32.json");
 const JSON_F32C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32c.json");
+const JSON_F32M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32m.json");
 const JSON_F31: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f31.json");
 const JSON_F31C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f31c.json");
 const JSON_F31F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f31f.json");
@@ -53,6 +54,12 @@ fn builds_dejson_f32() {
 #[test]
 fn builds_dejson_f32c() {
     let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32C).unwrap()).unwrap();
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_f32m() {
+    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32M).unwrap()).unwrap();
 }
 
 #[cfg(feature = "data-tests")]

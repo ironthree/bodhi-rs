@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -OO
+#!/usr/bin/python3
 
 import argparse
 import requests
@@ -13,6 +13,7 @@ ALL_RELEASES = [
     "F33",
     "F32",
     "F32C",
+    "F32M",
     "F31",
     "F31C",
     "F31F",
@@ -47,6 +48,7 @@ ACTIVE_RELEASES = [
     "F33",
     "F32",
     "F32C",
+    "F32M",
     "F31",
     "F31C",
     "F31F",
@@ -145,7 +147,7 @@ def do_comments() -> int:
     cpages = range(1, pages + 1)
 
     def per_page(page: int):
-        time.sleep(10)
+        time.sleep(5)
 
         print(f"Comments: page {page} / {pages}")
         data = try_request(f"{API_URL}/comments/?rows_per_page=100&page={page}")
@@ -160,7 +162,7 @@ def do_comments() -> int:
         thread.start()
 
         # do not DOS bodhi
-        time.sleep(10)
+        time.sleep(5)
 
     for thread in threads:
         thread.join()

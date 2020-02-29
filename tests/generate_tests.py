@@ -1,4 +1,4 @@
-#!/usr/bin/python3 -OO
+#!/usr/bin/python3
 
 import textwrap
 
@@ -6,6 +6,7 @@ RELEASES = [
     "F33",
     "F32",
     "F32C",
+    "F32M",
     "F31",
     "F31C",
     "F31F",
