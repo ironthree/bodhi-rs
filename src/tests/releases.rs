@@ -1,6 +1,15 @@
 use super::bodhi_init;
 
-use crate::{Release, ReleaseNameQuery};
+use crate::{Release, ReleaseNameQuery, ReleaseQuery};
+
+#[test]
+fn query() {
+    // This test makes sure that the FedoraRelease enum contains valid values for all fedora releases.
+    // If this fails, then new enum variant(s) need to be added.
+
+    let bodhi = bodhi_init();
+    let _releases: Vec<Release> = bodhi.query(ReleaseQuery::new()).unwrap();
+}
 
 #[test]
 fn name_query_some() {
