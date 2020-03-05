@@ -6,6 +6,7 @@ use std::fs::read_to_string;
 use bodhi::Build;
 
 const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33.json");
+const JSON_F33C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33c.json");
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32.json");
 const JSON_F32C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32c.json");
 const JSON_F32M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32m.json");
@@ -42,6 +43,12 @@ const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_e
 #[test]
 fn builds_dejson_f33() {
     let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33).unwrap()).unwrap();
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_f33c() {
+    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33C).unwrap()).unwrap();
 }
 
 #[cfg(feature = "data-tests")]

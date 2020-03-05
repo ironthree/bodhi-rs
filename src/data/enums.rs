@@ -211,6 +211,7 @@ impl FromStr for ContentType {
 #[non_exhaustive]
 pub enum FedoraRelease {
     F33,
+    F33C,
     F32,
     F32C,
     F32M,
@@ -253,6 +254,7 @@ impl Display for FedoraRelease {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         let value = match self {
             FedoraRelease::F33 => "F33",
+            FedoraRelease::F33C => "F33C",
             FedoraRelease::F32 => "F32",
             FedoraRelease::F32C => "F32C",
             FedoraRelease::F32M => "F32M",
@@ -296,6 +298,7 @@ impl TryFrom<&str> for FedoraRelease {
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
             "F33" => Ok(FedoraRelease::F33),
+            "F33C" => Ok(FedoraRelease::F33C),
             "F32" => Ok(FedoraRelease::F32),
             "F32C" => Ok(FedoraRelease::F32C),
             "F32M" => Ok(FedoraRelease::F32M),

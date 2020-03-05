@@ -11,6 +11,7 @@ API_URL = "https://bodhi.fedoraproject.org"
 
 ALL_RELEASES = [
     "F33",
+    "F33C",
     "F32",
     "F32C",
     "F32M",
@@ -46,6 +47,7 @@ ALL_RELEASES = [
 
 ACTIVE_RELEASES = [
     "F33",
+    "F33C",
     "F32",
     "F32C",
     "F32M",
