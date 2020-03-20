@@ -209,11 +209,16 @@ impl FromStr for ContentType {
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 #[non_exhaustive]
+// When updating this enum for new releases:
+// - also add them in the impls below,
+// - add them to the idem_fedora_release test,
+// - add integration tests and data for them.
 pub enum FedoraRelease {
     F33,
     F33C,
     F32,
     F32C,
+    F32F,
     F32M,
     F31,
     F31C,
@@ -257,6 +262,7 @@ impl Display for FedoraRelease {
             FedoraRelease::F33C => "F33C",
             FedoraRelease::F32 => "F32",
             FedoraRelease::F32C => "F32C",
+            FedoraRelease::F32F => "F32F",
             FedoraRelease::F32M => "F32M",
             FedoraRelease::F31 => "F31",
             FedoraRelease::F31C => "F31C",
@@ -301,6 +307,7 @@ impl TryFrom<&str> for FedoraRelease {
             "F33C" => Ok(FedoraRelease::F33C),
             "F32" => Ok(FedoraRelease::F32),
             "F32C" => Ok(FedoraRelease::F32C),
+            "F32F" => Ok(FedoraRelease::F32F),
             "F32M" => Ok(FedoraRelease::F32M),
             "F31" => Ok(FedoraRelease::F31),
             "F31C" => Ok(FedoraRelease::F31C),

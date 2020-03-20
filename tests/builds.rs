@@ -9,6 +9,7 @@ const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f
 const JSON_F33C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33c.json");
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32.json");
 const JSON_F32C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32c.json");
+const JSON_F32F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32f.json");
 const JSON_F32M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32m.json");
 const JSON_F31: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f31.json");
 const JSON_F31C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f31c.json");
@@ -61,6 +62,12 @@ fn builds_dejson_f32() {
 #[test]
 fn builds_dejson_f32c() {
     let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32C).unwrap()).unwrap();
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_f32f() {
+    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32F).unwrap()).unwrap();
 }
 
 #[cfg(feature = "data-tests")]
