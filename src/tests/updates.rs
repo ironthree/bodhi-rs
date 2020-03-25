@@ -1,6 +1,49 @@
 use super::bodhi_init;
 
-use crate::{FedoraRelease, Update, UpdateIDQuery, UpdateQuery};
+use crate::{BodhiDate, FedoraRelease, Update, UpdateIDQuery, UpdateQuery};
+
+fn days_ago(x: i64) -> BodhiDate {
+    BodhiDate::from(chrono::Utc::now() - chrono::Duration::days(x))
+}
+
+#[test]
+fn query_current() {
+    let bodhi = bodhi_init();
+
+    let _: Vec<Update> = bodhi
+        .query(
+            UpdateQuery::new()
+                .releases(FedoraRelease::Current)
+                .submitted_since(&days_ago(2)),
+        )
+        .unwrap();
+}
+
+#[test]
+fn query_pending() {
+    let bodhi = bodhi_init();
+
+    let _: Vec<Update> = bodhi
+        .query(
+            UpdateQuery::new()
+                .releases(FedoraRelease::Pending)
+                .submitted_since(&days_ago(1)),
+        )
+        .unwrap();
+}
+
+#[test]
+fn query_archived() {
+    let bodhi = bodhi_init();
+
+    let _: Vec<Update> = bodhi
+        .query(
+            UpdateQuery::new()
+                .releases(FedoraRelease::Archived)
+                .submitted_since(&days_ago(30)),
+        )
+        .unwrap();
+}
 
 #[test]
 fn query_sanity_aliases() {

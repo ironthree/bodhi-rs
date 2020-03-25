@@ -214,6 +214,12 @@ impl FromStr for ContentType {
 // - add them to the idem_fedora_release test,
 // - add integration tests and data for them.
 pub enum FedoraRelease {
+    #[serde(rename = "__current__")]
+    Current,
+    #[serde(rename = "__pending__")]
+    Pending,
+    #[serde(rename = "__archived__")]
+    Archived,
     F33,
     F33C,
     F32,
@@ -258,6 +264,9 @@ pub enum FedoraRelease {
 impl Display for FedoraRelease {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         let value = match self {
+            FedoraRelease::Current => "__current__",
+            FedoraRelease::Pending => "__pending__",
+            FedoraRelease::Archived => "__archived__",
             FedoraRelease::F33 => "F33",
             FedoraRelease::F33C => "F33C",
             FedoraRelease::F32 => "F32",
