@@ -10,7 +10,7 @@ authors = ["Fabio Valentini <decathorpe@gmail.com>"]
 readme = "README.md"
 categories = ["api-bindings"]
 keywords = ["fedora", "bodhi", "REST", "client"]
-repository = "https://github.com/ironthree/bodhi-rs"
+repository = "https://pagure.io/ironthree/bodhi-rs"
 exclude = ["/tests"]
 
 [features]
@@ -42,4 +42,5 @@ rpassword = "^4.0.3"
 [profile.release]
 codegen-units = 1
 lto = true
+opt-level = 3
 

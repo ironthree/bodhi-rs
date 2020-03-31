@@ -15,7 +15,7 @@ authenticated requests.
 
 [reqwest]: https://github.com/seanmonstar/reqwest
 [serde]: https://github.com/serde-rs/serde
-[fedora-rs]: https://github.com/ironthree/fedora-rs
+[fedora-rs]: https://pagure.io/ironthree/fedora-rs
 
 
 ## Reporting bugs
@@ -67,3 +67,4 @@ various places in the code (mostly HTTP responses from `reqwest`).
 
 It might also be helpful to enable building documentation for private items with `cargo doc --document-private-items`
 for locally browsing all documented items.
+
