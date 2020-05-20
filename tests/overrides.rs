@@ -39,6 +39,7 @@ const JSON_EPEL8M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overr
 const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel7.json");
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_el5.json");
+const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_eln.json");
 
 #[cfg(feature = "data-tests")]
 #[test]
@@ -242,4 +243,10 @@ fn overrides_dejson_el6() {
 #[test]
 fn overrides_dejson_el5() {
     let _: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EL5).unwrap()).unwrap();
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_eln() {
+    let _: Vec<Override> = serde_json::from_str(&read_to_string(JSON_ELN).unwrap()).unwrap();
 }

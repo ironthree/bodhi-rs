@@ -37,6 +37,7 @@ RELEASES = [
     "EPEL7",
     "EL6",
     "EL5",
+    "ELN",
 ]
 
 

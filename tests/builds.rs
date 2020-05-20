@@ -39,6 +39,7 @@ const JSON_EPEL8M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/build
 const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_epel7.json");
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_el5.json");
+const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_eln.json");
 
 #[cfg(feature = "data-tests")]
 #[test]
@@ -242,4 +243,10 @@ fn builds_dejson_el6() {
 #[test]
 fn builds_dejson_el5() {
     let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EL5).unwrap()).unwrap();
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_eln() {
+    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_ELN).unwrap()).unwrap();
 }

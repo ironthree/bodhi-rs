@@ -44,6 +44,7 @@ ALL_RELEASES = [
     "EPEL-7",
     "EL-6",
     "EL-5",
+    "ELN",
 ]
 
 ACTIVE_RELEASES = [
@@ -65,6 +66,7 @@ ACTIVE_RELEASES = [
     "EPEL-8M",
     "EPEL-7",
     "EL-6",
+    "ELN",
 ]
 
 # change this to "ALL_RELEASES" regenerate data for archived releases as well

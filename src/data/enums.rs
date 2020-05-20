@@ -259,6 +259,7 @@ pub enum FedoraRelease {
     EL6,
     #[serde(rename = "EL-5")]
     EL5,
+    ELN,
 }
 
 impl Display for FedoraRelease {
@@ -301,6 +302,7 @@ impl Display for FedoraRelease {
             FedoraRelease::EPEL7 => "EPEL-7",
             FedoraRelease::EL6 => "EL-6",
             FedoraRelease::EL5 => "EL-5",
+            FedoraRelease::ELN => "ELN",
         };
 
         write!(f, "{}", value)
@@ -346,6 +348,7 @@ impl TryFrom<&str> for FedoraRelease {
             "EPEL-7" => Ok(FedoraRelease::EPEL7),
             "EL-6" => Ok(FedoraRelease::EL6),
             "EL-5" => Ok(FedoraRelease::EL5),
+            "ELN" => Ok(FedoraRelease::ELN),
             _ => Err(InvalidValueError::new("FedoraRelease", value)),
         }
     }
