@@ -1,3 +1,10 @@
+# Release 0.5.10 "Elastin" (May 20, 2020)
+
+Improvements:
+
+- add `ELN` as valid `FedoraRelease` variant
+
+
 # Release 0.5.9 "Macros" (Mar. 25, 2020)
 
 New features:
