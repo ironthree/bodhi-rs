@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
 import argparse
-import requests
 import json
 import os
 import threading
 import time
+
+import requests
 
 API_URL = "https://bodhi.fedoraproject.org"
 
@@ -108,7 +109,7 @@ def retry(message: str = None, times: int = None, delay: int = 0):
     return wrap
 
 
-@retry(message=None, times=3, delay=5)
+@retry(message="A request failed or timed out, retrying ...\n", times=None, delay=60)
 def try_request(url: str):
     ret = requests.get(url, timeout=120).json()
     return ret
@@ -214,7 +215,7 @@ def do_overrides() -> int:
 
         while True:
             print(f"Overrides: {release} page {page} / {pages}")
-            data = try_request(f"{API_URL}/overrides/?releases={release}&rows_per_page=100&page={page}")
+            data = try_request(f"{API_URL}/overrides/?releases={release}&rows_per_page=25&page={page}")
 
             overrides.extend(data["overrides"])
 
@@ -292,7 +293,7 @@ def do_updates() -> int:
 
         while True:
             print(f"Updates: {release} page {page} / {pages}")
-            data = try_request(f"{API_URL}/updates/?releases={release}&rows_per_page=100&page={page}")
+            data = try_request(f"{API_URL}/updates/?releases={release}&rows_per_page=10&page={page}")
 
             updates.extend(data["updates"])
 
