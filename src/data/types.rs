@@ -384,8 +384,6 @@ pub struct TestCase {
     pub name: String,
     /// package this test case is associated with
     pub package: Option<Package>,
-    /// ID of the package this test case is associated with
-    pub package_id: u32,
 
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]

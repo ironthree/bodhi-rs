@@ -21,7 +21,6 @@ fn testcase_url() {
     let testcase = TestCase {
         name: String::from("QA:Foo Bar Baz"),
         package: None,
-        package_id: 0,
         extra: Default::default(),
     };
 
