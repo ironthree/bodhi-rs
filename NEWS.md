@@ -1,3 +1,9 @@
+# Release 0.6.0 "Upstream" (June 22, 2020)
+
+Bug fixes:
+
+- adapt to bodhi API response schema changes (causes a minor API change)
+
 # Release 0.5.10 "Elastin" (May 20, 2020)
 
 Improvements:
