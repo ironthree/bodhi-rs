@@ -50,7 +50,15 @@ def do_builds():
         #[cfg(feature = "data-tests")]
         #[test]
         fn builds_dejson_{release_lower}() {{
-            let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
+            let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
+
+            for build in builds {{
+                if !build.extra.is_empty() {{
+                    println!("{{:#?}}", build.extra);
+                }}
+        
+                assert!(build.extra.is_empty());
+            }}
         }}
         """
     )
@@ -76,7 +84,15 @@ def do_comments():
         #[cfg(feature = "data-tests")]
         #[test]
         fn comments_dejson() {
-            let _: Vec<Comment> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+            let comments: Vec<Comment> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+
+            for comment in comments {
+                if !comment.extra.is_empty() {
+                    println!("{:#?}", comment.extra);
+                }
+        
+                assert!(comment.extra.is_empty());
+            }
         }
         """
     )
@@ -102,7 +118,15 @@ def do_composes():
         #[cfg(feature = "data-tests")]
         #[test]
         fn composes_dejson() {
-            let _: Vec<Compose> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+            let composes: Vec<Compose> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+
+            for compose in composes {
+                if !compose.extra.is_empty() {
+                    println!("{:#?}", compose.extra);
+                }
+
+                assert!(compose.extra.is_empty());
+            }
         }
         """
     )
@@ -128,7 +152,15 @@ def do_overrides():
         #[cfg(feature = "data-tests")]
         #[test]
         fn overrides_dejson_{release_lower}() {{
-            let _: Vec<Override> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
+            let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
+
+            for o in os {{
+                if !o.extra.is_empty() {{
+                    println!("{{:#?}}", o.extra);
+                }}
+        
+                assert!(o.extra.is_empty());
+            }}
         }}
         """
     )
@@ -154,7 +186,15 @@ def do_packages():
         #[cfg(feature = "data-tests")]
         #[test]
         fn packages_dejson() {
-            let _: Vec<Package> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+            let packages: Vec<Package> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+
+            for package in packages {
+                if !package.extra.is_empty() {
+                    println!("{:#?}", package.extra);
+                }
+        
+                assert!(package.extra.is_empty());
+            }
         }
         """
     )
@@ -180,7 +220,15 @@ def do_releases():
         #[cfg(feature = "data-tests")]
         #[test]
         fn releases_dejson() {
-            let _: Vec<Release> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+            let releases: Vec<Release> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+
+            for release in releases {
+                if !release.extra.is_empty() {
+                    println!("{:#?}", release.extra);
+                }
+
+                assert!(release.extra.is_empty());
+            }
         }
         """
     )
@@ -206,7 +254,15 @@ def do_updates():
         #[cfg(feature = "data-tests")]
         #[test]
         fn updates_dejson_{release_lower}() {{
-            let _: Vec<Update> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
+            let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
+
+            for update in updates {{
+                if !update.extra.is_empty() {{
+                    println!("{{:#?}}", update.extra);
+                }}
+        
+                assert!(update.extra.is_empty());
+            }}
         }}
         """
     )
@@ -232,7 +288,15 @@ def do_users():
         #[cfg(feature = "data-tests")]
         #[test]
         fn users_dejson() {
-            let _: Vec<User> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+            let users: Vec<User> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+
+            for user in users {
+                if !user.extra.is_empty() {
+                    println!("{:#?}", user.extra);
+                }
+
+                assert!(user.extra.is_empty());
+            }
         }
         """
     )

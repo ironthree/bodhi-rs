@@ -10,5 +10,13 @@ const JSON: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/users.json")
 #[cfg(feature = "data-tests")]
 #[test]
 fn users_dejson() {
-    let _: Vec<User> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+    let users: Vec<User> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+
+    for user in users {
+        if !user.extra.is_empty() {
+            println!("{:#?}", user.extra);
+        }
+
+        assert!(user.extra.is_empty());
+    }
 }

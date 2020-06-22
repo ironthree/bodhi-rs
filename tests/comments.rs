@@ -10,5 +10,13 @@ const JSON: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/comments.jso
 #[cfg(feature = "data-tests")]
 #[test]
 fn comments_dejson() {
-    let _: Vec<Comment> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+    let comments: Vec<Comment> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
+
+    for comment in comments {
+        if !comment.extra.is_empty() {
+            println!("{:#?}", comment.extra);
+        }
+
+        assert!(comment.extra.is_empty());
+    }
 }

@@ -44,209 +44,489 @@ const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_e
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f33() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f33c() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33C).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33C).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f32() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f32c() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32C).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32C).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f32f() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32F).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32F).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f32m() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32M).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32M).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f31() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f31c() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31C).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31C).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f31f() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31F).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31F).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f31m() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31M).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31M).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f30() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f30c() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30C).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30C).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f30f() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30F).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30F).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f30m() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30M).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30M).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f29() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f29c() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29C).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29C).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f29f() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29F).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29F).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f29m() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29M).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29M).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f28() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F28).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F28).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f28c() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F28C).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F28C).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f28m() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F28M).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F28M).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f27() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F27).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F27).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f27m() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F27M).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F27M).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f26() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F26).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F26).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f25() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F25).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F25).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f24() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F24).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F24).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f23() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F23).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F23).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f22() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F22).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F22).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_f21() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F21).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F21).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_epel8() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL8).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL8).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_epel8m() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL8M).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL8M).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_epel7() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL7).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL7).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_el6() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EL6).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EL6).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_el5() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EL5).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EL5).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
 
 #[cfg(feature = "data-tests")]
 #[test]
 fn builds_dejson_eln() {
-    let _: Vec<Build> = serde_json::from_str(&read_to_string(JSON_ELN).unwrap()).unwrap();
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_ELN).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
 }
