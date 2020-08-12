@@ -5,6 +5,7 @@ use std::fs::read_to_string;
 
 use bodhi::Build;
 
+const JSON_F34: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f34.json");
 const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33.json");
 const JSON_F33C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33c.json");
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32.json");
@@ -40,6 +41,20 @@ const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_el5.json");
 const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_eln.json");
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_f34() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F34).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+}
 
 #[cfg(feature = "data-tests")]
 #[test]

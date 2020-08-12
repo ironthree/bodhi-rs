@@ -5,6 +5,7 @@ use std::fs::read_to_string;
 
 use bodhi::Override;
 
+const JSON_F34: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f34.json");
 const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f33.json");
 const JSON_F33C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f33c.json");
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f32.json");
@@ -40,6 +41,20 @@ const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overri
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_el5.json");
 const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_eln.json");
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_f34() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F34).unwrap()).unwrap();
+
+    for o in os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+}
 
 #[cfg(feature = "data-tests")]
 #[test]

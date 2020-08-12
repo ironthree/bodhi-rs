@@ -97,13 +97,13 @@ fn idem_fedora_release() {
     use FedoraRelease::*;
 
     let strings = vec![
-        "F33", "F33C", "F32", "F32C", "F32F", "F32M", "F31", "F31C", "F31F", "F31M", "F30", "F30C", "F30F", "F30M",
+        "F34", "F33", "F33C", "F32", "F32C", "F32F", "F32M", "F31", "F31C", "F31F", "F31M", "F30", "F30C", "F30F", "F30M",
         "F29", "F29C", "F29F", "F29M", "F28", "F28C", "F28M", "F27", "F27M", "F26", "F25", "F24", "F23", "F22", "F21",
         "EPEL-8", "EPEL-8M", "EPEL-7", "EL-6", "EL-5", "ELN",
     ];
 
     let values = vec![
-        F33, F33C, F32, F32C, F32F, F32M, F31, F31C, F31F, F31M, F30, F30C, F30F, F30M, F29, F29C, F29F, F29M, F28,
+        F34, F33, F33C, F32, F32C, F32F, F32M, F31, F31C, F31F, F31M, F30, F30C, F30F, F30M, F29, F29C, F29F, F29M, F28,
         F28C, F28M, F27, F27M, F26, F25, F24, F23, F22, F21, EPEL8, EPEL8M, EPEL7, EL6, EL5, ELN,
     ];
 

@@ -220,6 +220,7 @@ pub enum FedoraRelease {
     Pending,
     #[serde(rename = "__archived__")]
     Archived,
+    F34,
     F33,
     F33C,
     F32,
@@ -268,6 +269,7 @@ impl Display for FedoraRelease {
             FedoraRelease::Current => "__current__",
             FedoraRelease::Pending => "__pending__",
             FedoraRelease::Archived => "__archived__",
+            FedoraRelease::F34 => "F34",
             FedoraRelease::F33 => "F33",
             FedoraRelease::F33C => "F33C",
             FedoraRelease::F32 => "F32",
@@ -314,6 +316,7 @@ impl TryFrom<&str> for FedoraRelease {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
+            "F34" => Ok(FedoraRelease::F34),
             "F33" => Ok(FedoraRelease::F33),
             "F33C" => Ok(FedoraRelease::F33C),
             "F32" => Ok(FedoraRelease::F32),

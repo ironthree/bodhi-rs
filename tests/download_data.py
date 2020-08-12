@@ -11,6 +11,7 @@ import requests
 API_URL = "https://bodhi.fedoraproject.org"
 
 ALL_RELEASES = [
+    "F34",
     "F33",
     "F33C",
     "F32",
@@ -49,6 +50,7 @@ ALL_RELEASES = [
 ]
 
 ACTIVE_RELEASES = [
+    "F34",
     "F33",
     "F33C",
     "F32",
