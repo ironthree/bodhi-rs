@@ -1,3 +1,9 @@
+# Release 0.6.1 "Murmeltier" (Aug. 12, 2020)
+
+Improvements:
+
+- add `F34` as valid `FedoraRelease` variant
+
 # Release 0.6.0 "Upstream" (June 22, 2020)
 
 Bug fixes:
