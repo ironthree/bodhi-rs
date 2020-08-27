@@ -1,3 +1,10 @@
+# Release 0.6.2 "Groundhog Day" (Aug. 27, 2020)
+
+Improvements:
+
+- add `F33F` as valid `FedoraRelease` variant
+- add `F33M` as valid `FedoraRelease` variant
+
 # Release 0.6.1 "Murmeltier" (Aug. 12, 2020)
 
 Improvements:
@@ -15,7 +22,6 @@ Bug fixes:
 Improvements:
 
 - add `ELN` as valid `FedoraRelease` variant
-
 
 # Release 0.5.9 "Macros" (Mar. 25, 2020)
 
