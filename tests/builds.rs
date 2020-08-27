@@ -9,6 +9,7 @@ const JSON_F34: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f
 const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33.json");
 const JSON_F33C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33c.json");
 const JSON_F33F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33f.json");
+const JSON_F33M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f33m.json");
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32.json");
 const JSON_F32C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32c.json");
 const JSON_F32F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f32f.json");
@@ -89,6 +90,20 @@ fn builds_dejson_f33c() {
 #[test]
 fn builds_dejson_f33f() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33F).unwrap()).unwrap();
+
+    for build in builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_f33m() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33M).unwrap()).unwrap();
 
     for build in builds {
         if !build.extra.is_empty() {
