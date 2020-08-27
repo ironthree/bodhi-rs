@@ -8,6 +8,7 @@ use bodhi::Override;
 const JSON_F34: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f34.json");
 const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f33.json");
 const JSON_F33C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f33c.json");
+const JSON_F33F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f33f.json");
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f32.json");
 const JSON_F32C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f32c.json");
 const JSON_F32F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f32f.json");
@@ -74,6 +75,20 @@ fn overrides_dejson_f33() {
 #[test]
 fn overrides_dejson_f33c() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F33C).unwrap()).unwrap();
+
+    for o in os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_f33f() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F33F).unwrap()).unwrap();
 
     for o in os {
         if !o.extra.is_empty() {

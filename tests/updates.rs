@@ -8,6 +8,7 @@ use bodhi::Update;
 const JSON_F34: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f34.json");
 const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33.json");
 const JSON_F33C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33c.json");
+const JSON_F33F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33f.json");
 const JSON_F32: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f32.json");
 const JSON_F32C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f32c.json");
 const JSON_F32F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f32f.json");
@@ -74,6 +75,20 @@ fn updates_dejson_f33() {
 #[test]
 fn updates_dejson_f33c() {
     let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F33C).unwrap()).unwrap();
+
+    for update in updates {
+        if !update.extra.is_empty() {
+            println!("{:#?}", update.extra);
+        }
+
+        assert!(update.extra.is_empty());
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn updates_dejson_f33f() {
+    let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F33F).unwrap()).unwrap();
 
     for update in updates {
         if !update.extra.is_empty() {
