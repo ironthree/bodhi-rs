@@ -1,3 +1,10 @@
+# Release 0.6.3 "Thirty-Four Containers" (Oct. 27, 2020)
+
+Improvements:
+
+- `F34C` as valid `FedoraRelease` variant
+- minor code cleanups thanks to clippy
+
 # Release 0.6.2 "Groundhog Day" (Aug. 27, 2020)
 
 Improvements:
