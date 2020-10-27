@@ -12,6 +12,7 @@ API_URL = "https://bodhi.fedoraproject.org"
 
 ALL_RELEASES = [
     "F34",
+    "F34C",
     "F33",
     "F33C",
     "F33F",
@@ -53,6 +54,7 @@ ALL_RELEASES = [
 
 ACTIVE_RELEASES = [
     "F34",
+    "F34C",
     "F33",
     "F33C",
     "F33F",
@@ -74,6 +76,7 @@ ACTIVE_RELEASES = [
 
 # change this to "ALL_RELEASES" regenerate data for archived releases as well
 RELEASES = ACTIVE_RELEASES
+RELEASES = ["F34C"]
 
 
 class RetryError(Exception):

@@ -6,6 +6,7 @@ use std::fs::read_to_string;
 use bodhi::Update;
 
 const JSON_F34: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f34.json");
+const JSON_F34C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f34c.json");
 const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33.json");
 const JSON_F33C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33c.json");
 const JSON_F33F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33f.json");
@@ -48,6 +49,20 @@ const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_
 #[test]
 fn updates_dejson_f34() {
     let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F34).unwrap()).unwrap();
+
+    for update in updates {
+        if !update.extra.is_empty() {
+            println!("{:#?}", update.extra);
+        }
+
+        assert!(update.extra.is_empty());
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn updates_dejson_f34c() {
+    let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F34C).unwrap()).unwrap();
 
     for update in updates {
         if !update.extra.is_empty() {
