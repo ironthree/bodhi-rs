@@ -122,7 +122,7 @@ pub struct UpdateQuery<'a> {
     users: Option<Vec<&'a str>>,
 
     /// optional callback function for reporting progress
-    callback: Option<Box<dyn FnMut(u32, u32) -> () + 'a>>,
+    callback: Option<Box<dyn FnMut(u32, u32) + 'a>>,
 }
 
 impl<'a> Debug for UpdateQuery<'a> {
@@ -195,7 +195,7 @@ impl<'a> UpdateQuery<'a> {
     /// Add a callback function for reporting back query progress for long-running queries.
     /// The function will be called with the current page and the total number of pages for
     /// paginated queries.
-    pub fn callback(mut self, fun: impl Fn(u32, u32) -> () + 'a) -> Self {
+    pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
