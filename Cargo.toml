@@ -8,10 +8,10 @@ edition = "2018"
 
 authors = ["Fabio Valentini <decathorpe@gmail.com>"]
 readme = "README.md"
+exclude = ["/tests/", "/.github/", "/rustfmt.toml"]
 categories = ["api-bindings"]
 keywords = ["fedora", "bodhi", "REST", "client"]
 repository = "https://github.com/ironthree/bodhi-rs"
-exclude = ["/tests"]
 
 [features]
 default = ["offline-tests"]
