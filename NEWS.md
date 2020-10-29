@@ -1,3 +1,9 @@
+# Release 0.6.4 "Exclusivity" (October 29, 2020)
+
+This release only contains non-code changes:
+
+- exclude both the `.github` folder and `rustfmt.toml` from published crates
+
 # Release 0.6.3 "Thirty-Four Containers" (Oct. 27, 2020)
 
 Improvements:
