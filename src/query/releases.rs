@@ -104,14 +104,8 @@ impl<'a> ReleaseQuery<'a> {
     }
 
     /// Restrict results to releases with the given ID.
-    ///
-    /// Can be specified multiple times.
-    pub fn ids(mut self, id: &'a str) -> Self {
-        match &mut self.ids {
-            Some(ids) => ids.push(id),
-            None => self.ids = Some(vec![id]),
-        }
-
+    pub fn ids(mut self, ids: &'a [&str]) -> Self {
+        self.ids = Some(ids.to_vec());
         self
     }
 
@@ -123,26 +117,14 @@ impl<'a> ReleaseQuery<'a> {
     }
 
     /// Restrict the returned results to releases containing the given package(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn packages(mut self, package: &'a str) -> Self {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
+    pub fn packages(mut self, packages: &'a [&str]) -> Self {
+        self.packages = Some(packages.to_vec());
         self
     }
 
     /// Restrict the returned results to releases matching the given updates(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn updates(mut self, update: &'a str) -> Self {
-        match &mut self.updates {
-            Some(updates) => updates.push(update),
-            None => self.updates = Some(vec![update]),
-        }
-
+    pub fn updates(mut self, updates: &'a [&str]) -> Self {
+        self.updates = Some(updates.to_vec());
         self
     }
 

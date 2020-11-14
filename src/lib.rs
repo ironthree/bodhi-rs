@@ -30,12 +30,6 @@
 //! as proper `enum` types, and queries that return paginated results are not exposed to users of
 //! this library, but handled completely internally to return a union of all result pages.
 //!
-//! **NOTE**: Some `Query` modifiers can be called multiple times (methods marked with plural
-//! names), and other filters are mutually exclusive and should only be called *once* on a query
-//! (methods marked with singular name). If a filter that only allows one argument is called more
-//! than once, the last supplied argument will override arguments that were supplied to previous
-//! method calls.
-//!
 //! ## Usage
 //!
 //! To query a remote bodhi instance, first construct a

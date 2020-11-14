@@ -77,9 +77,8 @@ impl<'a> Query<Option<Build>> for BuildNVRQuery<'a> {
 /// let builds = bodhi
 ///     .query(
 ///         BuildQuery::new()
-///             .releases(FedoraRelease::F30)
-///             .releases(FedoraRelease::F29)
-///             .packages("rust"),
+///             .releases(&[FedoraRelease::F30, FedoraRelease::F29])
+///             .packages(&["rust"]),
 ///     )
 ///     .unwrap();
 /// ```
@@ -138,38 +137,20 @@ impl<'a> BuildQuery<'a> {
     }
 
     /// Restrict the returned results to builds of the given package(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn packages(mut self, package: &'a str) -> Self {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
+    pub fn packages(mut self, packages: &'a [&str]) -> Self {
+        self.packages = Some(packages.to_vec());
         self
     }
 
     /// Restrict the returned results to builds for the given release(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn releases(mut self, release: FedoraRelease) -> Self {
-        match &mut self.releases {
-            Some(releases) => releases.push(release),
-            None => self.releases = Some(vec![release]),
-        }
-
+    pub fn releases(mut self, releases: &'a [FedoraRelease]) -> Self {
+        self.releases = Some(releases.to_vec());
         self
     }
 
     /// Restrict the returned results to builds for the given update(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn updates(mut self, update: &'a str) -> Self {
-        match &mut self.updates {
-            Some(updates) => updates.push(update),
-            None => self.updates = Some(vec![update]),
-        }
-
+    pub fn updates(mut self, updates: &'a [&str]) -> Self {
+        self.updates = Some(updates.to_vec());
         self
     }
 

@@ -79,7 +79,7 @@ impl Query<Option<Comment>> for CommentIDQuery {
 ///
 /// # #[cfg(feature = "online-tests")]
 /// let comments = bodhi
-///     .query(CommentQuery::new().users("decathorpe").packages("rust"))
+///     .query(CommentQuery::new().users(&["decathorpe"]).packages(&["rust"]))
 ///     .unwrap();
 /// ```
 ///
@@ -152,14 +152,8 @@ impl<'a> CommentQuery<'a> {
     }
 
     /// Restrict results to ignore comments by certain users.
-    ///
-    /// Can be specified multiple times.
-    pub fn ignore_users(mut self, ignore_user: &'a str) -> Self {
-        match &mut self.ignore_users {
-            Some(ignore_users) => ignore_users.push(ignore_user),
-            None => self.ignore_users = Some(vec![ignore_user]),
-        }
-
+    pub fn ignore_users(mut self, ignore_users: &'a [&str]) -> Self {
+        self.ignore_users = Some(ignore_users.to_vec());
         self
     }
 
@@ -170,14 +164,8 @@ impl<'a> CommentQuery<'a> {
     }
 
     /// Restrict the returned results to comments filed against updates for the given package(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn packages(mut self, package: &'a str) -> Self {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
+    pub fn packages(mut self, packages: &'a [&str]) -> Self {
+        self.packages = Some(packages.to_vec());
         self
     }
 
@@ -195,38 +183,20 @@ impl<'a> CommentQuery<'a> {
 
     /// Restrict the returned results to comments filed against updates created by the specified
     /// user(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn update_owners(mut self, update_owner: &'a str) -> Self {
-        match &mut self.update_owners {
-            Some(update_owners) => update_owners.push(update_owner),
-            None => self.update_owners = Some(vec![update_owner]),
-        }
-
+    pub fn update_owners(mut self, update_owners: &'a [&str]) -> Self {
+        self.update_owners = Some(update_owners.to_vec());
         self
     }
 
     /// Restrict the returned results to comments filed against the given update(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn updates(mut self, update: &'a str) -> Self {
-        match &mut self.updates {
-            Some(updates) => updates.push(update),
-            None => self.updates = Some(vec![update]),
-        }
-
+    pub fn updates(mut self, updates: &'a [&str]) -> Self {
+        self.updates = Some(updates.to_vec());
         self
     }
 
     /// Restrict the returned results to comments filed by the given user(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn users(mut self, user: &'a str) -> Self {
-        match &mut self.users {
-            Some(users) => users.push(user),
-            None => self.users = Some(vec![user]),
-        }
-
+    pub fn users(mut self, users: &'a [&str]) -> Self {
+        self.users = Some(users.to_vec());
         self
     }
 

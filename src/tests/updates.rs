@@ -13,7 +13,7 @@ fn query_current() {
     let _: Vec<Update> = bodhi
         .query(
             UpdateQuery::new()
-                .releases(FedoraRelease::Current)
+                .releases(&[FedoraRelease::Current])
                 .submitted_since(&days_ago(2)),
         )
         .unwrap();
@@ -26,7 +26,7 @@ fn query_pending() {
     let _: Vec<Update> = bodhi
         .query(
             UpdateQuery::new()
-                .releases(FedoraRelease::Pending)
+                .releases(&[FedoraRelease::Pending])
                 .submitted_since(&days_ago(1)),
         )
         .unwrap();
@@ -39,7 +39,7 @@ fn query_archived() {
     let _: Vec<Update> = bodhi
         .query(
             UpdateQuery::new()
-                .releases(FedoraRelease::Archived)
+                .releases(&[FedoraRelease::Archived])
                 .submitted_since(&days_ago(30)),
         )
         .unwrap();
@@ -50,18 +50,14 @@ fn query_sanity_aliases() {
     let bodhi = bodhi_init();
 
     let updates_one: Vec<Update> = bodhi
-        .query(UpdateQuery::new().aliases("FEDORA-2019-cf87377f5f"))
+        .query(UpdateQuery::new().aliases(&["FEDORA-2019-cf87377f5f"]))
         .unwrap();
     let updates_two: Vec<Update> = bodhi
-        .query(UpdateQuery::new().aliases("FEDORA-2019-24c9d17287"))
+        .query(UpdateQuery::new().aliases(&["FEDORA-2019-24c9d17287"]))
         .unwrap();
 
     let updates_both: Vec<Update> = bodhi
-        .query(
-            UpdateQuery::new()
-                .aliases("FEDORA-2019-cf87377f5f")
-                .aliases("FEDORA-2019-24c9d17287"),
-        )
+        .query(UpdateQuery::new().aliases(&["FEDORA-2019-cf87377f5f", "FEDORA-2019-24c9d17287"]))
         .unwrap();
 
     assert_eq!(updates_both.len(), updates_one.len() + updates_two.len())
@@ -71,10 +67,10 @@ fn query_sanity_aliases() {
 fn query_sanity_bugs() {
     let bodhi = bodhi_init();
 
-    let updates_one: Vec<Update> = bodhi.query(UpdateQuery::new().bugs(1783602)).unwrap();
-    let updates_two: Vec<Update> = bodhi.query(UpdateQuery::new().bugs(1782383)).unwrap();
+    let updates_one: Vec<Update> = bodhi.query(UpdateQuery::new().bugs(&[1783602])).unwrap();
+    let updates_two: Vec<Update> = bodhi.query(UpdateQuery::new().bugs(&[1782383])).unwrap();
 
-    let updates_both: Vec<Update> = bodhi.query(UpdateQuery::new().bugs(1783602).bugs(1782383)).unwrap();
+    let updates_both: Vec<Update> = bodhi.query(UpdateQuery::new().bugs(&[1783602, 1782383])).unwrap();
 
     assert_eq!(updates_both.len(), updates_one.len() + updates_two.len())
 }
@@ -83,15 +79,11 @@ fn query_sanity_bugs() {
 fn query_sanity_builds() {
     let bodhi = bodhi_init();
 
-    let updates_one: Vec<Update> = bodhi.query(UpdateQuery::new().builds("rust-1.39.0-1.fc31")).unwrap();
-    let updates_two: Vec<Update> = bodhi.query(UpdateQuery::new().builds("rust-1.40.0-1.fc31")).unwrap();
+    let updates_one: Vec<Update> = bodhi.query(UpdateQuery::new().builds(&["rust-1.39.0-1.fc31"])).unwrap();
+    let updates_two: Vec<Update> = bodhi.query(UpdateQuery::new().builds(&["rust-1.40.0-1.fc31"])).unwrap();
 
     let updates_both: Vec<Update> = bodhi
-        .query(
-            UpdateQuery::new()
-                .builds("rust-1.39.0-1.fc31")
-                .builds("rust-1.40.0-1.fc31"),
-        )
+        .query(UpdateQuery::new().builds(&["rust-1.39.0-1.fc31", "rust-1.40.0-1.fc31"]))
         .unwrap();
 
     assert_eq!(updates_both.len(), updates_one.len() + updates_two.len())
@@ -101,11 +93,11 @@ fn query_sanity_builds() {
 fn query_sanity_packages() {
     let bodhi = bodhi_init();
 
-    let updates_one: Vec<Update> = bodhi.query(UpdateQuery::new().packages("granite")).unwrap();
-    let updates_two: Vec<Update> = bodhi.query(UpdateQuery::new().packages("python-tinydb")).unwrap();
+    let updates_one: Vec<Update> = bodhi.query(UpdateQuery::new().packages(&["granite"])).unwrap();
+    let updates_two: Vec<Update> = bodhi.query(UpdateQuery::new().packages(&["python-tinydb"])).unwrap();
 
     let updates_both: Vec<Update> = bodhi
-        .query(UpdateQuery::new().packages("granite").packages("python-tinydb"))
+        .query(UpdateQuery::new().packages(&["granite", "python-tinydb"]))
         .unwrap();
 
     assert_eq!(updates_both.len(), updates_one.len() + updates_two.len())
@@ -115,15 +107,15 @@ fn query_sanity_packages() {
 fn query_sanity_releases() {
     let bodhi = bodhi_init();
 
-    let updates_one: Vec<Update> = bodhi.query(UpdateQuery::new().releases(FedoraRelease::F32C)).unwrap();
-    let updates_two: Vec<Update> = bodhi.query(UpdateQuery::new().releases(FedoraRelease::F31C)).unwrap();
+    let updates_one: Vec<Update> = bodhi
+        .query(UpdateQuery::new().releases(&[FedoraRelease::F32C]))
+        .unwrap();
+    let updates_two: Vec<Update> = bodhi
+        .query(UpdateQuery::new().releases(&[FedoraRelease::F31C]))
+        .unwrap();
 
     let updates_both: Vec<Update> = bodhi
-        .query(
-            UpdateQuery::new()
-                .releases(FedoraRelease::F32C)
-                .releases(FedoraRelease::F31C),
-        )
+        .query(UpdateQuery::new().releases(&[FedoraRelease::F32C, FedoraRelease::F31C]))
         .unwrap();
 
     assert_eq!(updates_both.len(), updates_one.len() + updates_two.len())
@@ -133,12 +125,10 @@ fn query_sanity_releases() {
 fn query_sanity_users() {
     let bodhi = bodhi_init();
 
-    let updates_one: Vec<Update> = bodhi.query(UpdateQuery::new().users("astra")).unwrap();
-    let updates_two: Vec<Update> = bodhi.query(UpdateQuery::new().users("cipherboy")).unwrap();
+    let updates_one: Vec<Update> = bodhi.query(UpdateQuery::new().users(&["astra"])).unwrap();
+    let updates_two: Vec<Update> = bodhi.query(UpdateQuery::new().users(&["cipherboy"])).unwrap();
 
-    let updates_both: Vec<Update> = bodhi
-        .query(UpdateQuery::new().users("astra").users("cipherboy"))
-        .unwrap();
+    let updates_both: Vec<Update> = bodhi.query(UpdateQuery::new().users(&["astra", "cipherboy"])).unwrap();
 
     assert_eq!(updates_both.len(), updates_one.len() + updates_two.len())
 }

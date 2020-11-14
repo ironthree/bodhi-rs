@@ -82,8 +82,8 @@ impl<'a> Query<Option<Update>> for UpdateIDQuery<'a> {
 /// let updates = bodhi
 ///     .query(
 ///         UpdateQuery::new()
-///             .users("decathorpe")
-///             .releases(FedoraRelease::F30)
+///             .users(&["decathorpe"])
+///             .releases(&[FedoraRelease::F30])
 ///             .request(UpdateRequest::Testing),
 ///     )
 ///     .unwrap();
@@ -207,14 +207,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates matching the given alias(es).
-    ///
-    /// Can be specified multiple times.
-    pub fn aliases(mut self, alias: &'a str) -> Self {
-        match &mut self.aliases {
-            Some(aliases) => aliases.push(alias),
-            None => self.aliases = Some(vec![alias]),
-        }
-
+    pub fn aliases(mut self, aliases: &'a [&str]) -> Self {
+        self.aliases = Some(aliases.to_vec());
         self
     }
 
@@ -233,26 +227,14 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates associated with the given bug(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn bugs(mut self, bug: u32) -> Self {
-        match &mut self.bugs {
-            Some(bugs) => bugs.push(bug),
-            None => self.bugs = Some(vec![bug]),
-        }
-
+    pub fn bugs(mut self, bugs: &[u32]) -> Self {
+        self.bugs = Some(bugs.to_vec());
         self
     }
 
     /// Restrict results to updates associated with the given build(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn builds(mut self, build: &'a str) -> Self {
-        match &mut self.builds {
-            Some(builds) => builds.push(build),
-            None => self.builds = Some(vec![build]),
-        }
-
+    pub fn builds(mut self, builds: &'a [&str]) -> Self {
+        self.builds = Some(builds.to_vec());
         self
     }
 
@@ -269,14 +251,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates associated with the given CVE(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn cves(mut self, cve: &'a str) -> Self {
-        match &mut self.cves {
-            Some(cves) => cves.push(cve),
-            None => self.cves = Some(vec![cve]),
-        }
-
+    pub fn cves(mut self, cves: &'a [&str]) -> Self {
+        self.cves = Some(cves.to_vec());
         self
     }
 
@@ -307,14 +283,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates associated for the given package(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn packages(mut self, package: &'a str) -> Self {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
+    pub fn packages(mut self, packages: &'a [&str]) -> Self {
+        self.packages = Some(packages.to_vec());
         self
     }
 
@@ -339,14 +309,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates for the given release(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn releases(mut self, release: FedoraRelease) -> Self {
-        match &mut self.releases {
-            Some(releases) => releases.push(release),
-            None => self.releases = Some(vec![release]),
-        }
-
+    pub fn releases(mut self, releases: &'a [FedoraRelease]) -> Self {
+        self.releases = Some(releases.to_vec());
         self
     }
 
@@ -395,14 +359,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates matching the given update ID(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn update_ids(mut self, update_id: &'a str) -> Self {
-        match &mut self.update_ids {
-            Some(update_ids) => update_ids.push(update_id),
-            None => self.update_ids = Some(vec![update_id]),
-        }
-
+    pub fn update_ids(mut self, update_ids: &'a [&str]) -> Self {
+        self.update_ids = Some(update_ids.to_vec());
         self
     }
 
@@ -413,14 +371,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates associated with the given user(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn users(mut self, user: &'a str) -> Self {
-        match &mut self.users {
-            Some(users) => users.push(user),
-            None => self.users = Some(vec![user]),
-        }
-
+    pub fn users(mut self, users: &'a [&str]) -> Self {
+        self.users = Some(users.to_vec());
         self
     }
 

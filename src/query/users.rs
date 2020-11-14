@@ -78,7 +78,7 @@ impl<'a> Query<Option<User>> for UserNameQuery<'a> {
 /// let bodhi = BodhiServiceBuilder::default().build().unwrap();
 ///
 /// # #[cfg(feature = "online-tests")]
-/// let users = bodhi.query(UserQuery::new().groups("provenpackager")).unwrap();
+/// let users = bodhi.query(UserQuery::new().groups(&["provenpackager"])).unwrap();
 /// ```
 ///
 /// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-1>
@@ -126,14 +126,8 @@ impl<'a> UserQuery<'a> {
     }
 
     /// Restrict the returned results to members of the given group(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn groups(mut self, group: &'a str) -> Self {
-        match &mut self.groups {
-            Some(groups) => groups.push(group),
-            None => self.groups = Some(vec![group]),
-        }
-
+    pub fn groups(mut self, groups: &'a [&str]) -> Self {
+        self.groups = Some(groups.to_vec());
         self
     }
 
@@ -159,14 +153,8 @@ impl<'a> UserQuery<'a> {
     }
 
     /// Restrict the returned results to users associated with the given update(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn updates(mut self, update: &'a str) -> Self {
-        match &mut self.updates {
-            Some(updates) => updates.push(update),
-            None => self.updates = Some(vec![update]),
-        }
-
+    pub fn updates(mut self, updates: &'a [&str]) -> Self {
+        self.updates = Some(updates.to_vec());
         self
     }
 

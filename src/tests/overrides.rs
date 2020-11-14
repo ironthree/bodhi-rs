@@ -6,12 +6,10 @@ use crate::{FedoraRelease, Override, OverrideNVRQuery, OverrideQuery};
 fn query_sanity_packages() {
     let bodhi = bodhi_init();
 
-    let rs_overs: Vec<Override> = bodhi.query(OverrideQuery::new().packages("rust")).unwrap();
-    let go_overs: Vec<Override> = bodhi.query(OverrideQuery::new().packages("golang")).unwrap();
+    let rs_overs: Vec<Override> = bodhi.query(OverrideQuery::new().packages(&["rust"])).unwrap();
+    let go_overs: Vec<Override> = bodhi.query(OverrideQuery::new().packages(&["golang"])).unwrap();
 
-    let both_overs: Vec<Override> = bodhi
-        .query(OverrideQuery::new().packages("rust").packages("golang"))
-        .unwrap();
+    let both_overs: Vec<Override> = bodhi.query(OverrideQuery::new().packages(&["rust", "golang"])).unwrap();
 
     assert_eq!(both_overs.len(), rs_overs.len() + go_overs.len())
 }
@@ -20,15 +18,15 @@ fn query_sanity_packages() {
 fn query_sanity_releases() {
     let bodhi = bodhi_init();
 
-    let f31_overs: Vec<Override> = bodhi.query(OverrideQuery::new().releases(FedoraRelease::F31)).unwrap();
-    let f32_overs: Vec<Override> = bodhi.query(OverrideQuery::new().releases(FedoraRelease::F32)).unwrap();
+    let f31_overs: Vec<Override> = bodhi
+        .query(OverrideQuery::new().releases(&[FedoraRelease::F31]))
+        .unwrap();
+    let f32_overs: Vec<Override> = bodhi
+        .query(OverrideQuery::new().releases(&[FedoraRelease::F32]))
+        .unwrap();
 
     let both_overs: Vec<Override> = bodhi
-        .query(
-            OverrideQuery::new()
-                .releases(FedoraRelease::F31)
-                .releases(FedoraRelease::F32),
-        )
+        .query(OverrideQuery::new().releases(&[FedoraRelease::F31, FedoraRelease::F32]))
         .unwrap();
 
     assert_eq!(both_overs.len(), f31_overs.len() + f32_overs.len())
@@ -38,10 +36,10 @@ fn query_sanity_releases() {
 fn query_sanity_users() {
     let bodhi = bodhi_init();
 
-    let overs_one: Vec<Override> = bodhi.query(OverrideQuery::new().users("gil")).unwrap();
-    let overs_two: Vec<Override> = bodhi.query(OverrideQuery::new().users("lef")).unwrap();
+    let overs_one: Vec<Override> = bodhi.query(OverrideQuery::new().users(&["gil"])).unwrap();
+    let overs_two: Vec<Override> = bodhi.query(OverrideQuery::new().users(&["lef"])).unwrap();
 
-    let both_overs: Vec<Override> = bodhi.query(OverrideQuery::new().users("gil").users("lef")).unwrap();
+    let both_overs: Vec<Override> = bodhi.query(OverrideQuery::new().users(&["gil", "lef"])).unwrap();
 
     assert_eq!(both_overs.len(), overs_one.len() + overs_two.len())
 }

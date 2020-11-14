@@ -3,7 +3,7 @@ name = "bodhi"
 description = "bodhi REST API client"
 license = "MIT OR Apache-2.0"
 
-version = "0.6.4"
+version = "1.0.0-dev"
 edition = "2018"
 
 authors = ["Fabio Valentini <decathorpe@gmail.com>"]

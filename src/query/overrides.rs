@@ -80,7 +80,11 @@ impl<'a> Query<Option<Override>> for OverrideNVRQuery<'a> {
 ///
 /// # #[cfg(feature = "online-tests")]
 /// let overrides = bodhi
-///     .query(OverrideQuery::new().releases(FedoraRelease::F29).users("decathorpe"))
+///     .query(
+///         OverrideQuery::new()
+///             .releases(&[FedoraRelease::F29])
+///             .users(&["decathorpe"]),
+///     )
 ///     .unwrap();
 /// ```
 ///
@@ -134,14 +138,8 @@ impl<'a> OverrideQuery<'a> {
     }
 
     /// Restrict the returned results to overrides for the given build(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn builds(mut self, build: &'a str) -> Self {
-        match &mut self.builds {
-            Some(builds) => builds.push(build),
-            None => self.builds = Some(vec![build]),
-        }
-
+    pub fn builds(mut self, builds: &'a [&str]) -> Self {
+        self.builds = Some(builds.to_vec());
         self
     }
 
@@ -158,26 +156,14 @@ impl<'a> OverrideQuery<'a> {
     }
 
     /// Restrict the returned results to overrides for the given package(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn packages(mut self, package: &'a str) -> Self {
-        match &mut self.packages {
-            Some(packages) => packages.push(package),
-            None => self.packages = Some(vec![package]),
-        }
-
+    pub fn packages(mut self, packages: &'a [&str]) -> Self {
+        self.packages = Some(packages.to_vec());
         self
     }
 
     /// Restrict the returned results to overrides for the given release(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn releases(mut self, release: FedoraRelease) -> Self {
-        match &mut self.releases {
-            Some(releases) => releases.push(release),
-            None => self.releases = Some(vec![release]),
-        }
-
+    pub fn releases(mut self, releases: &[FedoraRelease]) -> Self {
+        self.releases = Some(releases.to_vec());
         self
     }
 
@@ -188,14 +174,8 @@ impl<'a> OverrideQuery<'a> {
     }
 
     /// Restrict the returned results to overrides created by the given user(s).
-    ///
-    /// Can be specified multiple times.
-    pub fn users(mut self, user: &'a str) -> Self {
-        match &mut self.users {
-            Some(users) => users.push(user),
-            None => self.users = Some(vec![user]),
-        }
-
+    pub fn users(mut self, users: &'a [&str]) -> Self {
+        self.users = Some(users.to_vec());
         self
     }
 
