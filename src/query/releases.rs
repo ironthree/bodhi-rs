@@ -104,8 +104,8 @@ impl<'a> ReleaseQuery<'a> {
     }
 
     /// Restrict results to releases with the given ID.
-    pub fn ids(mut self, ids: &'a [&str]) -> Self {
-        self.ids = Some(ids.to_vec());
+    pub fn ids(mut self, ids: Vec<&'a str>) -> Self {
+        self.ids = Some(ids);
         self
     }
 
@@ -117,14 +117,14 @@ impl<'a> ReleaseQuery<'a> {
     }
 
     /// Restrict the returned results to releases containing the given package(s).
-    pub fn packages(mut self, packages: &'a [&str]) -> Self {
-        self.packages = Some(packages.to_vec());
+    pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
+        self.packages = Some(packages);
         self
     }
 
     /// Restrict the returned results to releases matching the given updates(s).
-    pub fn updates(mut self, updates: &'a [&str]) -> Self {
-        self.updates = Some(updates.to_vec());
+    pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
+        self.updates = Some(updates);
         self
     }
 

@@ -79,7 +79,7 @@ impl Query<Option<Comment>> for CommentIDQuery {
 ///
 /// # #[cfg(feature = "online-tests")]
 /// let comments = bodhi
-///     .query(CommentQuery::new().users(&["decathorpe"]).packages(&["rust"]))
+///     .query(CommentQuery::new().users(vec!["decathorpe"]).packages(vec!["rust"]))
 ///     .unwrap();
 /// ```
 ///
@@ -152,8 +152,8 @@ impl<'a> CommentQuery<'a> {
     }
 
     /// Restrict results to ignore comments by certain users.
-    pub fn ignore_users(mut self, ignore_users: &'a [&str]) -> Self {
-        self.ignore_users = Some(ignore_users.to_vec());
+    pub fn ignore_users(mut self, ignore_users: Vec<&'a str>) -> Self {
+        self.ignore_users = Some(ignore_users);
         self
     }
 
@@ -164,8 +164,8 @@ impl<'a> CommentQuery<'a> {
     }
 
     /// Restrict the returned results to comments filed against updates for the given package(s).
-    pub fn packages(mut self, packages: &'a [&str]) -> Self {
-        self.packages = Some(packages.to_vec());
+    pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
+        self.packages = Some(packages);
         self
     }
 
@@ -183,20 +183,20 @@ impl<'a> CommentQuery<'a> {
 
     /// Restrict the returned results to comments filed against updates created by the specified
     /// user(s).
-    pub fn update_owners(mut self, update_owners: &'a [&str]) -> Self {
-        self.update_owners = Some(update_owners.to_vec());
+    pub fn update_owners(mut self, update_owners: Vec<&'a str>) -> Self {
+        self.update_owners = Some(update_owners);
         self
     }
 
     /// Restrict the returned results to comments filed against the given update(s).
-    pub fn updates(mut self, updates: &'a [&str]) -> Self {
-        self.updates = Some(updates.to_vec());
+    pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
+        self.updates = Some(updates);
         self
     }
 
     /// Restrict the returned results to comments filed by the given user(s).
-    pub fn users(mut self, users: &'a [&str]) -> Self {
-        self.users = Some(users.to_vec());
+    pub fn users(mut self, users: Vec<&'a str>) -> Self {
+        self.users = Some(users);
         self
     }
 

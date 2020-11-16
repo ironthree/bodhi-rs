@@ -82,8 +82,8 @@ impl<'a> Query<Option<Override>> for OverrideNVRQuery<'a> {
 /// let overrides = bodhi
 ///     .query(
 ///         OverrideQuery::new()
-///             .releases(&[FedoraRelease::F29])
-///             .users(&["decathorpe"]),
+///             .releases(vec![FedoraRelease::F29])
+///             .users(vec!["decathorpe"]),
 ///     )
 ///     .unwrap();
 /// ```
@@ -138,8 +138,8 @@ impl<'a> OverrideQuery<'a> {
     }
 
     /// Restrict the returned results to overrides for the given build(s).
-    pub fn builds(mut self, builds: &'a [&str]) -> Self {
-        self.builds = Some(builds.to_vec());
+    pub fn builds(mut self, builds: Vec<&'a str>) -> Self {
+        self.builds = Some(builds);
         self
     }
 
@@ -156,14 +156,14 @@ impl<'a> OverrideQuery<'a> {
     }
 
     /// Restrict the returned results to overrides for the given package(s).
-    pub fn packages(mut self, packages: &'a [&str]) -> Self {
-        self.packages = Some(packages.to_vec());
+    pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
+        self.packages = Some(packages);
         self
     }
 
     /// Restrict the returned results to overrides for the given release(s).
-    pub fn releases(mut self, releases: &[FedoraRelease]) -> Self {
-        self.releases = Some(releases.to_vec());
+    pub fn releases(mut self, releases: Vec<FedoraRelease>) -> Self {
+        self.releases = Some(releases);
         self
     }
 
@@ -174,8 +174,8 @@ impl<'a> OverrideQuery<'a> {
     }
 
     /// Restrict the returned results to overrides created by the given user(s).
-    pub fn users(mut self, users: &'a [&str]) -> Self {
-        self.users = Some(users.to_vec());
+    pub fn users(mut self, users: Vec<&'a str>) -> Self {
+        self.users = Some(users);
         self
     }
 

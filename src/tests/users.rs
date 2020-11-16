@@ -7,14 +7,14 @@ fn query_sanity_updates() {
     let bodhi = bodhi_init();
 
     let users_one: Vec<User> = bodhi
-        .query(UserQuery::new().updates(&["FEDORA-2019-ac2a21ff07"]))
+        .query(UserQuery::new().updates(vec!["FEDORA-2019-ac2a21ff07"]))
         .unwrap();
     let users_two: Vec<User> = bodhi
-        .query(UserQuery::new().updates(&["FEDORA-2019-ac3dc27f26"]))
+        .query(UserQuery::new().updates(vec!["FEDORA-2019-ac3dc27f26"]))
         .unwrap();
 
     let users_both: Vec<User> = bodhi
-        .query(UserQuery::new().updates(&["FEDORA-2019-ac2a21ff07", "FEDORA-2019-ac3dc27f26"]))
+        .query(UserQuery::new().updates(vec!["FEDORA-2019-ac2a21ff07", "FEDORA-2019-ac3dc27f26"]))
         .unwrap();
 
     assert_eq!(users_both.len(), users_one.len() + users_two.len())

@@ -77,8 +77,8 @@ impl<'a> Query<Option<Build>> for BuildNVRQuery<'a> {
 /// let builds = bodhi
 ///     .query(
 ///         BuildQuery::new()
-///             .releases(&[FedoraRelease::F30, FedoraRelease::F29])
-///             .packages(&["rust"]),
+///             .releases(vec![FedoraRelease::F30, FedoraRelease::F29])
+///             .packages(vec!["rust"]),
 ///     )
 ///     .unwrap();
 /// ```
@@ -137,20 +137,20 @@ impl<'a> BuildQuery<'a> {
     }
 
     /// Restrict the returned results to builds of the given package(s).
-    pub fn packages(mut self, packages: &'a [&str]) -> Self {
-        self.packages = Some(packages.to_vec());
+    pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
+        self.packages = Some(packages);
         self
     }
 
     /// Restrict the returned results to builds for the given release(s).
-    pub fn releases(mut self, releases: &'a [FedoraRelease]) -> Self {
-        self.releases = Some(releases.to_vec());
+    pub fn releases(mut self, releases: Vec<FedoraRelease>) -> Self {
+        self.releases = Some(releases);
         self
     }
 
     /// Restrict the returned results to builds for the given update(s).
-    pub fn updates(mut self, updates: &'a [&str]) -> Self {
-        self.updates = Some(updates.to_vec());
+    pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
+        self.updates = Some(updates);
         self
     }
 

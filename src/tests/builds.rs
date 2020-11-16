@@ -6,10 +6,10 @@ use crate::{Build, BuildNVRQuery, BuildQuery, FedoraRelease};
 fn query_sanity_packages() {
     let bodhi = bodhi_init();
 
-    let rs_builds: Vec<Build> = bodhi.query(BuildQuery::new().packages(&["rust"])).unwrap();
-    let go_builds: Vec<Build> = bodhi.query(BuildQuery::new().packages(&["golang"])).unwrap();
+    let rs_builds: Vec<Build> = bodhi.query(BuildQuery::new().packages(vec!["rust"])).unwrap();
+    let go_builds: Vec<Build> = bodhi.query(BuildQuery::new().packages(vec!["golang"])).unwrap();
 
-    let both_builds: Vec<Build> = bodhi.query(BuildQuery::new().packages(&["rust", "golang"])).unwrap();
+    let both_builds: Vec<Build> = bodhi.query(BuildQuery::new().packages(vec!["rust", "golang"])).unwrap();
 
     assert_eq!(both_builds.len(), rs_builds.len() + go_builds.len())
 }
@@ -18,11 +18,15 @@ fn query_sanity_packages() {
 fn query_sanity_releases() {
     let bodhi = bodhi_init();
 
-    let f31c_builds: Vec<Build> = bodhi.query(BuildQuery::new().releases(&[FedoraRelease::F31C])).unwrap();
-    let f30c_builds: Vec<Build> = bodhi.query(BuildQuery::new().releases(&[FedoraRelease::F30C])).unwrap();
+    let f31c_builds: Vec<Build> = bodhi
+        .query(BuildQuery::new().releases(vec![FedoraRelease::F31C]))
+        .unwrap();
+    let f30c_builds: Vec<Build> = bodhi
+        .query(BuildQuery::new().releases(vec![FedoraRelease::F30C]))
+        .unwrap();
 
     let both_builds: Vec<Build> = bodhi
-        .query(BuildQuery::new().releases(&[FedoraRelease::F31C, FedoraRelease::F30C]))
+        .query(BuildQuery::new().releases(vec![FedoraRelease::F31C, FedoraRelease::F30C]))
         .unwrap();
 
     assert_eq!(both_builds.len(), f31c_builds.len() + f30c_builds.len())
@@ -33,14 +37,14 @@ fn query_sanity_updates() {
     let bodhi = bodhi_init();
 
     let builds_one: Vec<Build> = bodhi
-        .query(BuildQuery::new().updates(&["FEDORA-2019-cf87377f5f"]))
+        .query(BuildQuery::new().updates(vec!["FEDORA-2019-cf87377f5f"]))
         .unwrap();
     let builds_two: Vec<Build> = bodhi
-        .query(BuildQuery::new().updates(&["FEDORA-2019-24c9d17287"]))
+        .query(BuildQuery::new().updates(vec!["FEDORA-2019-24c9d17287"]))
         .unwrap();
 
     let both_builds: Vec<Build> = bodhi
-        .query(BuildQuery::new().updates(&["FEDORA-2019-cf87377f5f", "FEDORA-2019-24c9d17287"]))
+        .query(BuildQuery::new().updates(vec!["FEDORA-2019-cf87377f5f", "FEDORA-2019-24c9d17287"]))
         .unwrap();
 
     assert_eq!(both_builds.len(), builds_one.len() + builds_two.len())

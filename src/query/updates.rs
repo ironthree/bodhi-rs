@@ -82,8 +82,8 @@ impl<'a> Query<Option<Update>> for UpdateIDQuery<'a> {
 /// let updates = bodhi
 ///     .query(
 ///         UpdateQuery::new()
-///             .users(&["decathorpe"])
-///             .releases(&[FedoraRelease::F30])
+///             .users(vec!["decathorpe"])
+///             .releases(vec![FedoraRelease::F30])
 ///             .request(UpdateRequest::Testing),
 ///     )
 ///     .unwrap();
@@ -207,8 +207,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates matching the given alias(es).
-    pub fn aliases(mut self, aliases: &'a [&str]) -> Self {
-        self.aliases = Some(aliases.to_vec());
+    pub fn aliases(mut self, aliases: Vec<&'a str>) -> Self {
+        self.aliases = Some(aliases);
         self
     }
 
@@ -227,14 +227,14 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates associated with the given bug(s).
-    pub fn bugs(mut self, bugs: &[u32]) -> Self {
-        self.bugs = Some(bugs.to_vec());
+    pub fn bugs(mut self, bugs: Vec<u32>) -> Self {
+        self.bugs = Some(bugs);
         self
     }
 
     /// Restrict results to updates associated with the given build(s).
-    pub fn builds(mut self, builds: &'a [&str]) -> Self {
-        self.builds = Some(builds.to_vec());
+    pub fn builds(mut self, builds: Vec<&'a str>) -> Self {
+        self.builds = Some(builds);
         self
     }
 
@@ -251,8 +251,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates associated with the given CVE(s).
-    pub fn cves(mut self, cves: &'a [&str]) -> Self {
-        self.cves = Some(cves.to_vec());
+    pub fn cves(mut self, cves: Vec<&'a str>) -> Self {
+        self.cves = Some(cves);
         self
     }
 
@@ -283,8 +283,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates associated for the given package(s).
-    pub fn packages(mut self, packages: &'a [&str]) -> Self {
-        self.packages = Some(packages.to_vec());
+    pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
+        self.packages = Some(packages);
         self
     }
 
@@ -309,8 +309,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates for the given release(s).
-    pub fn releases(mut self, releases: &'a [FedoraRelease]) -> Self {
-        self.releases = Some(releases.to_vec());
+    pub fn releases(mut self, releases: Vec<FedoraRelease>) -> Self {
+        self.releases = Some(releases);
         self
     }
 
@@ -359,8 +359,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates matching the given update ID(s).
-    pub fn update_ids(mut self, update_ids: &'a [&str]) -> Self {
-        self.update_ids = Some(update_ids.to_vec());
+    pub fn update_ids(mut self, update_ids: Vec<&'a str>) -> Self {
+        self.update_ids = Some(update_ids);
         self
     }
 
@@ -371,8 +371,8 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Restrict results to updates associated with the given user(s).
-    pub fn users(mut self, users: &'a [&str]) -> Self {
-        self.users = Some(users.to_vec());
+    pub fn users(mut self, users: Vec<&'a str>) -> Self {
+        self.users = Some(users);
         self
     }
 
