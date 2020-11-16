@@ -5,6 +5,7 @@ import json
 import os
 import threading
 import time
+from typing import List
 
 import requests
 
@@ -76,7 +77,6 @@ ACTIVE_RELEASES = [
 
 # change this to "ALL_RELEASES" regenerate data for archived releases as well
 RELEASES = ACTIVE_RELEASES
-RELEASES = ["F34C"]
 
 
 class RetryError(Exception):
@@ -105,6 +105,7 @@ def retry(message: str = None, times: int = None, delay: int = 0):
 
                     if message is not None:
                         print(message, end="", flush=True)
+                        print(f"{f.__name__}({args}, {kwargs})", flush=True)
                     if delay != 0:
                         time.sleep(delay)
             raise RetryError("Tried {} times, but failed.".format(times))
@@ -115,8 +116,10 @@ def retry(message: str = None, times: int = None, delay: int = 0):
 
 
 @retry(message="A request failed or timed out, retrying ...\n", times=None, delay=60)
-def try_request(url: str):
+def try_request(url: str, expected_keys: List[str]):
     ret = requests.get(url, timeout=120).json()
+    for key in expected_keys:
+        assert key in ret.keys()
     return ret
 
 
@@ -128,7 +131,10 @@ def do_builds() -> int:
 
         while True:
             print(f"Builds: {release} page {page} / {pages}")
-            data = try_request(f"{API_URL}/builds/?releases={release}&rows_per_page=100&page={page}")
+            data = try_request(
+                f"{API_URL}/builds/?releases={release}&rows_per_page=100&page={page}",
+                ["builds", "pages"]
+            )
 
             builds.extend(data["builds"])
 
@@ -155,17 +161,15 @@ def do_builds() -> int:
 
 
 def do_comments() -> int:
-    pages = try_request(f"{API_URL}/comments/?rows_per_page=100&page=1")["pages"]
+    pages = try_request(f"{API_URL}/comments/?rows_per_page=50&page=1", ["pages"])["pages"]
     cpages = range(1, pages + 1)
 
     def per_page(page: int):
-        time.sleep(5)
-
         print(f"Comments: page {page} / {pages}")
-        data = try_request(f"{API_URL}/comments/?rows_per_page=100&page={page}")
+        data = try_request(f"{API_URL}/comments/?rows_per_page=50&page={page}", ["comments"])
 
-        with open(f"data/comments_p{page}.json", "w") as file:
-            file.write(json.dumps(data["comments"], indent=2))
+        with open(f"data/comments_p{page}.json", "w") as jfile:
+            jfile.write(json.dumps(data["comments"], indent=2))
 
     threads = []
     for cpage in cpages:
@@ -174,7 +178,7 @@ def do_comments() -> int:
         thread.start()
 
         # do not DOS bodhi
-        time.sleep(5)
+        time.sleep(0.5)
 
     for thread in threads:
         thread.join()
@@ -193,7 +197,7 @@ def do_comments() -> int:
 
 def do_composes() -> int:
     print(f"Composes ...")
-    data = try_request(f"{API_URL}/composes/")
+    data = try_request(f"{API_URL}/composes/", ["composes"])
 
     new_composes = data["composes"]
 
@@ -220,7 +224,10 @@ def do_overrides() -> int:
 
         while True:
             print(f"Overrides: {release} page {page} / {pages}")
-            data = try_request(f"{API_URL}/overrides/?releases={release}&rows_per_page=25&page={page}")
+            data = try_request(
+                f"{API_URL}/overrides/?releases={release}&rows_per_page=25&page={page}",
+                ["overrides", "pages"]
+            )
 
             overrides.extend(data["overrides"])
 
@@ -253,7 +260,7 @@ def do_packages() -> int:
 
     while True:
         print(f"Packages: page {page} / {pages}")
-        data = try_request(f"{API_URL}/packages/?rows_per_page=100&page={page}")
+        data = try_request(f"{API_URL}/packages/?rows_per_page=100&page={page}", ["packages", "pages"])
 
         packages.extend(data["packages"])
 
@@ -275,7 +282,7 @@ def do_releases() -> int:
 
     while True:
         print(f"Releases: page {page} / {pages}")
-        data = try_request(f"{API_URL}/releases/?rows_per_page=100&page={page}")
+        data = try_request(f"{API_URL}/releases/?rows_per_page=100&page={page}", ["releases", "pages"])
 
         releases.extend(data["releases"])
 
@@ -298,7 +305,10 @@ def do_updates() -> int:
 
         while True:
             print(f"Updates: {release} page {page} / {pages}")
-            data = try_request(f"{API_URL}/updates/?releases={release}&rows_per_page=10&page={page}")
+            data = try_request(
+                f"{API_URL}/updates/?releases={release}&rows_per_page=10&page={page}",
+                ["updates", "pages"]
+            )
 
             updates.extend(data["updates"])
 
@@ -331,7 +341,7 @@ def do_users() -> int:
 
     while True:
         print(f"Users: page {page} / {pages}")
-        data = try_request(f"{API_URL}/users/?rows_per_page=100&page={page}")
+        data = try_request(f"{API_URL}/users/?rows_per_page=100&page={page}", ["users", "pages"])
 
         users.extend(data["users"])
 
