@@ -1,3 +1,13 @@
+# Release 1.0.0 "Stability" (November 16, 2020)
+
+This is the first "stable" release of bodhi-rs.
+
+Compared to 0.6.4, it brings only some minor API changes, primarily to no longer
+hide some Vec allocations, which allows to write more efficient code in some
+situations: Query arguments that allow multiple arguments now take a Vec of
+values directly instead of being callable multiple times. Of course, all
+examples and tests were adapted to reflect this change.
+
 # Release 0.6.4 "Exclusivity" (October 29, 2020)
 
 This release only contains non-code changes:
