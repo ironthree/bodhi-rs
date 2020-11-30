@@ -162,7 +162,12 @@ def do_builds() -> int:
 
 def do_comments() -> int:
     pages = try_request(f"{API_URL}/comments/?rows_per_page=50&page=1", ["pages"])["pages"]
-    cpages = range(1, pages + 1)
+    cpages = list(range(1, pages + 1))
+
+    # querying these pages crashes bodhi
+    skip_pages = [129, 130, 131, 134, 135]
+    for p in skip_pages:
+        cpages.remove(p)
 
     def per_page(page: int):
         print(f"Comments: page {page} / {pages}")
