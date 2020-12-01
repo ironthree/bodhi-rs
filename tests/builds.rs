@@ -50,13 +50,16 @@ const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_e
 fn builds_dejson_f34() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F34).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -64,13 +67,16 @@ fn builds_dejson_f34() {
 fn builds_dejson_f34c() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F34C).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -78,13 +84,16 @@ fn builds_dejson_f34c() {
 fn builds_dejson_f33() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -92,13 +101,16 @@ fn builds_dejson_f33() {
 fn builds_dejson_f33c() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33C).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -106,13 +118,16 @@ fn builds_dejson_f33c() {
 fn builds_dejson_f33f() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33F).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -120,13 +135,16 @@ fn builds_dejson_f33f() {
 fn builds_dejson_f33m() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F33M).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -134,13 +152,16 @@ fn builds_dejson_f33m() {
 fn builds_dejson_f32() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -148,13 +169,16 @@ fn builds_dejson_f32() {
 fn builds_dejson_f32c() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32C).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -162,13 +186,16 @@ fn builds_dejson_f32c() {
 fn builds_dejson_f32f() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32F).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -176,13 +203,16 @@ fn builds_dejson_f32f() {
 fn builds_dejson_f32m() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F32M).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -190,13 +220,16 @@ fn builds_dejson_f32m() {
 fn builds_dejson_f31() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -204,13 +237,16 @@ fn builds_dejson_f31() {
 fn builds_dejson_f31c() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31C).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -218,13 +254,16 @@ fn builds_dejson_f31c() {
 fn builds_dejson_f31f() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31F).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -232,13 +271,16 @@ fn builds_dejson_f31f() {
 fn builds_dejson_f31m() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F31M).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -246,13 +288,16 @@ fn builds_dejson_f31m() {
 fn builds_dejson_f30() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -260,13 +305,16 @@ fn builds_dejson_f30() {
 fn builds_dejson_f30c() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30C).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -274,13 +322,16 @@ fn builds_dejson_f30c() {
 fn builds_dejson_f30f() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30F).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -288,13 +339,16 @@ fn builds_dejson_f30f() {
 fn builds_dejson_f30m() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F30M).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -302,13 +356,16 @@ fn builds_dejson_f30m() {
 fn builds_dejson_f29() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -316,13 +373,16 @@ fn builds_dejson_f29() {
 fn builds_dejson_f29c() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29C).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -330,13 +390,16 @@ fn builds_dejson_f29c() {
 fn builds_dejson_f29f() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29F).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -344,13 +407,16 @@ fn builds_dejson_f29f() {
 fn builds_dejson_f29m() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F29M).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -358,13 +424,16 @@ fn builds_dejson_f29m() {
 fn builds_dejson_f28() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F28).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -372,13 +441,16 @@ fn builds_dejson_f28() {
 fn builds_dejson_f28c() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F28C).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -386,13 +458,16 @@ fn builds_dejson_f28c() {
 fn builds_dejson_f28m() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F28M).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -400,13 +475,16 @@ fn builds_dejson_f28m() {
 fn builds_dejson_f27() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F27).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -414,13 +492,16 @@ fn builds_dejson_f27() {
 fn builds_dejson_f27m() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F27M).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -428,13 +509,16 @@ fn builds_dejson_f27m() {
 fn builds_dejson_f26() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F26).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -442,13 +526,16 @@ fn builds_dejson_f26() {
 fn builds_dejson_f25() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F25).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -456,13 +543,16 @@ fn builds_dejson_f25() {
 fn builds_dejson_f24() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F24).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -470,13 +560,16 @@ fn builds_dejson_f24() {
 fn builds_dejson_f23() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F23).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -484,13 +577,16 @@ fn builds_dejson_f23() {
 fn builds_dejson_f22() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F22).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -498,13 +594,16 @@ fn builds_dejson_f22() {
 fn builds_dejson_f21() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F21).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -512,13 +611,16 @@ fn builds_dejson_f21() {
 fn builds_dejson_epel8() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL8).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -526,13 +628,16 @@ fn builds_dejson_epel8() {
 fn builds_dejson_epel8m() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL8M).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -540,13 +645,16 @@ fn builds_dejson_epel8m() {
 fn builds_dejson_epel7() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL7).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -554,13 +662,16 @@ fn builds_dejson_epel7() {
 fn builds_dejson_el6() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EL6).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -568,13 +679,16 @@ fn builds_dejson_el6() {
 fn builds_dejson_el5() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EL5).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }
 
 #[cfg(feature = "data-tests")]
@@ -582,11 +696,14 @@ fn builds_dejson_el5() {
 fn builds_dejson_eln() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_ELN).unwrap()).unwrap();
 
-    for build in builds {
+    for build in &builds {
         if !build.extra.is_empty() {
             println!("{:#?}", build.extra);
         }
 
         assert!(build.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!builds.iter().all(|b| b.release_id.is_none()));
 }

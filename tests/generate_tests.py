@@ -56,13 +56,16 @@ def do_builds():
         fn builds_dejson_{release_lower}() {{
             let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
 
-            for build in builds {{
+            for build in &builds {{
                 if !build.extra.is_empty() {{
                     println!("{{:#?}}", build.extra);
                 }}
         
                 assert!(build.extra.is_empty());
             }}
+
+            // check if an optional field is no longer present
+            assert!(!builds.iter().all(|b| b.release_id.is_none()));
         }}
         """
     )
@@ -90,13 +93,16 @@ def do_comments():
         fn comments_dejson() {
             let comments: Vec<Comment> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
 
-            for comment in comments {
+            for comment in &comments {
                 if !comment.extra.is_empty() {
                     println!("{:#?}", comment.extra);
                 }
         
                 assert!(comment.extra.is_empty());
             }
+
+            // check if an optional field is no longer present
+            assert!(!comments.iter().all(|c| c.update.is_none()));
         }
         """
     )
@@ -124,13 +130,18 @@ def do_composes():
         fn composes_dejson() {
             let composes: Vec<Compose> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
 
-            for compose in composes {
+            for compose in &composes {
                 if !compose.extra.is_empty() {
                     println!("{:#?}", compose.extra);
                 }
 
                 assert!(compose.extra.is_empty());
             }
+
+            // check if an optional field is no longer present
+            assert!(!composes.iter().all(|c| c.content_type.is_none()));
+            assert!(!composes.iter().all(|c| c.error_message.is_none()));
+            assert!(!composes.iter().all(|c| c.release.is_none()));
         }
         """
     )
@@ -158,12 +169,17 @@ def do_overrides():
         fn overrides_dejson_{release_lower}() {{
             let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
 
-            for o in os {{
+            for o in &os {{
                 if !o.extra.is_empty() {{
                     println!("{{:#?}}", o.extra);
                 }}
         
                 assert!(o.extra.is_empty());
+            }}
+
+            // check if an optional field is no longer present
+            if !os.is_empty() {{
+                assert!(!os.iter().all(|o| o.expired_date.is_none()));
             }}
         }}
         """
@@ -192,7 +208,7 @@ def do_packages():
         fn packages_dejson() {
             let packages: Vec<Package> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
 
-            for package in packages {
+            for package in &packages {
                 if !package.extra.is_empty() {
                     println!("{:#?}", package.extra);
                 }
@@ -226,13 +242,18 @@ def do_releases():
         fn releases_dejson() {
             let releases: Vec<Release> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
 
-            for release in releases {
+            for release in &releases {
                 if !release.extra.is_empty() {
                     println!("{:#?}", release.extra);
                 }
 
                 assert!(release.extra.is_empty());
             }
+
+            // check if an optional field is no longer present
+            assert!(!releases.iter().all(|r| r.composes.is_none()));
+            assert!(!releases.iter().all(|r| r.create_automatic_updates.is_none()));
+            assert!(!releases.iter().all(|r| r.testing_repository.is_none()));
         }
         """
     )
@@ -260,13 +281,29 @@ def do_updates():
         fn updates_dejson_{release_lower}() {{
             let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_{release}).unwrap()).unwrap();
 
-            for update in updates {{
+            for update in &updates {{
                 if !update.extra.is_empty() {{
                     println!("{{:#?}}", update.extra);
                 }}
         
                 assert!(update.extra.is_empty());
             }}
+
+            // check if an optional field is no longer present
+            assert!(!updates.iter().all(|u| u.comments.is_none()));
+            assert!(!updates.iter().all(|u| u.content_type.is_none()));
+            //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
+            //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
+            assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+            //assert!(!updates.iter().all(|u| u.date_stable.is_none())); // fails for F27M
+            assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
+            assert!(!updates.iter().all(|u| u.date_testing.is_none()));
+            assert!(!updates.iter().all(|u| u.karma.is_none()));
+            assert!(!updates.iter().all(|u| u.requirements.is_none()));
+            assert!(!updates.iter().all(|u| u.stable_days.is_none()));
+            assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
+            assert!(!updates.iter().all(|u| u.test_cases.is_none()));
+            assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
         }}
         """
     )
@@ -294,13 +331,18 @@ def do_users():
         fn users_dejson() {
             let users: Vec<User> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
 
-            for user in users {
+            for user in &users {
                 if !user.extra.is_empty() {
                     println!("{:#?}", user.extra);
                 }
 
                 assert!(user.extra.is_empty());
             }
+
+            // check if an optional field is no longer present
+            assert!(!users.iter().all(|u| u.avatar.is_none()));
+            assert!(!users.iter().all(|u| u.email.is_none()));
+            assert!(!users.iter().all(|u| u.openid.is_none()));
         }
         """
     )

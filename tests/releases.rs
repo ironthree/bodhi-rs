@@ -12,11 +12,16 @@ const JSON: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/releases.jso
 fn releases_dejson() {
     let releases: Vec<Release> = serde_json::from_str(&read_to_string(JSON).unwrap()).unwrap();
 
-    for release in releases {
+    for release in &releases {
         if !release.extra.is_empty() {
             println!("{:#?}", release.extra);
         }
 
         assert!(release.extra.is_empty());
     }
+
+    // check if an optional field is no longer present
+    assert!(!releases.iter().all(|r| r.composes.is_none()));
+    assert!(!releases.iter().all(|r| r.create_automatic_updates.is_none()));
+    assert!(!releases.iter().all(|r| r.testing_repository.is_none()));
 }

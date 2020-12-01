@@ -50,12 +50,17 @@ const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/override
 fn overrides_dejson_f34() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F34).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -64,12 +69,17 @@ fn overrides_dejson_f34() {
 fn overrides_dejson_f34c() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F34C).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -78,12 +88,17 @@ fn overrides_dejson_f34c() {
 fn overrides_dejson_f33() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F33).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -92,12 +107,17 @@ fn overrides_dejson_f33() {
 fn overrides_dejson_f33c() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F33C).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -106,12 +126,17 @@ fn overrides_dejson_f33c() {
 fn overrides_dejson_f33f() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F33F).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -120,12 +145,17 @@ fn overrides_dejson_f33f() {
 fn overrides_dejson_f33m() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F33M).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -134,12 +164,17 @@ fn overrides_dejson_f33m() {
 fn overrides_dejson_f32() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F32).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -148,12 +183,17 @@ fn overrides_dejson_f32() {
 fn overrides_dejson_f32c() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F32C).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -162,12 +202,17 @@ fn overrides_dejson_f32c() {
 fn overrides_dejson_f32f() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F32F).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -176,12 +221,17 @@ fn overrides_dejson_f32f() {
 fn overrides_dejson_f32m() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F32M).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -190,12 +240,17 @@ fn overrides_dejson_f32m() {
 fn overrides_dejson_f31() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F31).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -204,12 +259,17 @@ fn overrides_dejson_f31() {
 fn overrides_dejson_f31c() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F31C).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -218,12 +278,17 @@ fn overrides_dejson_f31c() {
 fn overrides_dejson_f31f() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F31F).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -232,12 +297,17 @@ fn overrides_dejson_f31f() {
 fn overrides_dejson_f31m() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F31M).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -246,12 +316,17 @@ fn overrides_dejson_f31m() {
 fn overrides_dejson_f30() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F30).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -260,12 +335,17 @@ fn overrides_dejson_f30() {
 fn overrides_dejson_f30c() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F30C).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -274,12 +354,17 @@ fn overrides_dejson_f30c() {
 fn overrides_dejson_f30f() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F30F).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -288,12 +373,17 @@ fn overrides_dejson_f30f() {
 fn overrides_dejson_f30m() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F30M).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -302,12 +392,17 @@ fn overrides_dejson_f30m() {
 fn overrides_dejson_f29() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F29).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -316,12 +411,17 @@ fn overrides_dejson_f29() {
 fn overrides_dejson_f29c() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F29C).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -330,12 +430,17 @@ fn overrides_dejson_f29c() {
 fn overrides_dejson_f29f() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F29F).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -344,12 +449,17 @@ fn overrides_dejson_f29f() {
 fn overrides_dejson_f29m() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F29M).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -358,12 +468,17 @@ fn overrides_dejson_f29m() {
 fn overrides_dejson_f28() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F28).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -372,12 +487,17 @@ fn overrides_dejson_f28() {
 fn overrides_dejson_f28c() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F28C).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -386,12 +506,17 @@ fn overrides_dejson_f28c() {
 fn overrides_dejson_f28m() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F28M).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -400,12 +525,17 @@ fn overrides_dejson_f28m() {
 fn overrides_dejson_f27() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F27).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -414,12 +544,17 @@ fn overrides_dejson_f27() {
 fn overrides_dejson_f27m() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F27M).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -428,12 +563,17 @@ fn overrides_dejson_f27m() {
 fn overrides_dejson_f26() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F26).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -442,12 +582,17 @@ fn overrides_dejson_f26() {
 fn overrides_dejson_f25() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F25).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -456,12 +601,17 @@ fn overrides_dejson_f25() {
 fn overrides_dejson_f24() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F24).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -470,12 +620,17 @@ fn overrides_dejson_f24() {
 fn overrides_dejson_f23() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F23).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -484,12 +639,17 @@ fn overrides_dejson_f23() {
 fn overrides_dejson_f22() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F22).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -498,12 +658,17 @@ fn overrides_dejson_f22() {
 fn overrides_dejson_f21() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F21).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -512,12 +677,17 @@ fn overrides_dejson_f21() {
 fn overrides_dejson_epel8() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EPEL8).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -526,12 +696,17 @@ fn overrides_dejson_epel8() {
 fn overrides_dejson_epel8m() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EPEL8M).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -540,12 +715,17 @@ fn overrides_dejson_epel8m() {
 fn overrides_dejson_epel7() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EPEL7).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -554,12 +734,17 @@ fn overrides_dejson_epel7() {
 fn overrides_dejson_el6() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EL6).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -568,12 +753,17 @@ fn overrides_dejson_el6() {
 fn overrides_dejson_el5() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EL5).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }
 
@@ -582,11 +772,16 @@ fn overrides_dejson_el5() {
 fn overrides_dejson_eln() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_ELN).unwrap()).unwrap();
 
-    for o in os {
+    for o in &os {
         if !o.extra.is_empty() {
             println!("{:#?}", o.extra);
         }
 
         assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
     }
 }

@@ -64,10 +64,6 @@ ACTIVE_RELEASES = [
     "F32C",
     "F32F",
     "F32M",
-    "F31",
-    "F31C",
-    "F31F",
-    "F31M",
     "EPEL-8",
     "EPEL-8M",
     "EPEL-7",
@@ -153,6 +149,7 @@ def do_builds() -> int:
         thread = threading.Thread(name=f"builds-{rel}", target=per_release, args=(rel,))
         threads.append(thread)
         thread.start()
+        time.sleep(120)
 
     for thread in threads:
         thread.join()
@@ -163,11 +160,6 @@ def do_builds() -> int:
 def do_comments() -> int:
     pages = try_request(f"{API_URL}/comments/?rows_per_page=50&page=1", ["pages"])["pages"]
     cpages = list(range(1, pages + 1))
-
-    # querying these pages crashes bodhi
-    skip_pages = [129, 130, 131, 134, 135]
-    for p in skip_pages:
-        cpages.remove(p)
 
     def per_page(page: int):
         print(f"Comments: page {page} / {pages}")
@@ -183,7 +175,7 @@ def do_comments() -> int:
         thread.start()
 
         # do not DOS bodhi
-        time.sleep(0.5)
+        time.sleep(1)
 
     for thread in threads:
         thread.join()
@@ -251,6 +243,7 @@ def do_overrides() -> int:
         thread = threading.Thread(name=f"overrides-{rel}", target=per_release, args=(rel,))
         threads.append(thread)
         thread.start()
+        time.sleep(300)
 
     for thread in threads:
         thread.join()
@@ -332,6 +325,7 @@ def do_updates() -> int:
         thread = threading.Thread(name=f"updates-{rel}", target=per_release, args=(rel,))
         threads.append(thread)
         thread.start()
+        time.sleep(600)
 
     for thread in threads:
         thread.join()
