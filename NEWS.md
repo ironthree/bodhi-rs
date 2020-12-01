@@ -1,3 +1,10 @@
+# Release 1.0.1 "Tranquility" (November 30, 2020)
+
+This is a routine update with no user-facing changes.
+
+The attached test data for offline tests contains a data dump of the Fedora
+bodhi instance from Nov. 30, 2020, just after the fedora 31 EOL date.
+
 # Release 1.0.0 "Stability" (November 16, 2020)
 
 This is the first "stable" release of bodhi-rs.
