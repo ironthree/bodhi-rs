@@ -25,7 +25,6 @@ data-tests = []
 
 [dependencies]
 chrono = { version = "^0.4.10", features = ["serde"] }
-failure = "^0.1.6"
 fedora = "^0.2.1"
 reqwest = { version = "^0.10.0", features = ["blocking", "cookies"] }
 retry = "^1.0.0"
@@ -33,6 +32,7 @@ serde = { version = "^1.0.104", features = ["derive"] }
 serde_repr = "^0.1.5"
 serde_json = "^1.0.44"
 serde_url_params = "^0.2.0"
+thiserror = "^1.0"
 url = "^2.1.0"
 
 [dev-dependencies]

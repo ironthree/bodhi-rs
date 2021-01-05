@@ -4,7 +4,6 @@
 use std::fmt::{Debug, Formatter};
 use std::time::Duration;
 
-use failure::Fail;
 use fedora::{AnonymousSessionBuilder, OpenIDSessionBuilder, Session};
 use reqwest::blocking::Response;
 use url::Url;
@@ -75,24 +74,24 @@ struct Authentication<'a> {
 
 /// This enum contains variants for all the ways in which constructing a
 /// [`BodhiService`](struct.BodhiService.html) instance can fail.
-#[derive(Debug, Fail)]
+#[derive(Debug, thiserror::Error)]
 pub enum BuilderError {
     /// This error represents an issue while parsing user-supplied URLs. If should never be returned
     /// for the default settings, since the hardcoded URLs should always be valid.
-    #[fail(display = "Failed to parse service URL: {}", error)]
+    #[error("Failed to parse service URL: {error}")]
     UrlParsingError {
         /// The inner error contains the issue that occurred while parsing the invalid URL.
         error: url::ParseError,
     },
     /// This error represents an issue that occurred during authentication via the OpenID API.
-    #[fail(display = "Failed to initialize OpenID client: {}", error)]
+    #[error("Failed to initialize OpenID client: {error}")]
     OpenIDClientError {
         /// The inner error contains the issue that occurred during the set up of an authenticated
         /// session via an OpenID endpoint.
         error: fedora::openid::OpenIDClientError,
     },
     /// This error represents an HTTP client library initialisation error.
-    #[fail(display = "Failed to initialize the HTTP client: {}", error)]
+    #[error("Failed to initialize the HTTP client: {error}")]
     InitialisationError {
         /// The inner error contains the issue that occurred during initialisation of the HTTP
         /// client library.
