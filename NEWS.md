@@ -1,3 +1,11 @@
+# Release 1.0.2 "Up This Grade" (January 5, 2020)
+
+Internal changes:
+
+- updated `reqwest` from `0.10` to `0.11`
+- updated `fedora` from `0.2.1` to `1.0`
+- port from `failure` to `thiserror`
+
 # Release 1.0.1 "Tranquility" (November 30, 2020)
 
 This is a routine update with no user-facing changes.
