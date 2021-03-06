@@ -1,4 +1,13 @@
-# Release 1.0.2 "Up This Grade" (January 5, 2020)
+# Release 1.0.3 "Modular Flatpak Containers" (March 6, 2021)
+
+Improvements:
+
+- add `F35` as valid `FedoraRelease` variant
+- add `F35C` as valid `FedoraRelease` variant
+- add `F34F` as valid `FedoraRelease` variant
+- add `F34M` as valid `FedoraRelease` variant
+
+# Release 1.0.2 "Up This Grade" (January 5, 2021)
 
 Internal changes:
 
