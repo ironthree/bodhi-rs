@@ -5,8 +5,12 @@ use std::fs::read_to_string;
 
 use bodhi::Update;
 
+const JSON_F35: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f35.json");
+const JSON_F35C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f35c.json");
 const JSON_F34: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f34.json");
 const JSON_F34C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f34c.json");
+const JSON_F34F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f34f.json");
+const JSON_F34M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f34m.json");
 const JSON_F33: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33.json");
 const JSON_F33C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33c.json");
 const JSON_F33F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f33f.json");
@@ -47,6 +51,66 @@ const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_
 
 #[cfg(feature = "data-tests")]
 #[test]
+fn updates_dejson_f35() {
+    let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F35).unwrap()).unwrap();
+
+    for update in &updates {
+        if !update.extra.is_empty() {
+            println!("{:#?}", update.extra);
+        }
+
+        assert!(update.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    assert!(!updates.iter().all(|u| u.comments.is_none()));
+    assert!(!updates.iter().all(|u| u.content_type.is_none()));
+    //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
+    //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
+    assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+    //assert!(!updates.iter().all(|u| u.date_stable.is_none())); // fails for F27M
+    assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
+    assert!(!updates.iter().all(|u| u.date_testing.is_none()));
+    assert!(!updates.iter().all(|u| u.karma.is_none()));
+    assert!(!updates.iter().all(|u| u.requirements.is_none()));
+    assert!(!updates.iter().all(|u| u.stable_days.is_none()));
+    assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
+    assert!(!updates.iter().all(|u| u.test_cases.is_none()));
+    assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn updates_dejson_f35c() {
+    let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F35C).unwrap()).unwrap();
+
+    for update in &updates {
+        if !update.extra.is_empty() {
+            println!("{:#?}", update.extra);
+        }
+
+        assert!(update.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    assert!(!updates.iter().all(|u| u.comments.is_none()));
+    assert!(!updates.iter().all(|u| u.content_type.is_none()));
+    //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
+    //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
+    assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+    //assert!(!updates.iter().all(|u| u.date_stable.is_none())); // fails for F27M
+    assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
+    assert!(!updates.iter().all(|u| u.date_testing.is_none()));
+    assert!(!updates.iter().all(|u| u.karma.is_none()));
+    assert!(!updates.iter().all(|u| u.requirements.is_none()));
+    assert!(!updates.iter().all(|u| u.stable_days.is_none()));
+    assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
+    assert!(!updates.iter().all(|u| u.test_cases.is_none()));
+    assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
 fn updates_dejson_f34() {
     let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F34).unwrap()).unwrap();
 
@@ -79,6 +143,66 @@ fn updates_dejson_f34() {
 #[test]
 fn updates_dejson_f34c() {
     let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F34C).unwrap()).unwrap();
+
+    for update in &updates {
+        if !update.extra.is_empty() {
+            println!("{:#?}", update.extra);
+        }
+
+        assert!(update.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    assert!(!updates.iter().all(|u| u.comments.is_none()));
+    assert!(!updates.iter().all(|u| u.content_type.is_none()));
+    //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
+    //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
+    assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+    //assert!(!updates.iter().all(|u| u.date_stable.is_none())); // fails for F27M
+    assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
+    assert!(!updates.iter().all(|u| u.date_testing.is_none()));
+    assert!(!updates.iter().all(|u| u.karma.is_none()));
+    assert!(!updates.iter().all(|u| u.requirements.is_none()));
+    assert!(!updates.iter().all(|u| u.stable_days.is_none()));
+    assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
+    assert!(!updates.iter().all(|u| u.test_cases.is_none()));
+    assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn updates_dejson_f34f() {
+    let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F34F).unwrap()).unwrap();
+
+    for update in &updates {
+        if !update.extra.is_empty() {
+            println!("{:#?}", update.extra);
+        }
+
+        assert!(update.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    assert!(!updates.iter().all(|u| u.comments.is_none()));
+    assert!(!updates.iter().all(|u| u.content_type.is_none()));
+    //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
+    //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
+    assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+    //assert!(!updates.iter().all(|u| u.date_stable.is_none())); // fails for F27M
+    assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
+    assert!(!updates.iter().all(|u| u.date_testing.is_none()));
+    assert!(!updates.iter().all(|u| u.karma.is_none()));
+    assert!(!updates.iter().all(|u| u.requirements.is_none()));
+    assert!(!updates.iter().all(|u| u.stable_days.is_none()));
+    assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
+    assert!(!updates.iter().all(|u| u.test_cases.is_none()));
+    assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn updates_dejson_f34m() {
+    let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F34M).unwrap()).unwrap();
 
     for update in &updates {
         if !update.extra.is_empty() {
