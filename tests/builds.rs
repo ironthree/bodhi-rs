@@ -44,6 +44,7 @@ const JSON_F22: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f
 const JSON_F21: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f21.json");
 const JSON_EPEL8: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_epel8.json");
 const JSON_EPEL8M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_epel8m.json");
+const JSON_EPEL8N: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_epel8n.json");
 const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_epel7.json");
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_el5.json");
@@ -63,7 +64,9 @@ fn builds_dejson_f35() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -80,7 +83,9 @@ fn builds_dejson_f35c() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -97,7 +102,9 @@ fn builds_dejson_f34() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -114,7 +121,9 @@ fn builds_dejson_f34c() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -131,7 +140,9 @@ fn builds_dejson_f34f() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -148,7 +159,9 @@ fn builds_dejson_f34m() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -165,7 +178,9 @@ fn builds_dejson_f33() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -182,7 +197,9 @@ fn builds_dejson_f33c() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -199,7 +216,9 @@ fn builds_dejson_f33f() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -216,7 +235,9 @@ fn builds_dejson_f33m() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -233,7 +254,9 @@ fn builds_dejson_f32() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -250,7 +273,9 @@ fn builds_dejson_f32c() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -267,7 +292,9 @@ fn builds_dejson_f32f() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -284,7 +311,9 @@ fn builds_dejson_f32m() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -301,7 +330,9 @@ fn builds_dejson_f31() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -318,7 +349,9 @@ fn builds_dejson_f31c() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -335,7 +368,9 @@ fn builds_dejson_f31f() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -352,7 +387,9 @@ fn builds_dejson_f31m() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -369,7 +406,9 @@ fn builds_dejson_f30() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -386,7 +425,9 @@ fn builds_dejson_f30c() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -403,7 +444,9 @@ fn builds_dejson_f30f() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -420,7 +463,9 @@ fn builds_dejson_f30m() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -437,7 +482,9 @@ fn builds_dejson_f29() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -454,7 +501,9 @@ fn builds_dejson_f29c() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -471,7 +520,9 @@ fn builds_dejson_f29f() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -488,7 +539,9 @@ fn builds_dejson_f29m() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -505,7 +558,9 @@ fn builds_dejson_f28() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -522,7 +577,9 @@ fn builds_dejson_f28c() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -539,7 +596,9 @@ fn builds_dejson_f28m() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -556,7 +615,9 @@ fn builds_dejson_f27() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -573,7 +634,9 @@ fn builds_dejson_f27m() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -590,7 +653,9 @@ fn builds_dejson_f26() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -607,7 +672,9 @@ fn builds_dejson_f25() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -624,7 +691,9 @@ fn builds_dejson_f24() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -641,7 +710,9 @@ fn builds_dejson_f23() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -658,7 +729,9 @@ fn builds_dejson_f22() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -675,7 +748,9 @@ fn builds_dejson_f21() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -692,7 +767,9 @@ fn builds_dejson_epel8() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -709,7 +786,28 @@ fn builds_dejson_epel8m() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_epel8n() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL8N).unwrap()).unwrap();
+
+    for build in &builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -726,7 +824,9 @@ fn builds_dejson_epel7() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -743,7 +843,9 @@ fn builds_dejson_el6() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -760,7 +862,9 @@ fn builds_dejson_el5() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }
 
 #[cfg(feature = "data-tests")]
@@ -777,5 +881,7 @@ fn builds_dejson_eln() {
     }
 
     // check if an optional field is no longer present
-    assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
 }

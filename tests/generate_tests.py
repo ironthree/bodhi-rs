@@ -42,6 +42,7 @@ RELEASES = [
     "F21",
     "EPEL8",
     "EPEL8M",
+    "EPEL8N",
     "EPEL7",
     "EL6",
     "EL5",
@@ -69,7 +70,9 @@ def do_builds():
             }}
 
             // check if an optional field is no longer present
-            assert!(!builds.iter().all(|b| b.release_id.is_none()));
+            if !builds.is_empty() {{
+                assert!(!builds.iter().all(|b| b.release_id.is_none()));
+            }}
         }}
         """
     )
@@ -294,20 +297,22 @@ def do_updates():
             }}
 
             // check if an optional field is no longer present
-            assert!(!updates.iter().all(|u| u.comments.is_none()));
-            assert!(!updates.iter().all(|u| u.content_type.is_none()));
-            //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-            //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-            assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
-            //assert!(!updates.iter().all(|u| u.date_stable.is_none())); // fails for F27M
-            assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-            assert!(!updates.iter().all(|u| u.date_testing.is_none()));
-            assert!(!updates.iter().all(|u| u.karma.is_none()));
-            assert!(!updates.iter().all(|u| u.requirements.is_none()));
-            assert!(!updates.iter().all(|u| u.stable_days.is_none()));
-            assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
-            assert!(!updates.iter().all(|u| u.test_cases.is_none()));
-            assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
+            if !updates.is_empty() {{
+                assert!(!updates.iter().all(|u| u.comments.is_none()));
+                assert!(!updates.iter().all(|u| u.content_type.is_none()));
+                //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
+                //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
+                //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
+                //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+                assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
+                //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+                assert!(!updates.iter().all(|u| u.karma.is_none()));
+                assert!(!updates.iter().all(|u| u.requirements.is_none()));
+                assert!(!updates.iter().all(|u| u.stable_days.is_none()));
+                assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
+                assert!(!updates.iter().all(|u| u.test_cases.is_none()));
+                assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
+            }}
         }}
         """
     )

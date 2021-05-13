@@ -44,6 +44,7 @@ const JSON_F22: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/override
 const JSON_F21: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f21.json");
 const JSON_EPEL8: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel8.json");
 const JSON_EPEL8M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel8m.json");
+const JSON_EPEL8N: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel8n.json");
 const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel7.json");
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_el5.json");
@@ -775,6 +776,25 @@ fn overrides_dejson_epel8() {
 #[test]
 fn overrides_dejson_epel8m() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EPEL8M).unwrap()).unwrap();
+
+    for o in &os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_epel8n() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EPEL8N).unwrap()).unwrap();
 
     for o in &os {
         if !o.extra.is_empty() {
