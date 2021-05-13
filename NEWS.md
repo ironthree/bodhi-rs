@@ -1,3 +1,9 @@
+# Release 1.0.4 "Number Next" (May 13, 2021)
+
+Improvements:
+
+- add `EPEL8N` as valid `FedoraRelease` variant
+
 # Release 1.0.3 "Modular Flatpak Containers" (March 6, 2021)
 
 Improvements:
