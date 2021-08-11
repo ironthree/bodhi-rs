@@ -3,8 +3,11 @@
 import textwrap
 
 RELEASES = [
+    "F36",
+    "F36C",
     "F35",
     "F35C",
+    "F35F",
     "F34",
     "F34C",
     "F34F",
