@@ -1,3 +1,9 @@
+# Release 1.0.5 "Moar Numbers" (August 11, 2021)
+
+Improvements:
+
+- add all F35 and F36 variants to `FedoraRelease`
+
 # Release 1.0.4 "Number Next" (May 13, 2021)
 
 Improvements:
