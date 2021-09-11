@@ -15,7 +15,7 @@ repository = "https://github.com/ironthree/bodhi-rs"
 
 [features]
 default = ["offline-tests"]
-debug = []
+debug = ["fedora/debug"]
 # feature flag for offline tests without prerequisites
 offline-tests = []
 # feature flag for tests requiring internet connection
@@ -25,7 +25,8 @@ data-tests = []
 
 [dependencies]
 chrono = { version = "^0.4.10", features = ["serde"] }
-fedora = "^1.0"
+#fedora = "^1.1"
+fedora = { path = "../fedora-rs" }
 reqwest = { version = "^0.11", features = ["blocking", "cookies"] }
 retry = "^1.0.0"
 serde = { version = "^1.0.104", features = ["derive"] }
@@ -36,6 +37,8 @@ thiserror = "^1.0"
 url = "^2.1.0"
 
 [dev-dependencies]
+# used for printing log messages in examples
+env_logger = "0.8.0"
 # used for reading the password in examples
 rpassword = "^5.0.0"
 
