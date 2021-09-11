@@ -136,9 +136,9 @@ impl<'a> Create<NewComment> for CommentBuilder<'a> {
         };
 
         let new_comment = CommentData {
-            update: &self.update,
-            text: match &self.text {
-                Some(text) => Some(&text),
+            update: self.update,
+            text: match self.text {
+                Some(text) => Some(text),
                 None => None,
             },
             karma: match self.karma {

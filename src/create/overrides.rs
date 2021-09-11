@@ -42,9 +42,9 @@ impl<'a> Create<NewOverride> for OverrideBuilder<'a> {
         let csrf_token = bodhi.query(CSRFQuery::new())?;
 
         let new_override = OverrideData {
-            nvr: &self.nvr,
-            notes: &self.notes,
-            expiration_date: &self.expiration_date,
+            nvr: self.nvr,
+            notes: self.notes,
+            expiration_date: self.expiration_date,
             expired: None,
             edited: None,
             csrf_token: &csrf_token,

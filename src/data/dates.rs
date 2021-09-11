@@ -114,7 +114,7 @@ pub(crate) mod option_bodhi_date_format_ref {
         S: Serializer,
     {
         match date {
-            Some(ref dt) => super::bodhi_date_format::serialize(dt, serializer),
+            Some(dt) => super::bodhi_date_format::serialize(dt, serializer),
             None => serializer.serialize_none(),
         }
     }

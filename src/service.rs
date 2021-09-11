@@ -27,6 +27,7 @@ const REQUEST_RETRIES: usize = 3;
 const USER_AGENT: &str = "bodhi-rs";
 
 #[derive(Debug)]
+#[allow(clippy::upper_case_acronyms)]
 enum BodhiServiceType {
     DEFAULT,
     STAGING,

@@ -244,10 +244,10 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
 
         let csrf_token = bodhi.query(CSRFQuery::new())?;
 
-        let bugs: Option<Vec<String>> = match &self.bugs {
-            Some(bugs) => Some(bugs.iter().map(|b| format!("{}", b)).collect()),
-            None => None,
-        };
+        let bugs: Option<Vec<String>> = self
+            .bugs
+            .as_ref()
+            .map(|bugs| bugs.iter().map(|b| format!("{}", b)).collect());
 
         let new_update = match self.source {
             UpdateSource::Builds { builds } => UpdateData {
@@ -255,7 +255,7 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 from_tag: None,
                 bugs: bugs.as_ref(),
                 display_name: match &self.display_name {
-                    Some(string) => Some(&string),
+                    Some(string) => Some(string),
                     None => None,
                 },
                 close_bugs: self.close_bugs,
@@ -265,14 +265,14 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 },
                 request: self.request,
                 severity: self.severity,
-                notes: &self.notes,
+                notes: self.notes,
                 autokarma: self.autokarma,
                 stable_karma: self.stable_karma,
                 unstable_karma: self.unstable_karma,
                 suggest: self.suggest,
                 edited: None,
                 requirements: match &self.requirements {
-                    Some(string) => Some(&string),
+                    Some(string) => Some(string),
                     None => None,
                 },
                 require_bugs: self.require_bugs,
@@ -286,7 +286,7 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 from_tag: Some(tag),
                 bugs: bugs.as_ref(),
                 display_name: match &self.display_name {
-                    Some(string) => Some(&string),
+                    Some(string) => Some(string),
                     None => None,
                 },
                 close_bugs: self.close_bugs,
@@ -296,14 +296,14 @@ impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
                 },
                 request: self.request,
                 severity: self.severity,
-                notes: &self.notes,
+                notes: self.notes,
                 autokarma: self.autokarma,
                 stable_karma: self.stable_karma,
                 unstable_karma: self.unstable_karma,
                 suggest: self.suggest,
                 edited: None,
                 requirements: match &self.requirements {
-                    Some(string) => Some(&string),
+                    Some(string) => Some(string),
                     None => None,
                 },
                 require_bugs: self.require_bugs,
