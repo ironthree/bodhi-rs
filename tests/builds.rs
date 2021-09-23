@@ -10,6 +10,7 @@ const JSON_F36C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_
 const JSON_F35: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f35.json");
 const JSON_F35C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f35c.json");
 const JSON_F35F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f35f.json");
+const JSON_F35M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f35m.json");
 const JSON_F34: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f34.json");
 const JSON_F34C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f34c.json");
 const JSON_F34F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f34f.json");
@@ -133,6 +134,25 @@ fn builds_dejson_f35c() {
 #[test]
 fn builds_dejson_f35f() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F35F).unwrap()).unwrap();
+
+    for build in &builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_f35m() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F35M).unwrap()).unwrap();
 
     for build in &builds {
         if !build.extra.is_empty() {
