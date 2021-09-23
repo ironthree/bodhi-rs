@@ -1,3 +1,9 @@
+# Release 1.1.0 "Cookie Monster" (September 23, 2021)
+
+Changes:
+
+- require `fedora = ^1.1` for better OpenID session / cookie cache support
+
 # Release 1.0.5 "Moar Numbers" (August 11, 2021)
 
 Improvements:
