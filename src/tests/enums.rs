@@ -100,13 +100,13 @@ fn idem_fedora_release() {
         "F36", "F36C", "F36F", "F36M", "F35", "F35C", "F35F", "F35M", "F34", "F34C", "F34F", "F34M", "F33", "F33C",
         "F33F", "F33M", "F32", "F32C", "F32F", "F32M", "F31", "F31C", "F31F", "F31M", "F30", "F30C", "F30F", "F30M",
         "F29", "F29C", "F29F", "F29M", "F28", "F28C", "F28M", "F27", "F27M", "F26", "F25", "F24", "F23", "F22", "F21",
-        "EPEL-8", "EPEL-8M", "EPEL-8N", "EPEL-7", "EL-6", "EL-5", "ELN",
+        "EPEL-9", "EPEL-9N", "EPEL-8", "EPEL-8M", "EPEL-8N", "EPEL-7", "EL-6", "EL-5", "ELN",
     ];
 
     let values = vec![
         F36, F36C, F36F, F36M, F35, F35C, F35F, F35M, F34, F34C, F34F, F34M, F33, F33C, F33F, F33M, F32, F32C, F32F,
         F32M, F31, F31C, F31F, F31M, F30, F30C, F30F, F30M, F29, F29C, F29F, F29M, F28, F28C, F28M, F27, F27M, F26,
-        F25, F24, F23, F22, F21, EPEL8, EPEL8M, EPEL8N, EPEL7, EL6, EL5, ELN,
+        F25, F24, F23, F22, F21, EPEL9, EPEL9N, EPEL8, EPEL8M, EPEL8N, EPEL7, EL6, EL5, ELN,
     ];
 
     assert_eq!(strings.len(), values.len());
