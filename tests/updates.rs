@@ -46,6 +46,8 @@ const JSON_F24: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_
 const JSON_F23: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f23.json");
 const JSON_F22: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f22.json");
 const JSON_F21: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f21.json");
+const JSON_EPEL9: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel9.json");
+const JSON_EPEL9N: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel9n.json");
 const JSON_EPEL8: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel8.json");
 const JSON_EPEL8M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel8m.json");
 const JSON_EPEL8N: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel8n.json");
@@ -1338,6 +1340,70 @@ fn updates_dejson_f22() {
 #[test]
 fn updates_dejson_f21() {
     let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_F21).unwrap()).unwrap();
+
+    for update in &updates {
+        if !update.extra.is_empty() {
+            println!("{:#?}", update.extra);
+        }
+
+        assert!(update.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !updates.is_empty() {
+        assert!(!updates.iter().all(|u| u.comments.is_none()));
+        assert!(!updates.iter().all(|u| u.content_type.is_none()));
+        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
+        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
+        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
+        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
+        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.karma.is_none()));
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
+        assert!(!updates.iter().all(|u| u.stable_days.is_none()));
+        assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
+        assert!(!updates.iter().all(|u| u.test_cases.is_none()));
+        assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn updates_dejson_epel9() {
+    let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_EPEL9).unwrap()).unwrap();
+
+    for update in &updates {
+        if !update.extra.is_empty() {
+            println!("{:#?}", update.extra);
+        }
+
+        assert!(update.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !updates.is_empty() {
+        assert!(!updates.iter().all(|u| u.comments.is_none()));
+        assert!(!updates.iter().all(|u| u.content_type.is_none()));
+        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
+        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
+        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
+        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
+        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.karma.is_none()));
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
+        assert!(!updates.iter().all(|u| u.stable_days.is_none()));
+        assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
+        assert!(!updates.iter().all(|u| u.test_cases.is_none()));
+        assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn updates_dejson_epel9n() {
+    let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_EPEL9N).unwrap()).unwrap();
 
     for update in &updates {
         if !update.extra.is_empty() {

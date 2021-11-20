@@ -263,6 +263,10 @@ pub enum FedoraRelease {
     F23,
     F22,
     F21,
+    #[serde(rename = "EPEL-9")]
+    EPEL9,
+    #[serde(rename = "EPEL-9N")]
+    EPEL9N,
     #[serde(rename = "EPEL-8")]
     EPEL8,
     #[serde(rename = "EPEL-8M")]
@@ -327,6 +331,8 @@ impl Display for FedoraRelease {
             FedoraRelease::F23 => "F23",
             FedoraRelease::F22 => "F22",
             FedoraRelease::F21 => "F21",
+            FedoraRelease::EPEL9 => "EPEL-9",
+            FedoraRelease::EPEL9N => "EPEL-9N",
             FedoraRelease::EPEL8 => "EPEL-8",
             FedoraRelease::EPEL8M => "EPEL-8M",
             FedoraRelease::EPEL8N => "EPEL-8N",
@@ -388,6 +394,8 @@ impl TryFrom<&str> for FedoraRelease {
             "F23" => Ok(FedoraRelease::F23),
             "F22" => Ok(FedoraRelease::F22),
             "F21" => Ok(FedoraRelease::F21),
+            "EPEL-9" => Ok(FedoraRelease::EPEL9),
+            "EPEL-9N" => Ok(FedoraRelease::EPEL9N),
             "EPEL-8" => Ok(FedoraRelease::EPEL8),
             "EPEL-8M" => Ok(FedoraRelease::EPEL8M),
             "EPEL-8N" => Ok(FedoraRelease::EPEL8N),

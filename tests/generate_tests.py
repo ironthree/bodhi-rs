@@ -44,6 +44,8 @@ RELEASES = [
     "F23",
     "F22",
     "F21",
+    "EPEL9",
+    "EPEL9N",
     "EPEL8",
     "EPEL8M",
     "EPEL8N",

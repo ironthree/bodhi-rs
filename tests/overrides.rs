@@ -46,6 +46,8 @@ const JSON_F24: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/override
 const JSON_F23: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f23.json");
 const JSON_F22: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f22.json");
 const JSON_F21: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f21.json");
+const JSON_EPEL9: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel9.json");
+const JSON_EPEL9N: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel9n.json");
 const JSON_EPEL8: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel8.json");
 const JSON_EPEL8M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel8m.json");
 const JSON_EPEL8N: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_epel8n.json");
@@ -818,6 +820,44 @@ fn overrides_dejson_f22() {
 #[test]
 fn overrides_dejson_f21() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F21).unwrap()).unwrap();
+
+    for o in &os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_epel9() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EPEL9).unwrap()).unwrap();
+
+    for o in &os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_epel9n() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_EPEL9N).unwrap()).unwrap();
 
     for o in &os {
         if !o.extra.is_empty() {
