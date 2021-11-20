@@ -53,7 +53,7 @@ ALL_RELEASES = [
     "F23",
     "F22",
     "F21",
-    "EPEL-9",
+    # "EPEL-9",
     "EPEL-9N",
     "EPEL-8",
     "EPEL-8M",
@@ -79,7 +79,7 @@ ACTIVE_RELEASES = [
     "F33C",
     "F33F",
     "F33M",
-    "EPEL-9",
+    # "EPEL-9",
     "EPEL-9N",
     "EPEL-8",
     "EPEL-8M",
@@ -91,6 +91,8 @@ ACTIVE_RELEASES = [
 
 # change this to "ALL_RELEASES" regenerate data for archived releases as well
 RELEASES = ACTIVE_RELEASES
+
+RELEASES = ["EPEL-9N"]
 
 
 class RetryError(Exception):

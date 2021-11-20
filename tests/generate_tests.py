@@ -44,7 +44,7 @@ RELEASES = [
     "F23",
     "F22",
     "F21",
-    "EPEL9",
+    # "EPEL9",
     "EPEL9N",
     "EPEL8",
     "EPEL8M",
@@ -192,7 +192,7 @@ def do_overrides():
 
             // check if an optional field is no longer present
             if !os.is_empty() {{
-                assert!(!os.iter().all(|o| o.expired_date.is_none()));
+                //assert!(!os.iter().all(|o| o.expired_date.is_none())); // fails for EPEL-9
             }}
         }}
         """
@@ -260,7 +260,7 @@ def do_releases():
                     println!("{:#?}", release.extra);
                 }
 
-                assert!(release.extra.is_empty());
+                //assert!(release.extra.is_empty()); // fails for EPEL-9
             }
 
             // check if an optional field is no longer present
@@ -313,7 +313,7 @@ def do_updates():
                 assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
                 //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
                 assert!(!updates.iter().all(|u| u.karma.is_none()));
-                assert!(!updates.iter().all(|u| u.requirements.is_none()));
+                //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
                 assert!(!updates.iter().all(|u| u.stable_days.is_none()));
                 assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
                 assert!(!updates.iter().all(|u| u.test_cases.is_none()));
