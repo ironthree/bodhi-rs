@@ -46,6 +46,7 @@ fn query_archived() {
 }
 
 #[test]
+#[ignore = "https://github.com/fedora-infra/bodhi/issues/4287"]
 fn query_sanity_aliases() {
     let bodhi = bodhi_init();
 
@@ -64,6 +65,7 @@ fn query_sanity_aliases() {
 }
 
 #[test]
+#[ignore = "https://github.com/fedora-infra/bodhi/issues/4287"]
 fn query_sanity_bugs() {
     let bodhi = bodhi_init();
 
@@ -76,6 +78,7 @@ fn query_sanity_bugs() {
 }
 
 #[test]
+#[ignore = "https://github.com/fedora-infra/bodhi/issues/4287"]
 fn query_sanity_builds() {
     let bodhi = bodhi_init();
 
@@ -94,6 +97,7 @@ fn query_sanity_builds() {
 }
 
 #[test]
+#[ignore = "https://github.com/fedora-infra/bodhi/issues/4287"]
 fn query_sanity_packages() {
     let bodhi = bodhi_init();
 
@@ -108,6 +112,7 @@ fn query_sanity_packages() {
 }
 
 #[test]
+#[ignore = "https://github.com/fedora-infra/bodhi/issues/4287"]
 fn query_sanity_releases() {
     let bodhi = bodhi_init();
 
@@ -126,6 +131,7 @@ fn query_sanity_releases() {
 }
 
 #[test]
+#[ignore = "https://github.com/fedora-infra/bodhi/issues/4287"]
 fn query_sanity_users() {
     let bodhi = bodhi_init();
 

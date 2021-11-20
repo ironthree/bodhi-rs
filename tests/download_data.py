@@ -92,8 +92,6 @@ ACTIVE_RELEASES = [
 # change this to "ALL_RELEASES" regenerate data for archived releases as well
 RELEASES = ACTIVE_RELEASES
 
-RELEASES = ["EPEL-9N"]
-
 
 class RetryError(Exception):
     pass
