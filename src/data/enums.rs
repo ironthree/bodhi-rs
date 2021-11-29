@@ -213,6 +213,7 @@ impl FromStr for ContentType {
 // - also add them in the impls below,
 // - add them to the idem_fedora_release test,
 // - add integration tests and data for them.
+// FIXME: make this just a newtype wrapping a String; should be more reliable and future-proof
 pub enum FedoraRelease {
     #[serde(rename = "__current__")]
     Current,

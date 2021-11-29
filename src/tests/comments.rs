@@ -3,7 +3,6 @@ use super::bodhi_init;
 use crate::{Comment, CommentIDQuery, CommentQuery};
 
 #[test]
-#[ignore = "https://github.com/fedora-infra/bodhi/issues/4287"]
 fn query_sanity_packages() {
     let bodhi = bodhi_init();
 
@@ -18,7 +17,6 @@ fn query_sanity_packages() {
 }
 
 #[test]
-#[ignore = "https://github.com/fedora-infra/bodhi/issues/4287"]
 fn query_sanity_updates() {
     let bodhi = bodhi_init();
 
@@ -37,7 +35,6 @@ fn query_sanity_updates() {
 }
 
 #[test]
-#[ignore = "https://github.com/fedora-infra/bodhi/issues/4287"]
 fn query_sanity_users() {
     let bodhi = bodhi_init();
 
