@@ -1,3 +1,10 @@
+# Release 1.1.1 "Corporate Badger" (November 30, 2021)
+
+Changes:
+
+- add EPEL 9 (`EPEL-9` and `EPEL-9N`) variants to `FedoraRelease`
+- add workarounds for slightly broken generated deserialization tests
+
 # Release 1.1.0 "Cookie Monster" (September 23, 2021)
 
 Changes:
