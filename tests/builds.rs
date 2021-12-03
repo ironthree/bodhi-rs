@@ -46,6 +46,7 @@ const JSON_F24: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f
 const JSON_F23: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f23.json");
 const JSON_F22: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f22.json");
 const JSON_F21: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f21.json");
+const JSON_EPEL9: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_epel9.json");
 const JSON_EPEL9N: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_epel9n.json");
 const JSON_EPEL8: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_epel8.json");
 const JSON_EPEL8M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_epel8m.json");
@@ -54,6 +55,7 @@ const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_el5.json");
 const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_eln.json");
+
 
 #[cfg(feature = "data-tests")]
 #[test]
@@ -836,6 +838,25 @@ fn builds_dejson_f21() {
 
 #[cfg(feature = "data-tests")]
 #[test]
+fn builds_dejson_epel9() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL9).unwrap()).unwrap();
+
+    for build in &builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
 fn builds_dejson_epel9n() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_EPEL9N).unwrap()).unwrap();
 
@@ -985,3 +1006,4 @@ fn builds_dejson_eln() {
         assert!(!builds.iter().all(|b| b.release_id.is_none()));
     }
 }
+

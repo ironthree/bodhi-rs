@@ -46,6 +46,7 @@ const JSON_F24: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_
 const JSON_F23: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f23.json");
 const JSON_F22: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f22.json");
 const JSON_F21: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_f21.json");
+const JSON_EPEL9: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel9.json");
 const JSON_EPEL9N: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel9n.json");
 const JSON_EPEL8: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel8.json");
 const JSON_EPEL8M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_epel8m.json");
@@ -54,6 +55,7 @@ const JSON_EPEL7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/update
 const JSON_EL6: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_el6.json");
 const JSON_EL5: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_el5.json");
 const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/updates_eln.json");
+
 
 #[cfg(feature = "data-tests")]
 #[test]
@@ -72,14 +74,14 @@ fn updates_dejson_f36() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -104,14 +106,14 @@ fn updates_dejson_f36c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -136,14 +138,14 @@ fn updates_dejson_f35() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -168,14 +170,14 @@ fn updates_dejson_f35c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -200,14 +202,14 @@ fn updates_dejson_f35f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -232,14 +234,14 @@ fn updates_dejson_f35m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -264,14 +266,14 @@ fn updates_dejson_f34() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -296,14 +298,14 @@ fn updates_dejson_f34c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -328,14 +330,14 @@ fn updates_dejson_f34f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -360,14 +362,14 @@ fn updates_dejson_f34m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -392,14 +394,14 @@ fn updates_dejson_f33() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -424,14 +426,14 @@ fn updates_dejson_f33c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -456,14 +458,14 @@ fn updates_dejson_f33f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -488,14 +490,14 @@ fn updates_dejson_f33m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -520,14 +522,14 @@ fn updates_dejson_f32() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -552,14 +554,14 @@ fn updates_dejson_f32c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -584,14 +586,14 @@ fn updates_dejson_f32f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -616,14 +618,14 @@ fn updates_dejson_f32m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -648,14 +650,14 @@ fn updates_dejson_f31() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -680,14 +682,14 @@ fn updates_dejson_f31c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -712,14 +714,14 @@ fn updates_dejson_f31f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -744,14 +746,14 @@ fn updates_dejson_f31m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -776,14 +778,14 @@ fn updates_dejson_f30() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -808,14 +810,14 @@ fn updates_dejson_f30c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -840,14 +842,14 @@ fn updates_dejson_f30f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -872,14 +874,14 @@ fn updates_dejson_f30m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -904,14 +906,14 @@ fn updates_dejson_f29() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -936,14 +938,14 @@ fn updates_dejson_f29c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -968,14 +970,14 @@ fn updates_dejson_f29f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1000,14 +1002,14 @@ fn updates_dejson_f29m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1032,14 +1034,14 @@ fn updates_dejson_f28() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1064,14 +1066,14 @@ fn updates_dejson_f28c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1096,14 +1098,14 @@ fn updates_dejson_f28m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1128,14 +1130,14 @@ fn updates_dejson_f27() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1160,14 +1162,14 @@ fn updates_dejson_f27m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1192,14 +1194,14 @@ fn updates_dejson_f26() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1224,14 +1226,14 @@ fn updates_dejson_f25() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1256,14 +1258,14 @@ fn updates_dejson_f24() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1288,14 +1290,14 @@ fn updates_dejson_f23() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1320,14 +1322,14 @@ fn updates_dejson_f22() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1352,14 +1354,46 @@ fn updates_dejson_f21() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
+        assert!(!updates.iter().all(|u| u.stable_days.is_none()));
+        assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
+        assert!(!updates.iter().all(|u| u.test_cases.is_none()));
+        assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn updates_dejson_epel9() {
+    let updates: Vec<Update> = serde_json::from_str(&read_to_string(JSON_EPEL9).unwrap()).unwrap();
+
+    for update in &updates {
+        if !update.extra.is_empty() {
+            println!("{:#?}", update.extra);
+        }
+
+        assert!(update.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !updates.is_empty() {
+        assert!(!updates.iter().all(|u| u.comments.is_none()));
+        assert!(!updates.iter().all(|u| u.content_type.is_none()));
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
+        assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
+        assert!(!updates.iter().all(|u| u.karma.is_none()));
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1384,14 +1418,14 @@ fn updates_dejson_epel9n() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1416,14 +1450,14 @@ fn updates_dejson_epel8() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1448,14 +1482,14 @@ fn updates_dejson_epel8m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1480,14 +1514,14 @@ fn updates_dejson_epel8n() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1512,14 +1546,14 @@ fn updates_dejson_epel7() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1544,14 +1578,14 @@ fn updates_dejson_el6() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1576,14 +1610,14 @@ fn updates_dejson_el5() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
@@ -1608,17 +1642,18 @@ fn updates_dejson_eln() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_approved.is_none())); // bodhi #4171
-        //assert!(!updates.iter().all(|u| u.date_modified.is_none())); // fails for ELN
-        //assert!(!updates.iter().all(|u| u.date_pushed.is_none()));   // fails for F34M
-        //assert!(!updates.iter().all(|u| u.date_stable.is_none()));   // fails for F27M
+        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
+        assert!(!updates.iter().all(|u| u.date_modified.is_none()));
+        assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
+        assert!(!updates.iter().all(|u| u.date_stable.is_none()));
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
-        //assert!(!updates.iter().all(|u| u.date_testing.is_none()));  // fails for F34M
+        assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        //assert!(!updates.iter().all(|u| u.requirements.is_none()));  // fails for EPEL-9
+        assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));
         assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
     }
 }
+

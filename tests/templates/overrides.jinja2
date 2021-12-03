@@ -1,0 +1,32 @@
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
+use std::fs::read_to_string;
+
+use bodhi::Override;
+
+{% for release in releases -%}
+const JSON_{{ release }}: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_{{ release.lower() }}.json");
+{% endfor %}
+
+{% for release in releases -%}
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_{{ release.lower() }}() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_{{ release }}).unwrap()).unwrap();
+
+    for o in &os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
+    }
+}
+
+{% endfor %}

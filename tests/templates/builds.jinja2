@@ -1,0 +1,32 @@
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
+use std::fs::read_to_string;
+
+use bodhi::Build;
+
+{% for release in releases -%}
+const JSON_{{ release }}: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_{{ release.lower() }}.json");
+{% endfor %}
+
+{% for release in releases -%}
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_{{ release.lower() }}() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_{{ release }}).unwrap()).unwrap();
+
+    for build in &builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
+}
+
+{% endfor %}
