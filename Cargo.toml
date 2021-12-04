@@ -3,7 +3,7 @@ name = "bodhi"
 description = "bodhi REST API client"
 license = "MIT OR Apache-2.0"
 
-version = "1.1.1"
+version = "2.0.0-dev"
 edition = "2018"
 
 authors = ["Fabio Valentini <decathorpe@gmail.com>"]
@@ -24,9 +24,12 @@ online-tests = []
 data-tests = []
 
 [dependencies]
+async-trait = "0.1.51"
 chrono = { version = "^0.4.10", features = ["serde"] }
-fedora = "^1.1"
-reqwest = { version = "^0.11", features = ["blocking", "cookies"] }
+#fedora = "^1.1"
+fedora = { path = "../fedora-rs" }
+log = "0.4.13"
+reqwest = { version = "^0.11", features = ["cookies"] }
 retry = "^1.0.0"
 serde = { version = "^1.0.104", features = ["derive"] }
 serde_repr = "^0.1.5"
@@ -36,10 +39,9 @@ thiserror = "^1.0"
 url = "^2.1.0"
 
 [dev-dependencies]
-# used for printing log messages in examples
 env_logger = "0.8.0"
-# used for reading the password in examples
 rpassword = "^5.0.0"
+tokio = { version = "1.14.0", features = ["macros", "rt-multi-thread"] }
 
 [profile.release]
 codegen-units = 1

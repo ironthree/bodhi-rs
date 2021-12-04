@@ -62,8 +62,9 @@ impl<'a> SinglePageQuery<Option<User>> for UserNameQuery<'a> {
     }
 }
 
-impl<'a> Query<Option<User>> for UserNameQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Option<User>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Option<User>> for UserNameQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Option<User>, QueryError> {
         <Self as SinglePageQuery<Option<User>>>::query(self, bodhi)
     }
 }
@@ -159,7 +160,7 @@ impl<'a> UserQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(mut self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
+    async fn query(mut self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
         let mut users: Vec<User> = Vec::new();
         let mut page = 1;
 
@@ -170,7 +171,7 @@ impl<'a> UserQuery<'a> {
 
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
-            let result = query.query(bodhi)?;
+            let result = query.query(bodhi).await?;
 
             if let Some(ref mut fun) = self.callback {
                 fun(page, result.pages)
@@ -200,8 +201,9 @@ impl<'a> UserQuery<'a> {
     }
 }
 
-impl<'a> Query<Vec<User>> for UserQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Vec<User>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Vec<User>> for UserQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Vec<User>, QueryError> {
         UserQuery::query(self, bodhi)
     }
 }

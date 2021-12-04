@@ -1006,4 +1006,3 @@ fn builds_dejson_eln() {
         assert!(!builds.iter().all(|b| b.release_id.is_none()));
     }
 }
-

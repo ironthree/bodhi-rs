@@ -83,7 +83,7 @@ impl<'a> PackageQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(mut self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
+    async fn query(mut self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
         let mut packages: Vec<Package> = Vec::new();
         let mut page = 1;
 
@@ -94,7 +94,7 @@ impl<'a> PackageQuery<'a> {
 
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
-            let result = query.query(bodhi)?;
+            let result = query.query(bodhi).await?;
 
             if let Some(ref mut fun) = self.callback {
                 fun(page, result.pages)
@@ -122,8 +122,9 @@ impl<'a> PackageQuery<'a> {
     }
 }
 
-impl<'a> Query<Vec<Package>> for PackageQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Vec<Package>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Vec<Package>> for PackageQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Vec<Package>, QueryError> {
         PackageQuery::query(self, bodhi)
     }
 }

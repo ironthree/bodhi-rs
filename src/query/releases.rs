@@ -55,8 +55,9 @@ impl<'a> SinglePageQuery<Option<Release>> for ReleaseNameQuery<'a> {
     }
 }
 
-impl<'a> Query<Option<Release>> for ReleaseNameQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Option<Release>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Option<Release>> for ReleaseNameQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Option<Release>, QueryError> {
         <Self as SinglePageQuery<Option<Release>>>::query(self, bodhi)
     }
 }
@@ -129,13 +130,13 @@ impl<'a> ReleaseQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
+    async fn query(self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
         let mut overrides: Vec<Release> = Vec::new();
         let mut page = 1;
 
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
-            let result = query.query(bodhi)?;
+            let result = query.query(bodhi).await?;
 
             overrides.extend(result.releases);
             page += 1;
@@ -161,8 +162,9 @@ impl<'a> ReleaseQuery<'a> {
     }
 }
 
-impl<'a> Query<Vec<Release>> for ReleaseQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Vec<Release>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Vec<Release>> for ReleaseQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Vec<Release>, QueryError> {
         ReleaseQuery::query(self, bodhi)
     }
 }

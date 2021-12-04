@@ -102,11 +102,13 @@ impl<'a> CommentBuilder<'a> {
     }
 }
 
-impl<'a> Create<NewComment> for CommentBuilder<'a> {
-    fn create(&self, bodhi: &BodhiService) -> Result<NewComment, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Create<'a, NewComment> for CommentBuilder<'a> {
+    async fn create(&'a self, bodhi: &'a BodhiService) -> Result<NewComment, QueryError> {
         let path = String::from("/comments/");
 
-        let csrf_token = CSRFQuery::new().query(bodhi)?;
+        let csrf_query = CSRFQuery::new();
+        let csrf_token = bodhi.query(&csrf_query).await?;
 
         let mut feedback: HashMap<String, String> = HashMap::new();
 
@@ -154,17 +156,17 @@ impl<'a> Create<NewComment> for CommentBuilder<'a> {
             Err(error) => return Err(QueryError::SerializationError { error }),
         };
 
-        let response = bodhi.post(&path, data)?;
+        let response = bodhi.post(&path, data).await?;
         let status = response.status();
 
         if !status.is_success() {
-            let text = response.text().unwrap_or_else(|_| String::from(""));
+            let text = response.text().await.unwrap_or_else(|_| String::from(""));
 
             let error: BodhiError = serde_json::from_str(&text)?;
             return Err(QueryError::BodhiError { error });
         };
 
-        let result = response.text()?;
+        let result = response.text().await?;
         let new_comment: NewComment = serde_json::from_str(&result)?;
 
         Ok(new_comment)

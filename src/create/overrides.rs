@@ -35,11 +35,12 @@ impl<'a> OverrideBuilder<'a> {
     }
 }
 
-impl<'a> Create<NewOverride> for OverrideBuilder<'a> {
-    fn create(&self, bodhi: &BodhiService) -> Result<NewOverride, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Create<'a, NewOverride> for OverrideBuilder<'a> {
+    async fn create(&'a self, bodhi: &'a BodhiService) -> Result<NewOverride, QueryError> {
         let path = String::from("/overrides/");
 
-        let csrf_token = bodhi.query(CSRFQuery::new())?;
+        let csrf_token = bodhi.query(&CSRFQuery::new())?;
 
         let new_override = OverrideData {
             nvr: self.nvr,

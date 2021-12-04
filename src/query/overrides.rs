@@ -63,8 +63,9 @@ impl<'a> SinglePageQuery<Option<Override>> for OverrideNVRQuery<'a> {
     }
 }
 
-impl<'a> Query<Option<Override>> for OverrideNVRQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Option<Override>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Option<Override>> for OverrideNVRQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Option<Override>, QueryError> {
         <Self as SinglePageQuery<Option<Override>>>::query(self, bodhi)
     }
 }
@@ -180,7 +181,7 @@ impl<'a> OverrideQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(mut self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
+    async fn query(mut self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
         let mut overrides: Vec<Override> = Vec::new();
         let mut page = 1;
 
@@ -191,7 +192,7 @@ impl<'a> OverrideQuery<'a> {
 
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
-            let result = query.query(bodhi)?;
+            let result = query.query(bodhi).await?;
 
             if let Some(ref mut fun) = self.callback {
                 fun(page, result.pages)
@@ -223,8 +224,9 @@ impl<'a> OverrideQuery<'a> {
     }
 }
 
-impl<'a> Query<Vec<Override>> for OverrideQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Vec<Override>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Vec<Override>> for OverrideQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Vec<Override>, QueryError> {
         OverrideQuery::query(self, bodhi)
     }
 }

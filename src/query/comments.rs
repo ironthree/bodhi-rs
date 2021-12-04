@@ -62,8 +62,9 @@ impl SinglePageQuery<Option<Comment>> for CommentIDQuery {
     }
 }
 
-impl Query<Option<Comment>> for CommentIDQuery {
-    fn query(self, bodhi: &BodhiService) -> Result<Option<Comment>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Option<Comment>> for CommentIDQuery {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Option<Comment>, QueryError> {
         <Self as SinglePageQuery<Option<Comment>>>::query(self, bodhi)
     }
 }
@@ -201,7 +202,7 @@ impl<'a> CommentQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(mut self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
+    async fn query(mut self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
         let mut comments: Vec<Comment> = Vec::new();
         let mut page = 1;
 
@@ -212,7 +213,7 @@ impl<'a> CommentQuery<'a> {
 
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
-            let result = query.query(bodhi)?;
+            let result = query.query(bodhi).await?;
 
             if let Some(ref mut fun) = self.callback {
                 fun(page, result.pages)
@@ -246,8 +247,9 @@ impl<'a> CommentQuery<'a> {
     }
 }
 
-impl<'a> Query<Vec<Comment>> for CommentQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Vec<Comment>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Vec<Comment>> for CommentQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Vec<Comment>, QueryError> {
         CommentQuery::query(self, bodhi)
     }
 }

@@ -49,7 +49,7 @@ impl FromStr for BodhiDate {
 
 impl Display for BodhiDate {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.date.format(BODHI_DATETIME_FORMAT).to_string())
+        write!(f, "{}", self.date.format(BODHI_DATETIME_FORMAT))
     }
 }
 

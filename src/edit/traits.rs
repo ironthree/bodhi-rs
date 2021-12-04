@@ -1,6 +1,7 @@
 use crate::error::QueryError;
 use crate::BodhiService;
 
-pub trait Edit<T> {
-    fn edit(&self, bodhi: &BodhiService) -> Result<T, QueryError>;
+#[async_trait::async_trait]
+pub trait Edit<'a, T> {
+    async fn edit(&'a self, bodhi: &'a BodhiService) -> Result<T, QueryError>;
 }

@@ -63,8 +63,9 @@ impl<'a> SinglePageQuery<Option<Update>> for UpdateIDQuery<'a> {
     }
 }
 
-impl<'a> Query<Option<Update>> for UpdateIDQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Option<Update>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Option<Update>> for UpdateIDQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Option<Update>, QueryError> {
         <Self as SinglePageQuery<Option<Update>>>::query(self, bodhi)
     }
 }
@@ -377,7 +378,7 @@ impl<'a> UpdateQuery<'a> {
     }
 
     /// Query the remote bodhi instance with the given parameters.
-    fn query(mut self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
+    async fn query(mut self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
         let mut updates: Vec<Update> = Vec::new();
         let mut page = 1;
 
@@ -388,7 +389,7 @@ impl<'a> UpdateQuery<'a> {
 
         loop {
             let query = self.page_query(page, DEFAULT_ROWS);
-            let result = query.query(bodhi)?;
+            let result = query.query(bodhi).await?;
 
             if let Some(ref mut fun) = self.callback {
                 fun(page, result.pages)
@@ -441,8 +442,9 @@ impl<'a> UpdateQuery<'a> {
     }
 }
 
-impl<'a> Query<Vec<Update>> for UpdateQuery<'a> {
-    fn query(self, bodhi: &BodhiService) -> Result<Vec<Update>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Vec<Update>> for UpdateQuery<'a> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Vec<Update>, QueryError> {
         UpdateQuery::query(self, bodhi)
     }
 }

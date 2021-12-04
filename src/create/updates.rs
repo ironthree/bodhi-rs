@@ -204,8 +204,9 @@ impl<'a> UpdateBuilder<'a> {
     }
 }
 
-impl<'a> Create<NewUpdate> for UpdateBuilder<'a> {
-    fn create(&self, bodhi: &BodhiService) -> Result<NewUpdate, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Create<'a, NewUpdate> for UpdateBuilder<'a> {
+    async fn create(&'a self, bodhi: &'a BodhiService) -> Result<NewUpdate, QueryError> {
         let path = String::from("/updates/");
 
         // do some data sanity verification

@@ -198,8 +198,9 @@ impl<'a> UpdateEditor<'a> {
     }
 }
 
-impl<'a> Edit<EditedUpdate> for UpdateEditor<'a> {
-    fn edit(&self, bodhi: &BodhiService) -> Result<EditedUpdate, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Edit<'a, EditedUpdate> for UpdateEditor<'a> {
+    async fn edit(&'a self, bodhi: &'a BodhiService) -> Result<EditedUpdate, QueryError> {
         let path = String::from("/updates/");
 
         // do some data sanity verification
@@ -314,11 +315,12 @@ impl<'a> UpdateStatusRequester<'a> {
     }
 }
 
-impl<'a> Edit<Update> for UpdateStatusRequester<'a> {
-    fn edit(&self, bodhi: &BodhiService) -> Result<Update, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Edit<'a, Update> for UpdateStatusRequester<'a> {
+    async fn edit(&'a self, bodhi: &'a BodhiService) -> Result<Update, QueryError> {
         let path = format!("/updates/{}/request", &self.alias);
 
-        let csrf_token = bodhi.query(CSRFQuery::new())?;
+        let csrf_token = bodhi.query(&CSRFQuery::new())?;
 
         #[derive(Serialize)]
         struct RequestEdit<'a> {
@@ -376,11 +378,12 @@ impl<'a> UpdateTestResultWaiver<'a> {
     }
 }
 
-impl<'a> Edit<Update> for UpdateTestResultWaiver<'a> {
-    fn edit(&self, bodhi: &BodhiService) -> Result<Update, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Edit<'a, Update> for UpdateTestResultWaiver<'a> {
+    async fn edit(&'a self, bodhi: &'a BodhiService) -> Result<Update, QueryError> {
         let path = format!("/updates/{}/waive-test-results", &self.alias);
 
-        let csrf_token = bodhi.query(CSRFQuery::new())?;
+        let csrf_token = bodhi.query(&CSRFQuery::new())?;
 
         #[derive(Serialize)]
         struct RequestWaiver<'a> {

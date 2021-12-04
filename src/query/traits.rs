@@ -1,10 +1,12 @@
 use crate::error::{BodhiError, QueryError};
 use crate::BodhiService;
 
-pub trait Query<T> {
-    fn query(self, bodhi: &BodhiService) -> Result<T, QueryError>;
+#[async_trait::async_trait]
+pub trait Query<'a, T> {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<T, QueryError>;
 }
 
+#[async_trait::async_trait]
 pub trait SinglePageQuery<T> {
     /// This method is expected to return the path of the API endpoint.
     fn path(&self) -> Result<String, QueryError>;
@@ -24,21 +26,21 @@ pub trait SinglePageQuery<T> {
     /// This method executes a single-page query, but delegates execution of some things to the
     /// individual trait implementations (such as deserializing JSON, handling 404 errors, or
     /// getting API paths and arguments).
-    fn query(self, bodhi: &BodhiService) -> Result<T, QueryError>
+    async fn query(self, bodhi: &BodhiService) -> Result<T, QueryError>
     where
         Self: Sized,
     {
         let path = self.path()?;
-        let response = bodhi.get(&path)?;
+        let response = bodhi.get(&path).await?;
         let status = response.status();
 
         if status.is_success() {
-            let string = response.text()?;
+            let string = response.text().await?;
             <Self as SinglePageQuery<T>>::parse(&string)
         } else if status == 404 {
             <Self as SinglePageQuery<T>>::missing()
         } else {
-            let result = response.text()?;
+            let result = response.text().await?;
             let error: BodhiError = serde_json::from_str(&result)?;
 
             Err(QueryError::BodhiError { error })

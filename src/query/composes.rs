@@ -55,8 +55,9 @@ impl SinglePageQuery<Option<Compose>> for ComposeReleaseRequestQuery {
     }
 }
 
-impl Query<Option<Compose>> for ComposeReleaseRequestQuery {
-    fn query(self, bodhi: &BodhiService) -> Result<Option<Compose>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Option<Compose>> for ComposeReleaseRequestQuery {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Option<Compose>, QueryError> {
         <Self as SinglePageQuery<Option<Compose>>>::query(self, bodhi)
     }
 }
@@ -104,8 +105,9 @@ impl SinglePageQuery<Vec<Compose>> for ComposeQuery {
     }
 }
 
-impl Query<Vec<Compose>> for ComposeQuery {
-    fn query(self, bodhi: &BodhiService) -> Result<Vec<Compose>, QueryError> {
+#[async_trait::async_trait]
+impl<'a> Query<'a, Vec<Compose>> for ComposeQuery {
+    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Vec<Compose>, QueryError> {
         <Self as SinglePageQuery<Vec<Compose>>>::query(self, bodhi)
     }
 }
