@@ -15,11 +15,12 @@ const TEST_TIMEOUT: Duration = Duration::from_secs(300);
 const TEST_RETRIES: usize = 10;
 
 #[cfg(feature = "online-tests")]
-fn bodhi_init() -> BodhiService {
+async fn bodhi_init() -> BodhiService {
     BodhiServiceBuilder::default()
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES)
         .build()
+        .await
         .expect("Failed to initialize bodhi service for tests.")
 }
 

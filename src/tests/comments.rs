@@ -2,66 +2,83 @@ use super::bodhi_init;
 
 use crate::{Comment, CommentIDQuery, CommentQuery};
 
-#[test]
-fn query_sanity_packages() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn query_sanity_packages() {
+    let bodhi = bodhi_init().await;
 
-    let rs_commis: Vec<Comment> = bodhi.query(CommentQuery::new().packages(vec!["rust"])).unwrap();
-    let go_commis: Vec<Comment> = bodhi.query(CommentQuery::new().packages(vec!["golang"])).unwrap();
+    let rs_commis: Vec<Comment> = bodhi
+        .paginated_request(&CommentQuery::new().packages(vec!["rust"]))
+        .await
+        .unwrap();
+    let go_commis: Vec<Comment> = bodhi
+        .paginated_request(&CommentQuery::new().packages(vec!["golang"]))
+        .await
+        .unwrap();
 
     let both_commis: Vec<Comment> = bodhi
-        .query(CommentQuery::new().packages(vec!["rust", "golang"]))
+        .paginated_request(&CommentQuery::new().packages(vec!["rust", "golang"]))
+        .await
         .unwrap();
 
     assert_eq!(both_commis.len(), rs_commis.len() + go_commis.len())
 }
 
-#[test]
-fn query_sanity_updates() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn query_sanity_updates() {
+    let bodhi = bodhi_init().await;
 
     let commis_one: Vec<Comment> = bodhi
-        .query(CommentQuery::new().updates(vec!["FEDORA-2019-cf87377f5f"]))
+        .paginated_request(&CommentQuery::new().updates(vec!["FEDORA-2019-cf87377f5f"]))
+        .await
         .unwrap();
     let commis_two: Vec<Comment> = bodhi
-        .query(CommentQuery::new().updates(vec!["FEDORA-2019-24c9d17287"]))
+        .paginated_request(&CommentQuery::new().updates(vec!["FEDORA-2019-24c9d17287"]))
+        .await
         .unwrap();
 
     let both_commis: Vec<Comment> = bodhi
-        .query(CommentQuery::new().updates(vec!["FEDORA-2019-cf87377f5f", "FEDORA-2019-24c9d17287"]))
+        .paginated_request(&CommentQuery::new().updates(vec!["FEDORA-2019-cf87377f5f", "FEDORA-2019-24c9d17287"]))
+        .await
         .unwrap();
 
     assert_eq!(both_commis.len(), commis_one.len() + commis_two.len())
 }
 
-#[test]
-fn query_sanity_users() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn query_sanity_users() {
+    let bodhi = bodhi_init().await;
 
-    let commis_one: Vec<Comment> = bodhi.query(CommentQuery::new().users(vec!["astra"])).unwrap();
-    let commis_two: Vec<Comment> = bodhi.query(CommentQuery::new().users(vec!["cipherboy"])).unwrap();
+    let commis_one: Vec<Comment> = bodhi
+        .paginated_request(&CommentQuery::new().users(vec!["astra"]))
+        .await
+        .unwrap();
+    let commis_two: Vec<Comment> = bodhi
+        .paginated_request(&CommentQuery::new().users(vec!["cipherboy"]))
+        .await
+        .unwrap();
 
     let both_commis: Vec<Comment> = bodhi
-        .query(CommentQuery::new().users(vec!["astra", "cipherboy"]))
+        .paginated_request(&CommentQuery::new().users(vec!["astra", "cipherboy"]))
+        .await
         .unwrap();
 
     assert_eq!(both_commis.len(), commis_one.len() + commis_two.len())
 }
 
-#[test]
-fn id_query_some() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn id_query_some() {
+    let bodhi = bodhi_init().await;
 
-    let comment: Option<Comment> = bodhi.query(CommentIDQuery::new(19_999)).unwrap();
+    let comment = bodhi.request(&CommentIDQuery::new(19_999)).await;
 
-    assert!(comment.is_some());
+    assert!(comment.is_ok());
 }
 
-#[test]
-fn id_query_none() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn id_query_none() {
+    let bodhi = bodhi_init().await;
 
-    let comment: Option<Comment> = bodhi.query(CommentIDQuery::new(999_999_999)).unwrap();
+    let comment = bodhi.request(&CommentIDQuery::new(999_999_999)).await;
 
-    assert!(comment.is_none());
+    assert!(comment.is_err());
 }
