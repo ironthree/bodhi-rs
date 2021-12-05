@@ -8,8 +8,8 @@
 pub mod builds;
 pub use builds::{BuildNVRQuery, BuildQuery};
 
-//pub mod comments;
-//pub use comments::{CommentIDQuery, CommentQuery};
+pub mod comments;
+pub use comments::{CommentIDQuery, CommentQuery};
 
 //pub mod composes;
 //pub use composes::{ComposeQuery, ComposeReleaseRequestQuery};

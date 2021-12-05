@@ -10,7 +10,7 @@ pub const BODHI_DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 
 /// This struct wraps a `chrono::DateTime<chrono::Utc>` instance with implementations for converting
 /// to and from the string format that bodhi expects and returns for dates and times.
-#[derive(Debug, Eq)]
+#[derive(Clone, Debug, Eq)]
 pub struct BodhiDate {
     date: DateTime<Utc>,
 }
