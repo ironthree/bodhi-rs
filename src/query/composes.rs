@@ -1,26 +1,27 @@
-//! The contents of this module can be used to query a bodhi instance for running composes.
+// ! The contents of this module can be used to query a bodhi instance for running composes.
 
 use serde::Deserialize;
 
-use crate::error::{QueryError, ServiceError};
-use crate::{BodhiService, Compose, ComposeRequest, FedoraRelease, Query, SinglePageQuery};
+use crate::data::{Compose, ComposeRequest, FedoraRelease};
+use crate::error::QueryError;
+use crate::request::{RequestMethod, SingleRequest};
 
-/// Use this for querying bodhi for a specific compose by its release and request. It will either
-/// return an `Ok(Some(Compose))` matching the specified values, return `Ok(None)` if it doesn't
-/// currently exist, or return an `Err(QueryError)` if another error occurred.
-///
-/// ```
-/// # use bodhi::{BodhiServiceBuilder, ComposeReleaseRequestQuery, FedoraRelease, ComposeRequest};
-/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-///
-/// # #[cfg(feature = "online-tests")]
-/// let compose = bodhi
-///     .query(ComposeReleaseRequestQuery::new(
-///         FedoraRelease::F31,
-///         ComposeRequest::Stable,
-///     ))
-///     .unwrap();
-/// ```
+// Use this for querying bodhi for a specific compose by its release and request. It will either
+// return an `Ok(Some(Compose))` matching the specified values, return `Ok(None)` if it doesn't
+// currently exist, or return an `Err(QueryError)` if another error occurred.
+//
+// ```
+// # use bodhi::{BodhiServiceBuilder, ComposeReleaseRequestQuery, FedoraRelease, ComposeRequest};
+// let bodhi = BodhiServiceBuilder::default().build().unwrap();
+//
+// # #[cfg(feature = "online-tests")]
+// let compose = bodhi
+//     .query(ComposeReleaseRequestQuery::new(
+//         FedoraRelease::F31,
+//         ComposeRequest::Stable,
+//     ))
+//     .unwrap();
+// ```
 #[derive(Debug)]
 pub struct ComposeReleaseRequestQuery {
     release: FedoraRelease,
@@ -33,46 +34,47 @@ struct ComposePage {
 }
 
 impl ComposeReleaseRequestQuery {
-    /// This method is the only way to create a new
-    /// [`ComposeReleaseRequestQuery`](struct.ComposeReleaseRequestQuery.html) instance.
+    // This method is the only way to create a new
+    // [`ComposeReleaseRequestQuery`](struct.ComposeReleaseRequestQuery.html) instance.
     pub fn new(release: FedoraRelease, request: ComposeRequest) -> Self {
         ComposeReleaseRequestQuery { release, request }
     }
 }
 
-impl SinglePageQuery<Option<Compose>> for ComposeReleaseRequestQuery {
+impl SingleRequest<ComposePage, Compose> for ComposeReleaseRequestQuery {
+    fn method(&self) -> RequestMethod {
+        RequestMethod::GET
+    }
+
     fn path(&self) -> Result<String, QueryError> {
         Ok(format!("/composes/{}/{}", self.release, self.request))
     }
 
-    fn parse(string: &str) -> Result<Option<Compose>, QueryError> {
+    fn body(&self) -> Option<String> {
+        None
+    }
+
+    fn parse(&self, string: &str) -> Result<ComposePage, QueryError> {
         let page: ComposePage = serde_json::from_str(string)?;
-        Ok(Some(page.compose))
+        Ok(page)
     }
 
-    fn missing() -> Result<Option<Compose>, QueryError> {
-        Ok(None)
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> Query<'a, Option<Compose>> for ComposeReleaseRequestQuery {
-    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Option<Compose>, QueryError> {
-        <Self as SinglePageQuery<Option<Compose>>>::query(self, bodhi)
+    fn extract(&self, page: ComposePage) -> Compose {
+        page.compose
     }
 }
 
-/// This query can be used to fetch information about currently running composes from bodhi.
-///
-/// ```
-/// # use bodhi::{BodhiServiceBuilder, ComposeQuery};
-/// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-///
-/// # #[cfg(feature = "online-tests")]
-/// let composes = bodhi.query(ComposeQuery::new()).unwrap();
-/// ```
-///
-/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/composes.html>
+// This query can be used to fetch information about currently running composes from bodhi.
+//
+// ```
+// # use bodhi::{BodhiServiceBuilder, ComposeQuery};
+// let bodhi = BodhiServiceBuilder::default().build().unwrap();
+//
+// # #[cfg(feature = "online-tests")]
+// let composes = bodhi.query(ComposeQuery::new()).unwrap();
+// ```
+//
+// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/composes.html>
 #[derive(Debug, Default)]
 pub struct ComposeQuery {}
 
@@ -82,32 +84,31 @@ struct ComposeListPage {
 }
 
 impl ComposeQuery {
-    /// This method creates a new [`ComposeQuery`](struct.ComposeQuery.html).
+    // This method creates a new [`ComposeQuery`](struct.ComposeQuery.html).
     pub fn new() -> Self {
-        ComposeQuery {}
+        Self::default()
     }
 }
 
-impl SinglePageQuery<Vec<Compose>> for ComposeQuery {
+impl SingleRequest<ComposeListPage, Vec<Compose>> for ComposeQuery {
+    fn method(&self) -> RequestMethod {
+        RequestMethod::GET
+    }
+
     fn path(&self) -> Result<String, QueryError> {
         Ok(String::from("/composes/"))
     }
 
-    fn parse(string: &str) -> Result<Vec<Compose>, QueryError> {
+    fn body(&self) -> Option<String> {
+        None
+    }
+
+    fn parse(&self, string: &str) -> Result<ComposeListPage, QueryError> {
         let page: ComposeListPage = serde_json::from_str(string)?;
-        Ok(page.composes)
+        Ok(page)
     }
 
-    fn missing() -> Result<Vec<Compose>, QueryError> {
-        Err(QueryError::ServiceError {
-            error: ServiceError::EmptyResponseError,
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> Query<'a, Vec<Compose>> for ComposeQuery {
-    async fn query(&'a self, bodhi: &'a BodhiService) -> Result<Vec<Compose>, QueryError> {
-        <Self as SinglePageQuery<Vec<Compose>>>::query(self, bodhi)
+    fn extract(&self, page: ComposeListPage) -> Vec<Compose> {
+        page.composes
     }
 }

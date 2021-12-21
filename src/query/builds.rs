@@ -12,10 +12,10 @@ use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+use crate::data::{Build, FedoraRelease};
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
 use crate::service::DEFAULT_ROWS;
-use crate::{Build, FedoraRelease};
 
 // Use this for querying bodhi for a specific build, by its NVR (Name-Version-Release) string. It
 // will either return an `Ok(Some(Build))` matching the specified NVR, return `Ok(None)` if it
@@ -117,13 +117,7 @@ impl<'a> Debug for BuildQuery<'a> {
 impl<'a> BuildQuery<'a> {
     // This method returns a new [`BuildQuery`](struct.BuildQuery.html) with *no* filters set.
     pub fn new() -> Self {
-        BuildQuery {
-            nvr: None,
-            packages: None,
-            releases: None,
-            updates: None,
-            callback: None,
-        }
+        Self::default()
     }
 
     // Add a callback function for reporting back query progress for long-running queries.
@@ -166,6 +160,7 @@ struct BuildPageQuery {
     packages: Option<Vec<String>>,
     releases: Option<Vec<FedoraRelease>>,
     updates: Option<Vec<String>>,
+
     page: u32,
     rows_per_page: u32,
 }
@@ -184,8 +179,8 @@ impl SingleRequest<BuildListPage, Vec<Build>> for BuildPageQuery {
     }
 
     fn parse(&self, string: &str) -> Result<BuildListPage, QueryError> {
-        let build_page: BuildListPage = serde_json::from_str(string)?;
-        Ok(build_page)
+        let page: BuildListPage = serde_json::from_str(string)?;
+        Ok(page)
     }
 
     fn extract(&self, page: BuildListPage) -> Vec<Build> {
@@ -193,7 +188,6 @@ impl SingleRequest<BuildListPage, Vec<Build>> for BuildPageQuery {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct BuildListPage {
     builds: Vec<Build>,

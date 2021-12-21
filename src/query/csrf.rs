@@ -16,7 +16,7 @@ pub struct CSRFPage {
 
 impl CSRFQuery {
     pub fn new() -> Self {
-        CSRFQuery {}
+        Self::default()
     }
 }
 

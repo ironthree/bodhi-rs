@@ -12,10 +12,10 @@ use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+use crate::data::{BodhiDate, Comment};
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
 use crate::service::DEFAULT_ROWS;
-use crate::{BodhiDate, Comment};
 
 // Use this for querying bodhi for a specific comment by its ID. It will either return an
 // `Ok(Some(Comment))` matching the specified ID, return `Ok(None)` if it doesn't exist, or return
@@ -123,18 +123,7 @@ impl<'a> Debug for CommentQuery<'a> {
 impl<'a> CommentQuery<'a> {
     // This method returns a new [`CommentQuery`](struct.CommentQuery.html) with *no* filters set.
     pub fn new() -> Self {
-        CommentQuery {
-            anonymous: None,
-            ignore_users: None,
-            like: None,
-            packages: None,
-            search: None,
-            since: None,
-            update_owners: None,
-            updates: None,
-            users: None,
-            callback: None,
-        }
+        Self::default()
     }
 
     // Add a callback function for reporting back query progress for long-running queries.
