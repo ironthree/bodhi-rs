@@ -2,10 +2,10 @@ use super::bodhi_init;
 
 use crate::CSRFQuery;
 
-#[test]
-fn deserialize() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn deserialize() {
+    let bodhi = bodhi_init().await;
 
     // query and deserialize a new CSRF token
-    bodhi.query(CSRFQuery::new()).unwrap();
+    bodhi.request(&CSRFQuery::new()).await.unwrap();
 }

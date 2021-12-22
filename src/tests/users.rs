@@ -1,39 +1,43 @@
 use super::bodhi_init;
 
+use crate::error::QueryError;
 use crate::{User, UserNameQuery, UserQuery};
 
-#[test]
-fn query_sanity_updates() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn query_sanity_updates() {
+    let bodhi = bodhi_init().await;
 
     let users_one: Vec<User> = bodhi
-        .query(UserQuery::new().updates(vec!["FEDORA-2019-ac2a21ff07"]))
+        .paginated_request(&UserQuery::new().updates(vec!["FEDORA-2019-ac2a21ff07"]))
+        .await
         .unwrap();
     let users_two: Vec<User> = bodhi
-        .query(UserQuery::new().updates(vec!["FEDORA-2019-ac3dc27f26"]))
+        .paginated_request(&UserQuery::new().updates(vec!["FEDORA-2019-ac3dc27f26"]))
+        .await
         .unwrap();
 
     let users_both: Vec<User> = bodhi
-        .query(UserQuery::new().updates(vec!["FEDORA-2019-ac2a21ff07", "FEDORA-2019-ac3dc27f26"]))
+        .paginated_request(&UserQuery::new().updates(vec!["FEDORA-2019-ac2a21ff07", "FEDORA-2019-ac3dc27f26"]))
+        .await
         .unwrap();
 
     assert_eq!(users_both.len(), users_one.len() + users_two.len())
 }
 
-#[test]
-fn name_query_some() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn name_query_ok() {
+    let bodhi = bodhi_init().await;
 
-    let user: Option<User> = bodhi.query(UserNameQuery::new("decathorpe")).unwrap();
+    let user = bodhi.request(&UserNameQuery::new("decathorpe")).await;
 
-    assert!(user.is_some());
+    assert!(user.is_ok());
 }
 
-#[test]
-fn name_query_none() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn name_query_err() {
+    let bodhi = bodhi_init().await;
 
-    let user: Option<User> = bodhi.query(UserNameQuery::new("nobody")).unwrap();
+    let user = bodhi.request(&UserNameQuery::new("nobody")).await;
 
-    assert!(user.is_none());
+    assert!(matches!(user, Err(QueryError::NotFound)));
 }

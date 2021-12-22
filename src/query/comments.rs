@@ -36,7 +36,7 @@ pub struct CommentIDQuery {
 }
 
 #[derive(Debug, Deserialize)]
-struct CommentPage {
+pub(crate) struct CommentPage {
     comment: Comment,
 }
 
@@ -236,7 +236,7 @@ impl SingleRequest<CommentListPage, Vec<Comment>> for CommentPageQuery {
 
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
-struct CommentListPage {
+pub(crate) struct CommentListPage {
     comments: Vec<Comment>,
     page: u32,
     pages: u32,

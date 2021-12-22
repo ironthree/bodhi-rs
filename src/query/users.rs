@@ -37,7 +37,7 @@ pub struct UserNameQuery<'a> {
 }
 
 #[derive(Debug, Deserialize)]
-struct UserPage {
+pub(crate) struct UserPage {
     user: User,
 }
 
@@ -164,7 +164,7 @@ struct UserPageQuery {
     like: Option<String>,
     name: Option<String>,
     search: Option<String>,
-    updates: Option<String>,
+    updates: Option<Vec<String>>,
 
     page: u32,
     rows_per_page: u32,
@@ -194,7 +194,7 @@ impl SingleRequest<UserListPage, Vec<User>> for UserPageQuery {
 }
 
 #[derive(Debug, Deserialize)]
-struct UserListPage {
+pub(crate) struct UserListPage {
     users: Vec<User>,
     page: u32,
     pages: u32,

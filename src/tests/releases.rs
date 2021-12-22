@@ -1,30 +1,31 @@
 use super::bodhi_init;
 
+use crate::error::QueryError;
 use crate::{Release, ReleaseNameQuery, ReleaseQuery};
 
-#[test]
-fn query() {
+#[tokio::test]
+async fn query() {
     // This test makes sure that the FedoraRelease enum contains valid values for all fedora releases.
     // If this fails, then new enum variant(s) need to be added.
 
-    let bodhi = bodhi_init();
-    let _releases: Vec<Release> = bodhi.query(ReleaseQuery::new()).unwrap();
+    let bodhi = bodhi_init().await;
+    let _releases: Vec<Release> = bodhi.paginated_request(&ReleaseQuery::new()).await.unwrap();
 }
 
-#[test]
-fn name_query_some() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn name_query_ok() {
+    let bodhi = bodhi_init().await;
 
-    let release: Option<Release> = bodhi.query(ReleaseNameQuery::new("F30")).unwrap();
+    let release = bodhi.request(&ReleaseNameQuery::new("F30")).await;
 
-    assert!(release.is_some());
+    assert!(release.is_ok());
 }
 
-#[test]
-fn name_query_none() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn name_query_err() {
+    let bodhi = bodhi_init().await;
 
-    let release: Option<Release> = bodhi.query(ReleaseNameQuery::new("X12")).unwrap();
+    let release = bodhi.request(&ReleaseNameQuery::new("X12")).await;
 
-    assert!(release.is_none());
+    assert!(matches!(release, Err(QueryError::NotFound)));
 }

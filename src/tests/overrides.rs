@@ -1,76 +1,85 @@
 use super::bodhi_init;
 
+use crate::error::QueryError;
 use crate::{FedoraRelease, Override, OverrideNVRQuery, OverrideQuery};
 
-#[test]
-fn query_sanity_packages() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn query_sanity_packages() {
+    let bodhi = bodhi_init().await;
 
-    let rs_overs: Vec<Override> = bodhi.query(OverrideQuery::new().packages(vec!["rust"])).unwrap();
-    let go_overs: Vec<Override> = bodhi.query(OverrideQuery::new().packages(vec!["golang"])).unwrap();
+    let rs_overs: Vec<Override> = bodhi
+        .paginated_request(&OverrideQuery::new().packages(vec!["rust"]))
+        .await
+        .unwrap();
+    let go_overs: Vec<Override> = bodhi
+        .paginated_request(&OverrideQuery::new().packages(vec!["golang"]))
+        .await
+        .unwrap();
 
     let both_overs: Vec<Override> = bodhi
-        .query(OverrideQuery::new().packages(vec!["rust", "golang"]))
+        .paginated_request(&OverrideQuery::new().packages(vec!["rust", "golang"]))
+        .await
         .unwrap();
 
     assert_eq!(both_overs.len(), rs_overs.len() + go_overs.len())
 }
 
-#[test]
-fn query_sanity_releases() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn query_sanity_releases() {
+    let bodhi = bodhi_init().await;
 
     let f31_overs: Vec<Override> = bodhi
-        .query(OverrideQuery::new().releases(vec![FedoraRelease::F31]))
+        .paginated_request(&OverrideQuery::new().releases(vec![FedoraRelease::F31]))
+        .await
         .unwrap();
     let f32_overs: Vec<Override> = bodhi
-        .query(OverrideQuery::new().releases(vec![FedoraRelease::F32]))
+        .paginated_request(&OverrideQuery::new().releases(vec![FedoraRelease::F32]))
+        .await
         .unwrap();
 
     let both_overs: Vec<Override> = bodhi
-        .query(OverrideQuery::new().releases(vec![FedoraRelease::F31, FedoraRelease::F32]))
+        .paginated_request(&OverrideQuery::new().releases(vec![FedoraRelease::F31, FedoraRelease::F32]))
+        .await
         .unwrap();
 
     assert_eq!(both_overs.len(), f31_overs.len() + f32_overs.len())
 }
 
-#[test]
-fn query_sanity_users() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn query_sanity_users() {
+    let bodhi = bodhi_init().await;
 
-    let overs_one: Vec<Override> = bodhi.query(OverrideQuery::new().users(vec!["gil"])).unwrap();
-    let overs_two: Vec<Override> = bodhi.query(OverrideQuery::new().users(vec!["lef"])).unwrap();
+    let overs_one: Vec<Override> = bodhi
+        .paginated_request(&OverrideQuery::new().users(vec!["gil"]))
+        .await
+        .unwrap();
+    let overs_two: Vec<Override> = bodhi
+        .paginated_request(&OverrideQuery::new().users(vec!["lef"]))
+        .await
+        .unwrap();
 
-    let both_overs: Vec<Override> = bodhi.query(OverrideQuery::new().users(vec!["gil", "lef"])).unwrap();
+    let both_overs: Vec<Override> = bodhi
+        .paginated_request(&OverrideQuery::new().users(vec!["gil", "lef"]))
+        .await
+        .unwrap();
 
     assert_eq!(both_overs.len(), overs_one.len() + overs_two.len())
 }
 
-#[test]
-fn nvr_query_some() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn nvr_query_ok() {
+    let bodhi = bodhi_init().await;
 
-    let over_ride: Option<Override> = bodhi.query(OverrideNVRQuery::new("rust-1.34.2-1.fc30")).unwrap();
+    let over_ride = bodhi.request(&OverrideNVRQuery::new("rust-1.34.2-1.fc30")).await;
 
-    assert!(over_ride.is_some());
+    assert!(over_ride.is_ok());
 }
 
-#[test]
-fn nvr_query_none() {
-    let bodhi = bodhi_init();
+#[tokio::test]
+async fn nvr_query_err() {
+    let bodhi = bodhi_init().await;
 
-    let over_ride: Option<Override> = bodhi.query(OverrideNVRQuery::new("syncthing-1.1.3-1.fc30")).unwrap();
+    let over_ride = bodhi.request(&OverrideNVRQuery::new("syncthing-1.1.3-1.fc30")).await;
 
-    assert!(over_ride.is_none());
-}
-
-#[test]
-fn nvr_query_invalid() {
-    let bodhi = bodhi_init();
-
-    let over_ride: Option<Override> = bodhi
-        .query(OverrideNVRQuery::new("this-doesnt-exist-1-1.fc30"))
-        .unwrap();
-
-    assert!(over_ride.is_none());
+    assert!(matches!(over_ride, Err(QueryError::NotFound)));
 }

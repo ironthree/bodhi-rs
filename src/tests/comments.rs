@@ -1,5 +1,6 @@
 use super::bodhi_init;
 
+use crate::error::QueryError;
 use crate::{Comment, CommentIDQuery, CommentQuery};
 
 #[tokio::test]
@@ -66,7 +67,7 @@ async fn query_sanity_users() {
 }
 
 #[tokio::test]
-async fn id_query_some() {
+async fn id_query_ok() {
     let bodhi = bodhi_init().await;
 
     let comment = bodhi.request(&CommentIDQuery::new(19_999)).await;
@@ -75,10 +76,10 @@ async fn id_query_some() {
 }
 
 #[tokio::test]
-async fn id_query_none() {
+async fn id_query_err() {
     let bodhi = bodhi_init().await;
 
     let comment = bodhi.request(&CommentIDQuery::new(999_999_999)).await;
 
-    assert!(comment.is_err());
+    assert!(matches!(comment, Err(QueryError::NotFound)));
 }

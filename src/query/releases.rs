@@ -188,7 +188,7 @@ impl SingleRequest<ReleaseListPage, Vec<Release>> for ReleasePageQuery {
 }
 
 #[derive(Debug, Deserialize)]
-struct ReleaseListPage {
+pub(crate) struct ReleaseListPage {
     releases: Vec<Release>,
     page: u32,
     pages: u32,

@@ -114,7 +114,7 @@ impl SingleRequest<PackageListPage, Vec<Package>> for PackagePageQuery {
 }
 
 #[derive(Debug, Deserialize)]
-struct PackageListPage {
+pub(crate) struct PackageListPage {
     packages: Vec<Package>,
     page: u32,
     pages: u32,

@@ -29,7 +29,7 @@ pub struct ComposeReleaseRequestQuery {
 }
 
 #[derive(Debug, Deserialize)]
-struct ComposePage {
+pub(crate) struct ComposePage {
     compose: Compose,
 }
 
@@ -79,7 +79,7 @@ impl SingleRequest<ComposePage, Compose> for ComposeReleaseRequestQuery {
 pub struct ComposeQuery {}
 
 #[derive(Debug, Deserialize)]
-struct ComposeListPage {
+pub(crate) struct ComposeListPage {
     composes: Vec<Compose>,
 }
 

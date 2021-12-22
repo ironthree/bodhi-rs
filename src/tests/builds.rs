@@ -1,5 +1,6 @@
 use super::bodhi_init;
 
+use crate::error::QueryError;
 use crate::{Build, BuildNVRQuery, BuildQuery, FedoraRelease};
 
 #[tokio::test]
@@ -66,7 +67,7 @@ async fn query_sanity_updates() {
 }
 
 #[tokio::test]
-async fn nvr_query_some() {
+async fn nvr_query_ok() {
     let bodhi = bodhi_init().await;
 
     let build = bodhi.request(&BuildNVRQuery::new("rust-1.34.2-1.fc30")).await;
@@ -75,10 +76,10 @@ async fn nvr_query_some() {
 }
 
 #[tokio::test]
-async fn nvr_query_none() {
+async fn nvr_query_err() {
     let bodhi = bodhi_init().await;
 
     let build = bodhi.request(&BuildNVRQuery::new("this-doesnt-exist-1-1.fc30")).await;
 
-    assert!(build.is_err());
+    assert!(matches!(build, Err(QueryError::NotFound)));
 }
