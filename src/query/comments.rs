@@ -236,7 +236,7 @@ impl SingleRequest<CommentListPage, Vec<Comment>> for CommentPageQuery {
 
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
-pub(crate) struct CommentListPage {
+pub struct CommentListPage {
     comments: Vec<Comment>,
     page: u32,
     pages: u32,

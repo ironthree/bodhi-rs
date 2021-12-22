@@ -2,11 +2,16 @@
 
 use std::env::args;
 
+use bodhi::error::QueryError;
 use bodhi::{BodhiServiceBuilder, UserNameQuery};
 
-fn main() -> Result<(), String> {
+#[tokio::main]
+async fn main() -> Result<(), String> {
     // construct bodhi client for the production instance
-    let bodhi = BodhiServiceBuilder::default().build().unwrap();
+    let bodhi = BodhiServiceBuilder::default()
+        .build()
+        .await
+        .map_err(|error| error.to_string())?;
 
     let mut arguments = args();
 
@@ -14,15 +19,15 @@ fn main() -> Result<(), String> {
     arguments.next();
 
     for argument in arguments {
-        let user = match bodhi.query(UserNameQuery::new(&argument)) {
-            Err(error) => return Err(format!("{}", error)),
-            Ok(user) => match user {
-                Some(user) => user,
-                None => {
+        let user = match bodhi.request(&UserNameQuery::new(&argument)).await {
+            Ok(user) => user,
+            Err(error) => match error {
+                QueryError::NotFound => {
                     println!("User '{}' not found.", &argument);
                     println!();
                     continue;
                 },
+                error => return Err(error.to_string()),
             },
         };
 

@@ -37,7 +37,7 @@ pub struct OverrideNVRQuery<'a> {
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct OverridePage {
+pub struct OverridePage {
     r#override: Override,
 }
 
@@ -217,9 +217,8 @@ impl SingleRequest<OverrideListPage, Vec<Override>> for OverridePageQuery {
     }
 }
 
-
 #[derive(Debug, Deserialize)]
-pub(crate) struct OverrideListPage {
+pub struct OverrideListPage {
     overrides: Vec<Override>,
     page: u32,
     pages: u32,

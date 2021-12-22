@@ -36,7 +36,7 @@ pub struct UpdateIDQuery<'a> {
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct UpdatePage {
+pub struct UpdatePage {
     update: Update,
     can_edit: bool,
 }
@@ -425,7 +425,7 @@ impl SingleRequest<UpdateListPage, Vec<Update>> for UpdatePageQuery {
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct UpdateListPage {
+pub struct UpdateListPage {
     updates: Vec<Update>,
     page: u32,
     pages: u32,
