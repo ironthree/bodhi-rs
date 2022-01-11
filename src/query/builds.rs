@@ -119,6 +119,7 @@ impl<'a> BuildQuery<'a> {
     // Add a callback function for reporting back query progress for long-running queries.
     // The function will be called with the current page and the total number of pages for
     // paginated queries.
+    #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
@@ -126,24 +127,28 @@ impl<'a> BuildQuery<'a> {
 
     // Restrict the returned results to builds with the given NVR. If this is the only required
     // filter, consider using a [`BuildNVRQuery`](struct.BuildNVRQuery.html) instead.
+    #[must_use]
     pub fn nvr(mut self, nvr: &'a str) -> Self {
         self.nvr = Some(nvr);
         self
     }
 
     // Restrict the returned results to builds of the given package(s).
+    #[must_use]
     pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
         self.packages = Some(packages);
         self
     }
 
     // Restrict the returned results to builds for the given release(s).
+    #[must_use]
     pub fn releases(mut self, releases: Vec<FedoraRelease>) -> Self {
         self.releases = Some(releases);
         self
     }
 
     // Restrict the returned results to builds for the given update(s).
+    #[must_use]
     pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
         self.updates = Some(updates);
         self

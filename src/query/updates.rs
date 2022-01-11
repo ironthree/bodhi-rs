@@ -169,18 +169,21 @@ impl<'a> UpdateQuery<'a> {
     // Add a callback function for reporting back query progress for long-running queries.
     // The function will be called with the current page and the total number of pages for
     // paginated queries.
+    #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
     // Restrict the returned results to (not) active releases.
+    #[must_use]
     pub fn active_releases(mut self, active_releases: bool) -> Self {
         self.active_releases = Some(active_releases);
         self
     }
 
     // Restrict results to updates matching the given alias(es).
+    #[must_use]
     pub fn aliases(mut self, aliases: Vec<&'a str>) -> Self {
         self.aliases = Some(aliases);
         self
@@ -188,6 +191,7 @@ impl<'a> UpdateQuery<'a> {
 
     // Restrict the returned results to updates which were approved
     // before the given date and time.
+    #[must_use]
     pub fn approved_before(mut self, approved_before: &'a BodhiDate) -> Self {
         self.approved_before = Some(approved_before);
         self
@@ -195,48 +199,56 @@ impl<'a> UpdateQuery<'a> {
 
     // Restrict the returned results to updates which were approved
     // since the given date and time.
+    #[must_use]
     pub fn approved_since(mut self, approved_since: &'a BodhiDate) -> Self {
         self.approved_since = Some(approved_since);
         self
     }
 
     // Restrict results to updates associated with the given bug(s).
+    #[must_use]
     pub fn bugs(mut self, bugs: Vec<u32>) -> Self {
         self.bugs = Some(bugs);
         self
     }
 
     // Restrict results to updates associated with the given build(s).
+    #[must_use]
     pub fn builds(mut self, builds: Vec<&'a str>) -> Self {
         self.builds = Some(builds);
         self
     }
 
     // Restrict the returned results to the given content type.
+    #[must_use]
     pub fn content_type(mut self, content_type: ContentType) -> Self {
         self.content_type = Some(content_type);
         self
     }
 
     // Restrict the returned results to updates (not) marked with critpath.
+    #[must_use]
     pub fn critpath(mut self, critpath: bool) -> Self {
         self.critpath = Some(critpath);
         self
     }
 
     // Restrict results to updates associated with the given CVE(s).
+    #[must_use]
     pub fn cves(mut self, cves: Vec<&'a str>) -> Self {
         self.cves = Some(cves);
         self
     }
 
     // Restrict search to updates *like* the given argument (in the SQL sense).
+    #[must_use]
     pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
     }
 
     // Restrict the returned results to (not) locked updates.
+    #[must_use]
     pub fn locked(mut self, locked: bool) -> Self {
         self.locked = Some(locked);
         self
@@ -244,6 +256,7 @@ impl<'a> UpdateQuery<'a> {
 
     // Restrict the returned results to updates which were modified
     // before the given date and time.
+    #[must_use]
     pub fn modified_before(mut self, modified_before: &'a BodhiDate) -> Self {
         self.modified_before = Some(modified_before);
         self
@@ -251,18 +264,21 @@ impl<'a> UpdateQuery<'a> {
 
     // Restrict the returned results to updates which were modified
     // since the given date and time.
+    #[must_use]
     pub fn modified_since(mut self, modified_since: &'a BodhiDate) -> Self {
         self.modified_since = Some(modified_since);
         self
     }
 
     // Restrict results to updates associated for the given package(s).
+    #[must_use]
     pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
         self.packages = Some(packages);
         self
     }
 
     // Restrict the returned results to (not) pushed updates.
+    #[must_use]
     pub fn pushed(mut self, pushed: bool) -> Self {
         self.pushed = Some(pushed);
         self
@@ -270,6 +286,7 @@ impl<'a> UpdateQuery<'a> {
 
     // Restrict the returned results to updates which were pushed
     // before the given date and time.
+    #[must_use]
     pub fn pushed_before(mut self, pushed_before: &'a BodhiDate) -> Self {
         self.pushed_before = Some(pushed_before);
         self
@@ -277,36 +294,42 @@ impl<'a> UpdateQuery<'a> {
 
     // Restrict the returned results to updates which were pushed
     // since the given date and time.
+    #[must_use]
     pub fn pushed_since(mut self, pushed_since: &'a BodhiDate) -> Self {
         self.pushed_since = Some(pushed_since);
         self
     }
 
     // Restrict results to updates for the given release(s).
+    #[must_use]
     pub fn releases(mut self, releases: Vec<FedoraRelease>) -> Self {
         self.releases = Some(releases);
         self
     }
 
     // Restrict the returned results to updates with the given request.
+    #[must_use]
     pub fn request(mut self, request: UpdateRequest) -> Self {
         self.request = Some(request);
         self
     }
 
     // Restrict search to updates containing the given argument.
+    #[must_use]
     pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
 
     // Restrict the returned results to updates with the given severity.
+    #[must_use]
     pub fn severity(mut self, severity: UpdateSeverity) -> Self {
         self.severity = Some(severity);
         self
     }
 
     // Restrict the returned results to updates with the given status.
+    #[must_use]
     pub fn status(mut self, status: UpdateStatus) -> Self {
         self.status = Some(status);
         self
@@ -314,6 +337,7 @@ impl<'a> UpdateQuery<'a> {
 
     // Restrict the returned results to updates which were submitted
     // before the given date and time.
+    #[must_use]
     pub fn submitted_before(mut self, submitted_before: &'a BodhiDate) -> Self {
         self.submitted_before = Some(submitted_before);
         self
@@ -321,30 +345,35 @@ impl<'a> UpdateQuery<'a> {
 
     // Restrict the returned results to updates which were submitted
     // since the given date and time.
+    #[must_use]
     pub fn submitted_since(mut self, submitted_since: &'a BodhiDate) -> Self {
         self.submitted_since = Some(submitted_since);
         self
     }
 
     // Restrict the returned results to updates with the given "suggest" value.
+    #[must_use]
     pub fn suggest(mut self, suggest: UpdateSuggestion) -> Self {
         self.suggest = Some(suggest);
         self
     }
 
     // Restrict results to updates matching the given update ID(s).
+    #[must_use]
     pub fn update_ids(mut self, update_ids: Vec<&'a str>) -> Self {
         self.update_ids = Some(update_ids);
         self
     }
 
     // Restrict results to updates matching the given update type.
+    #[must_use]
     pub fn update_type(mut self, update_type: UpdateType) -> Self {
         self.update_type = Some(update_type);
         self
     }
 
     // Restrict results to updates associated with the given user(s).
+    #[must_use]
     pub fn users(mut self, users: Vec<&'a str>) -> Self {
         self.users = Some(users);
         self

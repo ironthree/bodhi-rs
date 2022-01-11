@@ -132,12 +132,14 @@ impl<'a> BodhiServiceBuilder<'a> {
     }
 
     // This method can be used to override the default request timeout.
+    #[must_use]
     pub fn timeout(mut self, timeout: Duration) -> Self {
         self.timeout = Some(timeout);
         self
     }
 
     // This method can be used to override the default number of retries.
+    #[must_use]
     pub fn retries(mut self, retries: usize) -> Self {
         self.retries = Some(retries);
         self
@@ -146,6 +148,7 @@ impl<'a> BodhiServiceBuilder<'a> {
     // This method can be used to set credentials for authenticating with the fedora OpenID
     // endpoint, so the resulting [`BodhiService`](struct.BodhiService.html) can be used to
     // send authenticated requests for creating and editing things on the server.
+    #[must_use]
     pub fn authentication(mut self, username: &'a str, password: &'a str) -> Self {
         self.authentication = Some(Authentication { username, password });
         self

@@ -125,6 +125,7 @@ impl<'a> CommentQuery<'a> {
     // Add a callback function for reporting back query progress for long-running queries.
     // The function will be called with the current page and the total number of pages for
     // paginated queries.
+    #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
@@ -134,36 +135,43 @@ impl<'a> CommentQuery<'a> {
     //
     // **NOTE**: Anonymous comments are no longer supported as of bodhi 4.0.
     // FIXME: remove this
+    #[must_use]
+    #[deprecated]
     pub fn anonymous(mut self, anonymous: bool) -> Self {
         self.anonymous = Some(anonymous);
         self
     }
 
     // Restrict results to ignore comments by certain users.
+    #[must_use]
     pub fn ignore_users(mut self, ignore_users: Vec<&'a str>) -> Self {
         self.ignore_users = Some(ignore_users);
         self
     }
 
     // Restrict search to comments *like* the given argument (in the SQL sense).
+    #[must_use]
     pub fn like(mut self, like: &'a str) -> CommentQuery {
         self.like = Some(like);
         self
     }
 
     // Restrict the returned results to comments filed against updates for the given package(s).
+    #[must_use]
     pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
         self.packages = Some(packages);
         self
     }
 
     // Restrict search to comments containing the given argument.
+    #[must_use]
     pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
 
     // Restrict the returned results to comments filed since the given date and time.
+    #[must_use]
     pub fn since(mut self, since: &'a BodhiDate) -> Self {
         self.since = Some(since);
         self
@@ -171,18 +179,21 @@ impl<'a> CommentQuery<'a> {
 
     // Restrict the returned results to comments filed against updates created by the specified
     // user(s).
+    #[must_use]
     pub fn update_owners(mut self, update_owners: Vec<&'a str>) -> Self {
         self.update_owners = Some(update_owners);
         self
     }
 
     // Restrict the returned results to comments filed against the given update(s).
+    #[must_use]
     pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
         self.updates = Some(updates);
         self
     }
 
     // Restrict the returned results to comments filed by the given user(s).
+    #[must_use]
     pub fn users(mut self, users: Vec<&'a str>) -> Self {
         self.users = Some(users);
         self
@@ -256,7 +267,7 @@ impl<'a> PaginatedRequest<CommentListPage, Vec<Comment>> for CommentQuery<'a> {
                 .as_ref()
                 .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
             search: self.search.map(|s| s.to_owned()),
-            since: self.since.map(|s| s.clone()),
+            since: self.since.cloned(),
             update_owners: self
                 .update_owners
                 .as_ref()

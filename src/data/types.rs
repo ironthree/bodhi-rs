@@ -411,7 +411,7 @@ impl TestCase {
     pub fn url(&self) -> Url {
         Url::parse(&format!(
             "https://fedoraproject.org/wiki/{}",
-            self.name.replace(" ", "_")
+            self.name.replace(' ', "_")
         ))
         .expect("Failed to parse the hard-coded URL, this should not happen.")
     }

@@ -39,18 +39,21 @@ impl<'a> OverrideEditor<'a> {
     }
 
     // Change the buildroot override notes.
+    #[must_use]
     pub fn notes(mut self, notes: &'a str) -> Self {
         self.notes = notes;
         self
     }
 
     // Change the buildroot override expiration date.
+    #[must_use]
     pub fn expiration_date(mut self, expiration_date: &'a BodhiDate) -> Self {
         self.expiration_date = expiration_date;
         self
     }
 
     // Change whether the buildroot override should be expired.
+    #[must_use]
     pub fn expired(mut self, expired: bool) -> Self {
         self.expired = Some(expired);
         self
@@ -73,7 +76,7 @@ impl<'a> SingleRequest<EditedOverride, EditedOverride> for OverrideEditor<'a> {
             expiration_date: self.expiration_date,
             expired: self.expired,
             edited: Some(self.edited),
-            csrf_token: csrf_token.as_ref().unwrap(),
+            csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
         match serde_json::to_string(&override_edit) {
@@ -83,7 +86,7 @@ impl<'a> SingleRequest<EditedOverride, EditedOverride> for OverrideEditor<'a> {
     }
 
     fn parse(&self, string: &str) -> Result<EditedOverride, QueryError> {
-        let edited_override: EditedOverride = serde_json::from_str(&string)?;
+        let edited_override: EditedOverride = serde_json::from_str(string)?;
         Ok(edited_override)
     }
 

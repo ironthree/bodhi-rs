@@ -127,48 +127,56 @@ impl<'a> OverrideQuery<'a> {
     // Add a callback function for reporting back query progress for long-running queries.
     // The function will be called with the current page and the total number of pages for
     // paginated queries.
+    #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
     // Restrict the returned results to overrides for the given build(s).
+    #[must_use]
     pub fn builds(mut self, builds: Vec<&'a str>) -> Self {
         self.builds = Some(builds);
         self
     }
 
     // Restrict the returned results to (not) expired overrides.
+    #[must_use]
     pub fn expired(mut self, expired: bool) -> Self {
         self.expired = Some(expired);
         self
     }
 
     // Restrict search to overrides *like* the given argument (in the SQL sense).
+    #[must_use]
     pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
     }
 
     // Restrict the returned results to overrides for the given package(s).
+    #[must_use]
     pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
         self.packages = Some(packages);
         self
     }
 
     // Restrict the returned results to overrides for the given release(s).
+    #[must_use]
     pub fn releases(mut self, releases: Vec<FedoraRelease>) -> Self {
         self.releases = Some(releases);
         self
     }
 
     // Restrict search to overrides containing the given argument.
+    #[must_use]
     pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
 
     // Restrict the returned results to overrides created by the given user(s).
+    #[must_use]
     pub fn users(mut self, users: Vec<&'a str>) -> Self {
         self.users = Some(users);
         self

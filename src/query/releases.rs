@@ -111,18 +111,21 @@ impl<'a> ReleaseQuery<'a> {
     // Add a callback function for reporting back query progress for long-running queries.
     // The function will be called with the current page and the total number of pages for
     // paginated queries.
+    #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
     // Restrict the returned results to (not) archived releases.
+    #[must_use]
     pub fn exclude_archived(mut self, exclude_archived: bool) -> Self {
         self.exclude_archived = Some(exclude_archived);
         self
     }
 
     // Restrict results to releases with the given ID.
+    #[must_use]
     pub fn ids(mut self, ids: Vec<&'a str>) -> Self {
         self.ids = Some(ids);
         self
@@ -130,18 +133,21 @@ impl<'a> ReleaseQuery<'a> {
 
     // Restrict results to a release with the given name. If this is the only required filter,
     // consider using a [`ReleaseNameQuery`](struct.ReleaseNameQuery.html) instead.
+    #[must_use]
     pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
     }
 
     // Restrict the returned results to releases containing the given package(s).
+    #[must_use]
     pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
         self.packages = Some(packages);
         self
     }
 
     // Restrict the returned results to releases matching the given updates(s).
+    #[must_use]
     pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
         self.updates = Some(updates);
         self

@@ -115,18 +115,21 @@ impl<'a> UserQuery<'a> {
     // Add a callback function for reporting back query progress for long-running queries.
     // The function will be called with the current page and the total number of pages for
     // paginated queries.
+    #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
     // Restrict the returned results to members of the given group(s).
+    #[must_use]
     pub fn groups(mut self, groups: Vec<&'a str>) -> Self {
         self.groups = Some(groups);
         self
     }
 
     // Restrict search to users *like* the given argument (in the SQL sense).
+    #[must_use]
     pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
@@ -136,18 +139,21 @@ impl<'a> UserQuery<'a> {
     //
     // If this is the only required filter, consider using a
     // [`UserNameQuery`](struct.UserNameQuery.html) instead.
+    #[must_use]
     pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
     }
 
     // Restrict search to users containing the given argument.
+    #[must_use]
     pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
 
     // Restrict the returned results to users associated with the given update(s).
+    #[must_use]
     pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
         self.updates = Some(updates);
         self

@@ -56,24 +56,28 @@ impl<'a> PackageQuery<'a> {
     // Add a callback function for reporting back query progress for long-running queries.
     // The function will be called with the current page and the total number of pages for
     // paginated queries.
+    #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
     // Restrict search to packages *like* the given argument (in the SQL sense).
+    #[must_use]
     pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
     }
 
     // Restrict the returned results to packages matching the given name.
+    #[must_use]
     pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
     }
 
     // Restrict search to packages containing the given argument.
+    #[must_use]
     pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
