@@ -99,10 +99,6 @@ impl SingleRequest<PackageListPage, Vec<Package>> for PackagePageQuery {
         Ok(format!("/packages/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<PackageListPage, QueryError> {
         let page: PackageListPage = serde_json::from_str(string)?;
         Ok(page)
@@ -113,6 +109,7 @@ impl SingleRequest<PackageListPage, Vec<Package>> for PackagePageQuery {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct PackageListPage {
     packages: Vec<Package>,

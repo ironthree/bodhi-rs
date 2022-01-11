@@ -29,10 +29,6 @@ impl SingleRequest<CSRFPage, String> for CSRFQuery {
         Ok(String::from("/csrf"))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<CSRFPage, QueryError> {
         let page: CSRFPage = serde_json::from_str(string)?;
         Ok(page)

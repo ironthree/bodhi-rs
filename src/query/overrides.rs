@@ -58,10 +58,6 @@ impl<'a> SingleRequest<OverridePage, Override> for OverrideNVRQuery<'a> {
         Ok(format!("/overrides/{}", self.nvr))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<OverridePage, QueryError> {
         let page: OverridePage = serde_json::from_str(string)?;
         Ok(page)
@@ -203,10 +199,6 @@ impl SingleRequest<OverrideListPage, Vec<Override>> for OverridePageQuery {
         Ok(format!("/overrides/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<OverrideListPage, QueryError> {
         let page: OverrideListPage = serde_json::from_str(string)?;
         Ok(page)
@@ -217,6 +209,7 @@ impl SingleRequest<OverrideListPage, Vec<Override>> for OverridePageQuery {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct OverrideListPage {
     overrides: Vec<Override>,

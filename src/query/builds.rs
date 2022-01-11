@@ -53,10 +53,6 @@ impl<'a> SingleRequest<Build, Build> for BuildNVRQuery<'a> {
         Ok(format!("/builds/{}", self.nvr))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<Build, QueryError> {
         let build: Build = serde_json::from_str(string)?;
         Ok(build)
@@ -174,10 +170,6 @@ impl SingleRequest<BuildListPage, Vec<Build>> for BuildPageQuery {
         Ok(format!("/builds/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<BuildListPage, QueryError> {
         let page: BuildListPage = serde_json::from_str(string)?;
         Ok(page)
@@ -188,6 +180,7 @@ impl SingleRequest<BuildListPage, Vec<Build>> for BuildPageQuery {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct BuildListPage {
     builds: Vec<Build>,

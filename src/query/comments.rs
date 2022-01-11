@@ -57,10 +57,6 @@ impl SingleRequest<CommentPage, Comment> for CommentIDQuery {
         Ok(format!("/comments/{}", self.id))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<CommentPage, QueryError> {
         let page: CommentPage = serde_json::from_str(string)?;
         Ok(page)
@@ -218,10 +214,6 @@ impl SingleRequest<CommentListPage, Vec<Comment>> for CommentPageQuery {
 
     fn path(&self) -> Result<String, QueryError> {
         Ok(format!("/comments/?{}", serde_url_params::to_string(self)?))
-    }
-
-    fn body(&self) -> Option<String> {
-        None
     }
 
     fn parse(&self, string: &str) -> Result<CommentListPage, QueryError> {

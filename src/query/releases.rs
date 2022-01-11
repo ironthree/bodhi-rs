@@ -52,10 +52,6 @@ impl<'a> SingleRequest<Release, Release> for ReleaseNameQuery<'a> {
         Ok(format!("/releases/{}", self.name))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<Release, QueryError> {
         let page: Release = serde_json::from_str(string)?;
         Ok(page)
@@ -173,10 +169,6 @@ impl SingleRequest<ReleaseListPage, Vec<Release>> for ReleasePageQuery {
         Ok(format!("/releases/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<ReleaseListPage, QueryError> {
         let page: ReleaseListPage = serde_json::from_str(string)?;
         Ok(page)
@@ -187,6 +179,7 @@ impl SingleRequest<ReleaseListPage, Vec<Release>> for ReleasePageQuery {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct ReleaseListPage {
     releases: Vec<Release>,

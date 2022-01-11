@@ -15,7 +15,12 @@ where
 {
     fn method(&self) -> RequestMethod;
     fn path(&self) -> Result<String, QueryError>;
-    fn body(&self) -> Option<String>;
+
+    #[allow(unused_variables)]
+    fn body(&self, csrf_token: Option<String>) -> Result<Option<String>, QueryError> {
+        Ok(None)
+    }
+
     fn parse(&self, string: &str) -> Result<P, QueryError>;
     fn extract(&self, page: P) -> T;
 }

@@ -35,6 +35,7 @@ pub struct UpdateIDQuery<'a> {
     id: &'a str,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct UpdatePage {
     update: Update,
@@ -55,10 +56,6 @@ impl<'a> SingleRequest<UpdatePage, Update> for UpdateIDQuery<'a> {
 
     fn path(&self) -> Result<String, QueryError> {
         Ok(format!("/updates/{}", self.id))
-    }
-
-    fn body(&self) -> Option<String> {
-        None
     }
 
     fn parse(&self, string: &str) -> Result<UpdatePage, QueryError> {
@@ -410,10 +407,6 @@ impl SingleRequest<UpdateListPage, Vec<Update>> for UpdatePageQuery {
         Ok(format!("/updates/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<UpdateListPage, QueryError> {
         let page: UpdateListPage = serde_json::from_str(string)?;
         Ok(page)
@@ -424,6 +417,7 @@ impl SingleRequest<UpdateListPage, Vec<Update>> for UpdatePageQuery {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct UpdateListPage {
     updates: Vec<Update>,

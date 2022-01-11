@@ -50,10 +50,6 @@ impl SingleRequest<ComposePage, Compose> for ComposeReleaseRequestQuery {
         Ok(format!("/composes/{}/{}", self.release, self.request))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<ComposePage, QueryError> {
         let page: ComposePage = serde_json::from_str(string)?;
         Ok(page)
@@ -97,10 +93,6 @@ impl SingleRequest<ComposeListPage, Vec<Compose>> for ComposeQuery {
 
     fn path(&self) -> Result<String, QueryError> {
         Ok(String::from("/composes/"))
-    }
-
-    fn body(&self) -> Option<String> {
-        None
     }
 
     fn parse(&self, string: &str) -> Result<ComposeListPage, QueryError> {

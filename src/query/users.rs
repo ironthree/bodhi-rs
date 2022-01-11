@@ -57,10 +57,6 @@ impl<'a> SingleRequest<UserPage, User> for UserNameQuery<'a> {
         Ok(format!("/users/{}", self.name))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<UserPage, QueryError> {
         let page: UserPage = serde_json::from_str(string)?;
         Ok(page)
@@ -179,10 +175,6 @@ impl SingleRequest<UserListPage, Vec<User>> for UserPageQuery {
         Ok(format!("/users/?{}", serde_url_params::to_string(self)?))
     }
 
-    fn body(&self) -> Option<String> {
-        None
-    }
-
     fn parse(&self, string: &str) -> Result<UserListPage, QueryError> {
         let page: UserListPage = serde_json::from_str(string)?;
         Ok(page)
@@ -193,6 +185,7 @@ impl SingleRequest<UserListPage, Vec<User>> for UserPageQuery {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct UserListPage {
     users: Vec<User>,

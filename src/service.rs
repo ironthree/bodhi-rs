@@ -11,6 +11,7 @@ use url::Url;
 use crate::data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 use crate::error::{BodhiError, QueryError, ServiceError};
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
+use crate::CSRFQuery;
 
 // This constant defines how many items are queried every time for multi-page queries. The
 // server-side maximum is usually 100, the default is 20, and 50 seems a good compromise for speed.
@@ -253,6 +254,7 @@ async fn retry_get(session: &Client, url: Url, body: Option<String>, retries: us
                 Ok(result) => break Ok(result),
                 Err(error) => {
                     log::warn!("Retrying failed HTTP request: {}", error);
+                    // FIXME: this will block the async runtime
                     std::thread::sleep(duration);
                 },
             }
@@ -305,10 +307,21 @@ impl BodhiService {
     where
         T: DeserializeOwned,
     {
-        Ok(request.extract(self.page_request(request).await?))
+        match request.method() {
+            RequestMethod::GET => self.request_get(request).await,
+            RequestMethod::POST => self.request_post(request).await,
+        }
     }
 
-    async fn page_request<P, T>(&self, request: &dyn SingleRequest<P, T>) -> Result<P, QueryError>
+    async fn request_get<P, T>(&self, request: &dyn SingleRequest<P, T>) -> Result<T, QueryError>
+    where
+        T: DeserializeOwned,
+    {
+        let page = self.page_request_get(request).await?;
+        Ok(request.extract(page))
+    }
+
+    async fn page_request_get<P, T>(&self, request: &dyn SingleRequest<P, T>) -> Result<P, QueryError>
     where
         T: DeserializeOwned,
     {
@@ -316,13 +329,43 @@ impl BodhiService {
             .url
             .join(&request.path()?)
             .map_err(|e| ServiceError::UrlParsingError { error: e })?;
+        let response = retry_get(self.session(), url, request.body(None)?, self.retries).await?;
+        let status = response.status();
 
-        // retry only GET requests, as POST requests might change server state even if they "fail"
-        let response = match request.method() {
-            RequestMethod::GET => retry_get(self.session(), url.clone(), request.body(), self.retries).await,
-            RequestMethod::POST => try_post(self.session(), url.clone(), request.body()).await,
-        }?;
+        let page = if status.is_success() {
+            let string = response.text().await?;
+            let page = request.parse(&string)?;
+            Ok(page)
+        } else if status == 404 {
+            Err(QueryError::NotFound)
+        } else {
+            let result = response.text().await?;
+            let error: BodhiError = serde_json::from_str(&result)?;
 
+            Err(QueryError::BodhiError { error })
+        };
+
+        page
+    }
+
+    async fn request_post<P, T>(&self, request: &dyn SingleRequest<P, T>) -> Result<T, QueryError>
+    where
+        T: DeserializeOwned,
+    {
+        let page = self.page_request_post(request).await?;
+        Ok(request.extract(page))
+    }
+
+    async fn page_request_post<P, T>(&self, request: &dyn SingleRequest<P, T>) -> Result<P, QueryError>
+    where
+        T: DeserializeOwned,
+    {
+        let token = self.request_get(&CSRFQuery::new()).await?;
+        let url = self
+            .url
+            .join(&request.path()?)
+            .map_err(|e| ServiceError::UrlParsingError { error: e })?;
+        let response = try_post(self.session(), url, request.body(Some(token))?).await?;
         let status = response.status();
 
         let page = if status.is_success() {
@@ -352,7 +395,7 @@ impl BodhiService {
 
         let first_request = request.page_request(1);
 
-        let first_page = self.page_request(first_request.as_ref()).await?;
+        let first_page = self.page_request_get(first_request.as_ref()).await?;
 
         let mut page = 2u32;
         let mut pages = first_page.pages();
@@ -364,7 +407,7 @@ impl BodhiService {
         while page <= pages {
             let page_request = request.page_request(page);
 
-            let next_page = self.page_request(page_request.as_ref()).await?;
+            let next_page = self.page_request_get(page_request.as_ref()).await?;
             request.callback(page, pages);
 
             page += 1;

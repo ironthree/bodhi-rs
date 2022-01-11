@@ -65,8 +65,8 @@ pub mod error;
 //pub mod create;
 //pub use create::*;
 
-//pub mod edit;
-//pub use edit::*;
+pub mod edit;
+pub use edit::*;
 
 pub mod query;
 pub use query::*;
