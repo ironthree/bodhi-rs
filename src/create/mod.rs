@@ -5,8 +5,8 @@
 mod comments;
 pub use comments::{CommentCreator, NewComment};
 
-//mod overrides;
-//pub use overrides::{NewOverride, OverrideBuilder};
+mod overrides;
+pub use overrides::{NewOverride, OverrideCreator};
 
 //mod updates;
 //pub use updates::{NewUpdate, UpdateBuilder};

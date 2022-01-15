@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 use std::io::{stdin, stdout, Write};
 
-use bodhi::{BodhiDate, BodhiServiceBuilder, OverrideBuilder};
+use bodhi::{BodhiDate, BodhiServiceBuilder, OverrideCreator};
 
 fn read_username() -> String {
     print!("FAS username: ");
@@ -27,7 +27,7 @@ fn main() -> Result<(), String> {
 
     let expiration_date = BodhiDate::try_from("2020-01-01").unwrap();
 
-    let new_override = OverrideBuilder::new(
+    let new_override = OverrideCreator::new(
         "elementary-theme-5.4.0-1.fc30",
         "Test buildroot override.",
         &expiration_date,
