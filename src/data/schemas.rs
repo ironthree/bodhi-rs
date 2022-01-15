@@ -28,8 +28,10 @@ pub(crate) struct OverrideData<'a> {
 #[derive(Debug, Serialize)]
 pub(crate) struct UpdateData<'a> {
     /// list of builds to include in the update
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub builds: Option<&'a [&'a str]>,
     /// koji side tag to take builds from (if this is specified, builds must be `None` or `[]`)
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub from_tag: Option<&'a str>,
     /// bugs associated with the update (default: `[]`)
     pub bugs: Option<&'a Vec<String>>,

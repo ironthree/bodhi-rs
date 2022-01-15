@@ -2,26 +2,17 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::error::{BodhiError, QueryError};
-use crate::{
-    BodhiService,
-    CSRFQuery,
-    Create,
-    Update,
-    UpdateData,
-    UpdateRequest,
-    UpdateSeverity,
-    UpdateSuggestion,
-    UpdateType,
-};
+use crate::data::{Update, UpdateData, UpdateRequest, UpdateSeverity, UpdateSuggestion, UpdateType};
+use crate::error::QueryError;
+use crate::request::{RequestMethod, SingleRequest};
 
-/// This struct contains the values that are returned when creating a new update.
+// This struct contains the values that are returned when creating a new update.
 #[derive(Debug, Deserialize)]
 pub struct NewUpdate {
-    /// the newly created update
+    // the newly created update
     #[serde(flatten)]
     pub update: Update,
-    /// additional server messages
+    // additional server messages
     pub caveats: Vec<HashMap<String, String>>,
 }
 
@@ -31,10 +22,10 @@ enum UpdateSource<'a> {
     Tag { tag: &'a str },
 }
 
-/// This struct contains all the values that are necessary for creating a new update. Methods to
-/// supply optional arguments are also available.
+// This struct contains all the values that are necessary for creating a new update. Methods to
+// supply optional arguments are also available.
 #[derive(Debug)]
-pub struct UpdateBuilder<'a> {
+pub struct UpdateCreator<'a> {
     // mandatory fields
     source: UpdateSource<'a>,
     notes: &'a str,
@@ -57,10 +48,10 @@ pub struct UpdateBuilder<'a> {
     stable_days: Option<u32>,
 }
 
-impl<'a> UpdateBuilder<'a> {
-    /// Use this method when creating an update for a list of builds.
+impl<'a> UpdateCreator<'a> {
+    // Use this method when creating an update for a list of builds.
     pub fn from_builds(builds: &'a [&str], notes: &'a str) -> Self {
-        UpdateBuilder {
+        UpdateCreator {
             source: UpdateSource::Builds { builds },
             notes,
 
@@ -82,9 +73,9 @@ impl<'a> UpdateBuilder<'a> {
         }
     }
 
-    /// Use this method when creating an update for a side tag.
+    // Use this method when creating an update for a side tag.
     pub fn from_tag(tag: &'a str, notes: &'a str) -> Self {
-        UpdateBuilder {
+        UpdateCreator {
             source: UpdateSource::Tag { tag },
             notes,
 
@@ -106,109 +97,122 @@ impl<'a> UpdateBuilder<'a> {
         }
     }
 
-    /// Add a related bug to the update.
-    ///
-    /// Can be specified multiple times.
-    pub fn bugs(mut self, bug: u32) -> Self {
-        match &mut self.bugs {
-            Some(bugs) => bugs.push(bug),
-            None => self.bugs = Some(vec![bug]),
-        };
-
+    // Add related bug(s) to the update.
+    #[must_use]
+    pub fn bugs(mut self, bugs: Vec<u32>) -> Self {
+        self.bugs = Some(bugs);
         self
     }
 
-    /// Set the flag whether bugs will be closed when the update is pushed to stable.
+    // Set the flag whether bugs will be closed when the update is pushed to stable.
+    #[must_use]
     pub fn close_bugs(mut self, close_bugs: bool) -> Self {
         self.close_bugs = Some(close_bugs);
         self
     }
 
-    /// Add a custom user-visible title to the update.
+    // Add a custom user-visible title to the update.
+    #[must_use]
     pub fn display_name(mut self, display_name: String) -> Self {
         self.display_name = Some(display_name);
         self
     }
 
-    /// Flag to specify the type of update (new package, bug fix, enhancement, security update, or
-    /// unspecified). For security updates, the severity also has to be specified.
+    // Flag to specify the type of update (new package, bug fix, enhancement, security update, or
+    // unspecified). For security updates, the severity also has to be specified.
+    #[must_use]
     pub fn update_type(mut self, update_type: UpdateType) -> Self {
         self.update_type = Some(update_type);
         self
     }
 
-    /// Flag to specify the update severity (primarily used for security updates, where this flag is
-    /// mandatory).
+    // Flag to specify the update severity (primarily used for security updates, where this flag is
+    // mandatory).
+    #[must_use]
     pub fn severity(mut self, severity: UpdateSeverity) -> Self {
         self.severity = Some(severity);
         self
     }
 
-    /// Set the flag whether the update can automatically be pushed to stable once it reaches the
-    /// specified stable karma.
+    // Set the flag whether the update can automatically be pushed to stable once it reaches the
+    // specified stable karma.
+    #[must_use]
     pub fn autokarma(mut self, autokarma: bool) -> Self {
         self.autokarma = Some(autokarma);
         self
     }
 
-    /// Manually set the stable karma feedback threshold.
+    // Manually set the stable karma feedback threshold.
+    #[must_use]
     pub fn stable_karma(mut self, stable_karma: i32) -> Self {
         self.stable_karma = Some(stable_karma);
         self
     }
 
-    /// Manually set the unstable karma feedback threshold.
+    // Manually set the unstable karma feedback threshold.
+    #[must_use]
     pub fn unstable_karma(mut self, unstable_karma: i32) -> Self {
         self.unstable_karma = Some(unstable_karma);
         self
     }
 
-    /// Flag to specify whether users should log out or reboot to successfully apply an update.
+    // Flag to specify whether users should log out or reboot to successfully apply an update.
+    #[must_use]
     pub fn suggest(mut self, suggestion: UpdateSuggestion) -> Self {
         self.suggest = Some(suggestion);
         self
     }
 
-    /// Add custom taskotron requirements.
+    // Add custom taskotron requirements.
+    #[must_use]
     pub fn requirements(mut self, requirements: String) -> Self {
         self.requirements = Some(requirements);
         self
     }
 
-    /// Flag to indicate whether bug feedback is required for karma to be counted.
+    // Flag to indicate whether bug feedback is required for karma to be counted.
+    #[must_use]
     pub fn require_bugs(mut self, require_bugs: bool) -> Self {
         self.require_bugs = Some(require_bugs);
         self
     }
 
-    /// Flag to indicate whether test case feedback is required for karma to be counted.
+    // Flag to indicate whether test case feedback is required for karma to be counted.
+    #[must_use]
     pub fn require_testcases(mut self, require_testcases: bool) -> Self {
         self.require_testcases = Some(require_testcases);
         self
     }
 
-    /// Set the flag whether the update can automatically be pushed to stable once it reaches the
-    /// specified days in testing.
+    // Set the flag whether the update can automatically be pushed to stable once it reaches the
+    // specified days in testing.
+    #[must_use]
     pub fn autotime(mut self, autotime: bool) -> Self {
         self.autotime = Some(autotime);
         self
     }
 
-    /// Manually specify the minimum duration the update has to stay in testing.
-    ///
-    /// The default is 7 days for stable updates, 14 days for stable updates containing critpath
-    /// packages, and 3 days for fedora pre-releases.
+    // Manually specify the minimum duration the update has to stay in testing.
+    //
+    // The default is 7 days for stable updates, 14 days for stable updates containing critpath
+    // packages, and 3 days for fedora pre-releases.
+    #[must_use]
     pub fn stable_days(mut self, stable_days: u32) -> Self {
         self.stable_days = Some(stable_days);
         self
     }
 }
 
-#[async_trait::async_trait]
-impl<'a> Create<'a, NewUpdate> for UpdateBuilder<'a> {
-    async fn create(&'a self, bodhi: &'a BodhiService) -> Result<NewUpdate, QueryError> {
-        let path = String::from("/updates/");
+impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
+    fn method(&self) -> RequestMethod {
+        RequestMethod::POST
+    }
 
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(String::from("/updates/"))
+    }
+
+    fn body(&self, csrf_token: Option<String>) -> Result<Option<String>, QueryError> {
         // do some data sanity verification
         if let Some(karma) = self.stable_karma {
             if karma < 1 {
@@ -241,14 +245,14 @@ impl<'a> Create<'a, NewUpdate> for UpdateBuilder<'a> {
                     _ => {},
                 }
             }
-        }
-
-        let csrf_token = bodhi.query(CSRFQuery::new())?;
+        };
 
         let bugs: Option<Vec<String>> = self
             .bugs
             .as_ref()
             .map(|bugs| bugs.iter().map(|b| format!("{}", b)).collect());
+
+        let csrf_token = csrf_token.as_ref().unwrap_or_else(|| unreachable!());
 
         let new_update = match self.source {
             UpdateSource::Builds { builds } => UpdateData {
@@ -280,7 +284,7 @@ impl<'a> Create<'a, NewUpdate> for UpdateBuilder<'a> {
                 require_testcases: self.require_testcases,
                 autotime: self.autotime,
                 stable_days: self.stable_days,
-                csrf_token: &csrf_token,
+                csrf_token,
             },
             UpdateSource::Tag { tag } => UpdateData {
                 builds: None,
@@ -311,29 +315,22 @@ impl<'a> Create<'a, NewUpdate> for UpdateBuilder<'a> {
                 require_testcases: self.require_testcases,
                 autotime: self.autotime,
                 stable_days: self.stable_days,
-                csrf_token: &csrf_token,
+                csrf_token,
             },
         };
 
-        let data = match serde_json::to_string(&new_update) {
-            Ok(data) => data,
-            Err(error) => return Err(QueryError::SerializationError { error }),
-        };
+        match serde_json::to_string(&new_update) {
+            Ok(result) => Ok(Some(result)),
+            Err(error) => Err(QueryError::SerializationError { error }),
+        }
+    }
 
-        let response = bodhi.post(&path, data)?;
-        let status = response.status();
-
-        if !status.is_success() {
-            let text = response.text().unwrap_or_else(|_| String::from(""));
-
-            let error: BodhiError = serde_json::from_str(&text)?;
-            return Err(QueryError::BodhiError { error });
-        };
-
-        let result = response.text()?;
-
-        let new_update: NewUpdate = serde_json::from_str(&result)?;
-
+    fn parse(&self, string: &str) -> Result<NewUpdate, QueryError> {
+        let new_update: NewUpdate = serde_json::from_str(string)?;
         Ok(new_update)
+    }
+
+    fn extract(&self, page: NewUpdate) -> NewUpdate {
+        page
     }
 }

@@ -1,7 +1,7 @@
 use std::io::{stdin, stdout, Write};
 use std::time::Duration;
 
-use bodhi::{BodhiServiceBuilder, UpdateBuilder, UpdateType};
+use bodhi::{BodhiServiceBuilder, UpdateCreator, UpdateType};
 
 fn read_username() -> String {
     print!("FAS username: ");
@@ -25,7 +25,7 @@ fn main() -> Result<(), String> {
         .build()
         .unwrap();
 
-    let new_update = UpdateBuilder::from_builds(
+    let new_update = UpdateCreator::from_builds(
         &["elementary-theme-5.4.0-1.fc30"],
         "Update to version 5.4.0.\n\nRelease notes: https://github.com/elementary/stylesheet/releases/tag/5.4.0",
     )
