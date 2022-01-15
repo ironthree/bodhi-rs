@@ -62,8 +62,8 @@ pub use service::{BodhiService, BodhiServiceBuilder};
 
 pub mod error;
 
-//pub mod create;
-//pub use create::*;
+pub mod create;
+pub use create::*;
 
 pub mod edit;
 pub use edit::*;

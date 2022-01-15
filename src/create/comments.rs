@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::{BodhiError, QueryError};
-use crate::{BodhiService, CSRFQuery, Comment, Create, Karma, SinglePageQuery, Update};
+use crate::data::{Comment, Karma, Update};
+use crate::error::QueryError;
+use crate::request::{RequestMethod, SingleRequest};
 
 // API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST>
 #[derive(Debug, Serialize)]
@@ -29,19 +30,19 @@ struct TestCaseFeedbackData<'a> {
     karma: Karma,
 }
 
-/// This struct contains the values that are returned when creating a new comment.
+// This struct contains the values that are returned when creating a new comment.
 #[derive(Debug, Deserialize)]
 pub struct NewComment {
-    /// the newly created comment
+    // the newly created comment
     pub comment: Comment,
-    /// additional server messages
+    // additional server messages
     pub caveats: Vec<HashMap<String, String>>,
 }
 
-/// This struct contains all the values that are necessary for creating a new comment. Methods to
-/// supply optional arguments are also available.
+// This struct contains all the values that are necessary for creating a new comment. Methods to
+// supply optional arguments are also available.
 #[derive(Debug)]
-pub struct CommentBuilder<'a> {
+pub struct CommentCreator<'a> {
     update: &'a str,
     text: Option<&'a str>,
     karma: Option<Karma>,
@@ -49,10 +50,10 @@ pub struct CommentBuilder<'a> {
     testcase_feedback: Option<Vec<TestCaseFeedbackData<'a>>>,
 }
 
-impl<'a> CommentBuilder<'a> {
-    /// This method has to be used to create and initialize a new `CommentBuilder`.
+impl<'a> CommentCreator<'a> {
+    // This method has to be used to create and initialize a new `CommentBuilder`.
     pub fn new(update: &'a str) -> Self {
-        CommentBuilder {
+        CommentCreator {
             update,
             text: None,
             karma: None,
@@ -61,21 +62,24 @@ impl<'a> CommentBuilder<'a> {
         }
     }
 
-    /// Add optional text to the comment.
+    // Add optional text to the comment.
+    #[must_use]
     pub fn text(mut self, text: &'a str) -> Self {
         self.text = Some(text);
         self
     }
 
-    /// Add optional general karma feedback to the comment.
+    // Add optional general karma feedback to the comment.
+    #[must_use]
     pub fn karma(mut self, karma: Karma) -> Self {
         self.karma = Some(karma);
         self
     }
 
-    /// Add optional bug feedback to the comment.
-    ///
-    /// If the specified bug is not associated with the update, this is discarded server-side.
+    // Add optional bug feedback to the comment.
+    //
+    // If the specified bug is not associated with the update, this is discarded server-side.
+    #[must_use]
     pub fn bug_feedback(mut self, bug_id: u32, karma: Karma) -> Self {
         let feedback = BugFeedbackData { bug_id, karma };
 
@@ -87,9 +91,10 @@ impl<'a> CommentBuilder<'a> {
         self
     }
 
-    /// Add optional test case feedback to the comment.
-    ///
-    /// If the specified test case is not associated with the update, this is discarded server-side.
+    // Add optional test case feedback to the comment.
+    //
+    // If the specified test case is not associated with the update, this is discarded server-side.
+    #[must_use]
     pub fn testcase_feedback(mut self, testcase_name: &'a str, karma: Karma) -> Self {
         let feedback = TestCaseFeedbackData { karma, testcase_name };
 
@@ -102,14 +107,16 @@ impl<'a> CommentBuilder<'a> {
     }
 }
 
-#[async_trait::async_trait]
-impl<'a> Create<'a, NewComment> for CommentBuilder<'a> {
-    async fn create(&'a self, bodhi: &'a BodhiService) -> Result<NewComment, QueryError> {
-        let path = String::from("/comments/");
+impl<'a> SingleRequest<NewComment, NewComment> for CommentCreator<'a> {
+    fn method(&self) -> RequestMethod {
+        RequestMethod::POST
+    }
 
-        let csrf_query = CSRFQuery::new();
-        let csrf_token = bodhi.query(&csrf_query).await?;
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(String::from("/comments/"))
+    }
 
+    fn body(&self, csrf_token: Option<String>) -> Result<Option<String>, QueryError> {
         let mut feedback: HashMap<String, String> = HashMap::new();
 
         let karma_string = |k: Karma| match k {
@@ -148,34 +155,28 @@ impl<'a> Create<'a, NewComment> for CommentBuilder<'a> {
                 None => Karma::Neutral,
             },
             feedback,
-            csrf_token: &csrf_token,
+            csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        let data = match serde_json::to_string(&new_comment) {
-            Ok(data) => data,
-            Err(error) => return Err(QueryError::SerializationError { error }),
-        };
+        match serde_json::to_string(&new_comment) {
+            Ok(result) => Ok(Some(result)),
+            Err(error) => Err(QueryError::SerializationError { error }),
+        }
+    }
 
-        let response = bodhi.post(&path, data).await?;
-        let status = response.status();
-
-        if !status.is_success() {
-            let text = response.text().await.unwrap_or_else(|_| String::from(""));
-
-            let error: BodhiError = serde_json::from_str(&text)?;
-            return Err(QueryError::BodhiError { error });
-        };
-
-        let result = response.text().await?;
-        let new_comment: NewComment = serde_json::from_str(&result)?;
-
+    fn parse(&self, string: &str) -> Result<NewComment, QueryError> {
+        let new_comment: NewComment = serde_json::from_str(string)?;
         Ok(new_comment)
+    }
+
+    fn extract(&self, page: NewComment) -> NewComment {
+        page
     }
 }
 
 impl Update {
-    /// This method creates a new `CommentBuilder` for commenting on this `Update`.
-    pub fn comment(&self) -> CommentBuilder {
-        CommentBuilder::new(self.alias.as_str())
+    // This method creates a new `CommentBuilder` for commenting on this `Update`.
+    pub fn comment(&self) -> CommentCreator {
+        CommentCreator::new(self.alias.as_str())
     }
 }
