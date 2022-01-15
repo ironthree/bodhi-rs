@@ -4,5 +4,5 @@
 mod overrides;
 pub use overrides::{EditedOverride, OverrideEditor};
 
-//mod updates;
-//pub use updates::{EditedUpdate, UpdateEditor, UpdateStatusRequester, UpdateTestResultWaiver};
+mod updates;
+pub use updates::{EditedUpdate, UpdateEditor, UpdateStatusRequester, UpdateTestResultWaiver};

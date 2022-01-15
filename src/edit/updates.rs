@@ -2,31 +2,22 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::{BodhiError, QueryError};
-use crate::{
-    BodhiService,
-    CSRFQuery,
-    Edit,
-    Update,
-    UpdateData,
-    UpdateRequest,
-    UpdateSeverity,
-    UpdateSuggestion,
-    UpdateType,
-};
+use crate::data::{Update, UpdateData, UpdateRequest, UpdateSeverity, UpdateSuggestion, UpdateType};
+use crate::error::QueryError;
+use crate::request::{RequestMethod, SingleRequest};
 
-/// This struct contains the values that are returned when editing an update.
+// This struct contains the values that are returned when editing an update.
 #[derive(Debug, Deserialize)]
 pub struct EditedUpdate {
-    /// the edited update
+    // the edited update
     #[serde(flatten)]
     pub update: Update,
-    /// additional server messages
+    // additional server messages
     pub caveats: Vec<HashMap<String, String>>,
 }
 
-/// This struct contains all the possible arguments for editing an update. Methods to supply
-/// optional arguments are also available.
+// This struct contains all the possible arguments for editing an update. Methods to supply
+// optional arguments are also available.
 #[derive(Debug)]
 pub struct UpdateEditor<'a> {
     // mandatory fields
@@ -53,8 +44,8 @@ pub struct UpdateEditor<'a> {
 }
 
 impl<'a> UpdateEditor<'a> {
-    /// Use this method to create an edit request for an existing update. It pre-populates all
-    /// fields with the current values.
+    // Use this method to create an edit request for an existing update. It pre-populates all
+    // fields with the current values.
     pub fn from_update(update: &'a Update) -> Self {
         UpdateEditor {
             builds: update.builds.iter().map(|b| b.nvr.as_str()).collect(),
@@ -82,127 +73,150 @@ impl<'a> UpdateEditor<'a> {
         }
     }
 
-    /// Add a build to the update.
+    // Add a build to the update.
+    #[must_use]
     pub fn add_build(mut self, build: &'a str) -> Self {
         self.builds.push(build);
         self
     }
 
-    /// Remove a build to the update.
+    // Remove a build from the update.
+    #[must_use]
     pub fn remove_build(mut self, build: &'a str) -> Self {
         self.builds.retain(|b| *b != build);
         self
     }
 
-    /// Change the update notes.
+    // Change the update notes.
+    #[must_use]
     pub fn notes(mut self, notes: &'a str) -> Self {
         self.notes = notes;
         self
     }
 
-    /// Add a related bug to the update.
+    // Add a related bug to the update.
+    #[must_use]
     pub fn add_bug(mut self, bug: u32) -> Self {
         self.bugs.push(bug);
         self
     }
 
-    /// Remove a related bug from the update.
+    // Remove a related bug from the update.
+    #[must_use]
     pub fn remove_bug(mut self, bug: u32) -> Self {
         self.bugs.retain(|b| *b != bug);
         self
     }
 
-    /// Change the custom, user-visible title of the update.
+    // Change the custom, user-visible title of the update.
+    #[must_use]
     pub fn display_name(mut self, display_name: &'a str) -> Self {
         self.display_name = Some(display_name);
         self
     }
 
-    /// Set the flag whether bugs will be closed when the update is pushed to stable.
+    // Set the flag whether bugs will be closed when the update is pushed to stable.
+    #[must_use]
     pub fn close_bugs(mut self, close_bugs: bool) -> Self {
         self.close_bugs = Some(close_bugs);
         self
     }
 
-    /// Flag to specify the type of update (new package, bug fix, enhancement, security update, or
-    /// unspecified). For security updates, the severity also has to be specified.
+    // Flag to specify the type of update (new package, bug fix, enhancement, security update, or
+    // unspecified). For security updates, the severity also has to be specified.
+    #[must_use]
     pub fn update_type(mut self, update_type: UpdateType) -> Self {
         self.update_type = Some(update_type);
         self
     }
 
-    /// Flag to specify the update severity (primarily used for security updates, where this flag is
-    /// mandatory).
+    // Flag to specify the update severity (primarily used for security updates, where this flag is
+    // mandatory).
+    #[must_use]
     pub fn severity(mut self, severity: UpdateSeverity) -> Self {
         self.severity = Some(severity);
         self
     }
 
-    /// Set the flag whether the update can automatically be pushed to stable once it reaches the
-    /// specified stable karma.
+    // Set the flag whether the update can automatically be pushed to stable once it reaches the
+    // specified stable karma.
+    #[must_use]
     pub fn autokarma(mut self, autokarma: bool) -> Self {
         self.autokarma = Some(autokarma);
         self
     }
 
-    /// Manually set the stable karma feedback threshold.
+    // Manually set the stable karma feedback threshold.
+    #[must_use]
     pub fn stable_karma(mut self, stable_karma: i32) -> Self {
         self.stable_karma = Some(stable_karma);
         self
     }
 
-    /// Manually set the unstable karma feedback threshold.
+    // Manually set the unstable karma feedback threshold.
+    #[must_use]
     pub fn unstable_karma(mut self, unstable_karma: i32) -> Self {
         self.unstable_karma = Some(unstable_karma);
         self
     }
 
-    /// Flag to specify whether users should log out or reboot to successfully apply an update.
+    // Flag to specify whether users should log out or reboot to successfully apply an update.
+    #[must_use]
     pub fn suggest(mut self, suggestion: UpdateSuggestion) -> Self {
         self.suggest = Some(suggestion);
         self
     }
 
-    /// Set custom taskotron requirements.
+    // Set custom gating requirements.
+    #[must_use]
     pub fn requirements(mut self, requirements: &'a str) -> Self {
         self.requirements = Some(requirements);
         self
     }
 
-    /// Flag to indicate whether bug feedback is required for karma to be counted.
+    // Flag to indicate whether bug feedback is required for karma to be counted.
+    #[must_use]
     pub fn require_bugs(mut self, require_bugs: bool) -> Self {
         self.require_bugs = Some(require_bugs);
         self
     }
 
-    /// Flag to indicate whether test case feedback is required for karma to be counted.
+    // Flag to indicate whether test case feedback is required for karma to be counted.
+    #[must_use]
     pub fn require_testcases(mut self, require_testcases: bool) -> Self {
         self.require_testcases = Some(require_testcases);
         self
     }
 
-    /// Set the flag whether the update can automatically be pushed to stable once it reaches the
-    /// specified days in testing.
+    // Set the flag whether the update can automatically be pushed to stable once it reaches the
+    // specified days in testing.
+    #[must_use]
     pub fn autotime(mut self, autotime: bool) -> Self {
         self.autotime = Some(autotime);
         self
     }
 
-    /// Manually specify the minimum duration the update has to stay in testing.
-    ///
-    /// The default is 7 days for stable updates, 14 days for stable updates containing critpath
-    /// packages, and 3 days for fedora pre-releases.
+    // Manually specify the minimum duration the update has to stay in testing.
+    //
+    // The default is 7 days for stable updates, 14 days for stable updates containing critpath
+    // packages, and 3 days for fedora pre-releases.
+    #[must_use]
     pub fn stable_days(mut self, stable_days: u32) -> Self {
         self.stable_days = Some(stable_days);
         self
     }
 }
 
-#[async_trait::async_trait]
-impl<'a> Edit<'a, EditedUpdate> for UpdateEditor<'a> {
-    async fn edit(&'a self, bodhi: &'a BodhiService) -> Result<EditedUpdate, QueryError> {
-        let path = String::from("/updates/");
+impl<'a> SingleRequest<EditedUpdate, EditedUpdate> for UpdateEditor<'a> {
+    fn method(&self) -> RequestMethod {
+        RequestMethod::POST
+    }
 
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(String::from("/updates/"))
+    }
+
+    fn body(&self, csrf_token: Option<String>) -> Result<Option<String>, QueryError> {
         // do some data sanity verification
         if let Some(karma) = self.stable_karma {
             if karma < 1 {
@@ -237,8 +251,6 @@ impl<'a> Edit<'a, EditedUpdate> for UpdateEditor<'a> {
             }
         }
 
-        let csrf_token = bodhi.query(CSRFQuery::new())?;
-
         let bugs: Vec<String> = self.bugs.iter().map(|b| format!("{}", b)).collect();
 
         let update_edit = UpdateData {
@@ -267,38 +279,31 @@ impl<'a> Edit<'a, EditedUpdate> for UpdateEditor<'a> {
             require_testcases: self.require_testcases,
             autotime: self.autotime,
             stable_days: self.stable_days,
-            csrf_token: &csrf_token,
+            csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        let data = match serde_json::to_string(&update_edit) {
-            Ok(data) => data,
-            Err(error) => return Err(QueryError::SerializationError { error }),
-        };
+        match serde_json::to_string(&update_edit) {
+            Ok(result) => Ok(Some(result)),
+            Err(error) => Err(QueryError::SerializationError { error }),
+        }
+    }
 
-        let response = bodhi.post(&path, data)?;
-        let status = response.status();
-
-        if !status.is_success() {
-            let text = response.text().unwrap_or_else(|_| String::from(""));
-
-            let error: BodhiError = serde_json::from_str(&text)?;
-            return Err(QueryError::BodhiError { error });
-        };
-
-        let result = response.text()?;
-        let edited_update: EditedUpdate = serde_json::from_str(&result)?;
-
+    fn parse(&self, string: &str) -> Result<EditedUpdate, QueryError> {
+        let edited_update: EditedUpdate = serde_json::from_str(string)?;
         Ok(edited_update)
     }
-}
 
+    fn extract(&self, page: EditedUpdate) -> EditedUpdate {
+        page
+    }
+}
 
 #[derive(Debug, Deserialize)]
 struct RequestedUpdate {
     update: Update,
 }
 
-/// This struct contains all the arguments for changing the update status request.
+// This struct contains all the arguments for changing the update status request.
 #[derive(Debug)]
 pub struct UpdateStatusRequester<'a> {
     alias: &'a str,
@@ -306,7 +311,7 @@ pub struct UpdateStatusRequester<'a> {
 }
 
 impl<'a> UpdateStatusRequester<'a> {
-    /// Use this method when creating an update state request.
+    // Use this method when creating an update state request.
     pub fn from_update(update: &'a Update, request: UpdateRequest) -> Self {
         UpdateStatusRequester {
             alias: &update.alias,
@@ -315,13 +320,16 @@ impl<'a> UpdateStatusRequester<'a> {
     }
 }
 
-#[async_trait::async_trait]
-impl<'a> Edit<'a, Update> for UpdateStatusRequester<'a> {
-    async fn edit(&'a self, bodhi: &'a BodhiService) -> Result<Update, QueryError> {
-        let path = format!("/updates/{}/request", &self.alias);
+impl<'a> SingleRequest<RequestedUpdate, Update> for UpdateStatusRequester<'a> {
+    fn method(&self) -> RequestMethod {
+        RequestMethod::POST
+    }
 
-        let csrf_token = bodhi.query(&CSRFQuery::new())?;
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/updates/{}/request", &self.alias))
+    }
 
+    fn body(&self, csrf_token: Option<String>) -> Result<Option<String>, QueryError> {
         #[derive(Serialize)]
         struct RequestEdit<'a> {
             request: UpdateRequest,
@@ -330,38 +338,31 @@ impl<'a> Edit<'a, Update> for UpdateStatusRequester<'a> {
 
         let request_edit = RequestEdit {
             request: self.request,
-            csrf_token: &csrf_token,
+            csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        let data = match serde_json::to_string(&request_edit) {
-            Ok(data) => data,
-            Err(error) => return Err(QueryError::SerializationError { error }),
-        };
+        match serde_json::to_string(&request_edit) {
+            Ok(result) => Ok(Some(result)),
+            Err(error) => Err(QueryError::SerializationError { error }),
+        }
+    }
 
-        let response = bodhi.post(&path, data)?;
-        let status = response.status();
+    fn parse(&self, string: &str) -> Result<RequestedUpdate, QueryError> {
+        let requested_update: RequestedUpdate = serde_json::from_str(string)?;
+        Ok(requested_update)
+    }
 
-        if !status.is_success() {
-            let text = response.text().unwrap_or_else(|_| String::from(""));
-
-            let error: BodhiError = serde_json::from_str(&text)?;
-            return Err(QueryError::BodhiError { error });
-        };
-
-        let result = response.text()?;
-        let requested_update: RequestedUpdate = serde_json::from_str(&result)?;
-
-        Ok(requested_update.update)
+    fn extract(&self, page: RequestedUpdate) -> Update {
+        page.update
     }
 }
-
 
 #[derive(Debug, Deserialize)]
 struct WaivedUpdate {
     update: Update,
 }
 
-/// This struct contains all the arguments for waiving test results for an update.
+// This struct contains all the arguments for waiving test results for an update.
 #[derive(Debug)]
 pub struct UpdateTestResultWaiver<'a> {
     alias: &'a str,
@@ -369,7 +370,7 @@ pub struct UpdateTestResultWaiver<'a> {
 }
 
 impl<'a> UpdateTestResultWaiver<'a> {
-    /// Use this method when creating the waive request.
+    // Use this method when creating the waive request.
     pub fn from_update(update: &'a Update, comment: &'a str) -> Self {
         UpdateTestResultWaiver {
             alias: &update.alias,
@@ -378,60 +379,57 @@ impl<'a> UpdateTestResultWaiver<'a> {
     }
 }
 
-#[async_trait::async_trait]
-impl<'a> Edit<'a, Update> for UpdateTestResultWaiver<'a> {
-    async fn edit(&'a self, bodhi: &'a BodhiService) -> Result<Update, QueryError> {
-        let path = format!("/updates/{}/waive-test-results", &self.alias);
+impl<'a> SingleRequest<WaivedUpdate, Update> for UpdateTestResultWaiver<'a> {
+    fn method(&self) -> RequestMethod {
+        RequestMethod::POST
+    }
 
-        let csrf_token = bodhi.query(&CSRFQuery::new())?;
+    fn path(&self) -> Result<String, QueryError> {
+        Ok(format!("/updates/{}/waive-test-results", &self.alias))
+    }
 
+    fn body(&self, csrf_token: Option<String>) -> Result<Option<String>, QueryError> {
         #[derive(Serialize)]
         struct RequestWaiver<'a> {
             comment: &'a str,
-            // tests: ?
+            // tests: ?, FIXME
             csrf_token: &'a str,
         }
 
         let request_waiver = RequestWaiver {
             comment: self.comment,
-            // tests: ?
-            csrf_token: &csrf_token,
+            // tests: ? FIXME
+            csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        let data = match serde_json::to_string(&request_waiver) {
-            Ok(data) => data,
-            Err(error) => return Err(QueryError::SerializationError { error }),
-        };
+        match serde_json::to_string(&request_waiver) {
+            Ok(result) => Ok(Some(result)),
+            Err(error) => Err(QueryError::SerializationError { error }),
+        }
+    }
 
-        let response = bodhi.post(&path, data)?;
-        let status = response.status();
+    fn parse(&self, string: &str) -> Result<WaivedUpdate, QueryError> {
+        let waived_update: WaivedUpdate = serde_json::from_str(string)?;
+        Ok(waived_update)
+    }
 
-        if !status.is_success() {
-            let text = response.text().unwrap_or_else(|_| String::from(""));
-
-            let error: BodhiError = serde_json::from_str(&text)?;
-            return Err(QueryError::BodhiError { error });
-        };
-
-        let result = response.text()?;
-        let waived_update: WaivedUpdate = serde_json::from_str(&result)?;
-
-        Ok(waived_update.update)
+    fn extract(&self, page: WaivedUpdate) -> Update {
+        page.update
     }
 }
 
 impl Update {
-    /// This method creates a new `UpdateEditor` for editing this `Update`.
+    // This method creates a new `UpdateEditor` for editing this `Update`.
     pub fn edit(&self) -> UpdateEditor {
         UpdateEditor::from_update(self)
     }
 
-    /// This method creates a new `UpdateStatusRequester` for editing this `Update`.
+    // This method creates a new `UpdateStatusRequester` for editing this `Update`.
     pub fn request(&self, request: UpdateRequest) -> UpdateStatusRequester {
         UpdateStatusRequester::from_update(self, request)
     }
 
-    /// This method creates a new `UpdateTestResultWaiver` for editing this `Update`.
+    // This method creates a new `UpdateTestResultWaiver` for editing this `Update`.
     pub fn waive<'a>(&'a self, comment: &'a str) -> UpdateTestResultWaiver<'a> {
         UpdateTestResultWaiver::from_update(self, comment)
     }
