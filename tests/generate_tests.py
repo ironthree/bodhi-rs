@@ -76,8 +76,15 @@ def do_updates():
     with open("templates/updates.jinja2") as file:
         template = jinja2.Template(file.read())
 
+    ignore_date_modified = ["ELN", "EPEL9", "F27M", "F35C", "F36C"]
+    ignore_date_stable = ["F27M"]
+
     with open("updates.rs", "w") as file:
-        file.write(template.render(releases=RELEASES))
+        file.write(template.render(
+            releases=RELEASES,
+            ignore_date_modified=ignore_date_modified,
+            ignore_date_stable=ignore_date_stable,
+        ))
 
 
 def main() -> int:
