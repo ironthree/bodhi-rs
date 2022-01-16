@@ -131,17 +131,6 @@ impl<'a> CommentQuery<'a> {
         self
     }
 
-    // Restrict the returned results to (not) anonymous comments.
-    //
-    // **NOTE**: Anonymous comments are no longer supported as of bodhi 4.0.
-    // FIXME: remove this
-    #[must_use]
-    #[deprecated]
-    pub fn anonymous(mut self, anonymous: bool) -> Self {
-        self.anonymous = Some(anonymous);
-        self
-    }
-
     // Restrict results to ignore comments by certain users.
     #[must_use]
     pub fn ignore_users(mut self, ignore_users: Vec<&'a str>) -> Self {
