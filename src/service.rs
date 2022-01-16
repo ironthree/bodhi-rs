@@ -25,7 +25,7 @@ const REQUEST_TIMEOUT: Duration = Duration::from_secs(60);
 const REQUEST_RETRIES: usize = 3;
 
 // Specify a sane default user agent for bodhi-rs.
-const USER_AGENT: &str = "bodhi-rs";
+const USER_AGENT: &str = concat!("bodhi-rs v", env!("CARGO_PKG_VERSION"));
 
 #[derive(Debug)]
 #[allow(clippy::upper_case_acronyms)]
