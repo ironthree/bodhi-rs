@@ -13,7 +13,8 @@ fn read_username() -> String {
     username.trim().to_string()
 }
 
-fn main() -> Result<(), String> {
+#[tokio::main]
+async fn main() -> Result<(), String> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
 
     let username = read_username();
@@ -23,23 +24,17 @@ fn main() -> Result<(), String> {
         .authentication(&username, &password)
         .timeout(Duration::from_secs(60))
         .build()
+        .await
         .unwrap();
 
-    let update: Update = match bodhi.query(UpdateIDQuery::new("FEDORA-2019-586c873435")) {
-        Err(_) => {
-            return Err(String::from("Failed to fetch update."));
-        },
-        Ok(value) => match value {
-            Some(update) => update,
-            None => {
-                return Err(String::from("Failed to fetch update."));
-            },
-        },
-    };
+    let update: Update = bodhi
+        .request(&UpdateIDQuery::new("FEDORA-2019-586c873435"))
+        .await
+        .map_err(|error| error.to_string())?;
 
     let update_waiver = update.waive("Ignore test results.");
 
-    let response = bodhi.edit(&update_waiver);
+    let response = bodhi.request(&update_waiver).await;
 
     match response {
         Ok(edited_update) => {

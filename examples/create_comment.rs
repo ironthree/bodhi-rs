@@ -12,7 +12,8 @@ fn read_username() -> String {
     username.trim().to_string()
 }
 
-fn main() -> Result<(), String> {
+#[tokio::main]
+async fn main() -> Result<(), String> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
 
     let username = read_username();
@@ -23,19 +24,13 @@ fn main() -> Result<(), String> {
     let bodhi = BodhiServiceBuilder::staging()
         .authentication(&username, &password)
         .build()
+        .await
         .unwrap();
 
-    let update: Update = match bodhi.query(UpdateIDQuery::new("FEDORA-2019-e7f463674c")) {
-        Ok(ok) => match ok {
-            Some(update) => update,
-            None => {
-                return Err(String::from("Update not found."));
-            },
-        },
-        Err(_) => {
-            return Err(String::from("Update not found."));
-        },
-    };
+    let update: Update = bodhi
+        .request(&UpdateIDQuery::new("FEDORA-2019-e7f463674c"))
+        .await
+        .map_err(|error| error.to_string())?;
 
     // build a new comment for an update that's still in "testing" state,
     // and add some boilerplate text and a karma value
@@ -45,15 +40,16 @@ fn main() -> Result<(), String> {
         .karma(Karma::Positive);
 
     // create the update on the service
-    let response = bodhi.create(&new_comment);
+    let response = bodhi.request(&new_comment).await;
 
     // check the response whether creating the comment was successful
     match response {
         Ok(new_comment) => {
             println!("New comment created:");
             println!("{:#?}", new_comment);
-            Ok(())
         },
-        Err(error) => Err(format!("{:?}", error)),
+        Err(error) => return Err(error.to_string()),
     }
+
+    Ok(())
 }

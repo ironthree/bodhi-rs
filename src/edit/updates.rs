@@ -299,7 +299,7 @@ impl<'a> SingleRequest<EditedUpdate, EditedUpdate> for UpdateEditor<'a> {
 }
 
 #[derive(Debug, Deserialize)]
-struct RequestedUpdate {
+pub struct RequestedUpdate {
     update: Update,
 }
 
@@ -358,7 +358,7 @@ impl<'a> SingleRequest<RequestedUpdate, Update> for UpdateStatusRequester<'a> {
 }
 
 #[derive(Debug, Deserialize)]
-struct WaivedUpdate {
+pub struct WaivedUpdate {
     update: Update,
 }
 

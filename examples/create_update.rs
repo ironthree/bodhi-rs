@@ -13,7 +13,8 @@ fn read_username() -> String {
     username.trim().to_string()
 }
 
-fn main() -> Result<(), String> {
+#[tokio::main]
+async fn main() -> Result<(), String> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
 
     let username = read_username();
@@ -23,6 +24,7 @@ fn main() -> Result<(), String> {
         .authentication(&username, &password)
         .timeout(Duration::from_secs(60))
         .build()
+        .await
         .unwrap();
 
     let new_update = UpdateCreator::from_builds(
@@ -31,7 +33,7 @@ fn main() -> Result<(), String> {
     )
     .update_type(UpdateType::Enhancement);
 
-    let response = bodhi.create(&new_update);
+    let response = bodhi.request(&new_update).await;
 
     match response {
         Ok(created_update) => {

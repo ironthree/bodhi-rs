@@ -12,7 +12,8 @@ fn read_username() -> String {
     username.trim().to_string()
 }
 
-fn main() -> Result<(), String> {
+#[tokio::main]
+async fn main() -> Result<(), String> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
 
     let username = read_username();
@@ -22,23 +23,17 @@ fn main() -> Result<(), String> {
     let bodhi = BodhiServiceBuilder::staging()
         .authentication(&username, &password)
         .build()
+        .await
         .unwrap();
 
-    let over_ride = match bodhi.query(OverrideNVRQuery::new("elementary-theme-5.4.0-1.fc30")) {
-        Ok(o) => match o {
-            Some(o) => o,
-            None => {
-                return Err(String::from("Buildroot override not found."));
-            },
-        },
-        Err(_) => {
-            return Err(String::from("Buildroot override not found."));
-        },
-    };
+    let over_ride = bodhi
+        .request(&OverrideNVRQuery::new("elementary-theme-5.4.0-1.fc30"))
+        .await
+        .map_err(|error| error.to_string())?;
 
     let override_edit = OverrideEditor::from_override(&over_ride).expired(true);
 
-    let response = bodhi.edit(&override_edit);
+    let response = bodhi.request(&override_edit).await;
 
     match response {
         Ok(value) => Ok(println!("{:#?}", value)),

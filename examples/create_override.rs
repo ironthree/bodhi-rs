@@ -13,7 +13,8 @@ fn read_username() -> String {
     username.trim().to_string()
 }
 
-fn main() -> Result<(), String> {
+#[tokio::main]
+async fn main() -> Result<(), String> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
 
     let username = read_username();
@@ -23,6 +24,7 @@ fn main() -> Result<(), String> {
     let bodhi = BodhiServiceBuilder::staging()
         .authentication(&username, &password)
         .build()
+        .await
         .unwrap();
 
     let expiration_date = BodhiDate::try_from("2020-01-01").unwrap();
@@ -33,7 +35,7 @@ fn main() -> Result<(), String> {
         &expiration_date,
     );
 
-    let response = bodhi.create(&new_override);
+    let response = bodhi.request(&new_override).await;
 
     match response {
         Ok(value) => Ok(println!("{:#?}", value)),
