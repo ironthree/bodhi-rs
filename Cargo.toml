@@ -15,7 +15,6 @@ repository = "https://github.com/ironthree/bodhi-rs"
 
 [features]
 default = ["offline-tests"]
-debug = ["fedora/debug"]
 # feature flag for offline tests without prerequisites
 offline-tests = []
 # feature flag for tests requiring internet connection
