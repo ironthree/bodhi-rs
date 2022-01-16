@@ -7,12 +7,12 @@ use std::str::FromStr;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-/// This error is returned when a string fails to be parsed into an enumerated value.
+// This error is returned when a string fails to be parsed into an enumerated value.
 #[derive(Debug)]
 pub struct InvalidValueError {
-    /// This field contains the name of the enum.
+    // This field contains the name of the enum.
     pub name: &'static str,
-    /// This field contains the invalid value.
+    // This field contains the invalid value.
     pub value: String,
 }
 
@@ -33,7 +33,7 @@ impl Display for InvalidValueError {
 
 impl Error for InvalidValueError {}
 
-/// This enum represents the possible request values for composes.
+// This enum represents the possible request values for composes.
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum ComposeRequest {
@@ -75,7 +75,7 @@ impl FromStr for ComposeRequest {
 }
 
 
-/// This enum represents the possible status values for composes.
+// This enum represents the possible status values for composes.
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum ComposeStatus {
@@ -152,19 +152,19 @@ impl FromStr for ComposeStatus {
     }
 }
 
-/// This enum represents the type of a bodhi update, of a package, and of builds.
+// This enum represents the type of a bodhi update, of a package, and of builds.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum ContentType {
-    /// tag for container image updates
+    // tag for container image updates
     #[serde(rename = "container")]
     Container,
-    /// tag for flatpak updates
+    // tag for flatpak updates
     #[serde(rename = "flatpak")]
     Flatpak,
-    /// tag for module updates
+    // tag for module updates
     #[serde(rename = "module")]
     Module,
-    /// tag for traditional RPM package updates
+    // tag for traditional RPM package updates
     #[serde(rename = "rpm")]
     RPM,
 }
@@ -205,7 +205,7 @@ impl FromStr for ContentType {
 }
 
 
-/// This enum represents a fedora release.
+// This enum represents a fedora release.
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 #[non_exhaustive]
@@ -418,18 +418,18 @@ impl FromStr for FedoraRelease {
 }
 
 
-/// This enum represents a "Karma" value, which is either a positive (+1), neutral (±0), or negative
-/// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and
-/// possibly also a [`TestCaseFeedback`](struct.TestCase.html) or a
-/// [`BugFeedback`](struct.BugFeedback.html).
+// This enum represents a "Karma" value, which is either a positive (+1), neutral (±0), or negative
+// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and
+// possibly also a [`TestCaseFeedback`](struct.TestCase.html) or a
+// [`BugFeedback`](struct.BugFeedback.html).
 #[derive(Clone, Copy, Debug, Deserialize_repr, PartialEq, Serialize_repr)]
 #[repr(i8)]
 pub enum Karma {
-    /// positive feedback
+    // positive feedback
     Positive = 1,
-    /// neutral / informational feedback
+    // neutral / informational feedback
     Neutral = 0,
-    /// negative feedback
+    // negative feedback
     Negative = -1,
 }
 
@@ -469,7 +469,7 @@ impl FromStr for Karma {
 }
 
 
-/// This enum represents the name of the package manager that's in use on a release.
+// This enum represents the name of the package manager that's in use on a release.
 #[allow(missing_docs)]
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
 pub enum PackageManager {
@@ -514,22 +514,22 @@ impl FromStr for PackageManager {
 }
 
 
-/// This enum represents the state of a release.
+// This enum represents the state of a release.
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
 pub enum ReleaseState {
-    /// release has been archived after it has reached its EOL
+    // release has been archived after it has reached its EOL
     #[serde(rename = "archived")]
     Archived,
-    /// release is currently supported
+    // release is currently supported
     #[serde(rename = "current")]
     Current,
-    /// release is disabled
+    // release is disabled
     #[serde(rename = "disabled")]
     Disabled,
-    /// release is frozen
+    // release is frozen
     #[serde(rename = "frozen")]
     Frozen,
-    /// release is in development
+    // release is in development
     #[serde(rename = "pending")]
     Pending,
 }
@@ -572,7 +572,7 @@ impl FromStr for ReleaseState {
 }
 
 
-/// This enum represents the test gating status from `greenwave`.
+// This enum represents the test gating status from `greenwave`.
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
 pub enum TestGatingStatus {
@@ -634,15 +634,15 @@ impl FromStr for TestGatingStatus {
 }
 
 
-/// This enum represents the two possible ways to identify a fedora update:
-/// - internal, numerical ID
-/// - public, human-readable "alias" (`FEDORA-2019-1A2BB23E`)
+// This enum represents the two possible ways to identify a fedora update:
+// - internal, numerical ID
+// - public, human-readable "alias" (`FEDORA-2019-1A2BB23E`)
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub(crate) enum UpdateID {
-    /// identified via numerical update ID
+    // identified via numerical update ID
     ID(u32),
-    /// identified via update alias
+    // identified via update alias
     Alias(String),
 }
 
@@ -658,22 +658,22 @@ impl Display for UpdateID {
 }
 
 
-/// This enum represents a requested state change of an update.
+// This enum represents a requested state change of an update.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateRequest {
-    /// request for an update to be marked as "obsolete" (usually when another update supersedes it)
+    // request for an update to be marked as "obsolete" (usually when another update supersedes it)
     #[serde(rename = "obsolete")]
     Obsolete,
-    /// request for the update to be "revoked" or removed
+    // request for the update to be "revoked" or removed
     #[serde(rename = "revoke")]
     Revoke,
-    /// request for the update to get pushed to stable
+    // request for the update to get pushed to stable
     #[serde(rename = "stable")]
     Stable,
-    /// request for the update to get pushed to testing
+    // request for the update to get pushed to testing
     #[serde(rename = "testing")]
     Testing,
-    /// request for the update to get "unpushed" (removed) from testing
+    // request for the update to get "unpushed" (removed) from testing
     #[serde(rename = "unpush")]
     Unpush,
 }
@@ -716,8 +716,8 @@ impl FromStr for UpdateRequest {
 }
 
 
-/// This enum represents the associated severity of a bodhi update. This field is required to not be
-/// unspecified for updates with [`UpdateType::Security`](enum.UpdateType.html).
+// This enum represents the associated severity of a bodhi update. This field is required to not be
+// unspecified for updates with [`UpdateType::Security`](enum.UpdateType.html).
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateSeverity {
@@ -771,28 +771,28 @@ impl FromStr for UpdateSeverity {
 }
 
 
-/// This enum represents the current state of a bodhi update.
+// This enum represents the current state of a bodhi update.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateStatus {
-    /// tag for updates that have been obsoleted by another update
+    // tag for updates that have been obsoleted by another update
     #[serde(rename = "obsolete")]
     Obsolete,
-    /// tag for updates that are pending for either testing or stable
+    // tag for updates that are pending for either testing or stable
     #[serde(rename = "pending")]
     Pending,
-    /// tag for updates that are associated with an active side tag
+    // tag for updates that are associated with an active side tag
     #[serde(rename = "side_tag_active")]
     SideTagActive,
-    /// tag for updates that are associated with an expired side tag
+    // tag for updates that are associated with an expired side tag
     #[serde(rename = "side_tag_expired")]
     SideTagExpired,
-    /// tag for updates that have been pushed to stable
+    // tag for updates that have been pushed to stable
     #[serde(rename = "stable")]
     Stable,
-    /// tag for updates that have been pushed to testing
+    // tag for updates that have been pushed to testing
     #[serde(rename = "testing")]
     Testing,
-    /// tag for updates that have been "unpushed" from testing
+    // tag for updates that have been "unpushed" from testing
     #[serde(rename = "unpushed")]
     Unpushed,
 }
@@ -839,16 +839,16 @@ impl FromStr for UpdateStatus {
 }
 
 
-/// This enum represents the associated suggested action for a bodhi update.
+// This enum represents the associated suggested action for a bodhi update.
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateSuggestion {
-    /// recommendation to log out for the update to get applied
+    // recommendation to log out for the update to get applied
     #[serde(rename = "logout")]
     Logout,
-    /// recommendation to reboot for the update to get applied
+    // recommendation to reboot for the update to get applied
     #[serde(rename = "reboot")]
     Reboot,
-    /// no recommendation
+    // no recommendation
     #[serde(rename = "unspecified")]
     Unspecified,
 }
@@ -887,7 +887,7 @@ impl FromStr for UpdateSuggestion {
 }
 
 
-/// This enum represents the type of a bodhi update.
+// This enum represents the type of a bodhi update.
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateType {
