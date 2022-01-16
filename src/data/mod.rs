@@ -12,6 +12,9 @@ pub use dates::*;
 mod enums;
 pub use enums::*;
 
+mod release;
+pub use release::*;
+
 mod schemas;
 pub(crate) use schemas::*;
 

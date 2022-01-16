@@ -30,6 +30,8 @@ mod dates;
 #[cfg(feature = "offline-tests")]
 mod enums;
 #[cfg(feature = "offline-tests")]
+mod release;
+#[cfg(feature = "offline-tests")]
 mod types;
 
 // tests requiring internet access

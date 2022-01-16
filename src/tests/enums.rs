@@ -2,22 +2,6 @@ use crate::data::*;
 use std::convert::TryFrom;
 
 #[test]
-fn release_try_from_ok() {
-    assert_eq!(FedoraRelease::try_from("F31").unwrap(), FedoraRelease::F31);
-}
-
-#[test]
-fn release_format() {
-    assert_eq!(FedoraRelease::F31.to_string().as_str(), "F31");
-}
-
-#[test]
-#[should_panic]
-fn release_try_from_err() {
-    FedoraRelease::try_from("X12").unwrap();
-}
-
-#[test]
 fn idem_compose_request() {
     use ComposeRequest::*;
 
@@ -92,6 +76,7 @@ fn idem_content_type() {
     }
 }
 
+/*
 #[test]
 fn idem_fedora_release() {
     use FedoraRelease::*;
@@ -124,6 +109,7 @@ fn idem_fedora_release() {
         assert_eq!(value.to_string().parse::<FedoraRelease>().unwrap(), value);
     }
 }
+*/
 
 #[test]
 fn idem_karma() {

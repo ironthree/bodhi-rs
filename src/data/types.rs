@@ -6,6 +6,7 @@ use url::Url;
 
 use super::dates::*;
 use super::enums::*;
+use super::release::FedoraRelease;
 
 // This struct represents a specific BugZilla bug that is associated with an update.
 #[derive(Debug, Deserialize, Serialize)]
