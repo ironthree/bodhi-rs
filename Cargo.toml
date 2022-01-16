@@ -24,7 +24,6 @@ online-tests = []
 data-tests = []
 
 [dependencies]
-async-trait = "0.1.51"
 chrono = { version = "^0.4.10", features = ["serde"] }
 #fedora = "^1.1"
 fedora = { path = "../fedora-rs" }
@@ -45,6 +44,5 @@ tokio = { version = "1.14.0", features = ["macros", "rt-multi-thread"] }
 
 [profile.release]
 codegen-units = 1
-lto = true
 opt-level = 3
 
