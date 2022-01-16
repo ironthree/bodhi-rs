@@ -74,7 +74,6 @@ fn updates_dejson_f36() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -106,7 +105,6 @@ fn updates_dejson_f36c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -138,7 +136,6 @@ fn updates_dejson_f35() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -170,7 +167,6 @@ fn updates_dejson_f35c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -202,7 +198,6 @@ fn updates_dejson_f35f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -234,7 +229,6 @@ fn updates_dejson_f35m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -266,7 +260,6 @@ fn updates_dejson_f34() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -298,7 +291,6 @@ fn updates_dejson_f34c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -330,7 +322,6 @@ fn updates_dejson_f34f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -362,7 +353,6 @@ fn updates_dejson_f34m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -394,7 +384,6 @@ fn updates_dejson_f33() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -426,7 +415,6 @@ fn updates_dejson_f33c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -458,7 +446,6 @@ fn updates_dejson_f33f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -490,7 +477,6 @@ fn updates_dejson_f33m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -522,7 +508,6 @@ fn updates_dejson_f32() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -554,7 +539,6 @@ fn updates_dejson_f32c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -586,7 +570,6 @@ fn updates_dejson_f32f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -618,7 +601,6 @@ fn updates_dejson_f32m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -650,7 +632,6 @@ fn updates_dejson_f31() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -682,7 +663,6 @@ fn updates_dejson_f31c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -714,7 +694,6 @@ fn updates_dejson_f31f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -746,7 +725,6 @@ fn updates_dejson_f31m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -778,7 +756,6 @@ fn updates_dejson_f30() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -810,7 +787,6 @@ fn updates_dejson_f30c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -842,7 +818,6 @@ fn updates_dejson_f30f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -874,7 +849,6 @@ fn updates_dejson_f30m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -906,7 +880,6 @@ fn updates_dejson_f29() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -938,7 +911,6 @@ fn updates_dejson_f29c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -970,7 +942,6 @@ fn updates_dejson_f29f() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1002,7 +973,6 @@ fn updates_dejson_f29m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1034,7 +1004,6 @@ fn updates_dejson_f28() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1066,7 +1035,6 @@ fn updates_dejson_f28c() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1098,7 +1066,6 @@ fn updates_dejson_f28m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1130,7 +1097,6 @@ fn updates_dejson_f27() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1162,7 +1128,6 @@ fn updates_dejson_f27m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1194,7 +1159,6 @@ fn updates_dejson_f26() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1226,7 +1190,6 @@ fn updates_dejson_f25() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1258,7 +1221,6 @@ fn updates_dejson_f24() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1290,7 +1252,6 @@ fn updates_dejson_f23() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1322,7 +1283,6 @@ fn updates_dejson_f22() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1354,7 +1314,6 @@ fn updates_dejson_f21() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1386,7 +1345,6 @@ fn updates_dejson_epel9() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1418,7 +1376,6 @@ fn updates_dejson_epel9n() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1450,7 +1407,6 @@ fn updates_dejson_epel8() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1482,7 +1438,6 @@ fn updates_dejson_epel8m() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1514,7 +1469,6 @@ fn updates_dejson_epel8n() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1546,7 +1500,6 @@ fn updates_dejson_epel7() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1578,7 +1531,6 @@ fn updates_dejson_el6() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1610,7 +1562,6 @@ fn updates_dejson_el5() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));
@@ -1642,7 +1593,6 @@ fn updates_dejson_eln() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));

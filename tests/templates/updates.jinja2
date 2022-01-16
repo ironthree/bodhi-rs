@@ -27,7 +27,6 @@ fn updates_dejson_{{ release.lower() }}() {
     if !updates.is_empty() {
         assert!(!updates.iter().all(|u| u.comments.is_none()));
         assert!(!updates.iter().all(|u| u.content_type.is_none()));
-        assert!(!updates.iter().all(|u| u.date_approved.is_none()));
         assert!(!updates.iter().all(|u| u.date_modified.is_none()));
         assert!(!updates.iter().all(|u| u.date_pushed.is_none()));
         assert!(!updates.iter().all(|u| u.date_stable.is_none()));

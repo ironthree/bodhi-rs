@@ -468,6 +468,7 @@ pub struct Update {
     pub critpath: bool,
     // date & time when this update has last been approved
     // NOTE: `date_approved` is an unused field: <https://github.com/fedora-infra/bodhi/issues/4171>
+    #[deprecated]
     #[serde(with = "option_bodhi_date_format")]
     pub date_approved: Option<BodhiDate>,
     // date & time when this update has last been modified
