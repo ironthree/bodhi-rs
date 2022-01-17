@@ -32,16 +32,16 @@ async fn query_sanity_releases() {
     let f32 = FedoraRelease::try_from("F32").unwrap();
 
     let f31_overs: Vec<Override> = bodhi
-        .paginated_request(&OverrideQuery::new().releases(vec![f31.clone()]))
+        .paginated_request(&OverrideQuery::new().releases(vec![&f31]))
         .await
         .unwrap();
     let f32_overs: Vec<Override> = bodhi
-        .paginated_request(&OverrideQuery::new().releases(vec![f32.clone()]))
+        .paginated_request(&OverrideQuery::new().releases(vec![&f32]))
         .await
         .unwrap();
 
     let both_overs: Vec<Override> = bodhi
-        .paginated_request(&OverrideQuery::new().releases(vec![f31, f32]))
+        .paginated_request(&OverrideQuery::new().releases(vec![&f31, &f32]))
         .await
         .unwrap();
 

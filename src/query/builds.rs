@@ -90,7 +90,7 @@ pub struct BuildQuery<'a> {
     // list of packages to request builds for
     packages: Option<Vec<&'a str>>,
     // list of releases to request builds for
-    releases: Option<Vec<FedoraRelease>>,
+    releases: Option<Vec<&'a FedoraRelease>>,
     // list of updates to request builds for
     updates: Option<Vec<&'a str>>,
 
@@ -142,7 +142,7 @@ impl<'a> BuildQuery<'a> {
 
     // Restrict the returned results to builds for the given release(s).
     #[must_use]
-    pub fn releases(mut self, releases: Vec<FedoraRelease>) -> Self {
+    pub fn releases(mut self, releases: Vec<&'a FedoraRelease>) -> Self {
         self.releases = Some(releases);
         self
     }
@@ -209,7 +209,10 @@ impl<'a> PaginatedRequest<BuildListPage, Vec<Build>> for BuildQuery<'a> {
                 .packages
                 .as_ref()
                 .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            releases: self.releases.as_ref().map(|v| v.iter().map(|r| r.to_owned()).collect()),
+            releases: self
+                .releases
+                .as_ref()
+                .map(|v| v.iter().map(|r| (*r).to_owned()).collect()),
             updates: self
                 .updates
                 .as_ref()

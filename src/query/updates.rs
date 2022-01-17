@@ -108,7 +108,7 @@ pub struct UpdateQuery<'a> {
     pushed: Option<bool>,
     pushed_before: Option<&'a BodhiDate>,
     pushed_since: Option<&'a BodhiDate>,
-    releases: Option<Vec<FedoraRelease>>,
+    releases: Option<Vec<&'a FedoraRelease>>,
     request: Option<UpdateRequest>,
     search: Option<&'a str>,
     severity: Option<UpdateSeverity>,
@@ -302,7 +302,7 @@ impl<'a> UpdateQuery<'a> {
 
     // Restrict results to updates for the given release(s).
     #[must_use]
-    pub fn releases(mut self, releases: Vec<FedoraRelease>) -> Self {
+    pub fn releases(mut self, releases: Vec<&'a FedoraRelease>) -> Self {
         self.releases = Some(releases);
         self
     }
@@ -491,7 +491,10 @@ impl<'a> PaginatedRequest<UpdateListPage, Vec<Update>> for UpdateQuery<'a> {
             pushed: self.pushed,
             pushed_before: self.pushed_before.as_ref().map(|d| (*d).clone()),
             pushed_since: self.pushed_since.as_ref().map(|d| (*d).clone()),
-            releases: self.releases.clone(),
+            releases: self
+                .releases
+                .as_ref()
+                .map(|v| v.iter().map(|r| (*r).to_owned()).collect()),
             request: self.request,
             search: self.search.map(|s| s.to_owned()),
             severity: self.severity,

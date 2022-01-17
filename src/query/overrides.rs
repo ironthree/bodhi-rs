@@ -94,7 +94,7 @@ pub struct OverrideQuery<'a> {
     expired: Option<bool>,
     like: Option<&'a str>,
     packages: Option<Vec<&'a str>>,
-    releases: Option<Vec<FedoraRelease>>,
+    releases: Option<Vec<&'a FedoraRelease>>,
     search: Option<&'a str>,
     users: Option<Vec<&'a str>>,
 
@@ -163,7 +163,7 @@ impl<'a> OverrideQuery<'a> {
 
     // Restrict the returned results to overrides for the given release(s).
     #[must_use]
-    pub fn releases(mut self, releases: Vec<FedoraRelease>) -> Self {
+    pub fn releases(mut self, releases: Vec<&'a FedoraRelease>) -> Self {
         self.releases = Some(releases);
         self
     }
@@ -246,7 +246,10 @@ impl<'a> PaginatedRequest<OverrideListPage, Vec<Override>> for OverrideQuery<'a>
                 .packages
                 .as_ref()
                 .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            releases: self.releases.as_ref().map(|v| v.iter().map(|r| r.to_owned()).collect()),
+            releases: self
+                .releases
+                .as_ref()
+                .map(|v| v.iter().map(|r| (*r).to_owned()).collect()),
             search: self.search.map(|s| s.to_owned()),
             users: self.users.as_ref().map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
             page,

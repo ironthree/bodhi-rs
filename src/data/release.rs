@@ -33,7 +33,7 @@ fn release_parse_fedora(release: &str) -> Result<(u32, String), InvalidValueErro
         .ok_or_else(invalid)?
         .as_str()
         .parse::<u32>()
-        .or(Err(invalid()))?;
+        .map_err(|_| invalid())?;
     let ctype: String = parsed.name("ctype").ok_or_else(invalid)?.as_str().to_owned();
 
     Ok((number, ctype))
@@ -53,7 +53,7 @@ fn release_parse_epel(release: &str) -> Result<(u32, String, bool), InvalidValue
         .ok_or_else(invalid)?
         .as_str()
         .parse::<u32>()
-        .or(Err(invalid()))?;
+        .map_err(|_| invalid())?;
     let ctype: String = parsed.name("ctype").ok_or_else(invalid)?.as_str().to_owned();
     let next: bool = parsed.name("next").ok_or_else(invalid)?.as_str() == "N";
 
@@ -74,7 +74,7 @@ fn release_parse_el(release: &str) -> Result<u32, InvalidValueError> {
         .ok_or_else(invalid)?
         .as_str()
         .parse::<u32>()
-        .or(Err(invalid()))?;
+        .map_err(|_| invalid())?;
 
     Ok(number)
 }

@@ -23,8 +23,8 @@ use crate::request::{RequestMethod, SingleRequest};
 //     .unwrap();
 // ```
 #[derive(Debug)]
-pub struct ComposeReleaseRequestQuery {
-    release: FedoraRelease,
+pub struct ComposeReleaseRequestQuery<'a> {
+    release: &'a FedoraRelease,
     request: ComposeRequest,
 }
 
@@ -33,15 +33,15 @@ pub struct ComposePage {
     compose: Compose,
 }
 
-impl ComposeReleaseRequestQuery {
+impl<'a> ComposeReleaseRequestQuery<'a> {
     // This method is the only way to create a new
     // [`ComposeReleaseRequestQuery`](struct.ComposeReleaseRequestQuery.html) instance.
-    pub fn new(release: FedoraRelease, request: ComposeRequest) -> Self {
+    pub fn new(release: &'a FedoraRelease, request: ComposeRequest) -> Self {
         ComposeReleaseRequestQuery { release, request }
     }
 }
 
-impl SingleRequest<ComposePage, Compose> for ComposeReleaseRequestQuery {
+impl<'a> SingleRequest<ComposePage, Compose> for ComposeReleaseRequestQuery<'a> {
     fn method(&self) -> RequestMethod {
         RequestMethod::GET
     }

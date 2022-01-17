@@ -32,16 +32,16 @@ async fn query_sanity_releases() {
     let f30c = FedoraRelease::try_from("F30C").unwrap();
 
     let f31c_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().releases(vec![f31c.clone()]))
+        .paginated_request(&BuildQuery::new().releases(vec![&f31c]))
         .await
         .unwrap();
     let f30c_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().releases(vec![f30c.clone()]))
+        .paginated_request(&BuildQuery::new().releases(vec![&f30c]))
         .await
         .unwrap();
 
     let both_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().releases(vec![f31c, f30c]))
+        .paginated_request(&BuildQuery::new().releases(vec![&f31c, &f30c]))
         .await
         .unwrap();
 
