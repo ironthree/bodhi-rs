@@ -299,6 +299,25 @@ async fn try_post(session: &Client, url: Url, body: Option<String>) -> Result<Re
     }
 }
 
+async fn handle_response<P, T>(response: Response, request: &dyn SingleRequest<P, T>) -> Result<P, QueryError>
+where
+    T: DeserializeOwned,
+{
+    let status = response.status();
+
+    if status.is_success() {
+        let string = response.text().await?;
+        let page = request.parse(&string)?;
+        Ok(page)
+    } else if status == 404 {
+        Err(QueryError::NotFound)
+    } else {
+        let result = response.text().await?;
+        let error: BodhiError = serde_json::from_str(&result)?;
+        Err(QueryError::BodhiError { error })
+    }
+}
+
 impl BodhiService {
     fn session(&self) -> &Client {
         self.session.session()
@@ -333,22 +352,8 @@ impl BodhiService {
             .join(&request.path()?)
             .map_err(|e| ServiceError::UrlParsingError { error: e })?;
         let response = retry_get(self.session(), url, request.body(None)?, self.retries).await?;
-        let status = response.status();
 
-        let page = if status.is_success() {
-            let string = response.text().await?;
-            let page = request.parse(&string)?;
-            Ok(page)
-        } else if status == 404 {
-            Err(QueryError::NotFound)
-        } else {
-            let result = response.text().await?;
-            let error: BodhiError = serde_json::from_str(&result)?;
-
-            Err(QueryError::BodhiError { error })
-        };
-
-        page
+        handle_response(response, request).await
     }
 
     async fn request_post<P, T>(&self, request: &dyn SingleRequest<P, T>) -> Result<T, QueryError>
@@ -369,22 +374,8 @@ impl BodhiService {
             .join(&request.path()?)
             .map_err(|e| ServiceError::UrlParsingError { error: e })?;
         let response = try_post(self.session(), url, request.body(Some(token))?).await?;
-        let status = response.status();
 
-        let page = if status.is_success() {
-            let string = response.text().await?;
-            let page = request.parse(&string)?;
-            Ok(page)
-        } else if status == 404 {
-            Err(QueryError::NotFound)
-        } else {
-            let result = response.text().await?;
-            let error: BodhiError = serde_json::from_str(&result)?;
-
-            Err(QueryError::BodhiError { error })
-        };
-
-        page
+        handle_response(response, request).await
     }
 
     pub async fn paginated_request<P, V, T>(&self, request: &dyn PaginatedRequest<P, V>) -> Result<Vec<T>, QueryError>
