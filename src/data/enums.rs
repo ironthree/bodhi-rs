@@ -1,37 +1,11 @@
 use std::cmp::PartialEq;
-use std::convert::TryFrom;
-use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-// This error is returned when a string fails to be parsed into an enumerated value.
-#[derive(Debug)]
-pub struct InvalidValueError {
-    // This field contains the name of the enum.
-    pub name: &'static str,
-    // This field contains the invalid value.
-    pub value: String,
-}
-
-impl InvalidValueError {
-    pub(crate) fn new(name: &'static str, value: &str) -> Self {
-        InvalidValueError {
-            name,
-            value: value.to_owned(),
-        }
-    }
-}
-
-impl Display for InvalidValueError {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), std::fmt::Error> {
-        write!(f, "Invalid value for {}: {}", self.name, self.value)
-    }
-}
-
-impl Error for InvalidValueError {}
+use super::InvalidValueError;
 
 // This enum represents the possible request values for composes.
 #[allow(missing_docs)]
@@ -170,7 +144,7 @@ pub enum ContentType {
 }
 
 impl ContentType {
-    pub(crate) fn suffix(&self) -> &str {
+    pub fn suffix(&self) -> &str {
         use ContentType::*;
 
         match self {

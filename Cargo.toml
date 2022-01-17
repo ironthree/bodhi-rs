@@ -23,22 +23,24 @@ online-tests = []
 data-tests = []
 
 [dependencies]
-chrono = { version = "^0.4.10", features = ["serde"] }
-#fedora = "^1.1"
+chrono = { version = "0.4.10", features = ["serde"] }
+#fedora = "1.1"
 fedora = { path = "../fedora-rs" }
+lazy_static = "1.4"
 log = "0.4.13"
-reqwest = { version = "^0.11", features = ["cookies"] }
-retry = "^1.0.0"
-serde = { version = "^1.0.104", features = ["derive"] }
-serde_repr = "^0.1.5"
-serde_json = "^1.0.44"
-serde_url_params = "^0.2.0"
-thiserror = "^1.0"
-url = "^2.1.0"
+regex = "1.5"
+reqwest = { version = "0.11", features = ["cookies"] }
+retry = "1.0.0"
+serde = { version = "1.0.104", features = ["derive"] }
+serde_repr = "0.1.5"
+serde_json = "1.0.44"
+serde_url_params = "0.2.0"
+thiserror = "1.0"
+url = "2.1.0"
 
 [dev-dependencies]
 env_logger = "0.8.0"
-rpassword = "^5.0.0"
+rpassword = "5.0.0"
 tokio = { version = "1.14.0", features = ["macros", "rt-multi-thread"] }
 
 [profile.release]

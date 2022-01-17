@@ -12,6 +12,9 @@ pub use dates::*;
 mod enums;
 pub use enums::*;
 
+mod error;
+pub use error::InvalidValueError;
+
 mod release;
 pub use release::*;
 

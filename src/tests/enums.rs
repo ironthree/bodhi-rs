@@ -1,5 +1,4 @@
 use crate::data::*;
-use std::convert::TryFrom;
 
 #[test]
 fn idem_compose_request() {
