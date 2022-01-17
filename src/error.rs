@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-// This struct contains error messages that are deserialized from bodhi's error responses.
+// This struct contains error messages that are deserialized from bodhi error responses.
 #[derive(Debug, Deserialize, thiserror::Error)]
 pub struct BodhiError {
     // This field contains a list of server-side error messages.

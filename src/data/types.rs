@@ -509,7 +509,7 @@ pub struct Update {
     pub require_bugs: bool,
     // flag to specify whether feedback for test cases is required when counting karma
     pub require_testcases: bool,
-    // comma- or space-separated list of required taskotron test results
+    // comma- or space-separated list of required gating test results
     pub requirements: Option<String>,
     // severity of this update
     pub severity: UpdateSeverity,

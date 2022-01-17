@@ -1,4 +1,4 @@
-#![allow(clippy::result_unwrap_used)]
+#![allow(clippy::unwrap_used)]
 
 #[cfg(feature = "online-tests")]
 use std::time::Duration;

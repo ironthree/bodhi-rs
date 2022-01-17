@@ -163,7 +163,7 @@ impl<'a> UpdateCreator<'a> {
         self
     }
 
-    // Add custom taskotron requirements.
+    // Add custom gating test requirements.
     #[must_use]
     pub fn requirements(mut self, requirements: String) -> Self {
         self.requirements = Some(requirements);

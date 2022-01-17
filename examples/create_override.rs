@@ -38,7 +38,10 @@ async fn main() -> Result<(), String> {
     let response = bodhi.request(&new_override).await;
 
     match response {
-        Ok(value) => Ok(println!("{:#?}", value)),
+        Ok(value) => {
+            println!("{:#?}", value);
+            Ok(())
+        },
         Err(error) => Err(format!("{:#?}", error)),
     }
 }

@@ -52,7 +52,7 @@ bodhi instance from Nov. 30, 2020, just after the fedora 31 EOL date.
 This is the first "stable" release of bodhi-rs.
 
 Compared to 0.6.4, it brings only some minor API changes, primarily to no longer
-hide some Vec allocations, which allows to write more efficient code in some
+hide some Vec allocations, which allows writing more efficient code in some
 situations: Query arguments that allow multiple arguments now take a Vec of
 values directly instead of being callable multiple times. Of course, all
 examples and tests were adapted to reflect this change.
@@ -148,7 +148,7 @@ run from the crate downloaded from <https://crates.io>.
 
 # Release 0.5.1 "Constructive Feedback" (Jan. 23, 2020)
 
-Finally fixed providing bug and testcase feedback with comments.
+Finally: Fixed providing bug and testcase feedback with comments.
 
 # Release 0.5.0 "Argument Alignment" (Jan. 19, 2020)
 
