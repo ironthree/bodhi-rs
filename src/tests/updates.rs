@@ -14,7 +14,7 @@ async fn query_current() {
     let _: Vec<Update> = bodhi
         .paginated_request(
             &UpdateQuery::new()
-                .releases(vec![FedoraRelease::Current])
+                .releases(vec![FedoraRelease::CURRENT])
                 .submitted_since(&days_ago(2)),
         )
         .await
@@ -28,7 +28,7 @@ async fn query_pending() {
     let _: Vec<Update> = bodhi
         .paginated_request(
             &UpdateQuery::new()
-                .releases(vec![FedoraRelease::Pending])
+                .releases(vec![FedoraRelease::PENDING])
                 .submitted_since(&days_ago(1)),
         )
         .await
@@ -42,7 +42,7 @@ async fn query_archived() {
     let _: Vec<Update> = bodhi
         .paginated_request(
             &UpdateQuery::new()
-                .releases(vec![FedoraRelease::Archived])
+                .releases(vec![FedoraRelease::ARCHIVED])
                 .submitted_since(&days_ago(30)),
         )
         .await
@@ -137,17 +137,20 @@ async fn query_sanity_packages() {
 async fn query_sanity_releases() {
     let bodhi = bodhi_init().await;
 
+    let f32c = FedoraRelease::try_from("F32C").unwrap();
+    let f31c = FedoraRelease::try_from("F31C").unwrap();
+
     let updates_one: Vec<Update> = bodhi
-        .paginated_request(&UpdateQuery::new().releases(vec![FedoraRelease::F32C]))
+        .paginated_request(&UpdateQuery::new().releases(vec![f32c.clone()]))
         .await
         .unwrap();
     let updates_two: Vec<Update> = bodhi
-        .paginated_request(&UpdateQuery::new().releases(vec![FedoraRelease::F31C]))
+        .paginated_request(&UpdateQuery::new().releases(vec![f31c.clone()]))
         .await
         .unwrap();
 
     let updates_both: Vec<Update> = bodhi
-        .paginated_request(&UpdateQuery::new().releases(vec![FedoraRelease::F32C, FedoraRelease::F31C]))
+        .paginated_request(&UpdateQuery::new().releases(vec![f32c, f31c]))
         .await
         .unwrap();
 
