@@ -367,7 +367,7 @@ pub struct WaivedUpdate {
 pub struct UpdateTestResultWaiver<'a> {
     alias: &'a str,
     comment: &'a str,
-    tests: Option<&'a [&'a str]>,
+    tests: Option<&'a [String]>,
 }
 
 impl<'a> UpdateTestResultWaiver<'a> {
@@ -381,7 +381,7 @@ impl<'a> UpdateTestResultWaiver<'a> {
     }
 
     #[must_use]
-    pub fn tests(mut self, tests: &'a [&'a str]) -> Self {
+    pub fn tests(mut self, tests: &'a [String]) -> Self {
         self.tests = Some(tests);
         self
     }
@@ -401,7 +401,7 @@ impl<'a> SingleRequest<WaivedUpdate, Update> for UpdateTestResultWaiver<'a> {
         struct RequestWaiver<'a> {
             comment: &'a str,
             #[serde(skip_serializing_if = "Option::is_none")]
-            tests: Option<&'a [&'a str]>,
+            tests: Option<&'a [String]>,
             csrf_token: &'a str,
         }
 
