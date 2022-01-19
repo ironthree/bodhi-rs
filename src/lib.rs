@@ -50,7 +50,7 @@
 // ! let packages = bodhi.query(package_query).unwrap();
 // ! ```
 
-// FIXME #![warn(missing_docs)]
+#![warn(missing_docs)]
 #![warn(missing_debug_implementations)]
 #![warn(clippy::unwrap_used)]
 
