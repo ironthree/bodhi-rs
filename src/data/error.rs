@@ -11,10 +11,7 @@ pub struct InvalidValueError {
 }
 
 impl InvalidValueError {
-    pub(crate) fn new(name: &'static str, value: &str) -> Self {
-        InvalidValueError {
-            name,
-            value: value.to_owned(),
-        }
+    pub(crate) fn new(name: &'static str, value: String) -> Self {
+        InvalidValueError { name, value }
     }
 }

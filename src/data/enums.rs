@@ -35,7 +35,7 @@ impl TryFrom<&str> for ComposeRequest {
         match value.to_lowercase().as_str() {
             "stable" => Ok(ComposeRequest::Stable),
             "testing" => Ok(ComposeRequest::Testing),
-            _ => Err(InvalidValueError::new("ComposeRequest", value)),
+            _ => Err(InvalidValueError::new("ComposeRequest", value.to_owned())),
         }
     }
 }
@@ -113,7 +113,7 @@ impl TryFrom<&str> for ComposeStatus {
             "success" => Ok(ComposeStatus::Success),
             "syncing_repo" => Ok(ComposeStatus::SyncingRepo),
             "updateinfo" => Ok(ComposeStatus::UpdateInfo),
-            _ => Err(InvalidValueError::new("ComposeStatus", value)),
+            _ => Err(InvalidValueError::new("ComposeStatus", value.to_owned())),
         }
     }
 }
@@ -154,6 +154,19 @@ impl ContentType {
             Module => "M",
         }
     }
+
+    pub fn try_from_suffix(suffix: &str) -> Result<Self, InvalidValueError> {
+        match suffix {
+            "" => Ok(ContentType::RPM),
+            "C" => Ok(ContentType::Container),
+            "F" => Ok(ContentType::Flatpak),
+            "M" => Ok(ContentType::Module),
+            _ => Err(InvalidValueError::new(
+                "ContentType",
+                format!("Suffix '{}' is not valid.", suffix),
+            )),
+        }
+    }
 }
 
 impl Display for ContentType {
@@ -178,7 +191,7 @@ impl TryFrom<&str> for ContentType {
             "flatpak" => Ok(ContentType::Flatpak),
             "module" => Ok(ContentType::Module),
             "rpm" => Ok(ContentType::RPM),
-            _ => Err(InvalidValueError::new("ContentType", value)),
+            _ => Err(InvalidValueError::new("ContentType", value.to_owned())),
         }
     }
 }
@@ -229,7 +242,7 @@ impl TryFrom<&str> for Karma {
             "+1" | "1" => Ok(Karma::Positive),
             "0" | "±0" => Ok(Karma::Neutral),
             "-1" => Ok(Karma::Negative),
-            _ => Err(InvalidValueError::new("Karma", value)),
+            _ => Err(InvalidValueError::new("Karma", value.to_owned())),
         }
     }
 }
@@ -274,7 +287,7 @@ impl TryFrom<&str> for PackageManager {
         match value.to_lowercase().as_str() {
             "dnf" => Ok(PackageManager::DNF),
             "yum" => Ok(PackageManager::YUM),
-            _ => Err(InvalidValueError::new("PackageManager", value)),
+            _ => Err(InvalidValueError::new("PackageManager", value.to_owned())),
         }
     }
 }
@@ -332,7 +345,7 @@ impl TryFrom<&str> for ReleaseState {
             "disabled" => Ok(ReleaseState::Disabled),
             "frozen" => Ok(ReleaseState::Frozen),
             "pending" => Ok(ReleaseState::Pending),
-            _ => Err(InvalidValueError::new("ReleaseState", value)),
+            _ => Err(InvalidValueError::new("ReleaseState", value.to_owned())),
         }
     }
 }
@@ -394,7 +407,7 @@ impl TryFrom<&str> for TestGatingStatus {
             "queued" => Ok(TestGatingStatus::Queued),
             "running" => Ok(TestGatingStatus::Running),
             "waiting" => Ok(TestGatingStatus::Waiting),
-            _ => Err(InvalidValueError::new("TestGatingStatus", value)),
+            _ => Err(InvalidValueError::new("TestGatingStatus", value.to_owned())),
         }
     }
 }
@@ -476,7 +489,7 @@ impl TryFrom<&str> for UpdateRequest {
             "stable" => Ok(UpdateRequest::Stable),
             "testing" => Ok(UpdateRequest::Testing),
             "unpush" => Ok(UpdateRequest::Unpush),
-            _ => Err(InvalidValueError::new("UpdateRequest", value)),
+            _ => Err(InvalidValueError::new("UpdateRequest", value.to_owned())),
         }
     }
 }
@@ -531,7 +544,7 @@ impl TryFrom<&str> for UpdateSeverity {
             "medium" => Ok(UpdateSeverity::Medium),
             "unspecified" => Ok(UpdateSeverity::Unspecified),
             "urgent" => Ok(UpdateSeverity::Urgent),
-            _ => Err(InvalidValueError::new("UpdateSeverity", value)),
+            _ => Err(InvalidValueError::new("UpdateSeverity", value.to_owned())),
         }
     }
 }
@@ -599,7 +612,7 @@ impl TryFrom<&str> for UpdateStatus {
             "stable" => Ok(UpdateStatus::Stable),
             "testing" => Ok(UpdateStatus::Testing),
             "unpushed" => Ok(UpdateStatus::Unpushed),
-            _ => Err(InvalidValueError::new("UpdateStatus", value)),
+            _ => Err(InvalidValueError::new("UpdateStatus", value.to_owned())),
         }
     }
 }
@@ -647,7 +660,7 @@ impl TryFrom<&str> for UpdateSuggestion {
             "logout" => Ok(UpdateSuggestion::Logout),
             "reboot" => Ok(UpdateSuggestion::Reboot),
             "unspecified" => Ok(UpdateSuggestion::Unspecified),
-            _ => Err(InvalidValueError::new("UpdateSuggestion", value)),
+            _ => Err(InvalidValueError::new("UpdateSuggestion", value.to_owned())),
         }
     }
 }
@@ -701,7 +714,7 @@ impl TryFrom<&str> for UpdateType {
             "newpackage" => Ok(UpdateType::NewPackage),
             "security" => Ok(UpdateType::Security),
             "unspecified" => Ok(UpdateType::Unspecified),
-            _ => Err(InvalidValueError::new("UpdateType", value)),
+            _ => Err(InvalidValueError::new("UpdateType", value.to_owned())),
         }
     }
 }

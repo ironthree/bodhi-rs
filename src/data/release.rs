@@ -2,86 +2,166 @@ use std::borrow::Cow;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-use lazy_static::lazy_static;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use super::{ContentType, InvalidValueError};
 
-lazy_static! {
-    pub(crate) static ref FEDORA_RELEASE_RE: Regex =
-        Regex::new("^F(?P<number>[1-9][0-9]*)(?P<ctype>[CFM]?)$").expect("Failed to compile hard-coded regex!");
+mod fedora {
+    use lazy_static::lazy_static;
+    use regex::Regex;
+
+    use super::{ContentType, FedoraRelease, InvalidValueError};
+
+    lazy_static! {
+        pub static ref RELEASE_RE: Regex =
+            Regex::new("^F(?P<number>[1-9][0-9]*)(?P<ctype>[CFM]?)$").expect("Failed to compile hard-coded regex!");
+    }
+
+    pub fn release_parse(release: &str) -> Result<(u32, String), InvalidValueError> {
+        let invalid = || InvalidValueError::new("FedoraRelease", release.to_owned());
+
+        let parsed = RELEASE_RE.captures(release).ok_or_else(invalid)?;
+        let number: u32 = parsed
+            .name("number")
+            .ok_or_else(invalid)?
+            .as_str()
+            .parse::<u32>()
+            .map_err(|_| invalid())?;
+        let ctype: String = parsed.name("ctype").ok_or_else(invalid)?.as_str().to_owned();
+
+        Ok((number, ctype))
+    }
+
+    pub const MIN_RELEASE: u32 = 21;
+    pub const MIN_CONTAINER_RELEASE: u32 = 28;
+    pub const MIN_FLATPAK_RELEASE: u32 = 29;
+    pub const MIN_MODULE_RELEASE: u32 = 27;
+
+    pub fn is_valid_release(number: u32, ctype: ContentType) -> bool {
+        use ContentType::*;
+
+        match ctype {
+            RPM => number >= MIN_RELEASE,
+            Container => number >= MIN_CONTAINER_RELEASE,
+            Flatpak => number >= MIN_FLATPAK_RELEASE,
+            Module => number >= MIN_MODULE_RELEASE,
+        }
+    }
+
+    pub fn release_validate(release: &str) -> Result<FedoraRelease, InvalidValueError> {
+        let (num, ctype) = release_parse(release)?;
+
+        if !is_valid_release(num, ContentType::try_from_suffix(&ctype)?) {
+            return Err(InvalidValueError::new("FedoraRelease", release.to_string()));
+        }
+
+        Ok(FedoraRelease::from_str(release))
+    }
 }
 
-lazy_static! {
-    pub(crate) static ref EPEL_RELEASE_RE: Regex =
-        Regex::new("^EPEL-(?P<number>[1-9][0-9]*)(?P<ctype>[CFM]?)(?P<next>[N]?)$")
+mod epel {
+    use lazy_static::lazy_static;
+    use regex::Regex;
+
+    use super::{ContentType, FedoraRelease, InvalidValueError};
+
+    lazy_static! {
+        pub static ref RELEASE_RE: Regex = Regex::new("^EPEL-(?P<number>[1-9][0-9]*)(?P<ctype>[CFM]?)(?P<next>[N]?)$")
             .expect("Failed to compile hard-coded regex!");
+    }
+
+    pub fn release_parse(release: &str) -> Result<(u32, String, bool), InvalidValueError> {
+        let invalid = || InvalidValueError::new("FedoraRelease", release.to_owned());
+
+        let parsed = RELEASE_RE.captures(release).ok_or_else(invalid)?;
+        let number: u32 = parsed
+            .name("number")
+            .ok_or_else(invalid)?
+            .as_str()
+            .parse::<u32>()
+            .map_err(|_| invalid())?;
+        let ctype: String = parsed.name("ctype").ok_or_else(invalid)?.as_str().to_owned();
+        let next: bool = parsed.name("next").ok_or_else(invalid)?.as_str() == "N";
+
+        Ok((number, ctype, next))
+    }
+
+    pub const MIN_RELEASE: u32 = 7;
+    pub const MIN_MODULE_RELEASE: u32 = 8;
+    pub const MIN_NEXT_RELEASE: u32 = 8;
+
+    pub fn is_valid_release(number: u32, ctype: ContentType, next: bool) -> bool {
+        use ContentType::*;
+
+        let valid_type = match ctype {
+            RPM => number >= MIN_RELEASE,
+            Container => false,
+            Flatpak => false,
+            Module => number >= MIN_MODULE_RELEASE,
+        };
+
+        let valid_next = match next {
+            false => number >= MIN_RELEASE,
+            true => number >= MIN_NEXT_RELEASE,
+        };
+
+        let valid_combo = (ctype == RPM) || !next;
+
+        valid_type && valid_next && valid_combo
+    }
+
+    pub fn release_validate(release: &str) -> Result<FedoraRelease, InvalidValueError> {
+        let (num, ctype, next) = release_parse(release)?;
+
+        if !(is_valid_release(num, ContentType::try_from_suffix(&ctype)?, next)) {
+            return Err(InvalidValueError::new("FedoraRelease", release.to_string()));
+        }
+
+        Ok(FedoraRelease::from_str(release))
+    }
 }
 
-lazy_static! {
-    pub(crate) static ref EL_RELEASE_RE: Regex =
-        Regex::new("^EL-(?P<number>[1-9][0-9]*)$").expect("Failed to compile hard-coded regex!");
-}
+mod el {
+    use lazy_static::lazy_static;
+    use regex::Regex;
 
-fn release_parse_fedora(release: &str) -> Result<(u32, String), InvalidValueError> {
-    let invalid = || InvalidValueError::new("FedoraRelease", release);
+    use super::{FedoraRelease, InvalidValueError};
 
-    let parsed = FEDORA_RELEASE_RE.captures(release).ok_or_else(invalid)?;
-    let number: u32 = parsed
-        .name("number")
-        .ok_or_else(invalid)?
-        .as_str()
-        .parse::<u32>()
-        .map_err(|_| invalid())?;
-    let ctype: String = parsed.name("ctype").ok_or_else(invalid)?.as_str().to_owned();
+    lazy_static! {
+        pub static ref RELEASE_RE: Regex =
+            Regex::new("^EL-(?P<number>[1-9][0-9]*)$").expect("Failed to compile hard-coded regex!");
+    }
 
-    Ok((number, ctype))
-}
+    pub fn release_parse(release: &str) -> Result<u32, InvalidValueError> {
+        let invalid = || InvalidValueError::new("FedoraRelease", release.to_owned());
 
-fn release_validate_fedora(release: &str) -> Result<FedoraRelease, InvalidValueError> {
-    release_parse_fedora(release)?;
-    Ok(FedoraRelease::from_str(release))
-}
+        let parsed = RELEASE_RE.captures(release).ok_or_else(invalid)?;
+        let number: u32 = parsed
+            .name("number")
+            .ok_or_else(invalid)?
+            .as_str()
+            .parse::<u32>()
+            .map_err(|_| invalid())?;
 
-fn release_parse_epel(release: &str) -> Result<(u32, String, bool), InvalidValueError> {
-    let invalid = || InvalidValueError::new("FedoraRelease", release);
+        Ok(number)
+    }
 
-    let parsed = EPEL_RELEASE_RE.captures(release).ok_or_else(invalid)?;
-    let number: u32 = parsed
-        .name("number")
-        .ok_or_else(invalid)?
-        .as_str()
-        .parse::<u32>()
-        .map_err(|_| invalid())?;
-    let ctype: String = parsed.name("ctype").ok_or_else(invalid)?.as_str().to_owned();
-    let next: bool = parsed.name("next").ok_or_else(invalid)?.as_str() == "N";
+    pub const MIN_RELEASE: u32 = 5;
+    pub const MAX_RELEASE: u32 = 6;
 
-    Ok((number, ctype, next))
-}
+    pub fn is_valid_release(number: u32) -> bool {
+        (MIN_RELEASE..=MAX_RELEASE).contains(&number)
+    }
 
-fn release_validate_epel(release: &str) -> Result<FedoraRelease, InvalidValueError> {
-    release_parse_epel(release)?;
-    Ok(FedoraRelease::from_str(release))
-}
+    pub fn release_validate(release: &str) -> Result<FedoraRelease, InvalidValueError> {
+        let num = release_parse(release)?;
 
-fn release_parse_el(release: &str) -> Result<u32, InvalidValueError> {
-    let invalid = || InvalidValueError::new("FedoraRelease", release);
+        if !(is_valid_release(num)) {
+            return Err(InvalidValueError::new("FedoraRelease", release.to_string()));
+        }
 
-    let parsed = EL_RELEASE_RE.captures(release).ok_or_else(invalid)?;
-    let number: u32 = parsed
-        .name("number")
-        .ok_or_else(invalid)?
-        .as_str()
-        .parse::<u32>()
-        .map_err(|_| invalid())?;
-
-    Ok(number)
-}
-
-fn release_validate_el(release: &str) -> Result<FedoraRelease, InvalidValueError> {
-    release_parse_el(release)?;
-    Ok(FedoraRelease::from_str(release))
+        Ok(FedoraRelease::from_str(release))
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -111,31 +191,18 @@ impl FedoraRelease {
         }
     }
 
-    // internal method for constructing instances from verified owned strings
-    fn from_string(string: String) -> Self {
-        FedoraRelease {
-            release: Cow::Owned(string),
-        }
+    pub fn fedora(number: u32, ctype: ContentType) -> Result<Self, InvalidValueError> {
+        let string = format!("F{}{}", number, ctype.suffix());
+        string.parse()
     }
 
-    pub fn fedora(number: u32, ctype: ContentType) -> Self {
-        FedoraRelease::from_string(format!("F{}{}", number, ctype.suffix()))
-    }
+    pub fn epel(number: u32, ctype: ContentType, next: bool) -> Result<Self, InvalidValueError> {
+        let prefix = if number < 7 { "EL" } else { "EPEL" };
 
-    pub fn epel(number: u32) -> Self {
-        if number < 7 {
-            FedoraRelease::from_string(format!("EL-{}", number))
-        } else {
-            FedoraRelease::from_string(format!("EPEL-{}", number))
-        }
-    }
+        let suffix = if next { "N" } else { "" };
 
-    pub fn epel_modules(number: u32) -> Self {
-        FedoraRelease::from_string(format!("EPEL-{}M", number))
-    }
-
-    pub fn epel_next(number: u32) -> Self {
-        FedoraRelease::from_string(format!("EPEL-{}N", number))
+        let string = format!("{}-{}{}{}", prefix, number, ctype.suffix(), suffix);
+        string.parse()
     }
 }
 
@@ -150,12 +217,12 @@ impl TryFrom<&str> for FedoraRelease {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
-            "" => Err(InvalidValueError::new("FedoraRelease", "(empty string)")),
+            "" => Err(InvalidValueError::new("FedoraRelease", String::from("(empty string)"))),
             "ELN" => Ok(FedoraRelease::from_str("ELN")),
-            f if f.starts_with('F') => release_validate_fedora(f),
-            epel if epel.starts_with("EPEL") => release_validate_epel(epel),
-            el if el.starts_with("EL") => release_validate_el(el),
-            _ => Err(InvalidValueError::new("FedoraRelease", value)),
+            f if f.starts_with('F') => fedora::release_validate(f),
+            epel if epel.starts_with("EPEL") => epel::release_validate(epel),
+            el if el.starts_with("EL") => el::release_validate(el),
+            _ => Err(InvalidValueError::new("FedoraRelease", value.to_owned())),
         }
     }
 }
@@ -171,11 +238,23 @@ impl FromStr for FedoraRelease {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use std::num::NonZeroU32;
-
+    use quickcheck::Gen;
     use quickcheck_macros::quickcheck;
 
     use super::*;
+
+    // hacky implementation of the Arbitrary trait for ContentType
+    // this only works because the enum has exactly four variants
+    impl quickcheck::Arbitrary for ContentType {
+        fn arbitrary(g: &mut Gen) -> Self {
+            match (bool::arbitrary(g), bool::arbitrary(g)) {
+                (true, true) => ContentType::RPM,
+                (true, false) => ContentType::Container,
+                (false, true) => ContentType::Flatpak,
+                (false, false) => ContentType::Module,
+            }
+        }
+    }
 
     #[test]
     fn parse_print_all() {
@@ -247,7 +326,7 @@ mod tests {
 
         for (value, expected) in fixtures {
             // check if the parsing function can parse all known values
-            let parsed = release_parse_fedora(value).unwrap();
+            let parsed = fedora::release_parse(value).unwrap();
 
             // check if the parser returns the correct values
             assert_eq!(parsed.0, expected.0);
@@ -270,7 +349,7 @@ mod tests {
 
         for (value, expected) in fixtures {
             // check if the parsing function can parse all known values
-            let parsed = release_parse_epel(value).unwrap();
+            let parsed = epel::release_parse(value).unwrap();
 
             // check if the parser returns the correct values
             assert_eq!(parsed.0, expected.0);
@@ -290,7 +369,7 @@ mod tests {
 
         for (value, expected) in fixtures {
             // check if the parsing function can parse all known values
-            let parsed = release_parse_el(value).unwrap();
+            let parsed = el::release_parse(value).unwrap();
 
             // check if the parser returns the correct values
             assert_eq!(parsed, expected);
@@ -301,59 +380,137 @@ mod tests {
         }
     }
 
-    #[quickcheck]
-    fn check_fedora(number: NonZeroU32) -> bool {
-        let built = FedoraRelease::fedora(number.into(), ContentType::RPM).to_string();
-        let (num, ctype) = release_parse_fedora(&built).unwrap();
-        u32::from(number) == num && ctype.is_empty()
+    #[test]
+    fn parse_invalid() {
+        #[rustfmt::skip]
+        let values = [
+            "F20",      // too old
+            "F21C",     // no container support
+            "F22F",     // no flatpak support
+            "F23M",     // no module support
+            "EPEL-2",   // too old
+            "EPEL-3N",  // no next support
+            "EPEL-7M",  // no module support
+            "EPEL-8CN", // invalid combo
+            "EPEL-8FN", // invalid combo
+            "EPEL-8MN", // invalid combo
+            "EPEL-9CN", // invalid combo
+            "EPEL-9FN", // invalid combo
+            "EPEL-9MN", // invalid combo
+            "EL-10",    // too new
+        ];
+
+        for value in values {
+            value.parse::<FedoraRelease>().unwrap_err();
+        }
     }
 
     #[quickcheck]
-    fn check_fedora_container(number: NonZeroU32) -> bool {
-        let built = FedoraRelease::fedora(number.into(), ContentType::Container).to_string();
-        let (num, ctype) = release_parse_fedora(&built).unwrap();
-        u32::from(number) == num && ctype == "C"
+    fn check_fedora(number: u32) -> bool {
+        if number < fedora::MIN_RELEASE {
+            return true;
+        }
+
+        let built = FedoraRelease::fedora(number, ContentType::RPM).unwrap().to_string();
+        let (num, ctype) = fedora::release_parse(&built).unwrap();
+        number == num && ctype.is_empty()
     }
 
     #[quickcheck]
-    fn check_fedora_flatpak(number: NonZeroU32) -> bool {
-        let built = FedoraRelease::fedora(number.into(), ContentType::Flatpak).to_string();
-        let (num, ctype) = release_parse_fedora(&built).unwrap();
-        u32::from(number) == num && ctype == "F"
+    fn check_fedora_container(number: u32) -> bool {
+        if number < fedora::MIN_RELEASE {
+            return true;
+        }
+
+        let built = FedoraRelease::fedora(number, ContentType::Container)
+            .unwrap()
+            .to_string();
+        let (num, ctype) = fedora::release_parse(&built).unwrap();
+        number == num && ctype == "C"
     }
 
     #[quickcheck]
-    fn check_fedora_module(number: NonZeroU32) -> bool {
-        let built = FedoraRelease::fedora(number.into(), ContentType::Module).to_string();
-        let (num, ctype) = release_parse_fedora(&built).unwrap();
-        u32::from(number) == num && ctype == "M"
+    fn check_fedora_flatpak(number: u32) -> bool {
+        if number < fedora::MIN_RELEASE {
+            return true;
+        }
+
+        let built = FedoraRelease::fedora(number, ContentType::Flatpak).unwrap().to_string();
+        let (num, ctype) = fedora::release_parse(&built).unwrap();
+        number == num && ctype == "F"
     }
 
     #[quickcheck]
-    fn check_epel(number: NonZeroU32) -> bool {
-        let built = FedoraRelease::epel(number.into()).to_string();
-        let num = if u32::from(number) < 7 {
-            release_parse_el(&built).unwrap()
+    fn check_fedora_module(number: u32) -> bool {
+        if number < fedora::MIN_RELEASE {
+            return true;
+        }
+
+        let built = FedoraRelease::fedora(number, ContentType::Module).unwrap().to_string();
+        let (num, ctype) = fedora::release_parse(&built).unwrap();
+        number == num && ctype == "M"
+    }
+
+    #[quickcheck]
+    fn check_epel(number: u32) -> bool {
+        if number < epel::MIN_RELEASE {
+            return true;
+        }
+
+        let built = FedoraRelease::epel(number, ContentType::RPM, false)
+            .unwrap()
+            .to_string();
+        let num = if number < 7 {
+            el::release_parse(&built).unwrap()
         } else {
-            let (num, ctype, next) = release_parse_epel(&built).unwrap();
+            let (num, ctype, next) = epel::release_parse(&built).unwrap();
             assert!(ctype.is_empty());
             assert!(!next);
             num
         };
-        u32::from(number) == num
+        number == num
     }
 
     #[quickcheck]
-    fn check_epel_modules(number: NonZeroU32) -> bool {
-        let built = FedoraRelease::epel_modules(number.into()).to_string();
-        let (num, ctype, next) = release_parse_epel(&built).unwrap();
-        u32::from(number) == num && ctype == "M" && !next
+    fn check_epel_modules(number: u32) -> bool {
+        if number < epel::MIN_MODULE_RELEASE {
+            return true;
+        }
+
+        let built = FedoraRelease::epel(number, ContentType::Module, false)
+            .unwrap()
+            .to_string();
+        let (num, ctype, next) = epel::release_parse(&built).unwrap();
+        number == num && ctype == "M" && !next
     }
 
     #[quickcheck]
-    fn check_epel_next(number: NonZeroU32) -> bool {
-        let built = FedoraRelease::epel_next(number.into()).to_string();
-        let (num, ctype, next) = release_parse_epel(&built).unwrap();
-        u32::from(number) == num && ctype.is_empty() && next
+    fn check_epel_next(number: u32) -> bool {
+        if number < epel::MIN_NEXT_RELEASE {
+            return true;
+        }
+
+        let built = FedoraRelease::epel(number, ContentType::RPM, true).unwrap().to_string();
+        let (num, ctype, next) = epel::release_parse(&built).unwrap();
+        number == num && ctype.is_empty() && next
+    }
+
+    #[quickcheck]
+    fn check_epel_container(number: u32, next: bool) -> bool {
+        FedoraRelease::epel(number, ContentType::Container, next).is_err()
+    }
+
+    #[quickcheck]
+    fn check_epel_flatpak(number: u32, next: bool) -> bool {
+        FedoraRelease::epel(number, ContentType::Flatpak, next).is_err()
+    }
+
+    #[quickcheck]
+    fn check_epel_combo(number: u32, ctype: ContentType) -> bool {
+        if number < epel::MIN_RELEASE {
+            return true;
+        }
+
+        (ctype == ContentType::RPM) != FedoraRelease::epel(number, ctype, true).is_err()
     }
 }
