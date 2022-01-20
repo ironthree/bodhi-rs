@@ -98,16 +98,33 @@ impl<'a> PackageQuery<'a> {
 }
 
 #[derive(Debug, Serialize)]
-struct PackagePageQuery {
-    like: Option<String>,
-    name: Option<String>,
-    search: Option<String>,
+pub struct PackagePageQuery<'a> {
+    like: Option<&'a str>,
+    name: Option<&'a str>,
+    search: Option<&'a str>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl SingleRequest<PackageListPage, Vec<Package>> for PackagePageQuery {
+impl<'a> PackagePageQuery<'a> {
+    pub fn from_query(query: &'a PackageQuery, page: u32) -> Self {
+        PackagePageQuery {
+            like: query.like,
+            name: query.name,
+            search: query.search,
+            page,
+            rows_per_page: DEFAULT_ROWS,
+        }
+    }
+
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
+    }
+}
+
+impl<'a> SingleRequest<PackageListPage, Vec<Package>> for PackagePageQuery<'a> {
     fn method(&self) -> RequestMethod {
         RequestMethod::GET
     }
@@ -143,14 +160,8 @@ impl Pagination for PackageListPage {
 }
 
 impl<'a> PaginatedRequest<PackageListPage, Vec<Package>> for PackageQuery<'a> {
-    fn page_request(&self, page: u32) -> Box<dyn SingleRequest<PackageListPage, Vec<Package>>> {
-        Box::new(PackagePageQuery {
-            like: self.like.map(|s| s.to_owned()),
-            name: self.name.map(|s| s.to_owned()),
-            search: self.search.map(|s| s.to_owned()),
-            page,
-            rows_per_page: self.rows_per_page,
-        })
+    fn page_request<'b>(&'b self, page: u32) -> Box<dyn SingleRequest<PackageListPage, Vec<Package>> + 'b> {
+        Box::new(PackagePageQuery::from_query(self, page))
     }
 
     fn callback(&self, page: u32, pages: u32) {

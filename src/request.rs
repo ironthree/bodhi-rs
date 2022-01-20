@@ -30,7 +30,7 @@ where
     P: Pagination,
     T: DeserializeOwned,
 {
-    fn page_request(&self, page: u32) -> Box<dyn SingleRequest<P, T>>;
+    fn page_request<'a>(&'a self, page: u32) -> Box<dyn SingleRequest<P, T> + 'a>;
     fn callback(&self, page: u32, pages: u32);
 }
 

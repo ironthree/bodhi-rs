@@ -174,18 +174,32 @@ impl<'a> UserQuery<'a> {
 }
 
 #[derive(Debug, Serialize)]
-struct UserPageQuery {
-    groups: Option<Vec<String>>,
-    like: Option<String>,
-    name: Option<String>,
-    search: Option<String>,
-    updates: Option<Vec<String>>,
+pub struct UserPageQuery<'a> {
+    groups: Option<&'a Vec<&'a str>>,
+    like: Option<&'a str>,
+    name: Option<&'a str>,
+    search: Option<&'a str>,
+    updates: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl SingleRequest<UserListPage, Vec<User>> for UserPageQuery {
+impl<'a> UserPageQuery<'a> {
+    pub fn from_query(query: &'a UserQuery, page: u32) -> Self {
+        UserPageQuery {
+            groups: query.groups.as_ref(),
+            like: query.like,
+            name: query.name,
+            search: query.search,
+            updates: query.updates.as_ref(),
+            page,
+            rows_per_page: DEFAULT_ROWS,
+        }
+    }
+}
+
+impl<'a> SingleRequest<UserListPage, Vec<User>> for UserPageQuery<'a> {
     fn method(&self) -> RequestMethod {
         RequestMethod::GET
     }
@@ -221,22 +235,8 @@ impl Pagination for UserListPage {
 }
 
 impl<'a> PaginatedRequest<UserListPage, Vec<User>> for UserQuery<'a> {
-    fn page_request(&self, page: u32) -> Box<dyn SingleRequest<UserListPage, Vec<User>>> {
-        Box::new(UserPageQuery {
-            groups: self
-                .groups
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            like: self.like.map(|s| s.to_owned()),
-            name: self.name.map(|s| s.to_owned()),
-            search: self.search.map(|s| s.to_owned()),
-            updates: self
-                .updates
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            page,
-            rows_per_page: self.rows_per_page,
-        })
+    fn page_request<'b>(&'b self, page: u32) -> Box<dyn SingleRequest<UserListPage, Vec<User>> + 'b> {
+        Box::new(UserPageQuery::from_query(self, page))
     }
 
     fn callback(&self, page: u32, pages: u32) {

@@ -168,18 +168,37 @@ impl<'a> ReleaseQuery<'a> {
 }
 
 #[derive(Debug, Serialize)]
-struct ReleasePageQuery {
+pub struct ReleasePageQuery<'a> {
     exclude_archived: Option<bool>,
-    ids: Option<Vec<String>>,
-    name: Option<String>,
-    packages: Option<Vec<String>>,
-    updates: Option<Vec<String>>,
+    ids: Option<&'a Vec<&'a str>>,
+    name: Option<&'a str>,
+    packages: Option<&'a Vec<&'a str>>,
+    updates: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl SingleRequest<ReleaseListPage, Vec<Release>> for ReleasePageQuery {
+impl<'a> ReleasePageQuery<'a> {
+    pub fn from_query(query: &'a ReleaseQuery, page: u32) -> Self {
+        ReleasePageQuery {
+            exclude_archived: query.exclude_archived,
+            ids: query.ids.as_ref(),
+            name: query.name,
+            packages: query.packages.as_ref(),
+            updates: query.updates.as_ref(),
+            page,
+            rows_per_page: DEFAULT_ROWS,
+        }
+    }
+
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
+    }
+}
+
+impl<'a> SingleRequest<ReleaseListPage, Vec<Release>> for ReleasePageQuery<'a> {
     fn method(&self) -> RequestMethod {
         RequestMethod::GET
     }
@@ -215,22 +234,8 @@ impl Pagination for ReleaseListPage {
 }
 
 impl<'a> PaginatedRequest<ReleaseListPage, Vec<Release>> for ReleaseQuery<'a> {
-    fn page_request(&self, page: u32) -> Box<dyn SingleRequest<ReleaseListPage, Vec<Release>>> {
-        Box::new(ReleasePageQuery {
-            exclude_archived: self.exclude_archived,
-            ids: self.ids.as_ref().map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            name: self.name.map(|s| s.to_owned()),
-            packages: self
-                .packages
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            updates: self
-                .updates
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            page,
-            rows_per_page: self.rows_per_page,
-        })
+    fn page_request<'b>(&'b self, page: u32) -> Box<dyn SingleRequest<ReleaseListPage, Vec<Release>> + 'b> {
+        Box::new(ReleasePageQuery::from_query(self, page))
     }
 
     fn callback(&self, page: u32, pages: u32) {

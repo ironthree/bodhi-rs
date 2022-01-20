@@ -169,17 +169,35 @@ impl<'a> BuildQuery<'a> {
 }
 
 #[derive(Debug, Serialize)]
-struct BuildPageQuery {
-    nvr: Option<String>,
-    packages: Option<Vec<String>>,
-    releases: Option<Vec<FedoraRelease>>,
-    updates: Option<Vec<String>>,
+pub struct BuildPageQuery<'a> {
+    nvr: Option<&'a str>,
+    packages: Option<&'a Vec<&'a str>>,
+    releases: Option<&'a Vec<&'a FedoraRelease>>,
+    updates: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl SingleRequest<BuildListPage, Vec<Build>> for BuildPageQuery {
+impl<'a> BuildPageQuery<'a> {
+    pub fn from_query(query: &'a BuildQuery, page: u32) -> Self {
+        BuildPageQuery {
+            nvr: query.nvr,
+            packages: query.packages.as_ref(),
+            releases: query.releases.as_ref(),
+            updates: query.updates.as_ref(),
+            page,
+            rows_per_page: DEFAULT_ROWS,
+        }
+    }
+
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
+    }
+}
+
+impl<'a> SingleRequest<BuildListPage, Vec<Build>> for BuildPageQuery<'a> {
     fn method(&self) -> RequestMethod {
         RequestMethod::GET
     }
@@ -215,24 +233,8 @@ impl Pagination for BuildListPage {
 }
 
 impl<'a> PaginatedRequest<BuildListPage, Vec<Build>> for BuildQuery<'a> {
-    fn page_request(&self, page: u32) -> Box<dyn SingleRequest<BuildListPage, Vec<Build>>> {
-        Box::new(BuildPageQuery {
-            nvr: self.nvr.map(|s| s.to_owned()),
-            packages: self
-                .packages
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            releases: self
-                .releases
-                .as_ref()
-                .map(|v| v.iter().map(|r| (*r).to_owned()).collect()),
-            updates: self
-                .updates
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            page,
-            rows_per_page: self.rows_per_page,
-        })
+    fn page_request<'b>(&'b self, page: u32) -> Box<dyn SingleRequest<BuildListPage, Vec<Build>> + 'b> {
+        Box::new(BuildPageQuery::from_query(self, page))
     }
 
     fn callback(&self, page: u32, pages: u32) {

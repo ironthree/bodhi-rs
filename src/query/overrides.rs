@@ -197,21 +197,42 @@ impl<'a> OverrideQuery<'a> {
 }
 
 #[derive(Debug, Serialize)]
-struct OverridePageQuery {
-    builds: Option<Vec<String>>,
+pub struct OverridePageQuery<'a> {
+    builds: Option<&'a Vec<&'a str>>,
     expired: Option<bool>,
-    like: Option<String>,
-    packages: Option<Vec<String>>,
-    releases: Option<Vec<FedoraRelease>>,
-    search: Option<String>,
+    like: Option<&'a str>,
+    packages: Option<&'a Vec<&'a str>>,
+    releases: Option<&'a Vec<&'a FedoraRelease>>,
+    search: Option<&'a str>,
     #[serde(rename = "user")]
-    users: Option<Vec<String>>,
+    users: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl SingleRequest<OverrideListPage, Vec<Override>> for OverridePageQuery {
+impl<'a> OverridePageQuery<'a> {
+    pub fn from_query(query: &'a OverrideQuery, page: u32) -> Self {
+        OverridePageQuery {
+            builds: query.builds.as_ref(),
+            expired: query.expired,
+            like: query.like,
+            packages: query.packages.as_ref(),
+            releases: query.releases.as_ref(),
+            search: query.search,
+            users: query.users.as_ref(),
+            page,
+            rows_per_page: DEFAULT_ROWS,
+        }
+    }
+
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
+    }
+}
+
+impl<'a> SingleRequest<OverrideListPage, Vec<Override>> for OverridePageQuery<'a> {
     fn method(&self) -> RequestMethod {
         RequestMethod::GET
     }
@@ -247,27 +268,8 @@ impl Pagination for OverrideListPage {
 }
 
 impl<'a> PaginatedRequest<OverrideListPage, Vec<Override>> for OverrideQuery<'a> {
-    fn page_request(&self, page: u32) -> Box<dyn SingleRequest<OverrideListPage, Vec<Override>>> {
-        Box::new(OverridePageQuery {
-            builds: self
-                .builds
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            expired: self.expired,
-            like: self.like.map(|s| s.to_owned()),
-            packages: self
-                .packages
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            releases: self
-                .releases
-                .as_ref()
-                .map(|v| v.iter().map(|r| (*r).to_owned()).collect()),
-            search: self.search.map(|s| s.to_owned()),
-            users: self.users.as_ref().map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            page,
-            rows_per_page: self.rows_per_page,
-        })
+    fn page_request<'b>(&'b self, page: u32) -> Box<dyn SingleRequest<OverrideListPage, Vec<Override>> + 'b> {
+        Box::new(OverridePageQuery::from_query(self, page))
     }
 
     fn callback(&self, page: u32, pages: u32) {

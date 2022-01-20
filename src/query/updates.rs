@@ -394,53 +394,95 @@ impl<'a> UpdateQuery<'a> {
 }
 
 #[derive(Debug, Serialize)]
-struct UpdatePageQuery {
+pub struct UpdatePageQuery<'a> {
     active_releases: Option<bool>,
     #[serde(rename = "alias")]
-    aliases: Option<Vec<String>>,
-    #[serde(with = "crate::option_bodhi_date_format")]
-    approved_before: Option<BodhiDate>,
-    #[serde(with = "crate::option_bodhi_date_format")]
-    approved_since: Option<BodhiDate>,
-    bugs: Option<Vec<u32>>,
-    builds: Option<Vec<String>>,
+    aliases: Option<&'a Vec<&'a str>>,
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
+    approved_before: Option<&'a BodhiDate>,
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
+    approved_since: Option<&'a BodhiDate>,
+    bugs: Option<&'a Vec<u32>>,
+    builds: Option<&'a Vec<&'a str>>,
     content_type: Option<ContentType>,
     critpath: Option<bool>,
-    cves: Option<Vec<String>>,
-    like: Option<String>,
+    cves: Option<&'a Vec<&'a str>>,
+    like: Option<&'a str>,
     locked: Option<bool>,
-    #[serde(with = "crate::option_bodhi_date_format")]
-    modified_before: Option<BodhiDate>,
-    #[serde(with = "crate::option_bodhi_date_format")]
-    modified_since: Option<BodhiDate>,
-    packages: Option<Vec<String>>,
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
+    modified_before: Option<&'a BodhiDate>,
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
+    modified_since: Option<&'a BodhiDate>,
+    packages: Option<&'a Vec<&'a str>>,
     pushed: Option<bool>,
-    #[serde(with = "crate::option_bodhi_date_format")]
-    pushed_before: Option<BodhiDate>,
-    #[serde(with = "crate::option_bodhi_date_format")]
-    pushed_since: Option<BodhiDate>,
-    releases: Option<Vec<FedoraRelease>>,
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
+    pushed_before: Option<&'a BodhiDate>,
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
+    pushed_since: Option<&'a BodhiDate>,
+    releases: Option<&'a Vec<&'a FedoraRelease>>,
     request: Option<UpdateRequest>,
-    search: Option<String>,
+    search: Option<&'a str>,
     severity: Option<UpdateSeverity>,
     status: Option<UpdateStatus>,
-    #[serde(with = "crate::option_bodhi_date_format")]
-    submitted_before: Option<BodhiDate>,
-    #[serde(with = "crate::option_bodhi_date_format")]
-    submitted_since: Option<BodhiDate>,
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
+    submitted_before: Option<&'a BodhiDate>,
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
+    submitted_since: Option<&'a BodhiDate>,
     suggest: Option<UpdateSuggestion>,
     #[serde(rename = "updateid")]
-    update_ids: Option<Vec<String>>,
+    update_ids: Option<&'a Vec<&'a str>>,
     #[serde(rename = "type")]
     update_type: Option<UpdateType>,
     #[serde(rename = "user")]
-    users: Option<Vec<String>>,
+    users: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl SingleRequest<UpdateListPage, Vec<Update>> for UpdatePageQuery {
+impl<'a> UpdatePageQuery<'a> {
+    pub fn from_query(query: &'a UpdateQuery, page: u32) -> Self {
+        UpdatePageQuery {
+            active_releases: query.active_releases,
+            aliases: query.aliases.as_ref(),
+            approved_before: query.approved_before,
+            approved_since: query.approved_since,
+            bugs: query.bugs.as_ref(),
+            builds: query.builds.as_ref(),
+            content_type: query.content_type,
+            critpath: query.critpath,
+            cves: query.cves.as_ref(),
+            like: query.like,
+            locked: query.locked,
+            modified_before: query.modified_before,
+            modified_since: query.modified_since,
+            packages: query.packages.as_ref(),
+            pushed: query.pushed,
+            pushed_before: query.pushed_before,
+            pushed_since: query.pushed_since,
+            releases: query.releases.as_ref(),
+            request: query.request,
+            search: query.search,
+            severity: query.severity,
+            status: query.status,
+            submitted_before: query.submitted_before,
+            submitted_since: query.submitted_since,
+            suggest: query.suggest,
+            update_ids: query.update_ids.as_ref(),
+            update_type: query.update_type,
+            users: query.users.as_ref(),
+            page,
+            rows_per_page: DEFAULT_ROWS,
+        }
+    }
+
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
+    }
+}
+
+impl<'a> SingleRequest<UpdateListPage, Vec<Update>> for UpdatePageQuery<'a> {
     fn method(&self) -> RequestMethod {
         RequestMethod::GET
     }
@@ -476,54 +518,8 @@ impl Pagination for UpdateListPage {
 }
 
 impl<'a> PaginatedRequest<UpdateListPage, Vec<Update>> for UpdateQuery<'a> {
-    fn page_request(&self, page: u32) -> Box<dyn SingleRequest<UpdateListPage, Vec<Update>>> {
-        Box::new(UpdatePageQuery {
-            active_releases: self.active_releases,
-            aliases: self
-                .aliases
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            approved_before: self.approved_before.as_ref().map(|d| (*d).clone()),
-            approved_since: self.approved_since.as_ref().map(|d| (*d).clone()),
-            bugs: self.bugs.clone(),
-            builds: self
-                .builds
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            content_type: self.content_type,
-            critpath: self.critpath,
-            cves: self.cves.as_ref().map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            like: self.like.map(|s| s.to_owned()),
-            locked: self.locked,
-            modified_before: self.modified_before.as_ref().map(|d| (*d).clone()),
-            modified_since: self.modified_since.as_ref().map(|d| (*d).clone()),
-            packages: self
-                .packages
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            pushed: self.pushed,
-            pushed_before: self.pushed_before.as_ref().map(|d| (*d).clone()),
-            pushed_since: self.pushed_since.as_ref().map(|d| (*d).clone()),
-            releases: self
-                .releases
-                .as_ref()
-                .map(|v| v.iter().map(|r| (*r).to_owned()).collect()),
-            request: self.request,
-            search: self.search.map(|s| s.to_owned()),
-            severity: self.severity,
-            status: self.status,
-            submitted_before: self.submitted_before.as_ref().map(|d| (*d).clone()),
-            submitted_since: self.submitted_since.as_ref().map(|d| (*d).clone()),
-            suggest: self.suggest,
-            update_ids: self
-                .update_ids
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            update_type: self.update_type,
-            users: self.users.as_ref().map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            page,
-            rows_per_page: self.rows_per_page,
-        })
+    fn page_request<'b>(&'b self, page: u32) -> Box<dyn SingleRequest<UpdateListPage, Vec<Update>> + 'b> {
+        Box::new(UpdatePageQuery::from_query(self, page))
     }
 
     fn callback(&self, page: u32, pages: u32) {

@@ -203,24 +203,47 @@ impl<'a> CommentQuery<'a> {
 }
 
 #[derive(Debug, Serialize)]
-struct CommentPageQuery {
+pub struct CommentPageQuery<'a> {
     anonymous: Option<bool>,
-    ignore_users: Option<Vec<String>>,
-    like: Option<String>,
-    packages: Option<Vec<String>>,
-    search: Option<String>,
-    #[serde(with = "crate::option_bodhi_date_format")]
-    since: Option<BodhiDate>,
-    update_owners: Option<Vec<String>>,
-    updates: Option<Vec<String>>,
+    ignore_users: Option<&'a Vec<&'a str>>,
+    like: Option<&'a str>,
+    packages: Option<&'a Vec<&'a str>>,
+    search: Option<&'a str>,
+    #[serde(with = "crate::option_bodhi_date_format_ref")]
+    since: Option<&'a BodhiDate>,
+    update_owners: Option<&'a Vec<&'a str>>,
+    updates: Option<&'a Vec<&'a str>>,
     #[serde(rename = "user")]
-    users: Option<Vec<String>>,
+    users: Option<&'a Vec<&'a str>>,
 
     page: u32,
     rows_per_page: u32,
 }
 
-impl SingleRequest<CommentListPage, Vec<Comment>> for CommentPageQuery {
+impl<'a> CommentPageQuery<'a> {
+    pub fn from_query(query: &'a CommentQuery, page: u32) -> Self {
+        CommentPageQuery {
+            anonymous: query.anonymous,
+            ignore_users: query.ignore_users.as_ref(),
+            like: query.like,
+            packages: query.packages.as_ref(),
+            search: query.search,
+            since: query.since,
+            update_owners: query.update_owners.as_ref(),
+            updates: query.updates.as_ref(),
+            users: query.users.as_ref(),
+            page,
+            rows_per_page: DEFAULT_ROWS,
+        }
+    }
+
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
+    }
+}
+
+impl<'a> SingleRequest<CommentListPage, Vec<Comment>> for CommentPageQuery<'a> {
     fn method(&self) -> RequestMethod {
         RequestMethod::GET
     }
@@ -256,32 +279,8 @@ impl Pagination for CommentListPage {
 }
 
 impl<'a> PaginatedRequest<CommentListPage, Vec<Comment>> for CommentQuery<'a> {
-    fn page_request(&self, page: u32) -> Box<dyn SingleRequest<CommentListPage, Vec<Comment>>> {
-        Box::new(CommentPageQuery {
-            anonymous: self.anonymous,
-            ignore_users: self
-                .ignore_users
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            like: self.like.map(|s| s.to_owned()),
-            packages: self
-                .packages
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            search: self.search.map(|s| s.to_owned()),
-            since: self.since.cloned(),
-            update_owners: self
-                .update_owners
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            updates: self
-                .updates
-                .as_ref()
-                .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            users: self.users.as_ref().map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
-            page,
-            rows_per_page: self.rows_per_page,
-        })
+    fn page_request<'b>(&'b self, page: u32) -> Box<dyn SingleRequest<CommentListPage, Vec<Comment>> + 'b> {
+        Box::new(CommentPageQuery::from_query(self, page))
     }
 
     fn callback(&self, page: u32, pages: u32) {
