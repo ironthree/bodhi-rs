@@ -14,8 +14,9 @@ use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest}
 use crate::CSRFQuery;
 
 // This constant defines how many items are queried every time for multi-page queries. The
-// server-side maximum is usually 100, the default is 20, and 50 seems a good compromise for speed.
-pub const DEFAULT_ROWS: u32 = 50;
+// server-side maximum is 100, the default is 20, and 50 seems to be a good compromise between
+// the frequency of server timeouts, request failures, and query speed.
+pub(crate) const DEFAULT_ROWS: u32 = 50;
 
 // Specify a longer timeout duration (60 s) for bodhi requests. The `reqwest` default value of 30
 // seconds is a bit too short for long-running queries.
@@ -28,37 +29,36 @@ const REQUEST_RETRIES: usize = 3;
 const USER_AGENT: &str = concat!("bodhi-rs v", env!("CARGO_PKG_VERSION"));
 
 #[derive(Debug)]
-#[allow(clippy::upper_case_acronyms)]
 enum BodhiServiceType {
-    DEFAULT,
-    STAGING,
-    CUSTOM { openid_url: String },
+    Default,
+    Staging,
+    Custom { openid_url: String },
 }
 
-// This struct contains information necessary to build an instance of
-// [`BodhiService`](struct.BodhiService.html) with the necessary flags. Additionally, depending on
-// whether username and password were supplied as arguments, building the service instance will
-// try to return a privileged session by authenticating via the fedora OpenID endpoint first.
-//
-// It's possible to target either the fedora production or the staging instances of bodhi, or
-// provide a custom URL, via the `default()`, `staging()`, and `custom()` methods, respectively.
-//
-// ```
-// // create service with anonymous session
-// let bodhi = bodhi::BodhiServiceBuilder::default()
-//     .timeout(std::time::Duration::from_secs(42))
-//     .retries(9001)
-//     .build();
-// ```
-//
-// ```
-// // builder for an authenticated session
-// let builder = bodhi::BodhiServiceBuilder::staging()
-//     .timeout(std::time::Duration::from_secs(120))
-//     .retries(2)
-//     .authentication("bodhi-rs", "password1");
-// // builder.build();
-// ```
+/// This struct contains information necessary to build a [`BodhiService`] instance with the
+/// necessary flags. Additionally, depending on whether username and password are supplied as
+/// arguments, building the service instance will try to return a privileged session by
+/// authenticating with the specified OpenID endpoint first.
+///
+/// It's possible to target either the Fedora production or the staging instances of bodhi, or
+/// provide a custom URL, via the `default()`, `staging()`, and `custom()` methods, respectively.
+///
+/// ```
+/// // create service with anonymous session
+/// let bodhi = bodhi::BodhiServiceBuilder::default()
+///     .timeout(std::time::Duration::from_secs(42))
+///     .retries(9001)
+///     .build();
+/// ```
+///
+/// ```no_run
+/// // builder for an authenticated session
+/// let builder = bodhi::BodhiServiceBuilder::staging()
+///     .timeout(std::time::Duration::from_secs(120))
+///     .retries(2)
+///     .authentication("bodhi-rs", "password1");
+/// let bodhi = builder.build();
+/// ```
 #[derive(Debug)]
 pub struct BodhiServiceBuilder<'a> {
     service_type: BodhiServiceType,
@@ -101,7 +101,7 @@ impl<'a> BodhiServiceBuilder<'a> {
     // This method creates a new builder for the "production" instances of the fedora services.
     pub fn default() -> Self {
         BodhiServiceBuilder {
-            service_type: BodhiServiceType::DEFAULT,
+            service_type: BodhiServiceType::Default,
             authentication: None,
             url: FEDORA_BODHI_URL.to_string(),
             timeout: None,
@@ -113,7 +113,7 @@ impl<'a> BodhiServiceBuilder<'a> {
     // This method creates a new builder for the "staging" instances of the fedora services.
     pub fn staging() -> Self {
         BodhiServiceBuilder {
-            service_type: BodhiServiceType::STAGING,
+            service_type: BodhiServiceType::Staging,
             authentication: None,
             url: FEDORA_BODHI_STG_URL.to_string(),
             timeout: None,
@@ -126,7 +126,7 @@ impl<'a> BodhiServiceBuilder<'a> {
     // to be specified manually.
     pub fn custom(url: String, openid_url: String) -> Self {
         BodhiServiceBuilder {
-            service_type: BodhiServiceType::CUSTOM { openid_url },
+            service_type: BodhiServiceType::Custom { openid_url },
             authentication: None,
             url,
             timeout: None,
@@ -180,7 +180,7 @@ impl<'a> BodhiServiceBuilder<'a> {
 
         let session = if let Some(auth) = self.authentication {
             match self.service_type {
-                BodhiServiceType::DEFAULT => {
+                BodhiServiceType::Default => {
                     Session::openid_auth(login_url, OpenIDSessionKind::Default)
                         .user_agent(&user_agent)
                         .timeout(timeout)
@@ -188,7 +188,7 @@ impl<'a> BodhiServiceBuilder<'a> {
                         .login(auth.username, auth.password)
                         .await?
                 },
-                BodhiServiceType::STAGING => {
+                BodhiServiceType::Staging => {
                     Session::openid_auth(login_url, OpenIDSessionKind::Staging)
                         .user_agent(&user_agent)
                         .timeout(timeout)
@@ -196,7 +196,7 @@ impl<'a> BodhiServiceBuilder<'a> {
                         .login(auth.username, auth.password)
                         .await?
                 },
-                BodhiServiceType::CUSTOM { openid_url } => {
+                BodhiServiceType::Custom { openid_url } => {
                     let auth_url = Url::parse(&openid_url)?;
 
                     Session::openid_auth(login_url, OpenIDSessionKind::Custom { auth_url })

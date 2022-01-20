@@ -110,7 +110,7 @@
 //!
 //! - request timeout duration (default: 60 seconds)
 //! - retry count for failed requests (default: 3)
-//! - FIXME: User-Agent header in HTTP requests (default: "bodhi-rs v2.0.0")
+//! - `User-Agent` header in HTTP requests (default: `bodhi-rs v$(CARGO_PKG_VERSION)`)
 //! - username and password for authenticated requests (default: unauthenticated)
 //!
 //! ```no_run
@@ -120,7 +120,7 @@
 //! let bodhi = BodhiServiceBuilder::staging()
 //!     .timeout(std::time::Duration::from_secs(3600))
 //!     .retries(1000)
-//!     //  .user_agent("the bodhi-rs documentation tests say hello")
+//!     .user_agent("the bodhi-rs documentation tests say hello")
 //!     .authentication("janedoe", "CorrectHorseBatteryStaple")
 //!     .build()
 //!     .await
@@ -147,7 +147,7 @@
 // ! paginated results), and are not publicly exported. They are located next to the `Query` they
 // are ! used for.
 
-// FIXME #![warn(missing_docs)]
+#![warn(missing_docs)]
 #![warn(missing_debug_implementations)]
 #![warn(clippy::unwrap_used)]
 
