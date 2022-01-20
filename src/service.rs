@@ -65,6 +65,7 @@ pub struct BodhiServiceBuilder<'a> {
     authentication: Option<Authentication<'a>>,
     url: String,
     timeout: Option<Duration>,
+    user_agent: Option<&'a str>,
     retries: Option<usize>,
 }
 
@@ -104,6 +105,7 @@ impl<'a> BodhiServiceBuilder<'a> {
             authentication: None,
             url: FEDORA_BODHI_URL.to_string(),
             timeout: None,
+            user_agent: None,
             retries: None,
         }
     }
@@ -115,6 +117,7 @@ impl<'a> BodhiServiceBuilder<'a> {
             authentication: None,
             url: FEDORA_BODHI_STG_URL.to_string(),
             timeout: None,
+            user_agent: None,
             retries: None,
         }
     }
@@ -127,6 +130,7 @@ impl<'a> BodhiServiceBuilder<'a> {
             authentication: None,
             url,
             timeout: None,
+            user_agent: None,
             retries: None,
         }
     }
@@ -138,14 +142,19 @@ impl<'a> BodhiServiceBuilder<'a> {
         self
     }
 
+    // This method can be used to override the default User-Agent.
+    #[must_use]
+    pub fn user_agent(mut self, user_agent: &'a str) -> Self {
+        self.user_agent = Some(user_agent);
+        self
+    }
+
     // This method can be used to override the default number of retries.
     #[must_use]
     pub fn retries(mut self, retries: usize) -> Self {
         self.retries = Some(retries);
         self
     }
-
-    // FIXME: user_agent
 
     // This method can be used to set credentials for authenticating with the fedora OpenID
     // endpoint, so the resulting [`BodhiService`](struct.BodhiService.html) can be used to
@@ -163,18 +172,11 @@ impl<'a> BodhiServiceBuilder<'a> {
     pub async fn build(self) -> Result<BodhiService, BuilderError> {
         let url = Url::parse(&self.url)?;
 
-        let timeout = match self.timeout {
-            Some(timeout) => timeout,
-            None => REQUEST_TIMEOUT,
-        };
-
-        let retries = match self.retries {
-            Some(retries) => retries,
-            None => REQUEST_RETRIES,
-        };
+        let timeout = self.timeout.unwrap_or(REQUEST_TIMEOUT);
+        let retries = self.retries.unwrap_or(REQUEST_RETRIES);
+        let user_agent = self.user_agent.unwrap_or(USER_AGENT).to_string();
 
         let login_url = url.join("/login")?;
-        let user_agent = USER_AGENT.to_string();
 
         let session = if let Some(auth) = self.authentication {
             match self.service_type {
