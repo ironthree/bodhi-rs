@@ -3,10 +3,10 @@
 
 use std::time::Duration;
 
+use fedora::reqwest::{Client, Response};
+use fedora::url::{self, Url};
 use fedora::{OpenIDSessionKind, Session};
-use reqwest::{Client, Response};
 use serde::de::DeserializeOwned;
-use url::Url;
 
 use crate::data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
 use crate::error::{BodhiError, QueryError, ServiceError};
@@ -144,6 +144,8 @@ impl<'a> BodhiServiceBuilder<'a> {
         self.retries = Some(retries);
         self
     }
+
+    // FIXME: user_agent
 
     // This method can be used to set credentials for authenticating with the fedora OpenID
     // endpoint, so the resulting [`BodhiService`](struct.BodhiService.html) can be used to

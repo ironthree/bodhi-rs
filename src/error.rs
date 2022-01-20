@@ -2,6 +2,8 @@
 // ! server-side issues, and client-side issues (including JSON deserialization problems).
 use std::collections::HashMap;
 
+use fedora::reqwest;
+use fedora::url;
 use serde::Deserialize;
 
 // This struct contains error messages that are deserialized from bodhi error responses.
