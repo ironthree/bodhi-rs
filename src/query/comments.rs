@@ -95,6 +95,8 @@ pub struct CommentQuery<'a> {
     updates: Option<Vec<&'a str>>,
     users: Option<Vec<&'a str>>,
 
+    // number of results per page
+    rows_per_page: u32,
     // optional callback function for reporting progress
     callback: Option<Box<dyn Fn(u32, u32) + 'a>>,
 }
@@ -111,6 +113,7 @@ impl<'a> Debug for CommentQuery<'a> {
             .field("update_owners", &self.update_owners)
             .field("updates", &self.updates)
             .field("users", &self.users)
+            .field("rows_per_page", &self.rows_per_page)
             .field("callback", &"(function pointer)")
             .finish()
     }
@@ -119,7 +122,17 @@ impl<'a> Debug for CommentQuery<'a> {
 impl<'a> CommentQuery<'a> {
     // This method returns a new [`CommentQuery`](struct.CommentQuery.html) with *no* filters set.
     pub fn new() -> Self {
-        Self::default()
+        CommentQuery {
+            rows_per_page: DEFAULT_ROWS,
+            ..Default::default()
+        }
+    }
+
+    // Override the maximum number of results per page (capped at 100 server-side).
+    #[must_use]
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
     }
 
     // Add a callback function for reporting back query progress for long-running queries.
@@ -267,7 +280,7 @@ impl<'a> PaginatedRequest<CommentListPage, Vec<Comment>> for CommentQuery<'a> {
                 .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
             users: self.users.as_ref().map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
             page,
-            rows_per_page: DEFAULT_ROWS,
+            rows_per_page: self.rows_per_page,
         })
     }
 

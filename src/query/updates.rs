@@ -120,6 +120,8 @@ pub struct UpdateQuery<'a> {
     update_type: Option<UpdateType>,
     users: Option<Vec<&'a str>>,
 
+    // number of results per page
+    rows_per_page: u32,
     // optional callback function for reporting progress
     callback: Option<Box<dyn Fn(u32, u32) + 'a>>,
 }
@@ -155,6 +157,7 @@ impl<'a> Debug for UpdateQuery<'a> {
             .field("update_ids", &self.update_ids)
             .field("update_type", &self.update_type)
             .field("users", &self.users)
+            .field("rows_per_page", &self.rows_per_page)
             .field("callback", &"(function pointer)")
             .finish()
     }
@@ -163,7 +166,17 @@ impl<'a> Debug for UpdateQuery<'a> {
 impl<'a> UpdateQuery<'a> {
     // This method returns a new `UpdateQuery` with *no* filters set.
     pub fn new() -> Self {
-        Self::default()
+        UpdateQuery {
+            rows_per_page: DEFAULT_ROWS,
+            ..Default::default()
+        }
+    }
+
+    // Override the maximum number of results per page (capped at 100 server-side).
+    #[must_use]
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
     }
 
     // Add a callback function for reporting back query progress for long-running queries.
@@ -509,7 +522,7 @@ impl<'a> PaginatedRequest<UpdateListPage, Vec<Update>> for UpdateQuery<'a> {
             update_type: self.update_type,
             users: self.users.as_ref().map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
             page,
-            rows_per_page: DEFAULT_ROWS,
+            rows_per_page: self.rows_per_page,
         })
     }
 

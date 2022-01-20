@@ -147,7 +147,7 @@
 // ! paginated results), and are not publicly exported. They are located next to the `Query` they
 // are ! used for.
 
-#![warn(missing_docs)]
+// FIXME #![warn(missing_docs)]
 #![warn(missing_debug_implementations)]
 #![warn(clippy::unwrap_used)]
 

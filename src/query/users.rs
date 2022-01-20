@@ -89,6 +89,8 @@ pub struct UserQuery<'a> {
     search: Option<&'a str>,
     updates: Option<Vec<&'a str>>,
 
+    // number of results per page
+    rows_per_page: u32,
     // optional callback function for reporting progress
     callback: Option<Box<dyn Fn(u32, u32) + 'a>>,
 }
@@ -101,6 +103,7 @@ impl<'a> Debug for UserQuery<'a> {
             .field("name", &self.name)
             .field("search", &self.search)
             .field("updates", &self.updates)
+            .field("rows_per_page", &self.rows_per_page)
             .field("callback", &"(function pointer)")
             .finish()
     }
@@ -109,7 +112,17 @@ impl<'a> Debug for UserQuery<'a> {
 impl<'a> UserQuery<'a> {
     // This method returns a new `UserQuery` with *no* filters set.
     pub fn new() -> Self {
-        Self::default()
+        UserQuery {
+            rows_per_page: DEFAULT_ROWS,
+            ..Default::default()
+        }
+    }
+
+    // Override the maximum number of results per page (capped at 100 server-side).
+    #[must_use]
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
     }
 
     // Add a callback function for reporting back query progress for long-running queries.
@@ -222,7 +235,7 @@ impl<'a> PaginatedRequest<UserListPage, Vec<User>> for UserQuery<'a> {
                 .as_ref()
                 .map(|v| v.iter().map(|s| (*s).to_owned()).collect()),
             page,
-            rows_per_page: DEFAULT_ROWS,
+            rows_per_page: self.rows_per_page,
         })
     }
 

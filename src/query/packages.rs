@@ -32,6 +32,8 @@ pub struct PackageQuery<'a> {
     name: Option<&'a str>,
     search: Option<&'a str>,
 
+    // number of results per page
+    rows_per_page: u32,
     // optional callback function for reporting progress
     callback: Option<Box<dyn Fn(u32, u32) + 'a>>,
 }
@@ -42,6 +44,7 @@ impl<'a> Debug for PackageQuery<'a> {
             .field("like", &self.like)
             .field("name", &self.name)
             .field("search", &self.search)
+            .field("rows_per_page", &self.rows_per_page)
             .field("callback", &"(function pointer)")
             .finish()
     }
@@ -50,7 +53,17 @@ impl<'a> Debug for PackageQuery<'a> {
 impl<'a> PackageQuery<'a> {
     // This method returns a new [`PackageQuery`](struct.PackageQuery.html) with *no* filters set.
     pub fn new() -> Self {
-        Self::default()
+        PackageQuery {
+            rows_per_page: DEFAULT_ROWS,
+            ..Default::default()
+        }
+    }
+
+    // Override the maximum number of results per page (capped at 100 server-side).
+    #[must_use]
+    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
+        self.rows_per_page = rows_per_page;
+        self
     }
 
     // Add a callback function for reporting back query progress for long-running queries.
@@ -136,7 +149,7 @@ impl<'a> PaginatedRequest<PackageListPage, Vec<Package>> for PackageQuery<'a> {
             name: self.name.map(|s| s.to_owned()),
             search: self.search.map(|s| s.to_owned()),
             page,
-            rows_per_page: DEFAULT_ROWS,
+            rows_per_page: self.rows_per_page,
         })
     }
 
