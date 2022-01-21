@@ -172,3 +172,12 @@ pub(crate) mod request;
 
 #[cfg(test)]
 mod tests;
+
+/// release notes for all versions of this crate
+#[doc = include_str!("../NEWS.md")]
+#[cfg(doc)]
+#[allow(unused_imports)]
+pub mod changelog {
+    // includes for intra-doc links
+    // use super::Session;
+}
