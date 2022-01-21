@@ -1,9 +1,10 @@
-// ! This module contains implementations for creating **Comments**, **Overrides**, and **Updates**
-// ! on a bodhi instance. Creating **Releases** is possible with the REST API, but not implemented
-// ! yet.
+//! wrappers for API calls that create new things
+//!
+//! This module contains data type definitions and request implementations related to creating
+//! comments, overrides, and updates on a bodhi instance.
 
 mod comments;
-pub use comments::{CommentCreator, NewComment};
+pub use comments::{BugFeedbackData, CommentCreator, NewComment, TestCaseFeedbackData};
 
 mod overrides;
 pub use overrides::{NewOverride, OverrideCreator};
