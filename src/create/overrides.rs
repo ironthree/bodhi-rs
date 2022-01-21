@@ -6,18 +6,18 @@ use crate::data::{BodhiDate, Build, Override, OverrideData};
 use crate::error::QueryError;
 use crate::request::{RequestMethod, SingleRequest};
 
-// This struct contains the values that are returned when creating a new comment.
+/// data of this type is returned after successfully creating a new buildroot override
 #[derive(Debug, Deserialize)]
 pub struct NewOverride {
-    // the newly created buildroot override
+    /// new buildroot override that was just created
     #[serde(flatten)]
     pub over_ride: Override,
-    // additional server messages
+    /// additional server messages
     pub caveats: Vec<HashMap<String, String>>,
 }
 
-// This struct contains all the values that are necessary for creating a new buildroot override.
-// There are no optional arguments, so everything has to be supplied with the `new()` method.
+/// data type wrapping all mandatory (and no optional) parameters for creating a new buildroot
+/// override
 #[derive(Debug)]
 pub struct OverrideCreator<'a> {
     nvr: &'a str,
@@ -26,7 +26,7 @@ pub struct OverrideCreator<'a> {
 }
 
 impl<'a> OverrideCreator<'a> {
-    // This method has to be used to create and initialize a new `OverrideBuilder`.
+    /// constructor for [`OverrideCreator`] with arguments for all mandatory parameters
     pub fn new(nvr: &'a str, notes: &'a str, expiration_date: &'a BodhiDate) -> Self {
         OverrideCreator {
             nvr,
@@ -72,7 +72,7 @@ impl<'a> SingleRequest<NewOverride, NewOverride> for OverrideCreator<'a> {
 }
 
 impl Build {
-    // This method creates a new `OverrideBuilder` for this `Build`.
+    /// constructor for [`OverrideCreator`] which takes the build NVR from an existing build
     pub fn buildroot_override<'a>(&'a self, notes: &'a str, expiration_date: &'a BodhiDate) -> OverrideCreator<'a> {
         OverrideCreator::new(self.nvr.as_str(), notes, expiration_date)
     }
