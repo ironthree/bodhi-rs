@@ -3,12 +3,12 @@
 use std::env::args;
 
 use bodhi::error::QueryError;
-use bodhi::{BodhiServiceBuilder, UserNameQuery};
+use bodhi::{BodhiClientBuilder, UserNameQuery};
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
     // construct bodhi client for the production instance
-    let bodhi = BodhiServiceBuilder::default()
+    let bodhi = BodhiClientBuilder::default()
         .build()
         .await
         .map_err(|error| error.to_string())?;

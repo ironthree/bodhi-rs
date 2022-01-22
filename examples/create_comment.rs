@@ -1,6 +1,6 @@
 use std::io::{stdin, stdout, Write};
 
-use bodhi::{BodhiServiceBuilder, Karma, Update, UpdateIDQuery};
+use bodhi::{BodhiClientBuilder, Karma, Update, UpdateIDQuery};
 
 fn read_username() -> String {
     print!("FAS username: ");
@@ -21,7 +21,7 @@ async fn main() -> Result<(), String> {
 
     // construct bodhi client for the staging instance, and
     // authenticate with the supplied username and password
-    let bodhi = BodhiServiceBuilder::staging()
+    let bodhi = BodhiClientBuilder::staging()
         .authentication(&username, &password)
         .build()
         .await

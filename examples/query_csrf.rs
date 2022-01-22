@@ -1,9 +1,9 @@
-use bodhi::{BodhiServiceBuilder, CSRFQuery};
+use bodhi::{BodhiClientBuilder, CSRFQuery};
 
 #[tokio::main]
 async fn main() {
     // construct bodhi client for the production instance
-    let bodhi = BodhiServiceBuilder::default().build().await.unwrap();
+    let bodhi = BodhiClientBuilder::default().build().await.unwrap();
 
     let query = CSRFQuery::new();
 

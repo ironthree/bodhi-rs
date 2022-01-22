@@ -12,10 +12,10 @@ use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+use crate::client::DEFAULT_ROWS;
 use crate::data::*;
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
-use crate::service::DEFAULT_ROWS;
 
 // Use this for querying bodhi for a specific update by its ID or alias. It will either return an
 // `Ok(Some(Update))` matching the specified ID or alias, return `Ok(None)` if it doesn't exist, or

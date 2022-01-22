@@ -1,17 +1,23 @@
-// ! This module contains some common error types for wrapping networking-related issues,
-// ! server-side issues, and client-side issues (including JSON deserialization problems).
+//! # custom error types and conversion methods
+//!
+//! This module contains the error types that are used for wrapping networking-related issues,
+//! server-side issues, and client-side issues (including JSON deserialization problems).
+
 use std::collections::HashMap;
 
 use fedora::reqwest;
 use fedora::url;
 use serde::Deserialize;
 
-// This struct contains error messages that are deserialized from bodhi error responses.
+/// error type representing an error message that was returned from a bodhi server
+///
+/// Some bodhi requests result in structured JSON error messages, and this struct is used for
+/// deserializing those into Rust structs.
 #[derive(Debug, Deserialize, thiserror::Error)]
 pub struct BodhiError {
-    // This field contains a list of server-side error messages.
+    /// list of structured server-side error messages (key-value-pairs)
     pub errors: Vec<HashMap<String, String>>,
-    // This field contains the server-side status message for the failure.
+    /// server-side status message
     pub status: String,
 }
 
@@ -21,112 +27,71 @@ impl std::fmt::Display for BodhiError {
     }
 }
 
-// This enum encapsulates the different ways in which bodhi queries can fail.
+
+/// error type representing an error that happened during the execution of a request
 #[derive(Debug, thiserror::Error)]
 pub enum QueryError {
-    // This error represents an HTTP 404 response.
+    /// request returned an HTTP 404 responses
     #[error("Not found")]
     NotFound,
-    // This error represents a network-related issue that occurred within
-    // [`reqwest`](https://docs.rs/reqwest).
+    /// request returned an invalid / empty response
+    #[error("Invalid / empty server response")]
+    EmptyResponse,
+    /// request failed due to networking issues
     #[error("Failed to query bodhi service: {error}")]
     RequestError {
-        // The inner error contains the error passed from [`reqwest`](https://docs.rs/reqwest).
+        /// error returned by [`reqwest`]
+        #[from]
         error: reqwest::Error,
     },
-    // This error represents an issue with deserializing JSON request data. If this ever happens,
-    // it is almost certainly a bug in this crate.
+    /// failure to deserialize a JSON response
+    ///
+    /// If this error occurs, it is considered to be a bug in this crate.
     #[error("Failed to deserialize JSON response: {error}")]
     DeserializationError {
-        // The inner error contains the deserialization error message from
-        // [`serde_json`](https://docs.rs/serde_json).
+        /// error returned by [`serde_json`]
         error: serde_json::Error,
     },
-    // This error represents an issue with serializing request data for POST requests. Since all
-    // data that can be supplied to POST request builders should be valid, this should never
-    // happen.
+    /// failure to serialize JSON request data
+    ///
+    /// If this error occurs, it is considered to be a bug in this crate.
     #[error("Failed to serialize POST request data: {error}")]
     SerializationError {
-        // The inner error contains the serialization error message from
-        // [`serde_json`](https://docs.rs/serde_json).
-        error: serde_json::error::Error,
+        /// error returned by [`serde_json`]
+        error: serde_json::Error,
     },
-    // This error represents a successfully decoded bodhi server error message.
+    /// error parsing a string into a URL
+    #[error("Failed to compute request URL: {error}")]
+    UrlParsingError {
+        /// error returned from [`url`]
+        #[from]
+        error: url::ParseError,
+    },
+    /// error representing an internal server failure
     #[error("Remote bodhi instance returned an error message: {error}")]
     BodhiError {
-        // The inner [`BodhiError`](struct.BodhiError.html) contains the deserialized JSON error
-        // response from the server.
+        /// error returned by the remove server
         error: BodhiError,
     },
-    // This error represents an unexpected response or query error from the bodhi instance.
-    #[error("Failed to query bodhi service: {error}")]
-    ServiceError {
-        // The inner ServiceError contains more information about the type of failure that
-        // occurred, for example, malformed responses or network-related issues.
-        error: ServiceError,
-    },
-    // This error represents an unexpected issue when constructing a query URL, probably due
-    // to data that was not successfully deserialized into `x-www-urlencoded` format.
+    /// failure to serialize x-www-urlencoded request string
     #[error("Failed to construct `x-www-urlencoded` query string: {error}")]
     UrlEncodedError {
-        // This inner error contains the deserialization error.
-        error: String,
+        /// error returned by [`serde_url_params`]
+        #[from]
+        error: serde_url_params::Error,
     },
-    // This error represents some input data validation error.
+    /// failure to validate input data
     #[error("Invalid data: {error}")]
     InvalidDataError {
-        // This inner error contains a the reason why the data was considered invalid.
+        /// reason why data was considered invalid
         error: String,
     },
 }
 
+// The #[from] attribute for thiserror::Error can not be used for serde_json::Error, as there's two
+// errors with this same inner error type.
 impl From<serde_json::Error> for QueryError {
     fn from(error: serde_json::Error) -> Self {
         QueryError::DeserializationError { error }
     }
-}
-
-impl From<reqwest::Error> for QueryError {
-    fn from(error: reqwest::Error) -> Self {
-        QueryError::RequestError { error }
-    }
-}
-
-impl From<ServiceError> for QueryError {
-    fn from(error: ServiceError) -> Self {
-        QueryError::ServiceError { error }
-    }
-}
-
-impl From<serde_url_params::Error> for QueryError {
-    fn from(error: serde_url_params::Error) -> Self {
-        QueryError::UrlEncodedError {
-            error: format!("{}", error),
-        }
-    }
-}
-
-// This enum encapsulates the different ways in which requests to bodhi can fail.
-#[derive(Debug, thiserror::Error)]
-pub enum ServiceError {
-    // This error represents a network-related issue that occurred within
-    // [`reqwest`](https://docs.rs/reqwest).
-    #[error("Failed to query bodhi instance: {error}")]
-    RequestError {
-        // The inner error contains the error passed from [`reqwest`](https://docs.rs/reqwest).
-        #[from]
-        error: reqwest::Error,
-    },
-    // This error represents an issue with constructing the request URL from the base API URL
-    // and the query string.
-    #[error("Failed to compute request URL: {error}")]
-    UrlParsingError {
-        // The inner error contains the error that occurred when parsing the URL.
-        #[from]
-        error: url::ParseError,
-    },
-    // This error represents an issue where a response with an empty body was received (which is a
-    // server-side issue in bodhi, that sometimes happens under load).
-    #[error("Received an empty response.")]
-    EmptyResponseError,
 }

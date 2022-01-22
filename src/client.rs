@@ -1,5 +1,7 @@
-// ! This module contains the structures and methods to interact with a (remote) bodhi server
-// ! instance.
+//! # bodhi API client implementation
+//!
+//! This module contains data structures and implementations for creating a bodhi client session,
+//! and for sending requests to a bodhi server.
 
 use std::time::Duration;
 
@@ -9,7 +11,7 @@ use fedora::{OpenIDSessionKind, Session};
 use serde::de::DeserializeOwned;
 
 use crate::data::{FEDORA_BODHI_STG_URL, FEDORA_BODHI_URL};
-use crate::error::{BodhiError, QueryError, ServiceError};
+use crate::error::{BodhiError, QueryError};
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
 use crate::CSRFQuery;
 
@@ -28,6 +30,7 @@ const REQUEST_RETRIES: usize = 3;
 // Specify a sane default user agent for bodhi-rs.
 const USER_AGENT: &str = concat!("bodhi-rs v", env!("CARGO_PKG_VERSION"));
 
+
 #[derive(Debug)]
 enum BodhiServiceType {
     Default,
@@ -35,8 +38,9 @@ enum BodhiServiceType {
     Custom { openid_url: String },
 }
 
-/// This struct contains information necessary to build a [`BodhiService`] instance with the
-/// necessary flags. Additionally, depending on whether username and password are supplied as
+
+/// This data type contains all information that is required to build a [`BodhiClient`] instance
+/// with necessary flags. Additionally, depending on whether username and password are supplied as
 /// arguments, building the service instance will try to return a privileged session by
 /// authenticating with the specified OpenID endpoint first.
 ///
@@ -45,7 +49,7 @@ enum BodhiServiceType {
 ///
 /// ```
 /// // create service with anonymous session
-/// let bodhi = bodhi::BodhiServiceBuilder::default()
+/// let bodhi = bodhi::BodhiClientBuilder::default()
 ///     .timeout(std::time::Duration::from_secs(42))
 ///     .retries(9001)
 ///     .build();
@@ -53,14 +57,14 @@ enum BodhiServiceType {
 ///
 /// ```no_run
 /// // builder for an authenticated session
-/// let builder = bodhi::BodhiServiceBuilder::staging()
+/// let builder = bodhi::BodhiClientBuilder::staging()
 ///     .timeout(std::time::Duration::from_secs(120))
 ///     .retries(2)
 ///     .authentication("bodhi-rs", "password1");
 /// let bodhi = builder.build();
 /// ```
 #[derive(Debug)]
-pub struct BodhiServiceBuilder<'a> {
+pub struct BodhiClientBuilder<'a> {
     service_type: BodhiServiceType,
     authentication: Option<Authentication<'a>>,
     url: String,
@@ -75,32 +79,33 @@ struct Authentication<'a> {
     password: &'a str,
 }
 
-// This enum contains variants for all the ways in which constructing a
-// [`BodhiService`](struct.BodhiService.html) instance can fail.
+
+/// error type that represents a failure that occurs while initializing a [`BodhiClient`]
 #[derive(Debug, thiserror::Error)]
 pub enum BuilderError {
-    // This error represents an issue while parsing user-supplied URLs. If should never be returned
-    // for the default settings, since the hardcoded URLs should always be valid.
+    /// error while parsing base URL or login URL
+    ///
+    /// This error should only ever be returned when using custom URLs, never when constructing a
+    /// client for the default Fedora (production) or staging instances of bodhi.
     #[error("Failed to parse service URL: {error}")]
     UrlParsingError {
-        // The inner error contains the issue that occurred while parsing the invalid URL.
+        /// error that occurred while parsing the URL
         #[from]
         error: url::ParseError,
     },
-    // This error represents an issue that occurred during authentication via the OpenID API.
+    /// error while authenticating with an OpenID endpoint
     #[error("Failed to initialize OpenID client: {error}")]
     OpenIDClientError {
-        // The inner error contains the issue that occurred during the set up of an authenticated
-        // session via an OpenID endpoint.
+        /// error that occurred during the OpenID authentication process
         #[from]
         error: fedora::OpenIDClientError,
     },
 }
 
-impl<'a> BodhiServiceBuilder<'a> {
-    // This method creates a new builder for the "production" instances of the fedora services.
+impl<'a> BodhiClientBuilder<'a> {
+    /// constructor for [`BodhiClientBuilder`] for the default / production instance of bodhi
     pub fn default() -> Self {
-        BodhiServiceBuilder {
+        BodhiClientBuilder {
             service_type: BodhiServiceType::Default,
             authentication: None,
             url: FEDORA_BODHI_URL.to_string(),
@@ -110,9 +115,9 @@ impl<'a> BodhiServiceBuilder<'a> {
         }
     }
 
-    // This method creates a new builder for the "staging" instances of the fedora services.
+    /// constructor for [`BodhiClientBuilder`] for the staging instance of bodhi
     pub fn staging() -> Self {
-        BodhiServiceBuilder {
+        BodhiClientBuilder {
             service_type: BodhiServiceType::Staging,
             authentication: None,
             url: FEDORA_BODHI_STG_URL.to_string(),
@@ -122,10 +127,9 @@ impl<'a> BodhiServiceBuilder<'a> {
         }
     }
 
-    // This method creates a custom builder, where both bodhi URL and authentication endpoint need
-    // to be specified manually.
+    /// constructor for [`BodhiClientBuilder`] with custom settings (user-specified base URLs)
     pub fn custom(url: String, openid_url: String) -> Self {
-        BodhiServiceBuilder {
+        BodhiClientBuilder {
             service_type: BodhiServiceType::Custom { openid_url },
             authentication: None,
             url,
@@ -135,48 +139,45 @@ impl<'a> BodhiServiceBuilder<'a> {
         }
     }
 
-    // This method can be used to override the default request timeout.
+    /// method for overriding the default network request timeout
     #[must_use]
     pub fn timeout(mut self, timeout: Duration) -> Self {
         self.timeout = Some(timeout);
         self
     }
 
-    // This method can be used to override the default User-Agent.
+    /// method for overriding the default User-Agent HTTP header that is used for requests
     #[must_use]
     pub fn user_agent(mut self, user_agent: &'a str) -> Self {
         self.user_agent = Some(user_agent);
         self
     }
 
-    // This method can be used to override the default number of retries.
+    /// method for overriding the default number of retry attempts for read-only requests
     #[must_use]
     pub fn retries(mut self, retries: usize) -> Self {
         self.retries = Some(retries);
         self
     }
 
-    // This method can be used to set credentials for authenticating with the fedora OpenID
-    // endpoint, so the resulting [`BodhiService`](struct.BodhiService.html) can be used to
-    // send authenticated requests for creating and editing things on the server.
+    /// method for supplying username and password when using an authenticated bodhi API client
     #[must_use]
     pub fn authentication(mut self, username: &'a str, password: &'a str) -> Self {
         self.authentication = Some(Authentication { username, password });
         self
     }
 
-    // This method builds a [`BodhiService`](struct.BodhiService.html) given the arguments that
-    // were supplied to this [`BodhiServiceBuilder`](struct.BodhiServiceBuilder.html), including
-    // an attempt to authenticate with the fedora OpenID endpoint if credentials have been
-    // supplied.
-    pub async fn build(self) -> Result<BodhiService, BuilderError> {
+    /// method for building a [`BodhiClient`] based on the parameters in this [`BodhiClientBuilder`]
+    ///
+    /// If authentication parameters (username and password) have been supplied as arguments as
+    /// well, calling this method will also attempt to authenticate via OpenID.
+    pub async fn build(self) -> Result<BodhiClient, BuilderError> {
         let url = Url::parse(&self.url)?;
+        let login_url = url.join("/login")?;
 
         let timeout = self.timeout.unwrap_or(REQUEST_TIMEOUT);
         let retries = self.retries.unwrap_or(REQUEST_RETRIES);
         let user_agent = self.user_agent.unwrap_or(USER_AGENT).to_string();
-
-        let login_url = url.join("/login")?;
 
         let session = if let Some(auth) = self.authentication {
             match self.service_type {
@@ -211,21 +212,23 @@ impl<'a> BodhiServiceBuilder<'a> {
             Session::anonymous().user_agent(&user_agent).timeout(timeout).build()
         };
 
-        Ok(BodhiService { url, session, retries })
+        Ok(BodhiClient { url, session, retries })
     }
 }
 
-// This struct represents a specific bodhi service, typically running remotely, although a local
-// URL could be specified, as well. This BodhiService instance is then used by queries to actually
-// submit to, and receive from - the service.
+
+/// data type that encapsulates all information that is required for making network requests
+///
+/// A successfully constructed [`BodhiClient`] contains a valid base URL for the given bodhi server
+/// instance, and a networking session that is set up with all necessary headers and cookies.
 #[derive(Debug)]
-pub struct BodhiService {
+pub struct BodhiClient {
     url: Url,
     session: Session,
     retries: usize,
 }
 
-async fn try_get(session: &Client, url: Url, body: Option<String>) -> Result<Response, ServiceError> {
+async fn try_get(session: &Client, url: Url, body: Option<String>) -> Result<Response, QueryError> {
     let response = match body {
         Some(body) => session.get(url).body(body).send().await,
         None => session.get(url).send().await,
@@ -241,18 +244,18 @@ async fn try_get(session: &Client, url: Url, body: Option<String>) -> Result<Res
                 None => {
                     // response is empty
                     log::warn!("Invalid server response: Expected JSON but received empty body.");
-                    Err(ServiceError::EmptyResponseError)
+                    Err(QueryError::EmptyResponse)
                 },
             }
         },
         Err(error) => {
             // take a breath, and keep on trying (or not)
-            Err(ServiceError::RequestError { error })
+            Err(QueryError::RequestError { error })
         },
     }
 }
 
-async fn retry_get(session: &Client, url: Url, body: Option<String>, retries: usize) -> Result<Response, ServiceError> {
+async fn retry_get(session: &Client, url: Url, body: Option<String>, retries: usize) -> Result<Response, QueryError> {
     let mut retries: Vec<Duration> = vec![Duration::from_secs(1); retries];
 
     let result = loop {
@@ -276,7 +279,7 @@ async fn retry_get(session: &Client, url: Url, body: Option<String>, retries: us
     result
 }
 
-async fn try_post(session: &Client, url: Url, body: Option<String>) -> Result<Response, ServiceError> {
+async fn try_post(session: &Client, url: Url, body: Option<String>) -> Result<Response, QueryError> {
     let response = match body {
         Some(body) => session.post(url).body(body).send().await,
         None => session.post(url).send().await,
@@ -292,13 +295,13 @@ async fn try_post(session: &Client, url: Url, body: Option<String>) -> Result<Re
                 None => {
                     // response is empty
                     log::warn!("Invalid server response: Expected JSON but received empty body.");
-                    Err(ServiceError::EmptyResponseError)
+                    Err(QueryError::EmptyResponse)
                 },
             }
         },
         Err(error) => {
             // take a breath, and keep on trying (or not)
-            Err(ServiceError::RequestError { error })
+            Err(QueryError::RequestError { error })
         },
     }
 }
@@ -322,13 +325,17 @@ where
     }
 }
 
-impl BodhiService {
+impl BodhiClient {
     fn session(&self) -> &Client {
         self.session.session()
     }
-}
 
-impl BodhiService {
+    /// async method for making a single-page `GET` or a `POST` request
+    ///
+    /// This method is used to handle single-page `GET` and `POST` requests. By default, `GET`
+    /// requests are retried for the specified number of times (default: 3) before an error is
+    /// returned. `POST` requests are not retried, because they might have already modified server
+    /// state even if the request timed out or returned an error.
     pub async fn request<P, T>(&self, request: &dyn SingleRequest<P, T>) -> Result<T, QueryError>
     where
         T: DeserializeOwned,
@@ -354,7 +361,7 @@ impl BodhiService {
         let url = self
             .url
             .join(&request.path()?)
-            .map_err(|e| ServiceError::UrlParsingError { error: e })?;
+            .map_err(|e| QueryError::UrlParsingError { error: e })?;
         let response = retry_get(self.session(), url, request.body(None)?, self.retries).await?;
 
         handle_response(response, request).await
@@ -376,12 +383,19 @@ impl BodhiService {
         let url = self
             .url
             .join(&request.path()?)
-            .map_err(|e| ServiceError::UrlParsingError { error: e })?;
+            .map_err(|e| QueryError::UrlParsingError { error: e })?;
         let response = try_post(self.session(), url, request.body(Some(token))?).await?;
 
         handle_response(response, request).await
     }
 
+    /// async method for making multi-page / paginated `GET` requests
+    ///
+    /// This method is used to handle paginated `GET` requests. Internally, this will result in a
+    /// stream of single-page requests to be handled by [`BodhiClient::request`]. This method
+    /// is intended to be more convenient than manually constructing and executing single-page
+    /// requests, handling errors, and then reassembling the results - as those things are all
+    /// handled by this method internally.
     pub async fn paginated_request<P, V, T>(&self, request: &dyn PaginatedRequest<P, V>) -> Result<Vec<T>, QueryError>
     where
         P: Pagination,

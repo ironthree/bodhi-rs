@@ -12,10 +12,10 @@ use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+use crate::client::DEFAULT_ROWS;
 use crate::data::{BodhiDate, Comment};
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
-use crate::service::DEFAULT_ROWS;
 
 // Use this for querying bodhi for a specific comment by its ID. It will either return an
 // `Ok(Some(Comment))` matching the specified ID, return `Ok(None)` if it doesn't exist, or return

@@ -7,10 +7,10 @@ use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+use crate::client::DEFAULT_ROWS;
 use crate::data::Package;
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
-use crate::service::DEFAULT_ROWS;
 
 // Use this for querying bodhi about a set of packages with the given properties, which can be
 // specified with the builder pattern. Note that some options can be specified multiple times, and

@@ -1,11 +1,11 @@
 use std::io::Write;
 
-use bodhi::{BodhiServiceBuilder, BuildQuery};
+use bodhi::{BodhiClientBuilder, BuildQuery};
 
 #[tokio::main]
 async fn main() {
     // construct bodhi client for the production instance
-    let bodhi = BodhiServiceBuilder::default().build().await.unwrap();
+    let bodhi = BodhiClientBuilder::default().build().await.unwrap();
 
     let progressbar = |p, ps| {
         let progress = if ps == 0 { 0f64 } else { (p as f64) / (ps as f64) };

@@ -1,7 +1,7 @@
 use std::io::{stdin, stdout, Write};
 use std::time::Duration;
 
-use bodhi::{BodhiServiceBuilder, Update, UpdateIDQuery, UpdateRequest};
+use bodhi::{BodhiClientBuilder, Update, UpdateIDQuery, UpdateRequest};
 
 fn read_username() -> String {
     print!("FAS username: ");
@@ -20,7 +20,7 @@ async fn main() -> Result<(), String> {
     let username = read_username();
     let password = rpassword::prompt_password_stdout("FAS password: ").unwrap();
 
-    let bodhi = BodhiServiceBuilder::staging()
+    let bodhi = BodhiClientBuilder::staging()
         .authentication(&username, &password)
         .timeout(Duration::from_secs(60))
         .build()

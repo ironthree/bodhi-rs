@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 use std::io::{stdin, stdout, Write};
 
-use bodhi::{BodhiDate, BodhiServiceBuilder, OverrideCreator};
+use bodhi::{BodhiClientBuilder, BodhiDate, OverrideCreator};
 
 fn read_username() -> String {
     print!("FAS username: ");
@@ -21,7 +21,7 @@ async fn main() -> Result<(), String> {
     let password = rpassword::prompt_password_stdout("FAS password: ").unwrap();
 
     // beware: it looks like the staging instance can't create buildroot overrides
-    let bodhi = BodhiServiceBuilder::staging()
+    let bodhi = BodhiClientBuilder::staging()
         .authentication(&username, &password)
         .build()
         .await

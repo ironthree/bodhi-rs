@@ -12,10 +12,10 @@ use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+use crate::client::DEFAULT_ROWS;
 use crate::data::{Build, FedoraRelease};
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
-use crate::service::DEFAULT_ROWS;
 
 // Use this for querying bodhi for a specific build, by its NVR (Name-Version-Release) string. It
 // will either return an `Ok(Some(Build))` matching the specified NVR, return `Ok(None)` if it

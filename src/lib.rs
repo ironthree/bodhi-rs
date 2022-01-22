@@ -12,18 +12,22 @@
 //! [production]: https://bodhi.fedoraproject.org
 //! [staging]: https://bodhi.stg.fedoraproject.org
 //!
+//! Almost all public items in this crate are re-exported in the crate's root namespace for
+//! convenience, but documentation for public items from submodules is linked from the module where
+//! they are defined. Documentation for all public modules is available [below](crate#modules).
+//!
 //! ## Quick Tutorial
 //!
 //! Using this crate for making asynchronous API calls is straightforward:
 //!
-//! 1. initialize a [`BodhiService`] instance:
+//! 1. initialize a [`BodhiClient`] instance:
 //!
 //! ```
-//! use bodhi::{BodhiService, BodhiServiceBuilder};
+//! use bodhi::{BodhiClient, BodhiClientBuilder};
 //!
 //! # tokio_test::block_on( async {
 //! // initialize a service for interacting with the production instance of bodhi
-//! let bodhi: BodhiService = BodhiServiceBuilder::default().build().await.unwrap();
+//! let bodhi: BodhiClient = BodhiClientBuilder::default().build().await.unwrap();
 //! # })
 //! ```
 //!
@@ -39,9 +43,9 @@
 //! 3. pass the request to the service:
 //!
 //! ```
-//! # use bodhi::BodhiServiceBuilder;
+//! # use bodhi::BodhiClientBuilder;
 //! # use bodhi::{Package, PackageQuery};
-//! # let bodhi = tokio_test::block_on( async { BodhiServiceBuilder::default().build().await }).unwrap();
+//! # let bodhi = tokio_test::block_on( async { BodhiClientBuilder::default().build().await }).unwrap();
 //! # let package_query = PackageQuery::new().name("rust");
 //! # tokio_test::block_on( async {
 //! // pass the query to bodhi, wait for the result, and don't do any error handling
@@ -82,15 +86,15 @@
 //!
 //! All single-page requests implement the private `SingleRequest` trait, and all requests that
 //! result in multi-page / paginated results implement the private `PaginatedRequest` trait. So,
-//! any query that results in a single request must be passed to [`BodhiService::request`], and any
-//! query that results in multiple requests must be passed to [`BodhiService::paginated_request`].
+//! any query that results in a single request must be passed to [`BodhiClient::request`], and any
+//! query that results in multiple requests must be passed to [`BodhiClient::paginated_request`].
 //! Internally, paginated requests are handled as a stream of `SingleRequest` instances, one for
 //! each page of results.
 //!
 //! ```no_run
-//! # use bodhi::BodhiServiceBuilder;
+//! # use bodhi::BodhiClientBuilder;
 //! # use bodhi::{NewUpdate, Release, ReleaseQuery, UpdateCreator};
-//! # let bodhi = tokio_test::block_on( async { BodhiServiceBuilder::default().build().await }).unwrap();
+//! # let bodhi = tokio_test::block_on( async { BodhiClientBuilder::default().build().await }).unwrap();
 //! let release_query = ReleaseQuery::new().exclude_archived(true);
 //! let update_creator = UpdateCreator::from_builds(&["rust-bodhi-1.1.1-2.fc36"], "Update for bodhi-rs 1.1.1.");
 //!
@@ -102,8 +106,8 @@
 //!
 //! ## Changing default session parameters
 //!
-//! It is possible to customize some of the default behaviour of a [`BodhiService`] by calling
-//! methods on the [`BodhiServiceBuilder`], using the builder pattern. The following parameters can
+//! It is possible to customize some of the default behaviour of a [`BodhiClient`] by calling
+//! methods on the [`BodhiClientBuilder`], using the builder pattern. The following parameters can
 //! be modified:
 //!
 //! - request timeout duration (default: 60 seconds)
@@ -112,10 +116,10 @@
 //! - username and password for authenticated requests (default: unauthenticated)
 //!
 //! ```no_run
-//! use bodhi::BodhiServiceBuilder;
+//! use bodhi::BodhiClientBuilder;
 //!
 //! # tokio_test::block_on( async {
-//! let bodhi = BodhiServiceBuilder::staging()
+//! let bodhi = BodhiClientBuilder::staging()
 //!     .timeout(std::time::Duration::from_secs(3600))
 //!     .retries(1000)
 //!     .user_agent("the bodhi-rs documentation tests say hello")
@@ -134,10 +138,11 @@
 pub mod data;
 pub use data::*;
 
-pub mod service;
-pub use service::{BodhiService, BodhiServiceBuilder};
+pub mod client;
+pub use client::*;
 
 pub mod error;
+pub use error::*;
 
 pub mod create;
 pub use create::*;

@@ -4,7 +4,7 @@
 use std::time::Duration;
 
 #[cfg(feature = "online-tests")]
-use crate::{BodhiService, BodhiServiceBuilder};
+use crate::{BodhiClient, BodhiClientBuilder};
 
 // Longer timeout value for tests, since these queries can take a long time
 #[cfg(feature = "online-tests")]
@@ -15,8 +15,8 @@ const TEST_TIMEOUT: Duration = Duration::from_secs(300);
 const TEST_RETRIES: usize = 10;
 
 #[cfg(feature = "online-tests")]
-async fn bodhi_init() -> BodhiService {
-    BodhiServiceBuilder::default()
+async fn bodhi_init() -> BodhiClient {
+    BodhiClientBuilder::default()
         .timeout(TEST_TIMEOUT)
         .retries(TEST_RETRIES)
         .build()
