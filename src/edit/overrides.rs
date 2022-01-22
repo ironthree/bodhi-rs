@@ -6,17 +6,23 @@ use crate::data::{BodhiDate, Override, OverrideData};
 use crate::error::QueryError;
 use crate::request::{RequestMethod, SingleRequest};
 
-// This struct contains the values that are returned when editing a buildroot override.
+/// data of this type is returned after successfully editing a buildroot [`Override`]
 #[derive(Debug, Deserialize)]
 pub struct EditedOverride {
-    // the edited buildroot override
+    /// edited buildroot override
     #[serde(flatten)]
     pub over_ride: Override,
-    // additional server messages
+    /// additional server messages
     pub caveats: Vec<HashMap<String, String>>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
-// This struct contains all the possible arguments for editing a buildroot override.
+
+/// data type wrapping all mandatory and optional parameters for editing a buildroot override
 #[derive(Debug)]
 pub struct OverrideEditor<'a> {
     notes: &'a str,
@@ -27,8 +33,7 @@ pub struct OverrideEditor<'a> {
 }
 
 impl<'a> OverrideEditor<'a> {
-    // Use this method to create an edit request for an existing buildroot override. It
-    // pre-populates all editable fields with the current values.
+    /// constructor for [`OverrideEditor`] from an existing [`Override`] value
     pub fn from_override(over_ride: &'a Override) -> Self {
         OverrideEditor {
             notes: &over_ride.notes,
@@ -38,21 +43,21 @@ impl<'a> OverrideEditor<'a> {
         }
     }
 
-    // Change the buildroot override notes.
+    /// method for changing the override notes
     #[must_use]
     pub fn notes(mut self, notes: &'a str) -> Self {
         self.notes = notes;
         self
     }
 
-    // Change the buildroot override expiration date.
+    /// method for changing the expiration date of the override
     #[must_use]
     pub fn expiration_date(mut self, expiration_date: &'a BodhiDate) -> Self {
         self.expiration_date = expiration_date;
         self
     }
 
-    // Change whether the buildroot override should be expired.
+    /// method for setting whether the override should be expired
     #[must_use]
     pub fn expired(mut self, expired: bool) -> Self {
         self.expired = Some(expired);
@@ -95,8 +100,9 @@ impl<'a> SingleRequest<EditedOverride, EditedOverride> for OverrideEditor<'a> {
     }
 }
 
+
 impl Override {
-    // This method creates a new `OverrideEditor` for editing this `Override`.
+    /// constructor for [`OverrideEditor`] which takes the NVR from an existing [`Override`]
     pub fn edit(&self) -> OverrideEditor {
         OverrideEditor::from_override(self)
     }

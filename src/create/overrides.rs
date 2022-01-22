@@ -14,7 +14,13 @@ pub struct NewOverride {
     pub over_ride: Override,
     /// additional server messages
     pub caveats: Vec<HashMap<String, String>>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
+
 
 /// data type wrapping all mandatory (and no optional) parameters for creating a new buildroot
 /// override
@@ -71,8 +77,9 @@ impl<'a> SingleRequest<NewOverride, NewOverride> for OverrideCreator<'a> {
     }
 }
 
+
 impl Build {
-    /// constructor for [`OverrideCreator`] which takes the build NVR from an existing build
+    /// constructor for [`OverrideCreator`] which takes the build NVR from an existing [`Build`]
     pub fn buildroot_override<'a>(&'a self, notes: &'a str, expiration_date: &'a BodhiDate) -> OverrideCreator<'a> {
         OverrideCreator::new(self.nvr.as_str(), notes, expiration_date)
     }

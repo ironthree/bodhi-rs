@@ -18,6 +18,7 @@ struct CommentData<'a> {
     feedback: HashMap<String, String>,
 }
 
+
 /// data type for bug feedback
 #[derive(Debug, Serialize)]
 pub struct BugFeedbackData {
@@ -31,6 +32,7 @@ impl BugFeedbackData {
         BugFeedbackData { bug_id, karma }
     }
 }
+
 
 /// data type for test case feedback
 #[derive(Debug, Serialize)]
@@ -46,6 +48,7 @@ impl<'a> TestCaseFeedbackData<'a> {
     }
 }
 
+
 /// data of this type is returned after successfully posting a new [`Comment`]
 #[derive(Debug, Deserialize)]
 pub struct NewComment {
@@ -53,7 +56,13 @@ pub struct NewComment {
     pub comment: Comment,
     /// additional server messages
     pub caveats: Vec<HashMap<String, String>>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
+
 
 /// data type wrapping all mandatory and optional parameters for creating a new comment
 #[derive(Debug)]
@@ -173,8 +182,9 @@ impl<'a> SingleRequest<NewComment, NewComment> for CommentCreator<'a> {
     }
 }
 
+
 impl Update {
-    /// constructor for [`CommentCreator`] which takes the update ID from an existing update
+    /// constructor for [`CommentCreator`] which takes the update ID from an existing [`Update`]
     pub fn comment(&self) -> CommentCreator {
         CommentCreator::new(self.alias.as_str())
     }

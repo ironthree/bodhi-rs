@@ -6,18 +6,23 @@ use crate::data::{Update, UpdateData, UpdateRequest, UpdateSeverity, UpdateSugge
 use crate::error::QueryError;
 use crate::request::{RequestMethod, SingleRequest};
 
-// This struct contains the values that are returned when editing an update.
+/// data of this type is returned after successfully editing an [`Update`]
 #[derive(Debug, Deserialize)]
 pub struct EditedUpdate {
-    // the edited update
+    /// edited update
     #[serde(flatten)]
     pub update: Update,
-    // additional server messages
+    /// additional server messages
     pub caveats: Vec<HashMap<String, String>>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
-// This struct contains all the possible arguments for editing an update. Methods to supply
-// optional arguments are also available.
+
+/// data type wrapping all mandatory and optional parameters for editing an update
 #[derive(Debug)]
 pub struct UpdateEditor<'a> {
     // mandatory fields
@@ -44,8 +49,7 @@ pub struct UpdateEditor<'a> {
 }
 
 impl<'a> UpdateEditor<'a> {
-    // Use this method to create an edit request for an existing update. It pre-populates all
-    // fields with the current values.
+    /// constructor for [`UpdateEditor`] from an existing [`Update`]] value
     pub fn from_update(update: &'a Update) -> Self {
         UpdateEditor {
             builds: update.builds.iter().map(|b| b.nvr.as_str()).collect(),
@@ -73,133 +77,129 @@ impl<'a> UpdateEditor<'a> {
         }
     }
 
-    // Add a build to the update.
+    /// method for adding a build to the update
     #[must_use]
     pub fn add_build(mut self, build: &'a str) -> Self {
         self.builds.push(build);
         self
     }
 
-    // Remove a build from the update.
+    /// method for removing a build from the update
     #[must_use]
     pub fn remove_build(mut self, build: &'a str) -> Self {
         self.builds.retain(|b| *b != build);
         self
     }
 
-    // Change the update notes.
+    /// method for changing the update notes
     #[must_use]
     pub fn notes(mut self, notes: &'a str) -> Self {
         self.notes = notes;
         self
     }
 
-    // Add a related bug to the update.
+    /// method for adding a related bug to the update
     #[must_use]
     pub fn add_bug(mut self, bug: u32) -> Self {
         self.bugs.push(bug);
         self
     }
 
-    // Remove a related bug from the update.
+    /// method for removing a related bug from the update
     #[must_use]
     pub fn remove_bug(mut self, bug: u32) -> Self {
         self.bugs.retain(|b| *b != bug);
         self
     }
 
-    // Change the custom, user-visible title of the update.
+    /// method for changing the "pretty" update title
     #[must_use]
     pub fn display_name(mut self, display_name: &'a str) -> Self {
         self.display_name = Some(display_name);
         self
     }
 
-    // Set the flag whether bugs will be closed when the update is pushed to stable.
+    /// method for changing the `close_bugs` flag
     #[must_use]
     pub fn close_bugs(mut self, close_bugs: bool) -> Self {
         self.close_bugs = Some(close_bugs);
         self
     }
 
-    // Flag to specify the type of update (new package, bug fix, enhancement, security update, or
-    // unspecified). For security updates, the severity also has to be specified.
+    /// method for changing the update type
+    ///
+    /// Note that updates of type [`UpdateType::Security`] also need a severity value that is not
+    /// [`UpdateSeverity::Unspecified`].
     #[must_use]
     pub fn update_type(mut self, update_type: UpdateType) -> Self {
         self.update_type = Some(update_type);
         self
     }
 
-    // Flag to specify the update severity (primarily used for security updates, where this flag is
-    // mandatory).
+    /// method for changing the update severity
     #[must_use]
     pub fn severity(mut self, severity: UpdateSeverity) -> Self {
         self.severity = Some(severity);
         self
     }
 
-    // Set the flag whether the update can automatically be pushed to stable once it reaches the
-    // specified stable karma.
+    /// method for changing the `autokarma` flag
     #[must_use]
     pub fn autokarma(mut self, autokarma: bool) -> Self {
         self.autokarma = Some(autokarma);
         self
     }
 
-    // Manually set the stable karma feedback threshold.
+    /// method for changing the stable karma threshold
     #[must_use]
     pub fn stable_karma(mut self, stable_karma: i32) -> Self {
         self.stable_karma = Some(stable_karma);
         self
     }
 
-    // Manually set the unstable karma feedback threshold.
+    /// method for changing the unstable karma threshold
     #[must_use]
     pub fn unstable_karma(mut self, unstable_karma: i32) -> Self {
         self.unstable_karma = Some(unstable_karma);
         self
     }
 
-    // Flag to specify whether users should log out or reboot to successfully apply an update.
+    /// method for changing the update suggestion
     #[must_use]
     pub fn suggest(mut self, suggestion: UpdateSuggestion) -> Self {
         self.suggest = Some(suggestion);
         self
     }
 
-    // Set custom gating requirements.
+    /// method for changing the required gating tests
     #[must_use]
     pub fn requirements(mut self, requirements: &'a str) -> Self {
         self.requirements = Some(requirements);
         self
     }
 
-    // Flag to indicate whether bug feedback is required for karma to be counted.
+    /// method for changing the `require_bugs` flag
     #[must_use]
     pub fn require_bugs(mut self, require_bugs: bool) -> Self {
         self.require_bugs = Some(require_bugs);
         self
     }
 
-    // Flag to indicate whether test case feedback is required for karma to be counted.
+    /// method for changing the `require_testcases` flag
     #[must_use]
     pub fn require_testcases(mut self, require_testcases: bool) -> Self {
         self.require_testcases = Some(require_testcases);
         self
     }
 
-    // Set the flag whether the update can automatically be pushed to stable once it reaches the
-    // specified days in testing.
+    /// method for changing the `autotime` flag
     #[must_use]
     pub fn autotime(mut self, autotime: bool) -> Self {
         self.autotime = Some(autotime);
         self
     }
 
-    // Manually specify the minimum duration the update has to stay in testing.
-    //
-    // The default is 7 days for stable updates, 14 days for stable updates containing critpath
-    // packages, and 3 days for fedora pre-releases.
+    /// method for changing the stable time threshold
     #[must_use]
     pub fn stable_days(mut self, stable_days: u32) -> Self {
         self.stable_days = Some(stable_days);
@@ -298,12 +298,14 @@ impl<'a> SingleRequest<EditedUpdate, EditedUpdate> for UpdateEditor<'a> {
     }
 }
 
+
 #[derive(Debug, Deserialize)]
 pub struct RequestedUpdate {
     update: Update,
 }
 
-// This struct contains all the arguments for changing the update status request.
+
+/// data type wrapping all mandatory arguments for creating a request to change an update status
 #[derive(Debug)]
 pub struct UpdateStatusRequester<'a> {
     alias: &'a str,
@@ -311,7 +313,7 @@ pub struct UpdateStatusRequester<'a> {
 }
 
 impl<'a> UpdateStatusRequester<'a> {
-    // Use this method when creating an update state request.
+    /// constructor for [`UpdateStatusRequester`] from an existing [`Update`] value
     pub fn from_update(update: &'a Update, request: UpdateRequest) -> Self {
         UpdateStatusRequester {
             alias: &update.alias,
@@ -357,12 +359,14 @@ impl<'a> SingleRequest<RequestedUpdate, Update> for UpdateStatusRequester<'a> {
     }
 }
 
+
 #[derive(Debug, Deserialize)]
 pub struct WaivedUpdate {
     update: Update,
 }
 
-// This struct contains all the arguments for waiving test results for an update.
+
+/// data type wrapping all mandatory arguments for creating a request to waive test results
 #[derive(Debug)]
 pub struct UpdateTestResultWaiver<'a> {
     alias: &'a str,
@@ -371,7 +375,7 @@ pub struct UpdateTestResultWaiver<'a> {
 }
 
 impl<'a> UpdateTestResultWaiver<'a> {
-    // Use this method when creating the waive request.
+    /// constructor for [`UpdateTestResultWaiver`] from an existing [`Update`] value
     pub fn from_update(update: &'a Update, comment: &'a str) -> Self {
         UpdateTestResultWaiver {
             alias: &update.alias,
@@ -380,6 +384,9 @@ impl<'a> UpdateTestResultWaiver<'a> {
         }
     }
 
+    /// method for setting the tests for which results should be waived
+    ///
+    /// If no tests are explicitly specified by using this method, all test results are waived.
     #[must_use]
     pub fn tests(mut self, tests: &'a [String]) -> Self {
         self.tests = Some(tests);
@@ -427,18 +434,20 @@ impl<'a> SingleRequest<WaivedUpdate, Update> for UpdateTestResultWaiver<'a> {
     }
 }
 
+
 impl Update {
-    // This method creates a new `UpdateEditor` for editing this `Update`.
+    /// constructor for [`UpdateEditor`] which takes parameters from an existing [`Update`]
     pub fn edit(&self) -> UpdateEditor {
         UpdateEditor::from_update(self)
     }
 
-    // This method creates a new `UpdateStatusRequester` for editing this `Update`.
+    /// constructor for [`UpdateStatusRequester`] which takes parameters from an existing [`Update`]
     pub fn request(&self, request: UpdateRequest) -> UpdateStatusRequester {
         UpdateStatusRequester::from_update(self, request)
     }
 
-    // This method creates a new `UpdateTestResultWaiver` for editing this `Update`.
+    /// constructor for [`UpdateTestResultWaiver`] which takes parameters from an existing
+    /// [`Update`]
     pub fn waive<'a>(&'a self, comment: &'a str) -> UpdateTestResultWaiver<'a> {
         UpdateTestResultWaiver::from_update(self, comment)
     }

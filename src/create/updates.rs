@@ -18,6 +18,11 @@ pub struct NewUpdate {
     pub update: Update,
     /// additional server messages
     pub caveats: Vec<HashMap<String, String>>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 #[derive(Debug)]
