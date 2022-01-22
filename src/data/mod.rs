@@ -1,10 +1,19 @@
-// ! This module contains the data types that are needed to deserialize bodhi server responses which
-// ! are also public outside this crate. Some internal data types for queries are implemented in the
-// ! corresponding query module.
-// !
-// ! Additionally, the bodhi REST API has some arguments that accept Strings, but only from a
-// limited ! set of enumerated values. To abstract this, the corresponding query filters accept some
-// of the ! enum types defined here, instead of the String arguments directly.
+//! data type definitions for (de)serializing bodhi server requests and responses
+//!
+//! This module contains the data type definitions that are needed for deserializing bodhi server
+//! responses, and for serializing bodhi server request data, which are also expored as public
+//! API. Some internal wrapper types are implemented in the corresponding modules themselves.
+//!
+//! Additionally, the bodhi API accepts some arguments that are formally Strings, but only from a
+//! limited set of valid values. Enumerations for all such types, plus (de)serialization support,
+//! are provided in this module, as well.
+//!
+//! The bodhi server also returns date/time values in a non-standard format (neither RFC 3339 nor
+//! ISO 8601 compliant). The [`BodhiDate`] wrapper type provides convenient parsing, printing, and
+//! (de)serialization support for this format.
+//!
+//! FIXME mention [`FedoraRelease`] newtype wrapper around String with future-proof validated
+//!   contents
 
 mod dates;
 pub use dates::*;

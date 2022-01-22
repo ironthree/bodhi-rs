@@ -6,6 +6,10 @@ use crate::data::{Update, UpdateData, UpdateRequest, UpdateSeverity, UpdateSugge
 use crate::error::QueryError;
 use crate::request::{RequestMethod, SingleRequest};
 
+// imports for intra-doc links
+#[cfg(doc)]
+use crate::data::UpdateStatus;
+
 /// data of this type is returned after successfully creating a new [`Update`]
 #[derive(Debug, Deserialize)]
 pub struct NewUpdate {
@@ -206,7 +210,7 @@ impl<'a> UpdateCreator<'a> {
     }
 
     /// method for setting the optional preference whether an update should be pushed to stable
-    /// after having been in the [`UpdateState::Testing`] state for at least `stable_days` days
+    /// after having been in the [`UpdateStatus::Testing`] state for at least `stable_days` days
     #[must_use]
     pub fn autotime(mut self, autotime: bool) -> Self {
         self.autotime = Some(autotime);

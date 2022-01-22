@@ -40,7 +40,7 @@ pub struct TestCaseFeedbackData<'a> {
 }
 
 impl<'a> TestCaseFeedbackData<'a> {
-    /// constructor for [`TestCaseFeedBackData`] with arguments for both mandatory parameters
+    /// constructor for [`TestCaseFeedbackData`] with arguments for both mandatory parameters
     pub fn new(testcase_name: &'a str, karma: Karma) -> Self {
         TestCaseFeedbackData { testcase_name, karma }
     }

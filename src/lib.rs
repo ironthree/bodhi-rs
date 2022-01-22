@@ -150,6 +150,7 @@
 #![warn(missing_docs)]
 #![warn(missing_debug_implementations)]
 #![warn(clippy::unwrap_used)]
+#![deny(rustdoc::broken_intra_doc_links)]
 
 pub mod data;
 pub use data::*;
