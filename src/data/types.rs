@@ -179,7 +179,7 @@ pub struct Compose {
     // flag to indicate whether a compose contains security updates
     pub security: bool,
     // state of the compose
-    pub state: ComposeStatus,
+    pub state: ComposeState,
     // date & time the compose status was last updated
     #[serde(with = "bodhi_date_format")]
     pub state_date: BodhiDate,

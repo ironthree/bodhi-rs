@@ -19,7 +19,7 @@ fn idem_compose_request() {
 
 #[test]
 fn idem_compose_status() {
-    use ComposeStatus::*;
+    use ComposeState::*;
 
     let strings = vec![
         "cleaning",
@@ -50,11 +50,11 @@ fn idem_compose_status() {
     ];
 
     for string in strings {
-        assert_eq!(string.parse::<ComposeStatus>().unwrap().to_string(), string);
+        assert_eq!(string.parse::<ComposeState>().unwrap().to_string(), string);
     }
 
     for value in values {
-        assert_eq!(value.to_string().parse::<ComposeStatus>().unwrap(), value);
+        assert_eq!(value.to_string().parse::<ComposeState>().unwrap(), value);
     }
 }
 

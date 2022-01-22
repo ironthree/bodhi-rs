@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-/// error type that is returned when attempting to parse invalid input
+/// error representing an attempt to parse invalid data
 #[derive(Debug, Error)]
 #[error("Invalid value for {}: {}", .name, .value)]
 pub struct InvalidValueError {

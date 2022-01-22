@@ -164,6 +164,30 @@ mod el {
     }
 }
 
+
+/// type representing a valid Fedora or EPEL release identifier
+///
+/// [`FedoraRelease`] is implemented as a newtype wrapper around strings, but all public methods of
+/// constructing values ensure only instances containing valid release identifiers can be built.
+///
+/// The regular expressions that are used to validate and parse strings into valid [`FedoraRelease`]
+/// values are defined in a way that should make future adjustments for new releases unnecessary.
+/// For example, arbitrarily large numbers are supported. The only hard-coded parameters are the
+/// known suffixes:
+///
+/// - no suffix: [`ContentType::RPM`]
+/// - suffix `C`: [`ContentType::Container`]
+/// - suffix `F`: [`ContentType::Flatpak`]
+/// - suffix `M`: [`ContentType::Module`]
+/// - suffix `N`: EPEL-next
+///
+/// Additionally, there are predefined [`FedoraRelease`] constants for nonvariable releases, and for
+/// special values that are accepted by bodhi queries:
+///
+/// - [`FedoraRelease::ELN´]
+/// - [`FedoraRelease::CURRENT`]
+/// - [`FedoraRelease::PENDING`]
+/// - [`FedoraRelease::ARCHIVED`]
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(transparent)]
 pub struct FedoraRelease {
@@ -171,10 +195,14 @@ pub struct FedoraRelease {
 }
 
 impl FedoraRelease {
+    /// constant that refers to all releases that are currently supported
     pub const CURRENT: Self = Self::from_static_str("__current__");
+    /// constant that refers to all releases that are currently in development
     pub const PENDING: Self = Self::from_static_str("__pending__");
+    /// constant that refers to all releases which have been archived after their end-of-life (EOL)
     pub const ARCHIVED: Self = Self::from_static_str("__archived__");
 
+    /// constant that refers to the static "ELN" ("Enterprise Linux Next") release
     pub const ELN: Self = Self::from_static_str("ELN");
 
     // internal method for constructing instances in const contexts
@@ -191,16 +219,38 @@ impl FedoraRelease {
         }
     }
 
+    /// construct and validate a Fedora [`FedoraRelease`] value from its parts
+    ///
+    /// The validation process takes various constraints into account:
+    ///
+    /// - release number of the first Fedora release known to bodhi (Fedora 21)
+    /// - release number of the first Fedora release that supported Containers (Fedora 28)
+    /// - release number of the first Fedora release that supported Modules (Fedora 27)
+    /// - release number of the first Fedora release that supported Flatpaks (Fedora 29)
+    ///
+    /// However, since no information about the future is available, no maximum supported
+    /// Fedora release is checked against.
     pub fn fedora(number: u32, ctype: ContentType) -> Result<Self, InvalidValueError> {
         let string = format!("F{}{}", number, ctype.suffix());
         string.parse()
     }
 
+    /// construct and validate a EPEL [`FedoraRelease` value from its parts
+    ///
+    /// The validation process takes various constraints into account:
+    ///
+    /// - release number of the first EPEL releases known to bodhi (EL-5, EPEL-7)
+    /// - release numbers for which the identifier prefix is `EL-` (5, 6)
+    /// - release numbers for which the identifier prefix is `EPEL-` (7+)
+    /// - which content types are valid for EPEL releases (RPMs and Modules)
+    /// - release number of the first EPEL release that supported Modules (8)
+    /// - release number of the first EPEL release with a `-next` branch (8)
+    ///
+    /// However, no maximum release numbers are checked against during validation, due to lack of
+    /// information about future events.
     pub fn epel(number: u32, ctype: ContentType, next: bool) -> Result<Self, InvalidValueError> {
         let prefix = if number < 7 { "EL" } else { "EPEL" };
-
         let suffix = if next { "N" } else { "" };
-
         let string = format!("{}-{}{}{}", prefix, number, ctype.suffix(), suffix);
         string.parse()
     }

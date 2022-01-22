@@ -7,7 +7,11 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use super::InvalidValueError;
 
-// This enum represents the possible request values for composes.
+// imports for intra-doc links
+#[cfg(doc)]
+use super::FedoraRelease;
+
+/// valid `request` values for composes
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum ComposeRequest {
@@ -49,10 +53,10 @@ impl FromStr for ComposeRequest {
 }
 
 
-// This enum represents the possible status values for composes.
+/// valid `state` values for composes
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
-pub enum ComposeStatus {
+pub enum ComposeState {
     #[serde(rename = "cleaning")]
     Cleaning,
     #[serde(rename = "failed")]
@@ -77,48 +81,48 @@ pub enum ComposeStatus {
     UpdateInfo,
 }
 
-impl Display for ComposeStatus {
+impl Display for ComposeState {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         let value = match self {
-            ComposeStatus::Cleaning => "cleaning",
-            ComposeStatus::Failed => "failed",
-            ComposeStatus::Initializing => "initializing",
-            ComposeStatus::Notifying => "notifying",
-            ComposeStatus::Pending => "pending",
-            ComposeStatus::Punging => "punging",
-            ComposeStatus::Requested => "requested",
-            ComposeStatus::SigningRepo => "signing_repo",
-            ComposeStatus::Success => "success",
-            ComposeStatus::SyncingRepo => "syncing_repo",
-            ComposeStatus::UpdateInfo => "updateinfo",
+            ComposeState::Cleaning => "cleaning",
+            ComposeState::Failed => "failed",
+            ComposeState::Initializing => "initializing",
+            ComposeState::Notifying => "notifying",
+            ComposeState::Pending => "pending",
+            ComposeState::Punging => "punging",
+            ComposeState::Requested => "requested",
+            ComposeState::SigningRepo => "signing_repo",
+            ComposeState::Success => "success",
+            ComposeState::SyncingRepo => "syncing_repo",
+            ComposeState::UpdateInfo => "updateinfo",
         };
 
         write!(f, "{}", value)
     }
 }
 
-impl TryFrom<&str> for ComposeStatus {
+impl TryFrom<&str> for ComposeState {
     type Error = InvalidValueError;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value.to_lowercase().as_str() {
-            "cleaning" => Ok(ComposeStatus::Cleaning),
-            "failed" => Ok(ComposeStatus::Failed),
-            "initializing" => Ok(ComposeStatus::Initializing),
-            "notifying" => Ok(ComposeStatus::Notifying),
-            "pending" => Ok(ComposeStatus::Pending),
-            "punging" => Ok(ComposeStatus::Punging),
-            "requested" => Ok(ComposeStatus::Requested),
-            "signing_repo" => Ok(ComposeStatus::SigningRepo),
-            "success" => Ok(ComposeStatus::Success),
-            "syncing_repo" => Ok(ComposeStatus::SyncingRepo),
-            "updateinfo" => Ok(ComposeStatus::UpdateInfo),
+            "cleaning" => Ok(ComposeState::Cleaning),
+            "failed" => Ok(ComposeState::Failed),
+            "initializing" => Ok(ComposeState::Initializing),
+            "notifying" => Ok(ComposeState::Notifying),
+            "pending" => Ok(ComposeState::Pending),
+            "punging" => Ok(ComposeState::Punging),
+            "requested" => Ok(ComposeState::Requested),
+            "signing_repo" => Ok(ComposeState::SigningRepo),
+            "success" => Ok(ComposeState::Success),
+            "syncing_repo" => Ok(ComposeState::SyncingRepo),
+            "updateinfo" => Ok(ComposeState::UpdateInfo),
             _ => Err(InvalidValueError::new("ComposeStatus", value.to_owned())),
         }
     }
 }
 
-impl FromStr for ComposeStatus {
+impl FromStr for ComposeState {
     type Err = InvalidValueError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -126,7 +130,8 @@ impl FromStr for ComposeStatus {
     }
 }
 
-// This enum represents the type of a bodhi update, of a package, and of builds.
+/// valid / known content types
+#[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum ContentType {
     // tag for container image updates
@@ -144,7 +149,8 @@ pub enum ContentType {
 }
 
 impl ContentType {
-    pub fn suffix(&self) -> &str {
+    /// method for returning the [`FedoraRelease`] suffix corresponding to this [`ContentType`]
+    pub const fn suffix(&self) -> &str {
         use ContentType::*;
 
         match self {
@@ -155,6 +161,7 @@ impl ContentType {
         }
     }
 
+    /// method for parsing [`FedoraRelease`] suffixes into a [`ContentType`]
     pub fn try_from_suffix(suffix: &str) -> Result<Self, InvalidValueError> {
         match suffix {
             "" => Ok(ContentType::RPM),
@@ -204,20 +211,28 @@ impl FromStr for ContentType {
     }
 }
 
-
-// This enum represents a "Karma" value, which is either a positive (+1), neutral (±0), or negative
-// (-1) feedback for an update, and is associated with a [`Comment`](struct.Comment.html), and
-// possibly also a [`TestCaseFeedback`](struct.TestCase.html) or a
-// [`BugFeedback`](struct.BugFeedback.html).
+/// valid "karma" values that are associated for update comments and feedback
+///
+/// Only three values are valid: **-1** for positive feedback, **±0** for neutral (or unspecified)
+/// feedback, and **-1** for negative feedback.
+///
+/// This type uses (de)serializaion support from [`serde_repr`] for converting these three numeric
+/// values into the corresponding enum variants.
 #[derive(Clone, Copy, Debug, Deserialize_repr, PartialEq, Serialize_repr)]
 #[repr(i8)]
 pub enum Karma {
-    // positive feedback
+    /// positive feedback
     Positive = 1,
-    // neutral / informational feedback
+    /// neutral / informational feedback (default)
     Neutral = 0,
-    // negative feedback
+    /// negative feedback
     Negative = -1,
+}
+
+impl Default for Karma {
+    fn default() -> Self {
+        Karma::Neutral
+    }
 }
 
 impl Display for Karma {
@@ -256,7 +271,9 @@ impl FromStr for Karma {
 }
 
 
-// This enum represents the name of the package manager that's in use on a release.
+/// valid / known package managers
+///
+/// Values of this type are used to print installation instructions for updates on the server.
 #[allow(missing_docs)]
 #[derive(Debug, Deserialize, PartialEq, Serialize)]
 pub enum PackageManager {
@@ -301,22 +318,22 @@ impl FromStr for PackageManager {
 }
 
 
-// This enum represents the state of a release.
+/// valid `state` values for releases
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
 pub enum ReleaseState {
-    // release has been archived after it has reached its EOL
+    /// release has been archived after it has reached its EOL
     #[serde(rename = "archived")]
     Archived,
-    // release is currently supported
+    /// release is currently supported
     #[serde(rename = "current")]
     Current,
-    // release is disabled
+    /// release is disabled
     #[serde(rename = "disabled")]
     Disabled,
-    // release is frozen
+    /// release is frozen
     #[serde(rename = "frozen")]
     Frozen,
-    // release is in development
+    /// release is in development
     #[serde(rename = "pending")]
     Pending,
 }
@@ -359,7 +376,7 @@ impl FromStr for ReleaseState {
 }
 
 
-// This enum represents the test gating status from `greenwave`.
+/// valid `state` values for an update's gating tests
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
 pub enum TestGatingStatus {
@@ -422,7 +439,7 @@ impl FromStr for TestGatingStatus {
 
 
 // This enum represents the two possible ways to identify a fedora update:
-// - internal, numerical ID
+// - internal, numerical ID (only for compatibility with old releases)
 // - public, human-readable "alias" (`FEDORA-2019-1A2BB23E`)
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(untagged)]
@@ -445,22 +462,22 @@ impl Display for UpdateID {
 }
 
 
-// This enum represents a requested state change of an update.
+/// valid `request` values for updates
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateRequest {
-    // request for an update to be marked as "obsolete" (usually when another update supersedes it)
+    /// request for an update to be marked as "obsolete" (usually when another update supersedes it)
     #[serde(rename = "obsolete")]
     Obsolete,
-    // request for the update to be "revoked" or removed
+    /// request for the update to be "revoked" or removed
     #[serde(rename = "revoke")]
     Revoke,
-    // request for the update to get pushed to stable
+    /// request for the update to get pushed to stable
     #[serde(rename = "stable")]
     Stable,
-    // request for the update to get pushed to testing
+    /// request for the update to get pushed to testing
     #[serde(rename = "testing")]
     Testing,
-    // request for the update to get "unpushed" (removed) from testing
+    /// request for the update to get "unpushed" (removed) from testing
     #[serde(rename = "unpush")]
     Unpush,
 }
@@ -503,8 +520,9 @@ impl FromStr for UpdateRequest {
 }
 
 
-// This enum represents the associated severity of a bodhi update. This field is required to not be
-// unspecified for updates with [`UpdateType::Security`](enum.UpdateType.html).
+/// valid `severity` values for updates
+///
+/// This field is required to not be `Unspecified` for updates with type [`UpdateType::Security`].
 #[allow(missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateSeverity {
@@ -518,6 +536,12 @@ pub enum UpdateSeverity {
     Unspecified,
     #[serde(rename = "urgent")]
     Urgent,
+}
+
+impl Default for UpdateSeverity {
+    fn default() -> Self {
+        UpdateSeverity::Unspecified
+    }
 }
 
 impl Display for UpdateSeverity {
@@ -558,28 +582,28 @@ impl FromStr for UpdateSeverity {
 }
 
 
-// This enum represents the current state of a bodhi update.
+/// valid `status` values for updates
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateStatus {
-    // tag for updates that have been obsoleted by another update
+    /// status of updates that have been obsoleted by another update
     #[serde(rename = "obsolete")]
     Obsolete,
-    // tag for updates that are pending for either testing or stable
+    /// status of updates that are pending for either testing or stable
     #[serde(rename = "pending")]
     Pending,
-    // tag for updates that are associated with an active side tag
+    /// status of updates that are associated with an active side tag
     #[serde(rename = "side_tag_active")]
     SideTagActive,
-    // tag for updates that are associated with an expired side tag
+    /// status of updates that are associated with an expired side tag
     #[serde(rename = "side_tag_expired")]
     SideTagExpired,
-    // tag for updates that have been pushed to stable
+    /// status of updates that have been pushed to stable
     #[serde(rename = "stable")]
     Stable,
-    // tag for updates that have been pushed to testing
+    /// status of updates that have been pushed to testing
     #[serde(rename = "testing")]
     Testing,
-    // tag for updates that have been "unpushed" from testing
+    /// status of updates that have been "unpushed" from testing
     #[serde(rename = "unpushed")]
     Unpushed,
 }
@@ -626,18 +650,24 @@ impl FromStr for UpdateStatus {
 }
 
 
-// This enum represents the associated suggested action for a bodhi update.
+/// valid `suggestion` values for updates
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateSuggestion {
-    // recommendation to log out for the update to get applied
+    /// recommendation for logging out after this update has been installed
     #[serde(rename = "logout")]
     Logout,
-    // recommendation to reboot for the update to get applied
+    /// recommendation for rebooting after this update has been installed
     #[serde(rename = "reboot")]
     Reboot,
-    // no recommendation
+    /// no recommendation (default)
     #[serde(rename = "unspecified")]
     Unspecified,
+}
+
+impl Default for UpdateSuggestion {
+    fn default() -> Self {
+        UpdateSuggestion::Unspecified
+    }
 }
 
 impl Display for UpdateSuggestion {
@@ -674,20 +704,30 @@ impl FromStr for UpdateSuggestion {
 }
 
 
-// This enum represents the type of a bodhi update.
-#[allow(missing_docs)]
+/// valid `type` values for updates
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
 pub enum UpdateType {
+    /// the update contains fixes for known bugs
     #[serde(rename = "bugfix")]
     BugFix,
+    /// the update includes new features or other improvements
     #[serde(rename = "enhancement")]
     Enhancement,
+    /// the update includes new packages
     #[serde(rename = "newpackage")]
     NewPackage,
+    /// the update includes fixes for security problems
     #[serde(rename = "security")]
     Security,
+    /// unspecified type (default)
     #[serde(rename = "unspecified")]
     Unspecified,
+}
+
+impl Default for UpdateType {
+    fn default() -> Self {
+        UpdateType::Unspecified
+    }
 }
 
 impl Display for UpdateType {
