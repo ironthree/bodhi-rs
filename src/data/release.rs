@@ -165,7 +165,7 @@ mod el {
 }
 
 
-/// type representing a valid Fedora or EPEL release identifier
+/// newtype wrapper around strings that represents a valid Fedora or EPEL release identifier
 ///
 /// [`FedoraRelease`] is implemented as a newtype wrapper around strings, but all public methods of
 /// constructing values ensure only instances containing valid release identifiers can be built.
@@ -184,7 +184,7 @@ mod el {
 /// Additionally, there are predefined [`FedoraRelease`] constants for nonvariable releases, and for
 /// special values that are accepted by bodhi queries:
 ///
-/// - [`FedoraRelease::ELN´]
+/// - [`FedoraRelease::ELN`]
 /// - [`FedoraRelease::CURRENT`]
 /// - [`FedoraRelease::PENDING`]
 /// - [`FedoraRelease::ARCHIVED`]
@@ -235,7 +235,7 @@ impl FedoraRelease {
         string.parse()
     }
 
-    /// construct and validate a EPEL [`FedoraRelease` value from its parts
+    /// construct and validate a EPEL [`FedoraRelease`] value from its parts
     ///
     /// The validation process takes various constraints into account:
     ///

@@ -1,4 +1,4 @@
-//! wrappers for API calls that create new things
+//! # wrappers for API calls that create new things
 //!
 //! This module contains data type definitions and request implementations related to creating
 //! comments, overrides, and updates on a bodhi instance.

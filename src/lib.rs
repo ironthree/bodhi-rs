@@ -1,5 +1,7 @@
+//! # bodhi-rs
+//!
 //! This crate provides an opinionated, idiomatic, and async-aware Rust wrapper around the REST API
-//! of the [bodhi] web service.
+//! that is provided by the [bodhi] web service.
 //!
 //! [bodhi]: https://github.com/fedora-infra/bodhi
 //!
@@ -98,10 +100,6 @@
 //! # })
 //! ```
 //!
-//! ## Data type definitions
-//!
-//! serde all schemas structs and enums and custom release type blah blah blah FIXME
-//!
 //! ## Changing default session parameters
 //!
 //! It is possible to customize some of the default behaviour of a [`BodhiService`] by calling
@@ -127,25 +125,6 @@
 //!     .unwrap();
 //! # })
 //! ```
-
-// ! The library is structured like this:
-// !
-// ! - [`BodhiService`](service/struct.BodhiService.html), which contains all information related to
-// !   connecting to a remote bodhi instance
-// ! - a set of `*Query` structs and implementations for querying bodhi, which wrap the REST API
-// with !   a Rust-y API
-// ! - a set of `Create` implementations for creating new data on bodhi
-// ! - a set of `Edit` implementations for editing data on bodhi
-// ! - data type and enum definitions, used for (de)serializing JSON values with [serde]
-// !
-// ! [serde]: https://docs.rs/serde
-// !
-// ! ## Data type definitions
-// !
-// ! The data type definitions used for deserializing the server JSON responses are contained in the
-// ! `data` module. Some definitions are used only internally (for example, for deserializing
-// ! paginated results), and are not publicly exported. They are located next to the `Query` they
-// are ! used for.
 
 #![warn(missing_docs)]
 #![warn(missing_debug_implementations)]
@@ -174,7 +153,7 @@ pub(crate) mod request;
 #[cfg(test)]
 mod tests;
 
-/// release notes for all versions of this crate
+/// # release notes for all versions of this crate
 #[doc = include_str!("../NEWS.md")]
 #[cfg(doc)]
 #[allow(unused_imports)]

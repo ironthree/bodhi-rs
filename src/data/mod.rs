@@ -1,4 +1,4 @@
-//! data type definitions for (de)serializing bodhi server requests and responses
+//! # data type definitions for (de)serializing bodhi server requests and responses
 //!
 //! This module contains the data type definitions that are needed for deserializing bodhi server
 //! responses, and for serializing bodhi server request data, which are also expored as public

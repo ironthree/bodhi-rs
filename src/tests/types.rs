@@ -8,6 +8,7 @@ fn bug_url() {
         security: false,
         title: None,
         extra: Default::default(),
+        private: (),
     };
 
     assert_eq!(
@@ -22,6 +23,7 @@ fn testcase_url() {
         name: String::from("QA:Foo Bar Baz"),
         package: None,
         extra: Default::default(),
+        private: (),
     };
 
     assert_eq!(

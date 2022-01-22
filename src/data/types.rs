@@ -8,21 +8,26 @@ use super::dates::*;
 use super::enums::*;
 use super::release::FedoraRelease;
 
-// This struct represents a specific BugZilla bug that is associated with an update.
+/// data type that represents a BugZilla bug that is associated with an update
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Bug {
-    // bug ID in the BugZilla system: <https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}>
+    /// bug ID in the BugZilla system: <https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}>
     pub bug_id: u32,
-    // flag to indicate whether this bug has been tagged as a parent / tracking bug
+    /// flag to indicate whether this bug has been tagged as a parent / tracking bug
     pub parent: bool,
-    // flag to indicate whether this bug has been tagged as a `Security` issue
+    /// flag to indicate whether this bug has been tagged as a `Security` issue
     pub security: bool,
-    // title of the bug in BugZilla
+    /// title of the bug in BugZilla
     pub title: Option<String>,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for Bug {
@@ -41,28 +46,34 @@ impl Display for Bug {
 }
 
 impl Bug {
-    // This method constructs the URL of the bug on Red Hat BugZilla.
+    /// construct the Red Hat BugZilla (RHBZ) URL from this [`Bug`] from its ID
     pub fn url(&self) -> Url {
         Url::parse(&format!("https://bugzilla.redhat.com/show_bug.cgi?id={}", self.bug_id))
             .expect("Failed to parse the hard-coded URL, this should not happen.")
     }
 }
 
-// This struct represents an update feedback item associated with a specific bug.
+
+/// data type that represents a feedback item for a bug that is associated with an update
 #[derive(Debug, Deserialize, Serialize)]
 pub struct BugFeedback {
-    // bug this feedback is associated with
+    /// bug this feedback is associated with
     pub bug: Option<Bug>,
-    // ID of the bug this feedback is associated with
+    /// ID of the bug that this feedback is associated with
     pub bug_id: u32,
-    // ID of the comment that this feedback is associated with
+    /// ID of the comment that this feedback is associated with
     pub comment_id: Option<u32>,
-    // feedback (positive, neutral, negative)
+    /// feedback karma (positive, neutral, negative)
     pub karma: Karma,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for BugFeedback {
@@ -72,24 +83,29 @@ impl Display for BugFeedback {
 }
 
 
-// This struct represents a specific koji build that bodhi is aware of.
+/// data type that represents a koji build that is associated with an update
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Build {
-    // epoch associated with this build
+    /// Epoch value of this build (`None` if unspecified)
     pub epoch: Option<u32>,
-    // (Name-Version-Release) value for this build
+    /// NVR (Name-Version-Release) string of this build
     pub nvr: String,
-    // release ID of the release this build is associated with
+    /// release ID of the release that this build is associated with
     pub release_id: Option<u32>,
-    // flag to indicate whether this build has been signed yet
+    /// flag to indicate whether this build has been signed yet
     pub signed: bool,
-    // type of this build; one of: `container`, `flatpak`, `module`, `rpm`
+    /// build type (RPM, container, flatpak, module)
     #[serde(rename = "type")]
     pub build_type: ContentType,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for Build {
@@ -109,41 +125,49 @@ impl Display for Build {
 }
 
 
-// This struct represents one comment against a specific update, along with its associated bug and
-// test case feedback.
+/// data type that represents a comment on an update (including bug and test case feedback)
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Comment {
     // author of the comment (username), only provided for backwards compatibility
+    #[deprecated(since = "2.0.0")]
     author: Option<String>,
-    // list of bug feedback items
+    /// list of bug feedback items
     pub bug_feedback: Vec<BugFeedback>,
-    // numerical ID of this comment
+    /// numerical ID of this comment
     pub id: u32,
-    // feedback associated with this comment
+    /// karma feedback associated with this comment
     pub karma: Karma,
-    // feedback associated with "critpath" checks (deprecated)
+    // feedback associated with "critpath" checks
+    #[deprecated(since = "2.0.0")]
     karma_critpath: Karma,
-    // list of test case feedback items
+    /// list of test case feedback items
     pub testcase_feedback: Vec<TestCaseFeedback>,
-    // text of the comment
+    /// text of the comment
     pub text: String,
-    // date & time this comment was published
+    /// date & time this comment was published
     #[serde(with = "bodhi_date_format")]
     pub timestamp: BodhiDate,
-    // update this comment is associated with
+    /// update this comment is associated with
     pub update: Option<Update>,
-    // ID of the update this comment is associated with
+    /// ID of the update this comment is associated with
     pub update_id: u32,
-    // alias of the update this comment is for, only provided for backwards compatibility
+    // alias of the update this comment is associated with
+    // (only provided for backwards compatibility)
+    #[deprecated(since = "2.0.0")]
     update_alias: Option<String>,
-    // user who submitted this comment
+    /// user who submitted this comment
     pub user: User,
-    // user ID of the user who submitted this comment
+    /// user ID of the user who submitted this comment
     pub user_id: u32,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for Comment {
@@ -158,37 +182,45 @@ impl Display for Comment {
 }
 
 
-// This struct represents a currently running compose.
+/// data type that represents a (running) compose for an "updates" or "updates-testing" repository
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Compose {
-    // string of JSON-formatted checkpoint data for the compose
+    /// string of JSON-formatted checkpoint data for the compose
     pub checkpoints: String,
-    // type of the contained contents (RPMs, containers, flatpaks, modules)
+    /// type of the contained contents (RPMs, containers, flatpaks, modules)
     pub content_type: Option<ContentType>,
-    // date & time this compose was triggered
+    /// date & time when this compose was triggered
     #[serde(with = "bodhi_date_format")]
     pub date_created: BodhiDate,
-    // error message in case of failure, else empty string
+    /// error message in case of failures (empty string if no errors have occurred yet)
     pub error_message: Option<String>,
-    // release this compose is running for
+    /// release this compose is associated with
     pub release: Option<Release>,
-    // ID of the release this compose is running for
+    /// numerical ID of the release this compose is associated with
     pub release_id: u32,
-    // request for the compose (stable or testing)
+    /// target of the compose:
+    ///
+    /// - stable: "updates" repository
+    /// - testing: "updates-testing" repository
     pub request: ComposeRequest,
-    // flag to indicate whether a compose contains security updates
+    /// flag to indicate whether this compose contains security updates
     pub security: bool,
-    // state of the compose
+    /// current state of the compose
     pub state: ComposeState,
-    // date & time the compose status was last updated
+    /// date & time when the compose status was last updated
     #[serde(with = "bodhi_date_format")]
     pub state_date: BodhiDate,
-    // list of summaries for the contained updates (with update alias and title)
+    /// list of summaries for the contained updates (contains update aliases and titles)
     pub update_summary: Vec<UpdateSummary>,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for Compose {
@@ -215,15 +247,20 @@ impl Display for Compose {
 }
 
 
-// This struct represents a group from the fedora accounts system (FAS).
+/// data type that represents a group of users in the fedora accounts system (FAS)
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Group {
-    // name of the group
+    /// name of the group
     pub name: String,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for Group {
@@ -233,34 +270,40 @@ impl Display for Group {
 }
 
 
-// This struct represents a buildroot override, along with the associated build.
+/// data type that represents a buildroot override and its associated koji build
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Override {
-    // build associated with this buildroot override
+    /// koji build that is associated with this buildroot override
     pub build: Build,
-    // build ID of the build associated with this buildroot override
+    /// build ID of the koji build that is associated with this buildroot override
     pub build_id: u32,
-    // date & time this buildroot override will expire
+    /// date & time when this buildroot override will expire
     #[serde(with = "bodhi_date_format")]
     pub expiration_date: BodhiDate,
-    // date & time this buildroot override has expired
+    /// date & time when this buildroot override has expired
     #[serde(with = "option_bodhi_date_format")]
     pub expired_date: Option<BodhiDate>,
-    // public notes associated with this buildroot override
+    /// notes associated with this buildroot override
     pub notes: String,
-    // value of (Name-Version-Release) of the build associated with this buildroot override
+    /// NVR (Name-Version-Release) string of the build that is associated with this buildroot
+    /// override
     pub nvr: String,
-    // date & time this buildroot override was submitted
+    /// date & time when this buildroot override was submitted
     #[serde(with = "bodhi_date_format")]
     pub submission_date: BodhiDate,
-    // user who submitted this buildroot override
+    /// user who submitted this buildroot override
     pub submitter: User,
-    // user ID of the user who submitted this buildroot override
+    /// user ID of the user who submitted this buildroot override
     pub submitter_id: u32,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for Override {
@@ -282,20 +325,25 @@ impl Display for Override {
 }
 
 
-// This struct represents a specific fedora package (or another distributable unit)
+/// data type that represents a package (or other distributable content) known to bodhi
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Package {
-    // unique name of the (source) package (or container, flatpak, or module, as appropriate)
+    /// unique identifier of the (source) package (or container, flatpak, or module, as appropriate)
     pub name: String,
-    // content type; one of: `rpm`, `container`, `flatpak`, `module`
+    /// type of the associated contents (RPM package, container image, flatpak image, DNF module)
     #[serde(rename = "type")]
     pub package_type: ContentType,
-    // test case requirements associated with this package
+    /// test case requirements associated with this package
     pub requirements: Option<String>,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for Package {
@@ -310,54 +358,58 @@ impl Display for Package {
 }
 
 
-// This struct represents a fedora release as present in the bodhi database. This includes variants
-// (Modular, Container, Flatpak), identified with the "C", "F", and "M" suffixes.
+/// data type that represents a release (or release variant, based on content type) known to bodhi
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Release {
-    // dist-git branch for this release
+    /// name of the dist-git branch that is associated with this release
     pub branch: String,
-    // name of the tag for update candidates
+    /// name of the koji tag for update candidates
     pub candidate_tag: String,
-    // flag to indicate whether this release is composed by bodhi
+    /// flag to indicate whether this release is composed by bodhi itself
     pub composed_by_bodhi: bool,
-    // optional list of running composes for this release
+    /// optional list of running composes for this release
     pub composes: Option<Vec<Compose>>,
-    // flag to indicate whether updates are automatically created for this release
+    /// flag to indicate whether updates should automatically be created for this release
     pub create_automatic_updates: Option<bool>,
-    // value of the RPM `%{?dist}` tag on this release
+    /// value of the RPM `%{?dist}` tag on this release
     pub dist_tag: String,
-    // prefix for update aliases: one of `FEDORA{-EPEL,}{-CONTAINER,-FLATPAK,-MODULAR,}`
+    /// update alias prefix for this release (`FEDORA{-EPEL,}{-CONTAINER,-FLATPAK,-MODULAR,}`)
     pub id_prefix: String,
-    // long name of this release
+    /// long name of this release
     pub long_name: String,
-    // name of the email template for errata
+    /// name of the email template for errata
     pub mail_template: String,
-    // short name of this release
+    /// short identifier of this release
     pub name: FedoraRelease,
-    // package manager in use on this release
+    /// package manager that is used on this release (parsed into [`PackageManager`] variants)
     pub package_manager: PackageManager,
-    // name of the tag for builds in buildroot overrides
+    /// name of the tag for builds in buildroot overrides
     pub override_tag: String,
-    // name of the tag for builds that are pending to be signed
+    /// name of the tag for builds that are pending to be signed
     pub pending_signing_tag: String,
-    // name of the tag for builds that are pending to be pushed to stable
+    /// name of the tag for builds that are pending to be pushed to stable
     pub pending_stable_tag: String,
-    // name of the tag for builds that are pending to be pushed to testing
+    /// name of the tag for builds that are pending to be pushed to testing
     pub pending_testing_tag: String,
-    // name of the tag for builds that have been pushed to stable
+    /// name of the tag for builds that have been pushed to stable
     pub stable_tag: String,
-    // current state of this release; one of: `archived`, `current`, `pending`
+    /// current state of this release (parsed into [`ReleaseState`] variants)
     pub state: ReleaseState,
-    // name of the repository used for testing updates
+    /// name of the repository that is used for testing updates
     pub testing_repository: Option<String>,
-    // name of the tag for builds that have been pushed to testing
+    /// name of the tag for builds that have been pushed to testing
     pub testing_tag: String,
-    // version string of this release
+    /// Fedora version string corresponding to this release
     pub version: String,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for Release {
@@ -378,17 +430,22 @@ impl Display for Release {
 }
 
 
-// This struct represents a specific test case as associated with a package.
+/// data type that represents a test case that is associated with a package
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TestCase {
-    // name of this test case
+    /// name of this test case
     pub name: String,
-    // package this test case is associated with
+    /// package that this test case is associated with
     pub package: Option<Package>,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for TestCase {
@@ -408,7 +465,7 @@ impl Display for TestCase {
 }
 
 impl TestCase {
-    // This method constructs the URL of the test case on the fedora wiki.
+    /// construct the Fedora Project Wiki URL for this [`TestCase`] from its name
     pub fn url(&self) -> Url {
         Url::parse(&format!(
             "https://fedoraproject.org/wiki/{}",
@@ -419,21 +476,26 @@ impl TestCase {
 }
 
 
-// This struct represents an update feedback item associated with a specific test case.
+/// data type that represents a feedback item for a test case that is associated with an update
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TestCaseFeedback {
-    // ID of the comment this feedback is associated with
+    /// ID of the comment that this feedback is associated with
     pub comment_id: Option<u32>,
-    // karma feedback
+    /// feedback karma (positive, neutral, negative)
     pub karma: Karma,
-    // test case this feedback is associated with
+    /// test case that this feedback is associated with
     pub testcase: TestCase,
-    // ID of the test case this feedback is associated with
+    /// ID of the test case that this feedback is associated with
     pub testcase_id: u32,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for TestCaseFeedback {
@@ -443,112 +505,117 @@ impl Display for TestCaseFeedback {
 }
 
 
-// This struct represents a bodhi update, with associated items: bugs, builds, comments, release,
-// status, submitter, etc.
+/// data type that represents an update
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Update {
-    // user-visible, human-readable update alias (`FEDORA-2019-1A2BB23E`)
+    /// user-visible, human-readable update alias (`FEDORA-2019-1A2BB23E`)
     pub alias: String,
-    // flag to indicate whether this update can be pushed to stable automatically based on karma
+    /// flag to indicate whether this update will be pushed to stable automatically (based on karma)
     pub autokarma: bool,
-    // flag to indicate whether this update can be pushed to stable automatically based on time
+    /// flag to indicate whether this update will be pushed to stable automatically (based on time)
     pub autotime: bool,
-    // bugs associated with this update
+    /// list of bugs that are associated with this update
     pub bugs: Vec<Bug>,
-    // builds associated with this update
+    /// list of builds that are associated with this update
     pub builds: Vec<Build>,
-    // flag to indicate whether bugs will be closed when this update is pushed to stable
+    /// flag to indicate whether bugs will be closed when this update is pushed to stable
     pub close_bugs: bool,
-    // list of comments associated with this update
+    /// list of comments that are associated with this update
     pub comments: Option<Vec<Comment>>,
-    // compose this update is currently part of
+    /// currently running compose that this update is included in
     pub compose: Option<Compose>,
-    // content type of this update (RPM, Module, Flatpak, Container)
+    /// type of the contained contents (RPMs, containers, flatpaks, modules)
     pub content_type: Option<ContentType>,
-    // flag to indicate whether this update contains packages from the "critical path"
+    /// flag to indicate whether this update contains packages from the "critical path"
     pub critpath: bool,
-    // date & time when this update has last been approved
+    /// last date & time when this update has been approved
     #[deprecated(
         since = "2.0.0",
         note = "`date_approved` is an unused field: <https://github.com/fedora-infra/bodhi/issues/4171>"
     )]
     #[serde(with = "option_bodhi_date_format")]
     pub date_approved: Option<BodhiDate>,
-    // date & time when this update has last been modified
+    /// date & time when this update was modified
     #[serde(with = "option_bodhi_date_format")]
     pub date_modified: Option<BodhiDate>,
-    // date & time when this update has last been pushed
+    /// date & time when this update was pushed
     #[serde(with = "option_bodhi_date_format")]
     pub date_pushed: Option<BodhiDate>,
-    // date & time when this update has last been pushed to stable
+    /// date & time when this update was pushed to stable
     #[serde(with = "option_bodhi_date_format")]
     pub date_stable: Option<BodhiDate>,
-    // date & time when this update has last been submitted
+    /// date & time when this update was submitted
     #[serde(with = "option_bodhi_date_format")]
     pub date_submitted: Option<BodhiDate>,
-    // date & time when this update has last been pushed to testing
+    /// date & time when this update was pushed to testing
     #[serde(with = "option_bodhi_date_format")]
     pub date_testing: Option<BodhiDate>,
-    // displayed name of this update
+    /// displayed "pretty" name of this update
     pub display_name: String,
-    // side tag this update was created from
+    /// koji side tag that this update was created from
     pub from_tag: Option<String>,
-    // current karma total
+    /// current total of feedback karma values
     pub karma: Option<i32>,
-    // flag indicating whether this update can be edited
+    /// flag indicating whether this update can be edited
     pub locked: bool,
-    // flag indicating whether the update satisfies requirements
+    /// flag indicating whether the update satisfies test requirements
     pub meets_testing_requirements: bool,
-    // public notes associated with this update
+    /// notes / text that is associated with this update
     pub notes: String,
-    // flag indicating whether this update has already been pushed
+    /// flag indicating whether this update has already been pushed
     pub pushed: bool,
-    // release this update was submitted for
+    /// release that this update was submitted for
     pub release: Release,
-    // currently requested new update status
+    /// currently requested new update status
     pub request: Option<UpdateRequest>,
-    // flag to specify whether feedback for bugs is required when counting karma
+    /// flag to specify whether feedback for bugs is required when adding karma to the total
     pub require_bugs: bool,
-    // flag to specify whether feedback for test cases is required when counting karma
+    /// flag to specify whether feedback for test cases is required when adding karma to the total
     pub require_testcases: bool,
-    // comma- or space-separated list of required gating test results
+    /// comma- or space-separated list of required gating test results
     pub requirements: Option<String>,
-    // severity of this update
+    /// severity of this update
     pub severity: UpdateSeverity,
-    // minimum of days this update has to stay in testing
+    /// minimum number of days this update has to stay in the [`UpdateStatus::Testing`] state
     pub stable_days: Option<u32>,
-    // stable karma threshold set for this update
+    /// stable karma threshold for this update
     pub stable_karma: Option<i32>,
-    // current status of this update
+    /// current state of this update
     pub status: UpdateStatus,
-    // suggested action to take after installing this update
+    /// suggested action to take after installing this update
     pub suggest: UpdateSuggestion,
-    // list test cases associated with this update
+    /// list test cases that is  associated with this update
     pub test_cases: Option<Vec<TestCase>>,
-    // greenwave gating status; one of:
-    // `failed`, `greenwave_failed`, `ignored`, `passed`, `waiting`
-    // If this value is `None`, greenwave was not yet enabled when this update was created.
+    /// current greenwave gating status
+    ///
+    /// If this value is `None`, greenwave was not yet enabled when this update was created.
     pub test_gating_status: Option<TestGatingStatus>,
-    // title of this update (automatically computed from build NVRs if `display_name` is not set)
+    /// title of this update (automatically generated from build NVRs if `display_name` is `None`)
     pub title: String,
-    // unstable karma threshold set for this update
+    /// unstable karma threshold for this update
     pub unstable_karma: Option<i32>,
     // updateid is only provided for backwards compatibility with bodhi 1
+    #[deprecated(since = "2.0.0")]
     #[serde(rename = "updateid")]
     update_id: Option<UpdateID>,
-    // type of this update
+    /// type of this update
     #[serde(rename = "type")]
     pub update_type: UpdateType,
-    // public URL of this update
+    /// public URL of this update
     pub url: String,
-    // user who created this update
+    /// user who first created this update
     pub user: User,
-    // SHA-1 hash of the sorted, space-separated NVRs of the included builds
+    /// SHA-1 hash of the sorted, space-separated NVRs of the included builds
     pub version_hash: String,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for Update {
@@ -605,14 +672,18 @@ impl Display for Update {
 }
 
 
-// This struct wraps the short update summaries that are included in running
-// [`Compose`](struct.Compose.html)s.
+/// data type that represents an update summary
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UpdateSummary {
-    // unique update alias identifying the update
+    /// update alias that uniquely identifies the update
     pub alias: String,
-    // user-defined, descriptive update title
+    /// user-defined or automatically generated update title
     pub title: String,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for UpdateSummary {
@@ -622,25 +693,30 @@ impl Display for UpdateSummary {
 }
 
 
-// This struct represents one fedora user that bodhi is aware of.
+/// data type that represents a user in the Fedora Accounts System (FAS) who is known to bodhi
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
-    // URL of the [libravatar](https://www.libravatar.org/) avatar for this user
+    /// URL of the [libravatar](https://www.libravatar.org/) avatar for this user
     pub avatar: Option<String>,
-    // E-Mail address associated with this user (if set to public)
+    /// E-Mail address associated with this user (if public according to their account settings)
     pub email: Option<String>,
-    // group memberships for this user
+    /// list of groups this user is a member of
     pub groups: Vec<Group>,
-    // user ID associated with this user
+    /// user ID that is associated with this user
     pub id: u32,
-    // username identifying this user
+    /// unique FAS username of this user
     pub name: String,
-    // OpenID identity associated with the user
+    /// OpenID identity that is associated with the user
     pub openid: Option<String>,
 
-    // catch-all for fields that are not explicitly deserialized
+    /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
+
+    // private field that makes it impossible to construct values of this type outside this crate
+    #[serde(skip)]
+    #[allow(dead_code)]
+    pub(crate) private: (),
 }
 
 impl Display for User {
