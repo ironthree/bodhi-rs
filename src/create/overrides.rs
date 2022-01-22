@@ -6,7 +6,7 @@ use crate::data::{BodhiDate, Build, Override, OverrideData};
 use crate::error::QueryError;
 use crate::request::{RequestMethod, SingleRequest};
 
-/// data of this type is returned after successfully creating a new buildroot override
+/// data of this type is returned after successfully creating a new buildroot [`Override`]
 #[derive(Debug, Deserialize)]
 pub struct NewOverride {
     /// new buildroot override that was just created

@@ -6,13 +6,13 @@ use crate::data::{Update, UpdateData, UpdateRequest, UpdateSeverity, UpdateSugge
 use crate::error::QueryError;
 use crate::request::{RequestMethod, SingleRequest};
 
-// This struct contains the values that are returned when creating a new update.
+/// data of this type is returned after successfully creating a new [`Update`]
 #[derive(Debug, Deserialize)]
 pub struct NewUpdate {
-    // the newly created update
+    /// new update that was just created
     #[serde(flatten)]
     pub update: Update,
-    // additional server messages
+    /// additional server messages
     pub caveats: Vec<HashMap<String, String>>,
 }
 
@@ -22,8 +22,7 @@ enum UpdateSource<'a> {
     Tag { tag: &'a str },
 }
 
-// This struct contains all the values that are necessary for creating a new update. Methods to
-// supply optional arguments are also available.
+/// data type wrapping all mandatory and optional parameters for creating a new update
 #[derive(Debug)]
 pub struct UpdateCreator<'a> {
     // mandatory fields
@@ -31,8 +30,8 @@ pub struct UpdateCreator<'a> {
     notes: &'a str,
 
     // optional fields
-    bugs: Option<Vec<u32>>,
-    display_name: Option<String>,
+    bugs: Option<&'a [u32]>,
+    display_name: Option<&'a str>,
     close_bugs: Option<bool>,
     update_type: Option<UpdateType>,
     request: Option<UpdateRequest>,
@@ -41,7 +40,7 @@ pub struct UpdateCreator<'a> {
     stable_karma: Option<i32>,
     unstable_karma: Option<i32>,
     suggest: Option<UpdateSuggestion>,
-    requirements: Option<String>,
+    requirements: Option<&'a str>,
     require_bugs: Option<bool>,
     require_testcases: Option<bool>,
     autotime: Option<bool>,
@@ -49,7 +48,8 @@ pub struct UpdateCreator<'a> {
 }
 
 impl<'a> UpdateCreator<'a> {
-    // Use this method when creating an update for a list of builds.
+    /// constructor for [`UpdateCreator`] with a list of build NVRs and update notes as mandatory
+    /// parameters, and default values for all optional parameters
     pub fn from_builds(builds: &'a [&str], notes: &'a str) -> Self {
         UpdateCreator {
             source: UpdateSource::Builds { builds },
@@ -73,7 +73,8 @@ impl<'a> UpdateCreator<'a> {
         }
     }
 
-    // Use this method when creating an update for a side tag.
+    /// constructor for [`UpdateCreator`] with the name of a koji side tag as mandatory argument,
+    /// and default values for all optional parameters
     pub fn from_tag(tag: &'a str, notes: &'a str) -> Self {
         UpdateCreator {
             source: UpdateSource::Tag { tag },
@@ -97,105 +98,126 @@ impl<'a> UpdateCreator<'a> {
         }
     }
 
-    // Add related bug(s) to the update.
+    /// method for setting the optional list of associated bugs
     #[must_use]
-    pub fn bugs(mut self, bugs: Vec<u32>) -> Self {
+    pub fn bugs(mut self, bugs: &'a [u32]) -> Self {
         self.bugs = Some(bugs);
         self
     }
 
-    // Set the flag whether bugs will be closed when the update is pushed to stable.
+    /// method for setting the optional preference whether associated bugs should be closed when
+    /// an update is pushed to stable or not
     #[must_use]
     pub fn close_bugs(mut self, close_bugs: bool) -> Self {
         self.close_bugs = Some(close_bugs);
         self
     }
 
-    // Add a custom user-visible title to the update.
+    /// method for setting an optional "pretty" display name that will be used in the bodhi web UI
+    /// instead of a name that is automatically generated from the list of builds in the update
     #[must_use]
-    pub fn display_name(mut self, display_name: String) -> Self {
+    pub fn display_name(mut self, display_name: &'a str) -> Self {
         self.display_name = Some(display_name);
         self
     }
 
-    // Flag to specify the type of update (new package, bug fix, enhancement, security update, or
-    // unspecified). For security updates, the severity also has to be specified.
+    /// method for optionally setting the update type to a specific value
+    ///
+    /// If no value is specified for the update type, the server will create it with a default
+    /// value of [`UpdateType::Unspecified`].
     #[must_use]
     pub fn update_type(mut self, update_type: UpdateType) -> Self {
         self.update_type = Some(update_type);
         self
     }
 
-    // Flag to specify the update severity (primarily used for security updates, where this flag is
-    // mandatory).
+    /// method for optionally setting the update severity to a specific value
+    ///
+    /// If no value is specified for the update severity, the server will create it with a default
+    /// value of [`UpdateSeverity::Unspecified`].
     #[must_use]
     pub fn severity(mut self, severity: UpdateSeverity) -> Self {
         self.severity = Some(severity);
         self
     }
 
-    // Set the flag whether the update can automatically be pushed to stable once it reaches the
-    // specified stable karma.
+    /// method for setting the optional preference whether an update should be pushed to stable
+    /// after receiving total karma that is equal to or greater than the `stable_karma` value
     #[must_use]
     pub fn autokarma(mut self, autokarma: bool) -> Self {
         self.autokarma = Some(autokarma);
         self
     }
 
-    // Manually set the stable karma feedback threshold.
+    /// method for optionally overriding the default stable karma threshold
+    ///
+    /// The default value is **+3**, and the smallest accepted value is **+1** for normal updates,
+    /// and **+2** for updates that contain packages from the "critical path".
     #[must_use]
     pub fn stable_karma(mut self, stable_karma: i32) -> Self {
         self.stable_karma = Some(stable_karma);
         self
     }
 
-    // Manually set the unstable karma feedback threshold.
+    /// method for optionally overriding the default unstable karma threshold
+    ///
+    /// The default value is **-3**. Updates that receive a total negative karma equal or smaller
+    /// than this threshold are automatically retracted ("unpushed").
     #[must_use]
     pub fn unstable_karma(mut self, unstable_karma: i32) -> Self {
         self.unstable_karma = Some(unstable_karma);
         self
     }
 
-    // Flag to specify whether users should log out or reboot to successfully apply an update.
+    /// method for optionally specifying whether users should reboot or log out after installing
+    /// this update
+    ///
+    /// If no value is specified, the server will create the update with a default value of
+    /// [`UpdateSuggestion::Unspecified`].
     #[must_use]
     pub fn suggest(mut self, suggestion: UpdateSuggestion) -> Self {
         self.suggest = Some(suggestion);
         self
     }
 
-    // Add custom gating test requirements.
+    /// method for setting the optional list of associated gating test requirements
+    ///
+    /// The argument is expected to be a list of test names separated by spaces.
     #[must_use]
-    pub fn requirements(mut self, requirements: String) -> Self {
+    pub fn requirements(mut self, requirements: &'a str) -> Self {
         self.requirements = Some(requirements);
         self
     }
 
-    // Flag to indicate whether bug feedback is required for karma to be counted.
+    /// method for setting the optional preference whether feedback for associated bugs is
+    /// necessary for positive karma to be counted against the total
     #[must_use]
     pub fn require_bugs(mut self, require_bugs: bool) -> Self {
         self.require_bugs = Some(require_bugs);
         self
     }
 
-    // Flag to indicate whether test case feedback is required for karma to be counted.
+    /// method for setting the optional preference whether feedback for associated test cases is
+    /// necessary for positive karma to be counted against the total
     #[must_use]
     pub fn require_testcases(mut self, require_testcases: bool) -> Self {
         self.require_testcases = Some(require_testcases);
         self
     }
 
-    // Set the flag whether the update can automatically be pushed to stable once it reaches the
-    // specified days in testing.
+    /// method for setting the optional preference whether an update should be pushed to stable
+    /// after having been in the [`UpdateState::Testing`] state for at least `stable_days` days
     #[must_use]
     pub fn autotime(mut self, autotime: bool) -> Self {
         self.autotime = Some(autotime);
         self
     }
 
-    // Manually specify the minimum duration the update has to stay in testing.
-    //
-    // The default is 7 days for stable updates, 14 days for stable updates containing critpath
-    // packages, and 3 days for fedora pre-releases.
+    /// method for optionally overriding the default stable days threshold
+    ///
+    /// The default value is **7 days**. The smallest accepted value is **7 days** for normal
+    /// updates, **14 days** for updates that contain packages from the "critical path" or for
+    /// EPEL updates, and **3 days** for updates that are submitted to pre-releases.
     #[must_use]
     pub fn stable_days(mut self, stable_days: u32) -> Self {
         self.stable_days = Some(stable_days);
@@ -259,15 +281,9 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
                 builds: Some(builds),
                 from_tag: None,
                 bugs: bugs.as_ref(),
-                display_name: match &self.display_name {
-                    Some(string) => Some(string),
-                    None => None,
-                },
+                display_name: self.display_name,
                 close_bugs: self.close_bugs,
-                update_type: match self.update_type {
-                    Some(t) => t,
-                    None => UpdateType::Unspecified,
-                },
+                update_type: self.update_type.unwrap_or(UpdateType::Unspecified),
                 request: self.request,
                 severity: self.severity,
                 notes: self.notes,
@@ -276,10 +292,7 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
                 unstable_karma: self.unstable_karma,
                 suggest: self.suggest,
                 edited: None,
-                requirements: match &self.requirements {
-                    Some(string) => Some(string),
-                    None => None,
-                },
+                requirements: self.requirements,
                 require_bugs: self.require_bugs,
                 require_testcases: self.require_testcases,
                 autotime: self.autotime,
@@ -290,15 +303,9 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
                 builds: None,
                 from_tag: Some(tag),
                 bugs: bugs.as_ref(),
-                display_name: match &self.display_name {
-                    Some(string) => Some(string),
-                    None => None,
-                },
+                display_name: self.display_name,
                 close_bugs: self.close_bugs,
-                update_type: match self.update_type {
-                    Some(t) => t,
-                    None => UpdateType::Unspecified,
-                },
+                update_type: self.update_type.unwrap_or(UpdateType::Unspecified),
                 request: self.request,
                 severity: self.severity,
                 notes: self.notes,
@@ -307,10 +314,7 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
                 unstable_karma: self.unstable_karma,
                 suggest: self.suggest,
                 edited: None,
-                requirements: match &self.requirements {
-                    Some(string) => Some(string),
-                    None => None,
-                },
+                requirements: self.requirements,
                 require_bugs: self.require_bugs,
                 require_testcases: self.require_testcases,
                 autotime: self.autotime,

@@ -46,7 +46,7 @@ impl<'a> TestCaseFeedbackData<'a> {
     }
 }
 
-/// data of this type is returned after successfully posting a new comment
+/// data of this type is returned after successfully posting a new [`Comment`]
 #[derive(Debug, Deserialize)]
 pub struct NewComment {
     /// new comment that was just created
@@ -77,14 +77,14 @@ impl<'a> CommentCreator<'a> {
         }
     }
 
-    /// method for setting optional comment text
+    /// method for setting the optional comment text
     #[must_use]
     pub fn text(mut self, text: &'a str) -> Self {
         self.text = Some(text);
         self
     }
 
-    /// method for setting optional karma value
+    /// method for setting the optional karma value
     #[must_use]
     pub fn karma(mut self, karma: Karma) -> Self {
         self.karma = Some(karma);
