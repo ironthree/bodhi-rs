@@ -68,7 +68,7 @@ impl<'a> SingleRequest<Build, Build> for BuildNVRQuery<'a> {
 pub struct BuildQuery<'a> {
     nvr: Option<&'a str>,
     packages: Option<&'a [&'a str]>,
-    releases: Option<&'a [&'a FedoraRelease]>,
+    releases: Option<&'a [FedoraRelease]>,
     updates: Option<&'a [&'a str]>,
 
     // number of results per page
@@ -134,7 +134,7 @@ impl<'a> BuildQuery<'a> {
 
     /// restrict query to builds matching specific releases
     #[must_use]
-    pub fn releases(mut self, releases: &'a [&'a FedoraRelease]) -> Self {
+    pub fn releases(mut self, releases: &'a [FedoraRelease]) -> Self {
         self.releases = Some(releases);
         self
     }
@@ -153,7 +153,7 @@ impl<'a> BuildQuery<'a> {
 pub struct BuildPageQuery<'a> {
     nvr: Option<&'a str>,
     packages: Option<&'a [&'a str]>,
-    releases: Option<&'a [&'a FedoraRelease]>,
+    releases: Option<&'a [FedoraRelease]>,
     updates: Option<&'a [&'a str]>,
 
     page: u32,

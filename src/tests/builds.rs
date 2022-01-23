@@ -8,16 +8,16 @@ async fn query_sanity_packages() {
     let bodhi = bodhi_init().await;
 
     let rs_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().packages(vec!["rust"]))
+        .paginated_request(&BuildQuery::new().packages(&["rust"]))
         .await
         .unwrap();
     let go_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().packages(vec!["golang"]))
+        .paginated_request(&BuildQuery::new().packages(&["golang"]))
         .await
         .unwrap();
 
     let both_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().packages(vec!["rust", "golang"]))
+        .paginated_request(&BuildQuery::new().packages(&["rust", "golang"]))
         .await
         .unwrap();
 
@@ -28,20 +28,20 @@ async fn query_sanity_packages() {
 async fn query_sanity_releases() {
     let bodhi = bodhi_init().await;
 
-    let f31c = FedoraRelease::try_from("F31C").unwrap();
-    let f30c = FedoraRelease::try_from("F30C").unwrap();
+    let f31c = || FedoraRelease::try_from("F31C").unwrap();
+    let f30c = || FedoraRelease::try_from("F30C").unwrap();
 
     let f31c_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().releases(vec![&f31c]))
+        .paginated_request(&BuildQuery::new().releases(&[f31c()]))
         .await
         .unwrap();
     let f30c_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().releases(vec![&f30c]))
+        .paginated_request(&BuildQuery::new().releases(&[f30c()]))
         .await
         .unwrap();
 
     let both_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().releases(vec![&f31c, &f30c]))
+        .paginated_request(&BuildQuery::new().releases(&[f31c(), f30c()]))
         .await
         .unwrap();
 
@@ -53,16 +53,16 @@ async fn query_sanity_updates() {
     let bodhi = bodhi_init().await;
 
     let builds_one: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().updates(vec!["FEDORA-2019-cf87377f5f"]))
+        .paginated_request(&BuildQuery::new().updates(&["FEDORA-2019-cf87377f5f"]))
         .await
         .unwrap();
     let builds_two: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().updates(vec!["FEDORA-2019-24c9d17287"]))
+        .paginated_request(&BuildQuery::new().updates(&["FEDORA-2019-24c9d17287"]))
         .await
         .unwrap();
 
     let both_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().updates(vec!["FEDORA-2019-cf87377f5f", "FEDORA-2019-24c9d17287"]))
+        .paginated_request(&BuildQuery::new().updates(&["FEDORA-2019-cf87377f5f", "FEDORA-2019-24c9d17287"]))
         .await
         .unwrap();
 

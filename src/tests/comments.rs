@@ -8,16 +8,16 @@ async fn query_sanity_packages() {
     let bodhi = bodhi_init().await;
 
     let rs_commis: Vec<Comment> = bodhi
-        .paginated_request(&CommentQuery::new().packages(vec!["rust"]))
+        .paginated_request(&CommentQuery::new().packages(&["rust"]))
         .await
         .unwrap();
     let go_commis: Vec<Comment> = bodhi
-        .paginated_request(&CommentQuery::new().packages(vec!["golang"]))
+        .paginated_request(&CommentQuery::new().packages(&["golang"]))
         .await
         .unwrap();
 
     let both_commis: Vec<Comment> = bodhi
-        .paginated_request(&CommentQuery::new().packages(vec!["rust", "golang"]))
+        .paginated_request(&CommentQuery::new().packages(&["rust", "golang"]))
         .await
         .unwrap();
 
@@ -29,16 +29,16 @@ async fn query_sanity_updates() {
     let bodhi = bodhi_init().await;
 
     let commis_one: Vec<Comment> = bodhi
-        .paginated_request(&CommentQuery::new().updates(vec!["FEDORA-2019-cf87377f5f"]))
+        .paginated_request(&CommentQuery::new().updates(&["FEDORA-2019-cf87377f5f"]))
         .await
         .unwrap();
     let commis_two: Vec<Comment> = bodhi
-        .paginated_request(&CommentQuery::new().updates(vec!["FEDORA-2019-24c9d17287"]))
+        .paginated_request(&CommentQuery::new().updates(&["FEDORA-2019-24c9d17287"]))
         .await
         .unwrap();
 
     let both_commis: Vec<Comment> = bodhi
-        .paginated_request(&CommentQuery::new().updates(vec!["FEDORA-2019-cf87377f5f", "FEDORA-2019-24c9d17287"]))
+        .paginated_request(&CommentQuery::new().updates(&["FEDORA-2019-cf87377f5f", "FEDORA-2019-24c9d17287"]))
         .await
         .unwrap();
 
@@ -50,16 +50,16 @@ async fn query_sanity_users() {
     let bodhi = bodhi_init().await;
 
     let commis_one: Vec<Comment> = bodhi
-        .paginated_request(&CommentQuery::new().users(vec!["astra"]))
+        .paginated_request(&CommentQuery::new().users(&["astra"]))
         .await
         .unwrap();
     let commis_two: Vec<Comment> = bodhi
-        .paginated_request(&CommentQuery::new().users(vec!["cipherboy"]))
+        .paginated_request(&CommentQuery::new().users(&["cipherboy"]))
         .await
         .unwrap();
 
     let both_commis: Vec<Comment> = bodhi
-        .paginated_request(&CommentQuery::new().users(vec!["astra", "cipherboy"]))
+        .paginated_request(&CommentQuery::new().users(&["astra", "cipherboy"]))
         .await
         .unwrap();
 

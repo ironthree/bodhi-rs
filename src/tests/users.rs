@@ -8,16 +8,16 @@ async fn query_sanity_updates() {
     let bodhi = bodhi_init().await;
 
     let users_one: Vec<User> = bodhi
-        .paginated_request(&UserQuery::new().updates(vec!["FEDORA-2019-ac2a21ff07"]))
+        .paginated_request(&UserQuery::new().updates(&["FEDORA-2019-ac2a21ff07"]))
         .await
         .unwrap();
     let users_two: Vec<User> = bodhi
-        .paginated_request(&UserQuery::new().updates(vec!["FEDORA-2019-ac3dc27f26"]))
+        .paginated_request(&UserQuery::new().updates(&["FEDORA-2019-ac3dc27f26"]))
         .await
         .unwrap();
 
     let users_both: Vec<User> = bodhi
-        .paginated_request(&UserQuery::new().updates(vec!["FEDORA-2019-ac2a21ff07", "FEDORA-2019-ac3dc27f26"]))
+        .paginated_request(&UserQuery::new().updates(&["FEDORA-2019-ac2a21ff07", "FEDORA-2019-ac3dc27f26"]))
         .await
         .unwrap();
 
