@@ -1,13 +1,3 @@
-// ! The contents of this module can be used to query a bodhi instance about existing builds.
-// !
-// ! The [`BuildNVRQuery`](struct.BuildNVRQuery.html) returns exactly one Build, if and only if a
-// ! [`Build`](../../data/struct.Build.html) with the given Name-Version-Release triple exists -
-// ! otherwise, it will return an error.
-// !
-// ! The [`BuildQuery`](struct.BuildQuery.html) can be used to execute more complex queries -
-// ! querying builds of certain packages, builds for certain releases, or builds associated with a
-// ! given set of updates is possible.
-
 use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
@@ -17,19 +7,19 @@ use crate::data::{Build, FedoraRelease};
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
 
-// Use this for querying bodhi for a specific build, by its NVR (Name-Version-Release) string. It
-// will either return an `Ok(Some(Build))` matching the specified NVR, return `Ok(None)` if it
-// doesn't exist, or return an `Err(QueryError)` if another error occurred.
-//
-// ```
-// # use bodhi::{BuildNVRQuery, BodhiServiceBuilder};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let build = bodhi.query(BuildNVRQuery::new("rust-1.34.1-1.fc29")).unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-0>
+/// data type encapsulating parameters for querying for a [`Build`] by NVR
+///
+/// If no build with the specified NVR is known to bodhi, a [`QueryError::NotFound`] error is
+/// returned for the query.
+///
+/// ```
+/// use bodhi::BuildNVRQuery;
+///
+/// let query = BuildNVRQuery::new("rust-1.34.1-1.fc29");
+/// // let build = bodhi.request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-0>
 #[derive(Debug)]
 pub struct BuildNVRQuery<'a> {
     // NVR of the build to query (Name-Version-Release format, without Epoch)
@@ -37,8 +27,7 @@ pub struct BuildNVRQuery<'a> {
 }
 
 impl<'a> BuildNVRQuery<'a> {
-    // This method is the only way to create a new [`BuildNVRQuery`](struct.BuildNVRQuery.html)
-    // instance.
+    /// constructor for [`BuildNVRQuery`] from an NVR string
     pub fn new(nvr: &'a str) -> Self {
         BuildNVRQuery { nvr }
     }
@@ -63,36 +52,24 @@ impl<'a> SingleRequest<Build, Build> for BuildNVRQuery<'a> {
     }
 }
 
-// Use this for querying bodhi about a set of builds with the given properties, which can be
-// specified with the builder pattern. Note that some options can be specified multiple times, and
-// builds will be returned if any criteria match. This is consistent with both the web interface
-// and REST API behavior.
-//
-// ```
-// # use bodhi::{BuildQuery, FedoraRelease, BodhiServiceBuilder};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let builds = bodhi
-//     .query(
-//         BuildQuery::new()
-//             .releases(vec![FedoraRelease::F30, FedoraRelease::F29])
-//             .packages(vec!["rust"]),
-//     )
-//     .unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-1>
+
+/// data type encapsulating parameters for querying [`Build`]s
+///
+/// ```
+/// use bodhi::{BuildQuery, ContentType, FedoraRelease};
+///
+/// let releases = vec![FedoraRelease::fedora(34, ContentType::RPM).unwrap()];
+/// let query = BuildQuery::new().releases(&releases);
+/// // let builds = bodhi.paginated_request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/builds.html#service-1>
 #[derive(Default)]
 pub struct BuildQuery<'a> {
-    // NVR of the build to query (Name-Version-Release format, without Epoch)
     nvr: Option<&'a str>,
-    // list of packages to request builds for
-    packages: Option<Vec<&'a str>>,
-    // list of releases to request builds for
-    releases: Option<Vec<&'a FedoraRelease>>,
-    // list of updates to request builds for
-    updates: Option<Vec<&'a str>>,
+    packages: Option<&'a [&'a str]>,
+    releases: Option<&'a [&'a FedoraRelease]>,
+    updates: Option<&'a [&'a str]>,
 
     // number of results per page
     rows_per_page: u32,
@@ -114,7 +91,7 @@ impl<'a> Debug for BuildQuery<'a> {
 }
 
 impl<'a> BuildQuery<'a> {
-    // This method returns a new [`BuildQuery`](struct.BuildQuery.html) with *no* filters set.
+    /// constructor for [`BuildQuery`] without any filters
     pub fn new() -> Self {
         BuildQuery {
             rows_per_page: DEFAULT_ROWS,
@@ -122,78 +99,78 @@ impl<'a> BuildQuery<'a> {
         }
     }
 
-    // Override the maximum number of results per page (capped at 100 server-side).
+    /// override the default number of results per page
     #[must_use]
     pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
         self.rows_per_page = rows_per_page;
         self
     }
 
-    // Add a callback function for reporting back query progress for long-running queries.
-    // The function will be called with the current page and the total number of pages for
-    // paginated queries.
+    /// add callback function for progress reporting during long-running queries
+    ///
+    /// The specified function will be called with the current result page and the number of total
+    /// pages as arguments.
     #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
-    // Restrict the returned results to builds with the given NVR. If this is the only required
-    // filter, consider using a [`BuildNVRQuery`](struct.BuildNVRQuery.html) instead.
+    /// restrict query to builds matching a specific NVR
+    ///
+    /// If this is the only parameter, consider using a [`BuildNVRQuery`] instead.
     #[must_use]
     pub fn nvr(mut self, nvr: &'a str) -> Self {
         self.nvr = Some(nvr);
         self
     }
 
-    // Restrict the returned results to builds of the given package(s).
+    /// restrict query to builds matching specific packages
     #[must_use]
-    pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
+    pub fn packages(mut self, packages: &'a [&'a str]) -> Self {
         self.packages = Some(packages);
         self
     }
 
-    // Restrict the returned results to builds for the given release(s).
+    /// restrict query to builds matching specific releases
     #[must_use]
-    pub fn releases(mut self, releases: Vec<&'a FedoraRelease>) -> Self {
+    pub fn releases(mut self, releases: &'a [&'a FedoraRelease]) -> Self {
         self.releases = Some(releases);
         self
     }
 
-    // Restrict the returned results to builds for the given update(s).
+    /// restrict query to builds matching specific updates
     #[must_use]
-    pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
+    pub fn updates(mut self, updates: &'a [&'a str]) -> Self {
         self.updates = Some(updates);
         self
     }
 }
 
+
+/// data type encapsulating parameters for querying specific [`BuildQuery`] result pages
 #[derive(Debug, Serialize)]
 pub struct BuildPageQuery<'a> {
     nvr: Option<&'a str>,
-    packages: Option<&'a Vec<&'a str>>,
-    releases: Option<&'a Vec<&'a FedoraRelease>>,
-    updates: Option<&'a Vec<&'a str>>,
+    packages: Option<&'a [&'a str]>,
+    releases: Option<&'a [&'a FedoraRelease]>,
+    updates: Option<&'a [&'a str]>,
 
     page: u32,
     rows_per_page: u32,
 }
 
 impl<'a> BuildPageQuery<'a> {
+    /// constructor for [`BuildPageQuery`] taking parameters from an existing [`BuildQuery`]
     pub fn from_query(query: &'a BuildQuery, page: u32) -> Self {
         BuildPageQuery {
             nvr: query.nvr,
-            packages: query.packages.as_ref(),
-            releases: query.releases.as_ref(),
-            updates: query.updates.as_ref(),
+            packages: query.packages,
+            releases: query.releases,
+            updates: query.updates,
             page,
-            rows_per_page: DEFAULT_ROWS,
+            rows_per_page: query.rows_per_page,
         }
-    }
-
-    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
-        self.rows_per_page = rows_per_page;
-        self
     }
 }
 
@@ -215,6 +192,7 @@ impl<'a> SingleRequest<BuildListPage, Vec<Build>> for BuildPageQuery<'a> {
         page.builds
     }
 }
+
 
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]

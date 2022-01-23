@@ -24,6 +24,8 @@ pub struct NewOverride {
 
 /// data type wrapping all mandatory (and no optional) parameters for creating a new buildroot
 /// override
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1-POST>
 #[derive(Debug)]
 pub struct OverrideCreator<'a> {
     nvr: &'a str,

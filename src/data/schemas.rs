@@ -2,9 +2,6 @@ use serde::Serialize;
 
 use crate::{BodhiDate, UpdateRequest, UpdateSeverity, UpdateSuggestion, UpdateType};
 
-// Schema for POST requests for creating and editing buildroot overrides.
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1-POST>
 #[derive(Debug, Serialize)]
 pub(crate) struct OverrideData<'a> {
     // NVR this buildroot override is filed for
@@ -22,9 +19,6 @@ pub(crate) struct OverrideData<'a> {
     pub csrf_token: &'a str,
 }
 
-// Schema for POST requests for creating and editing updates.
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2-POST>
 #[derive(Debug, Serialize)]
 pub(crate) struct UpdateData<'a> {
     // list of builds to include in the update
@@ -34,7 +28,7 @@ pub(crate) struct UpdateData<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub from_tag: Option<&'a str>,
     // bugs associated with the update (default: `[]`)
-    pub bugs: Option<&'a Vec<String>>,
+    pub bugs: Option<&'a [&'a str]>,
     // user-visible update title (default: `""`)
     pub display_name: Option<&'a str>,
     // close bugs when update is pushed to stable (default: `true`)

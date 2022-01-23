@@ -1,27 +1,23 @@
-// ! The contents of this module can be used to query a bodhi instance for running composes.
-
 use serde::Deserialize;
 
 use crate::data::{Compose, ComposeRequest, FedoraRelease};
 use crate::error::QueryError;
 use crate::request::{RequestMethod, SingleRequest};
 
-// Use this for querying bodhi for a specific compose by its release and request. It will either
-// return an `Ok(Some(Compose))` matching the specified values, return `Ok(None)` if it doesn't
-// currently exist, or return an `Err(QueryError)` if another error occurred.
-//
-// ```
-// # use bodhi::{BodhiServiceBuilder, ComposeReleaseRequestQuery, FedoraRelease, ComposeRequest};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let compose = bodhi
-//     .query(ComposeReleaseRequestQuery::new(
-//         FedoraRelease::F31,
-//         ComposeRequest::Stable,
-//     ))
-//     .unwrap();
-// ```
+/// data type encapsulating parameters for querying for a [`Compose`] by release and request type
+///
+/// If no compose with these properties is currently running, a [`QueryError::NotFound`] error is
+/// returned for the query.
+///
+/// ```
+/// use bodhi::{ComposeReleaseRequestQuery, ComposeRequest, ContentType, FedoraRelease};
+///
+/// let query = ComposeReleaseRequestQuery::new(
+///     &FedoraRelease::fedora(34, ContentType::RPM).unwrap(),
+///     ComposeRequest::Stable,
+/// );
+/// // let compose = bodhi.request(&query).unwrap();
+/// ```
 #[derive(Debug)]
 pub struct ComposeReleaseRequestQuery<'a> {
     release: &'a FedoraRelease,
@@ -34,8 +30,7 @@ pub struct ComposePage {
 }
 
 impl<'a> ComposeReleaseRequestQuery<'a> {
-    // This method is the only way to create a new
-    // [`ComposeReleaseRequestQuery`](struct.ComposeReleaseRequestQuery.html) instance.
+    /// constructor for [`ComposeReleaseRequestQuery`] from Fedora release and request type
     pub fn new(release: &'a FedoraRelease, request: ComposeRequest) -> Self {
         ComposeReleaseRequestQuery { release, request }
     }
@@ -60,17 +55,17 @@ impl<'a> SingleRequest<ComposePage, Compose> for ComposeReleaseRequestQuery<'a> 
     }
 }
 
-// This query can be used to fetch information about currently running composes from bodhi.
-//
-// ```
-// # use bodhi::{BodhiServiceBuilder, ComposeQuery};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let composes = bodhi.query(ComposeQuery::new()).unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/composes.html>
+
+/// data type encapsulating (no) parameters for querying currently running [`Compose`]s
+///
+/// ```
+/// use bodhi::ComposeQuery;
+///
+/// let query = ComposeQuery::new();
+/// // let composes = bodhi.request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/composes.html>
 #[derive(Debug, Default)]
 pub struct ComposeQuery {}
 
@@ -80,7 +75,7 @@ pub struct ComposeListPage {
 }
 
 impl ComposeQuery {
-    // This method creates a new [`ComposeQuery`](struct.ComposeQuery.html).
+    /// constructor for [`ComposeQuery`] (no mandatory or optional parameters)
     pub fn new() -> Self {
         Self::default()
     }

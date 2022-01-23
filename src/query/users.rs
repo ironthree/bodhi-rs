@@ -1,14 +1,3 @@
-// ! The contents of this module can be used to query a bodhi instance about the user accounts it
-// ! knows.
-// !
-// ! The [`UserNameQuery`](struct.UserNameQuery.html) returns exactly one
-// ! [`User`](../../data/types/struct.User.html), if and only if a `User` with this username exists
-// - ! otherwise, it will return an error.
-// !
-// ! The [`UserQuery`](struct.UserQuery.html) can be used to execute more complex queries, for
-// ! example filtering users by the groups they are members of, or querying for users that are
-// ! associated with a given set of updates.
-
 use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
@@ -18,19 +7,19 @@ use crate::data::User;
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
 
-// Use this for querying bodhi for a specific user by their name. It will either return an
-// `Ok(User)` matching the specified name, return `Ok(None)` if it doesn't exist, or return an
-// `Err(QueryError)` if another error occurred.
-//
-// ```
-// # use bodhi::{BodhiServiceBuilder, UserNameQuery};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let comment = bodhi.query(UserNameQuery::new("decathorpe")).unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-0>
+/// data type encapsulating parameters for querying for a [`User`] by name
+///
+/// If no user with the specified name is known to bodhi, a [`QueryError::NotFound`] error is
+/// returned for the query.
+///
+/// ```
+/// use bodhi::UserNameQuery;
+///
+/// let query = UserNameQuery::new("decathorpe");
+/// // let user = bodhi.request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-0>
 #[derive(Debug)]
 pub struct UserNameQuery<'a> {
     name: &'a str,
@@ -42,7 +31,7 @@ pub struct UserPage {
 }
 
 impl<'a> UserNameQuery<'a> {
-    // This method is the only way to create a new `UserNameQuery` instance.
+    /// constructor for [`UserNameQuery`] from a username
     pub fn new(name: &'a str) -> Self {
         UserNameQuery { name }
     }
@@ -67,27 +56,24 @@ impl<'a> SingleRequest<UserPage, User> for UserNameQuery<'a> {
     }
 }
 
-// Use this for querying bodhi about a set of users with the given properties, which can be
-// specified with the builder pattern. Note that some options can be specified multiple times, and
-// users will be returned if any criteria match. This is consistent with both the web interface and
-// REST API behavior.
-//
-// ```
-// # use bodhi::{BodhiServiceBuilder, UserQuery};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let users = bodhi.query(UserQuery::new().groups(vec!["provenpackager"])).unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-1>
+
+/// data type encapsulating parameters for querying [`User`]s
+///
+/// ```
+/// use bodhi::UserQuery;
+///
+/// let query = UserQuery::new().groups(&["provenpackager"]);
+/// // let users = bodhi.paginated_request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/users.html#service-1>
 #[derive(Default)]
 pub struct UserQuery<'a> {
-    groups: Option<Vec<&'a str>>,
+    groups: Option<&'a [&'a str]>,
     like: Option<&'a str>,
     name: Option<&'a str>,
     search: Option<&'a str>,
-    updates: Option<Vec<&'a str>>,
+    updates: Option<&'a [&'a str]>,
 
     // number of results per page
     rows_per_page: u32,
@@ -110,7 +96,7 @@ impl<'a> Debug for UserQuery<'a> {
 }
 
 impl<'a> UserQuery<'a> {
-    // This method returns a new `UserQuery` with *no* filters set.
+    /// constructor for [`UserQuery`] without any filters
     pub fn new() -> Self {
         UserQuery {
             rows_per_page: DEFAULT_ROWS,
@@ -118,83 +104,86 @@ impl<'a> UserQuery<'a> {
         }
     }
 
-    // Override the maximum number of results per page (capped at 100 server-side).
+    /// override the default number of results per page
     #[must_use]
     pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
         self.rows_per_page = rows_per_page;
         self
     }
 
-    // Add a callback function for reporting back query progress for long-running queries.
-    // The function will be called with the current page and the total number of pages for
-    // paginated queries.
+    /// add callback function for progress reporting during long-running queries
+    ///
+    /// The specified function will be called with the current result page and the number of total
+    /// pages as arguments.
     #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
-    // Restrict the returned results to members of the given group(s).
+    /// restrict query to users that are members of the specified groups
     #[must_use]
-    pub fn groups(mut self, groups: Vec<&'a str>) -> Self {
+    pub fn groups(mut self, groups: &'a [&'a str]) -> Self {
         self.groups = Some(groups);
         self
     }
 
-    // Restrict search to users *like* the given argument (in the SQL sense).
+    /// restrict query to users with usernames "like" the given string (in the SQL sense)
     #[must_use]
     pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
     }
 
-    // Restrict results to users with the given username.
-    //
-    // If this is the only required filter, consider using a
-    // [`UserNameQuery`](struct.UserNameQuery.html) instead.
+    /// restrict query to users matching a specific username
+    ///
+    /// If this is the only parameter, consider using a [`UserNameQuery`] instead.
     #[must_use]
     pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
     }
 
-    // Restrict search to users containing the given argument.
+    /// restrict query to users with usernames that match a search keyword
     #[must_use]
     pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
 
-    // Restrict the returned results to users associated with the given update(s).
+    /// restrict query to users to submitted of specific updates (identified by their update alias)
     #[must_use]
-    pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
+    pub fn updates(mut self, updates: &'a [&'a str]) -> Self {
         self.updates = Some(updates);
         self
     }
 }
 
+
+/// data type encapsulating parameters for querying specific [`UserQuery`] result pages
 #[derive(Debug, Serialize)]
 pub struct UserPageQuery<'a> {
-    groups: Option<&'a Vec<&'a str>>,
+    groups: Option<&'a [&'a str]>,
     like: Option<&'a str>,
     name: Option<&'a str>,
     search: Option<&'a str>,
-    updates: Option<&'a Vec<&'a str>>,
+    updates: Option<&'a [&'a str]>,
 
     page: u32,
     rows_per_page: u32,
 }
 
 impl<'a> UserPageQuery<'a> {
+    /// constructor for [`UserPageQuery`] taking parameters from an existing [`UserQuery`]
     pub fn from_query(query: &'a UserQuery, page: u32) -> Self {
         UserPageQuery {
-            groups: query.groups.as_ref(),
+            groups: query.groups,
             like: query.like,
             name: query.name,
             search: query.search,
-            updates: query.updates.as_ref(),
+            updates: query.updates,
             page,
-            rows_per_page: DEFAULT_ROWS,
+            rows_per_page: query.rows_per_page,
         }
     }
 }

@@ -1,8 +1,3 @@
-// ! The contents of this module can be used to query a bodhi instance about existing packages.
-// !
-// ! The [`PackageQuery`](struct.PackageQuery.html) can be used to execute complex queries, for
-// ! example query packages by name, or filter packages matching a certain search string.
-
 use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
@@ -12,20 +7,16 @@ use crate::data::Package;
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
 
-// Use this for querying bodhi about a set of packages with the given properties, which can be
-// specified with the builder pattern. Note that some options can be specified multiple times, and
-// packages will be returned if any criteria match. This is consistent with both the web interface
-// and REST API behavior.
-//
-// ```
-// # use bodhi::{BodhiServiceBuilder, PackageQuery};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let packages = bodhi.query(PackageQuery::new().search("rust*")).unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/packages.html#service-0>
+/// data type encapsulating parameters for querying [`Package`]s
+///
+/// ```
+/// use bodhi::PackageQuery;
+///
+/// let query = PackageQuery::new().search("rust*");
+/// // let packages = bodhi.paginated_request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/packages.html#service-0>
 #[derive(Default)]
 pub struct PackageQuery<'a> {
     like: Option<&'a str>,
@@ -51,7 +42,7 @@ impl<'a> Debug for PackageQuery<'a> {
 }
 
 impl<'a> PackageQuery<'a> {
-    // This method returns a new [`PackageQuery`](struct.PackageQuery.html) with *no* filters set.
+    /// constructor for [`PackageQuery`] without any filters
     pub fn new() -> Self {
         PackageQuery {
             rows_per_page: DEFAULT_ROWS,
@@ -59,37 +50,38 @@ impl<'a> PackageQuery<'a> {
         }
     }
 
-    // Override the maximum number of results per page (capped at 100 server-side).
+    /// override the default number of results per page
     #[must_use]
     pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
         self.rows_per_page = rows_per_page;
         self
     }
 
-    // Add a callback function for reporting back query progress for long-running queries.
-    // The function will be called with the current page and the total number of pages for
-    // paginated queries.
+    /// add callback function for progress reporting during long-running queries
+    ///
+    /// The specified function will be called with the current result page and the number of total
+    /// pages as arguments.
     #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
-    // Restrict search to packages *like* the given argument (in the SQL sense).
+    /// restrict query to packages "like" the given string (in the SQL sense)
     #[must_use]
     pub fn like(mut self, like: &'a str) -> Self {
         self.like = Some(like);
         self
     }
 
-    // Restrict the returned results to packages matching the given name.
+    /// restrict query to packages matching a specific name
     #[must_use]
     pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
     }
 
-    // Restrict search to packages containing the given argument.
+    /// restrict query to packages matching a search keyword
     #[must_use]
     pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
@@ -97,6 +89,8 @@ impl<'a> PackageQuery<'a> {
     }
 }
 
+
+/// data type encapsulating parameters for querying specific [`PackageQuery`] result pages
 #[derive(Debug, Serialize)]
 pub struct PackagePageQuery<'a> {
     like: Option<&'a str>,
@@ -108,19 +102,15 @@ pub struct PackagePageQuery<'a> {
 }
 
 impl<'a> PackagePageQuery<'a> {
+    /// constructor for [`PackagePageQuery`] taking parameters from an existing [`PackageQuery`]
     pub fn from_query(query: &'a PackageQuery, page: u32) -> Self {
         PackagePageQuery {
             like: query.like,
             name: query.name,
             search: query.search,
             page,
-            rows_per_page: DEFAULT_ROWS,
+            rows_per_page: query.rows_per_page,
         }
-    }
-
-    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
-        self.rows_per_page = rows_per_page;
-        self
     }
 }
 

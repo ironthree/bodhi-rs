@@ -23,6 +23,8 @@ pub struct EditedUpdate {
 
 
 /// data type wrapping all mandatory and optional parameters for editing an update
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2-POST>
 #[derive(Debug)]
 pub struct UpdateEditor<'a> {
     // mandatory fields
@@ -252,11 +254,12 @@ impl<'a> SingleRequest<EditedUpdate, EditedUpdate> for UpdateEditor<'a> {
         }
 
         let bugs: Vec<String> = self.bugs.iter().map(|b| format!("{}", b)).collect();
+        let bug_refs: Vec<&str> = bugs.iter().map(|s| s.as_str()).collect();
 
         let update_edit = UpdateData {
             builds: Some(&self.builds),
             from_tag: None,
-            bugs: Some(&bugs),
+            bugs: Some(bug_refs.as_slice()),
             display_name: self.display_name,
             close_bugs: self.close_bugs,
             update_type: match self.update_type {

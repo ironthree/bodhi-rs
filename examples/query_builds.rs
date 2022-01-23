@@ -19,7 +19,7 @@ async fn main() {
     };
 
     let query = BuildQuery::new()
-        .updates(vec!["FEDORA-2021-165f1e7af4"])
+        .updates(&["FEDORA-2021-165f1e7af4"])
         .callback(progressbar);
 
     let builds = bodhi.paginated_request(&query).await.unwrap();

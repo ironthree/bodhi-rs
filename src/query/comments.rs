@@ -1,13 +1,3 @@
-// ! The contents of this module can be used to query a bodhi instance about existing comments.
-// !
-// ! The [`CommentIDQuery`](struct.CommentIDQuery.html) returns exactly one
-// ! [`Comment`](../../data/struct.Comment.html), if and only if a Comment with the given integer ID
-// ! exists - otherwise, it will return an error.
-// !
-// ! The [`CommentQuery`](struct.CommentQuery.html) can be used to execute more complex queries, for
-// ! example filtering comments that are associated with a set of updates or packages, or query
-// ! comments made by certain users, or filed against updates that were created by specific users.
-
 use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
@@ -17,32 +7,31 @@ use crate::data::{BodhiDate, Comment};
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
 
-// Use this for querying bodhi for a specific comment by its ID. It will either return an
-// `Ok(Some(Comment))` matching the specified ID, return `Ok(None)` if it doesn't exist, or return
-// an `Err(QueryError)` if another error occurred.
-//
-// ```
-// # use bodhi::{BodhiServiceBuilder, CommentIDQuery};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let comment = bodhi.query(CommentIDQuery::new(19999)).unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-0>
+/// data type encapsulating parameters for querying for a [`Comment`] by ID
+///
+/// If no comment with the specified ID is known to bodhi, a [`QueryError::NotFound`] error is
+/// returned for the query.
+///
+/// ```
+/// use bodhi::CommentIDQuery;
+///
+/// let query = CommentIDQuery::new(19999);
+/// // let comment = bodhi.request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-0>
 #[derive(Debug)]
 pub struct CommentIDQuery {
     id: u32,
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct CommentPage {
+pub struct CommentPage {
     comment: Comment,
 }
 
 impl CommentIDQuery {
-    // This method is the only way to create a new [`CommentIDQuery`](struct.CommentIDQuery.html)
-    // instance.
+    /// constructor for [`CommentIDQuery`] from a comment ID
     pub fn new(id: u32) -> Self {
         CommentIDQuery { id }
     }
@@ -67,33 +56,28 @@ impl SingleRequest<CommentPage, Comment> for CommentIDQuery {
     }
 }
 
-// Use this for querying bodhi about a set of comments with the given properties, which can be
-// specified with the builder pattern. Note that some options can be specified multiple times, and
-// comments will be returned if any criteria match. This is consistent with both the web interface
-// and REST API behavior.
-//
-// ```
-// # use bodhi::{BodhiServiceBuilder, CommentQuery};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let comments = bodhi
-//     .query(CommentQuery::new().users(vec!["decathorpe"]).packages(vec!["rust"]))
-//     .unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1>
+
+/// data type encapsulating parameters for querying [`Comment`]s
+///
+/// ```
+/// use bodhi::CommentQuery;
+///
+/// let query = CommentQuery::new().update_owners(&["decathorpe"]);
+/// // let comments = bodhi.paginated_request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1>
 #[derive(Default)]
 pub struct CommentQuery<'a> {
     anonymous: Option<bool>,
-    ignore_users: Option<Vec<&'a str>>,
+    ignore_users: Option<&'a [&'a str]>,
     like: Option<&'a str>,
-    packages: Option<Vec<&'a str>>,
+    packages: Option<&'a [&'a str]>,
     search: Option<&'a str>,
     since: Option<&'a BodhiDate>,
-    update_owners: Option<Vec<&'a str>>,
-    updates: Option<Vec<&'a str>>,
-    users: Option<Vec<&'a str>>,
+    update_owners: Option<&'a [&'a str]>,
+    updates: Option<&'a [&'a str]>,
+    users: Option<&'a [&'a str]>,
 
     // number of results per page
     rows_per_page: u32,
@@ -120,7 +104,7 @@ impl<'a> Debug for CommentQuery<'a> {
 }
 
 impl<'a> CommentQuery<'a> {
-    // This method returns a new [`CommentQuery`](struct.CommentQuery.html) with *no* filters set.
+    /// constructor for [`CommentQuery`] without any filters
     pub fn new() -> Self {
         CommentQuery {
             rows_per_page: DEFAULT_ROWS,
@@ -128,118 +112,116 @@ impl<'a> CommentQuery<'a> {
         }
     }
 
-    // Override the maximum number of results per page (capped at 100 server-side).
+    /// override the default number of results per page
     #[must_use]
     pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
         self.rows_per_page = rows_per_page;
         self
     }
 
-    // Add a callback function for reporting back query progress for long-running queries.
-    // The function will be called with the current page and the total number of pages for
-    // paginated queries.
+    /// add callback function for progress reporting during long-running queries
+    ///
+    /// The specified function will be called with the current result page and the number of total
+    /// pages as arguments.
     #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
-    // Restrict results to ignore comments by certain users.
+    /// restrict query by excluding comments by certain users
     #[must_use]
-    pub fn ignore_users(mut self, ignore_users: Vec<&'a str>) -> Self {
+    pub fn ignore_users(mut self, ignore_users: &'a [&'a str]) -> Self {
         self.ignore_users = Some(ignore_users);
         self
     }
 
-    // Restrict search to comments *like* the given argument (in the SQL sense).
+    /// restrict query to comments where the text is "like" the given string (in the SQL sense)
     #[must_use]
     pub fn like(mut self, like: &'a str) -> CommentQuery {
         self.like = Some(like);
         self
     }
 
-    // Restrict the returned results to comments filed against updates for the given package(s).
+    /// restruct query to comments on updates for certain packages
     #[must_use]
-    pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
+    pub fn packages(mut self, packages: &'a [&'a str]) -> Self {
         self.packages = Some(packages);
         self
     }
 
-    // Restrict search to comments containing the given argument.
+    /// restrict query to comments matching a search keyword
     #[must_use]
     pub fn search(mut self, search: &'a str) -> Self {
         self.search = Some(search);
         self
     }
 
-    // Restrict the returned results to comments filed since the given date and time.
+    /// restrict query to comments that have been posted since a specific date & time
     #[must_use]
     pub fn since(mut self, since: &'a BodhiDate) -> Self {
         self.since = Some(since);
         self
     }
 
-    // Restrict the returned results to comments filed against updates created by the specified
-    // user(s).
+    /// restrict query to comments on updates that have been submitted by certain users
     #[must_use]
-    pub fn update_owners(mut self, update_owners: Vec<&'a str>) -> Self {
+    pub fn update_owners(mut self, update_owners: &'a [&'a str]) -> Self {
         self.update_owners = Some(update_owners);
         self
     }
 
-    // Restrict the returned results to comments filed against the given update(s).
+    /// restrict query to comments on specific updates (identified by their update alias)
     #[must_use]
-    pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
+    pub fn updates(mut self, updates: &'a [&'a str]) -> Self {
         self.updates = Some(updates);
         self
     }
 
-    // Restrict the returned results to comments filed by the given user(s).
+    /// restrict query to comments posted by specific users (identified by their username)
     #[must_use]
-    pub fn users(mut self, users: Vec<&'a str>) -> Self {
+    pub fn users(mut self, users: &'a [&'a str]) -> Self {
         self.users = Some(users);
         self
     }
 }
 
+
+/// data type encapsulating parameters for querying specific [`CommentQuery`] result pages
 #[derive(Debug, Serialize)]
 pub struct CommentPageQuery<'a> {
     anonymous: Option<bool>,
-    ignore_users: Option<&'a Vec<&'a str>>,
+    ignore_users: Option<&'a [&'a str]>,
     like: Option<&'a str>,
-    packages: Option<&'a Vec<&'a str>>,
+    packages: Option<&'a [&'a str]>,
     search: Option<&'a str>,
     #[serde(with = "crate::option_bodhi_date_format_ref")]
     since: Option<&'a BodhiDate>,
-    update_owners: Option<&'a Vec<&'a str>>,
-    updates: Option<&'a Vec<&'a str>>,
+    update_owners: Option<&'a [&'a str]>,
+    updates: Option<&'a [&'a str]>,
     #[serde(rename = "user")]
-    users: Option<&'a Vec<&'a str>>,
+    users: Option<&'a [&'a str]>,
 
     page: u32,
     rows_per_page: u32,
 }
 
 impl<'a> CommentPageQuery<'a> {
+    /// constructor for [`CommentPageQuery`] taking parameters from an existing [`CommentQuery`]
     pub fn from_query(query: &'a CommentQuery, page: u32) -> Self {
         CommentPageQuery {
             anonymous: query.anonymous,
-            ignore_users: query.ignore_users.as_ref(),
+            ignore_users: query.ignore_users,
             like: query.like,
-            packages: query.packages.as_ref(),
+            packages: query.packages,
             search: query.search,
             since: query.since,
-            update_owners: query.update_owners.as_ref(),
-            updates: query.updates.as_ref(),
-            users: query.users.as_ref(),
+            update_owners: query.update_owners,
+            updates: query.updates,
+            users: query.users,
             page,
-            rows_per_page: DEFAULT_ROWS,
+            rows_per_page: query.rows_per_page,
         }
-    }
-
-    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
-        self.rows_per_page = rows_per_page;
-        self
     }
 }
 

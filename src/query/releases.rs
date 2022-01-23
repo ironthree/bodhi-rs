@@ -1,45 +1,44 @@
-// ! The contents of this module can be used to query a bodhi instance about existing releases.
-// !
-// ! The [`ReleaseNameQuery`](struct.ReleaseNameQuery.html) returns exactly one
-// ! [`Release`](../../data/struct.Release.html), if and only if a `Release` with this name exists -
-// ! otherwise, it will return an error.
-// !
-// ! The [`ReleaseQuery`](struct.ReleaseQuery.html) can be used to execute more complex queries, for
-// ! example filtering releases by status, or query the releases associated with a given set of
-// ! updates or packages.
-
+use std::borrow::Cow;
 use std::fmt::{Debug, Formatter};
 
 use serde::{Deserialize, Serialize};
 
 use crate::client::DEFAULT_ROWS;
-use crate::data::Release;
+use crate::data::{FedoraRelease, Release};
 use crate::error::QueryError;
 use crate::request::{PaginatedRequest, Pagination, RequestMethod, SingleRequest};
 
-// Use this for querying bodhi for a specific release by its name. It will either return an
-// `Ok(Some(Release))` matching the specified name, return `Ok(None)` if it doesn't exist, or
-// return an `Err(QueryError)` if another error occurred.
-//
-// ```
-// # use bodhi::{BodhiServiceBuilder, FedoraRelease, ReleaseNameQuery};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let release = bodhi.query(ReleaseNameQuery::new("F30")).unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-0>
+/// data type encapsulating parameters for querying for a [`Release`] by name
+///
+/// If no release with the specified name is known to bodhi, a [`QueryError::NotFound`] error is
+/// returned for the query.
+///
+/// ```
+/// use bodhi::ReleaseNameQuery;
+///
+/// let query = ReleaseNameQuery::new("F34");
+/// // let release = bodhi.request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-0>
 #[derive(Debug)]
 pub struct ReleaseNameQuery<'a> {
-    name: &'a str,
+    name: Cow<'a, str>,
 }
 
 impl<'a> ReleaseNameQuery<'a> {
-    // This method is the only way to create a new
-    // [`ReleaseNameQuery`](struct.ReleaseNameQuery.html) instance.
+    /// constructor for [`ReleaseNameQuery`] from a release name
     pub fn new(name: &'a str) -> Self {
-        ReleaseNameQuery { name }
+        ReleaseNameQuery {
+            name: Cow::Borrowed(name),
+        }
+    }
+
+    /// constructor for [`ReleaseNameQuery`] from a [`FedoraRelease`] value
+    pub fn from_release(release: &FedoraRelease) -> Self {
+        ReleaseNameQuery {
+            name: Cow::Owned(release.to_string()),
+        }
     }
 }
 
@@ -62,28 +61,24 @@ impl<'a> SingleRequest<Release, Release> for ReleaseNameQuery<'a> {
     }
 }
 
-// Use this for querying bodhi about a set of releases with the given properties, which can be
-// specified with the builder pattern. Note that some options can be specified multiple times, and
-// comments will be returned if any criteria match. This is consistent with both the web interface
-// and REST API behavior.
-//
-// ```
-// # use bodhi::{BodhiServiceBuilder, ReleaseQuery};
-// let bodhi = BodhiServiceBuilder::default().build().unwrap();
-//
-// # #[cfg(feature = "online-tests")]
-// let releases = bodhi.query(ReleaseQuery::new().exclude_archived(true)).unwrap();
-// ```
-//
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-1>
-#[derive(Default)]
 
+/// data type encapsulating parameters for querying [`Release`]s
+///
+/// ```
+/// use bodhi::ReleaseQuery;
+///
+/// let query = ReleaseQuery::new().exclude_archived(true);
+/// // let releases = bodhi.paginated_request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/releases.html#service-1>
+#[derive(Default)]
 pub struct ReleaseQuery<'a> {
     exclude_archived: Option<bool>,
-    ids: Option<Vec<&'a str>>,
+    ids: Option<&'a [&'a str]>,
     name: Option<&'a str>,
-    packages: Option<Vec<&'a str>>,
-    updates: Option<Vec<&'a str>>,
+    packages: Option<&'a [&'a str]>,
+    updates: Option<&'a [&'a str]>,
 
     // number of results per page
     rows_per_page: u32,
@@ -106,7 +101,7 @@ impl<'a> Debug for ReleaseQuery<'a> {
 }
 
 impl<'a> ReleaseQuery<'a> {
-    // This method returns a new [`ReleaseQuery`](struct.ReleaseQuery.html) with *no* filters set.
+    /// constructor for [`ReleaseQuery`] without any filters
     pub fn new() -> Self {
         ReleaseQuery {
             rows_per_page: DEFAULT_ROWS,
@@ -114,87 +109,87 @@ impl<'a> ReleaseQuery<'a> {
         }
     }
 
-    // Override the maximum number of results per page (capped at 100 server-side).
+    /// override the default number of results per page
     #[must_use]
     pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
         self.rows_per_page = rows_per_page;
         self
     }
 
-    // Add a callback function for reporting back query progress for long-running queries.
-    // The function will be called with the current page and the total number of pages for
-    // paginated queries.
+    /// add callback function for progress reporting during long-running queries
+    ///
+    /// The specified function will be called with the current result page and the number of total
+    /// pages as arguments.
     #[must_use]
     pub fn callback(mut self, fun: impl Fn(u32, u32) + 'a) -> Self {
         self.callback = Some(Box::new(fun));
         self
     }
 
-    // Restrict the returned results to (not) archived releases.
+    /// restrict query to releases that have (not) been archived
     #[must_use]
     pub fn exclude_archived(mut self, exclude_archived: bool) -> Self {
         self.exclude_archived = Some(exclude_archived);
         self
     }
 
-    // Restrict results to releases with the given ID.
+    /// restrict query to releases matching the given IDs
     #[must_use]
-    pub fn ids(mut self, ids: Vec<&'a str>) -> Self {
+    pub fn ids(mut self, ids: &'a [&'a str]) -> Self {
         self.ids = Some(ids);
         self
     }
 
-    // Restrict results to a release with the given name. If this is the only required filter,
-    // consider using a [`ReleaseNameQuery`](struct.ReleaseNameQuery.html) instead.
+    /// restrict query to releases matching a specific name
+    ///
+    /// If this is the only parameter, consider using a [`ReleaseNameQuery`] instead.
     #[must_use]
     pub fn name(mut self, name: &'a str) -> Self {
         self.name = Some(name);
         self
     }
 
-    // Restrict the returned results to releases containing the given package(s).
+    /// restrict query to releases which contain the given packages
     #[must_use]
-    pub fn packages(mut self, packages: Vec<&'a str>) -> Self {
+    pub fn packages(mut self, packages: &'a [&'a str]) -> Self {
         self.packages = Some(packages);
         self
     }
 
-    // Restrict the returned results to releases matching the given updates(s).
+    /// restrict query to releases which match the given updates
     #[must_use]
-    pub fn updates(mut self, updates: Vec<&'a str>) -> Self {
+    pub fn updates(mut self, updates: &'a [&'a str]) -> Self {
         self.updates = Some(updates);
         self
     }
 }
 
+
+/// data type encapsulating parameters for querying specific [`ReleaseQuery`] result pages
 #[derive(Debug, Serialize)]
 pub struct ReleasePageQuery<'a> {
     exclude_archived: Option<bool>,
-    ids: Option<&'a Vec<&'a str>>,
+    ids: Option<&'a [&'a str]>,
     name: Option<&'a str>,
-    packages: Option<&'a Vec<&'a str>>,
-    updates: Option<&'a Vec<&'a str>>,
+    packages: Option<&'a [&'a str]>,
+    updates: Option<&'a [&'a str]>,
 
     page: u32,
     rows_per_page: u32,
 }
 
 impl<'a> ReleasePageQuery<'a> {
+    /// constructor for [`ReleasePageQuery`] taking parameters from an existing [`ReleaseQuery`]
     pub fn from_query(query: &'a ReleaseQuery, page: u32) -> Self {
         ReleasePageQuery {
             exclude_archived: query.exclude_archived,
-            ids: query.ids.as_ref(),
+            ids: query.ids,
             name: query.name,
-            packages: query.packages.as_ref(),
-            updates: query.updates.as_ref(),
+            packages: query.packages,
+            updates: query.updates,
             page,
-            rows_per_page: DEFAULT_ROWS,
+            rows_per_page: query.rows_per_page,
         }
-    }
-
-    pub fn rows_per_page(mut self, rows_per_page: u32) -> Self {
-        self.rows_per_page = rows_per_page;
-        self
     }
 }
 

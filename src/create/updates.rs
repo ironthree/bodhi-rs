@@ -32,6 +32,8 @@ enum UpdateSource<'a> {
 }
 
 /// data type wrapping all mandatory and optional parameters for creating a new update
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/updates.html#service-2-POST>
 #[derive(Debug)]
 pub struct UpdateCreator<'a> {
     // mandatory fields
@@ -282,6 +284,7 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
             .bugs
             .as_ref()
             .map(|bugs| bugs.iter().map(|b| format!("{}", b)).collect());
+        let bug_refs: Option<Vec<&str>> = bugs.as_ref().map(|b| b.iter().map(|s| s.as_str()).collect());
 
         let csrf_token = csrf_token.as_ref().unwrap_or_else(|| unreachable!());
 
@@ -289,7 +292,7 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
             UpdateSource::Builds { builds } => UpdateData {
                 builds: Some(builds),
                 from_tag: None,
-                bugs: bugs.as_ref(),
+                bugs: bug_refs.as_deref(),
                 display_name: self.display_name,
                 close_bugs: self.close_bugs,
                 update_type: self.update_type.unwrap_or(UpdateType::Unspecified),
@@ -311,7 +314,7 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
             UpdateSource::Tag { tag } => UpdateData {
                 builds: None,
                 from_tag: Some(tag),
-                bugs: bugs.as_ref(),
+                bugs: bug_refs.as_deref(),
                 display_name: self.display_name,
                 close_bugs: self.close_bugs,
                 update_type: self.update_type.unwrap_or(UpdateType::Unspecified),

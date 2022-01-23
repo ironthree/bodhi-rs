@@ -23,6 +23,8 @@ pub struct EditedOverride {
 
 
 /// data type wrapping all mandatory and optional parameters for editing a buildroot override
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/overrides.html#service-1-POST>
 #[derive(Debug)]
 pub struct OverrideEditor<'a> {
     notes: &'a str,

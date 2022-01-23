@@ -1,11 +1,18 @@
-// ! The contents of this module can be used to query a bodhi instance for a new CSRF token.
-
 use serde::Deserialize;
 
 use crate::error::QueryError;
 use crate::request::{RequestMethod, SingleRequest};
 
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/csrf.html>
+/// data type encapsulating (no) parameters for requesting a CSRF token
+///
+/// ```
+/// use bodhi::CSRFQuery;
+///
+/// let query = CSRFQuery::new();
+/// // let token = bodhi.request(&query).unwrap();
+/// ```
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/csrf.html>
 #[derive(Debug, Default)]
 pub struct CSRFQuery {}
 
@@ -15,6 +22,7 @@ pub struct CSRFPage {
 }
 
 impl CSRFQuery {
+    /// constructor for [`CSRFQuery`] (no mandatory or optional parameters)
     pub fn new() -> Self {
         Self::default()
     }
