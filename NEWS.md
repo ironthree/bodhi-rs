@@ -1,3 +1,55 @@
+### Release 2.0.0-beta.1 "Modern Times" (January 20, 2022)
+
+This version is an almost-complete rewrite of the entire crate, with
+numerous changes and improvements.
+
+Most notably, all network calls that use the underlying `fedora` crate are now
+non-blocking / `async`.
+
+The API for making requests has been completely rewritten with simplified
+traits, and it is now explicit when which requests will be processed as
+paginated queries based on the trait they implement.
+
+The rewritten API also makes it very easy to expose requests for specific pages
+of paginated results, which was not the case in older versions of this crate.
+
+The `FedoraRelease` type has been converted from an enumerated value (which
+made it necessary to release new versions of this crate for new Fedora or EPEL
+releases) to a newtype wrapper around string types with a validated format. This
+is intended to be a more future-proof solution, as only the format of release
+identifier strings is now validated, but the strings themselves are not compared
+to a list of hard-coded known release identifiers.
+
+Overview of changes since version 1.1.1:
+
+- ported to use asynchronous network calls exposed by `fedora` v2.0.0+
+- ported all examples and tests to use `#[tokio::test]`, though all library code
+  of this crate is runtime-agnostic
+- use re-exported `reqwest` and `url` from `fedora`, since those crates are
+  part of the public API and version needs to match the one exposed by the 
+  `fedora` crate
+- renamed `BodhiService` to `BodhiClient`, as that matches what it does
+- removed all specialized traits for `Query` / `PaginatedQuery`, `Create`, and
+  `Edit` in favor of using only `Request` and `PaginatedRequest`
+- simplified error types (removed `ServiceError`, its variants have been merged
+  into the `QueryError` type), and added a specific error for invalid input data
+- reimplemented `FedoraRelease` enum as a newtype wrapper around string types,
+  making the crate more future-proof, as this does not require code changes for
+  supporting new Fedora or EPEL releases every few months
+- make it impossible to construct most "output-only" types outside this crate
+- expose APIs for running single-page queries for specific result pages
+
+Development-specific changes:
+
+- python scripts for generating integration tests have been rewritten to use
+  Jinja2 templates, making the code moch more easy to maintain or adapt
+- added property-based tests for validating the regular expressions used to
+  parse and validate `FedoraRelease` values from strings
+
+Additionally, every line of documentation has been rewritten from scratch to
+make sure it matches the latest state of the crate. The `NEWS.md` changelog is
+now also imported into the crate's documentation.
+
 ### Release 1.1.1 "Corporate Badger" (November 30, 2021)
 
 Changes:
