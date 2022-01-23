@@ -63,8 +63,7 @@ impl<'a> SingleRequest<OverridePage, Override> for OverrideNVRQuery<'a> {
 /// ```
 /// use bodhi::{ContentType, FedoraRelease, OverrideQuery};
 ///
-/// let releases = vec![FedoraRelease::fedora(34, ContentType::RPM).unwrap()];
-/// let query = OverrideQuery::new().releases(&releases).users(&["decathorpe"]);
+/// let query = OverrideQuery::new().users(&["decathorpe"]).expired(false);
 /// // let overrides = bodhi.paginated_request(&query).unwrap();
 /// ```
 ///
@@ -75,7 +74,7 @@ pub struct OverrideQuery<'a> {
     expired: Option<bool>,
     like: Option<&'a str>,
     packages: Option<&'a [&'a str]>,
-    releases: Option<&'a [FedoraRelease]>,
+    releases: Option<&'a [&'a FedoraRelease]>,
     search: Option<&'a str>,
     users: Option<&'a [&'a str]>,
 
@@ -157,7 +156,7 @@ impl<'a> OverrideQuery<'a> {
 
     /// restrict query to overrides matching specific releases
     #[must_use]
-    pub fn releases(mut self, releases: &'a [FedoraRelease]) -> Self {
+    pub fn releases(mut self, releases: &'a [&'a FedoraRelease]) -> Self {
         self.releases = Some(releases);
         self
     }
@@ -185,7 +184,7 @@ pub struct OverridePageQuery<'a> {
     expired: Option<bool>,
     like: Option<&'a str>,
     packages: Option<&'a [&'a str]>,
-    releases: Option<&'a [FedoraRelease]>,
+    releases: Option<&'a [&'a FedoraRelease]>,
     search: Option<&'a str>,
     #[serde(rename = "user")]
     users: Option<&'a [&'a str]>,

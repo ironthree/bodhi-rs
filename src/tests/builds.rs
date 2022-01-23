@@ -28,20 +28,20 @@ async fn query_sanity_packages() {
 async fn query_sanity_releases() {
     let bodhi = bodhi_init().await;
 
-    let f31c = || FedoraRelease::try_from("F31C").unwrap();
-    let f30c = || FedoraRelease::try_from("F30C").unwrap();
+    let f31c = FedoraRelease::try_from("F31C").unwrap();
+    let f30c = FedoraRelease::try_from("F30C").unwrap();
 
     let f31c_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().releases(&[f31c()]))
+        .paginated_request(&BuildQuery::new().releases(&[&f31c]))
         .await
         .unwrap();
     let f30c_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().releases(&[f30c()]))
+        .paginated_request(&BuildQuery::new().releases(&[&f30c]))
         .await
         .unwrap();
 
     let both_builds: Vec<Build> = bodhi
-        .paginated_request(&BuildQuery::new().releases(&[f31c(), f30c()]))
+        .paginated_request(&BuildQuery::new().releases(&[&f31c, &f30c]))
         .await
         .unwrap();
 

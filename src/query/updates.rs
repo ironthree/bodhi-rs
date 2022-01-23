@@ -64,10 +64,8 @@ impl<'a> SingleRequest<UpdatePage, Update> for UpdateIDQuery<'a> {
 /// ```
 /// use bodhi::{ContentType, FedoraRelease, UpdateQuery, UpdateRequest};
 ///
-/// let releases = vec![FedoraRelease::fedora(34, ContentType::RPM).unwrap()];
 /// let query = UpdateQuery::new()
 ///     .users(&["decathorpe"])
-///     .releases(&releases)
 ///     .request(UpdateRequest::Testing);
 /// // let updates = bodhi.paginated_request(&query).unwrap();
 /// ```
@@ -92,7 +90,7 @@ pub struct UpdateQuery<'a> {
     pushed: Option<bool>,
     pushed_before: Option<&'a BodhiDate>,
     pushed_since: Option<&'a BodhiDate>,
-    releases: Option<&'a [FedoraRelease]>,
+    releases: Option<&'a [&'a FedoraRelease]>,
     request: Option<UpdateRequest>,
     search: Option<&'a str>,
     severity: Option<UpdateSeverity>,
@@ -302,7 +300,7 @@ impl<'a> UpdateQuery<'a> {
 
     /// restrict query to updates for any of the specified releases
     #[must_use]
-    pub fn releases(mut self, releases: &'a [FedoraRelease]) -> Self {
+    pub fn releases(mut self, releases: &'a [&'a FedoraRelease]) -> Self {
         self.releases = Some(releases);
         self
     }
@@ -406,7 +404,7 @@ pub struct UpdatePageQuery<'a> {
     pushed_before: Option<&'a BodhiDate>,
     #[serde(with = "crate::option_bodhi_date_format_ref")]
     pushed_since: Option<&'a BodhiDate>,
-    releases: Option<&'a [FedoraRelease]>,
+    releases: Option<&'a [&'a FedoraRelease]>,
     request: Option<UpdateRequest>,
     search: Option<&'a str>,
     severity: Option<UpdateSeverity>,
