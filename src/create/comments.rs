@@ -6,7 +6,6 @@ use crate::data::{Comment, Karma, Update};
 use crate::error::QueryError;
 use crate::request::{RequestMethod, SingleRequest};
 
-// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST>
 #[derive(Debug, Serialize)]
 struct CommentData<'a> {
     update: &'a str,
@@ -65,6 +64,8 @@ pub struct NewComment {
 
 
 /// data type wrapping all mandatory and optional parameters for creating a new comment
+///
+/// API documentation: <https://bodhi.fedoraproject.org/docs/server_api/rest/comments.html#service-1-POST>
 #[derive(Debug)]
 pub struct CommentCreator<'a> {
     update: &'a str,
@@ -166,10 +167,9 @@ impl<'a> SingleRequest<NewComment, NewComment> for CommentCreator<'a> {
             csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        match serde_json::to_string(&new_comment) {
-            Ok(result) => Ok(Some(result)),
-            Err(error) => Err(QueryError::SerializationError { error }),
-        }
+        Ok(Some(
+            serde_json::to_string(&new_comment).map_err(|error| QueryError::SerializationError { error })?,
+        ))
     }
 
     fn parse(&self, string: &str) -> Result<NewComment, QueryError> {

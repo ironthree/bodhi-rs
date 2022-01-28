@@ -86,10 +86,9 @@ impl<'a> SingleRequest<EditedOverride, EditedOverride> for OverrideEditor<'a> {
             csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        match serde_json::to_string(&override_edit) {
-            Ok(result) => Ok(Some(result)),
-            Err(error) => Err(QueryError::SerializationError { error }),
-        }
+        Ok(Some(
+            serde_json::to_string(&override_edit).map_err(|error| QueryError::SerializationError { error })?,
+        ))
     }
 
     fn parse(&self, string: &str) -> Result<EditedOverride, QueryError> {

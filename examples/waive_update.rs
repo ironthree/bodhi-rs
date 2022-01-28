@@ -36,11 +36,11 @@ async fn main() -> Result<(), String> {
 
     let response = bodhi.request(&update_waiver).await;
 
-    match response {
-        Ok(edited_update) => {
-            println!("{:#?}", edited_update);
-            Ok(())
-        },
-        Err(error) => Err(format!("{:#?}", error)),
-    }
+    // check the response whether editing the update was successful
+    let edited_update: Update = response.map_err(|error| error.to_string())?;
+
+    println!("Update tests waived:");
+    println!("{:#?}", edited_update);
+
+    Ok(())
 }

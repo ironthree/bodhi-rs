@@ -335,10 +335,9 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
             },
         };
 
-        match serde_json::to_string(&new_update) {
-            Ok(result) => Ok(Some(result)),
-            Err(error) => Err(QueryError::SerializationError { error }),
-        }
+        Ok(Some(
+            serde_json::to_string(&new_update).map_err(|error| QueryError::SerializationError { error })?,
+        ))
     }
 
     fn parse(&self, string: &str) -> Result<NewUpdate, QueryError> {

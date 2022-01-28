@@ -288,14 +288,13 @@ impl FromStr for FedoraRelease {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use quickcheck::Gen;
-    use quickcheck_macros::quickcheck;
+    use quickcheck::{Arbitrary, Gen, QuickCheck};
 
     use super::*;
 
     // hacky implementation of the Arbitrary trait for ContentType
     // this only works because the enum has exactly four variants
-    impl quickcheck::Arbitrary for ContentType {
+    impl Arbitrary for ContentType {
         fn arbitrary(g: &mut Gen) -> Self {
             match (bool::arbitrary(g), bool::arbitrary(g)) {
                 (true, true) => ContentType::RPM,
@@ -304,6 +303,11 @@ mod tests {
                 (false, false) => ContentType::Module,
             }
         }
+    }
+
+    // helper function that returns a quickcheck value
+    fn quickchecker() -> QuickCheck {
+        QuickCheck::new().tests(1_000_000)
     }
 
     #[test]
@@ -455,112 +459,152 @@ mod tests {
         }
     }
 
-    #[quickcheck]
-    fn check_fedora(number: u32) -> bool {
-        if number < fedora::MIN_RELEASE {
-            return true;
+    #[test]
+    fn check_fedora() {
+        fn prop(number: u32) -> bool {
+            if number < fedora::MIN_RELEASE {
+                return true;
+            }
+
+            let built = FedoraRelease::fedora(number, ContentType::RPM).unwrap().to_string();
+            let (num, ctype) = fedora::release_parse(&built).unwrap();
+            number == num && ctype.is_empty()
         }
 
-        let built = FedoraRelease::fedora(number, ContentType::RPM).unwrap().to_string();
-        let (num, ctype) = fedora::release_parse(&built).unwrap();
-        number == num && ctype.is_empty()
+        quickchecker().quickcheck(prop as fn(u32) -> bool)
     }
 
-    #[quickcheck]
-    fn check_fedora_container(number: u32) -> bool {
-        if number < fedora::MIN_RELEASE {
-            return true;
+    #[test]
+    fn check_fedora_container() {
+        fn prop(number: u32) -> bool {
+            if number < fedora::MIN_RELEASE {
+                return true;
+            }
+
+            let built = FedoraRelease::fedora(number, ContentType::Container)
+                .unwrap()
+                .to_string();
+            let (num, ctype) = fedora::release_parse(&built).unwrap();
+            number == num && ctype == "C"
         }
 
-        let built = FedoraRelease::fedora(number, ContentType::Container)
-            .unwrap()
-            .to_string();
-        let (num, ctype) = fedora::release_parse(&built).unwrap();
-        number == num && ctype == "C"
+        quickchecker().quickcheck(prop as fn(u32) -> bool)
     }
 
-    #[quickcheck]
-    fn check_fedora_flatpak(number: u32) -> bool {
-        if number < fedora::MIN_RELEASE {
-            return true;
+    #[test]
+    fn check_fedora_flatpak() {
+        fn prop(number: u32) -> bool {
+            if number < fedora::MIN_RELEASE {
+                return true;
+            }
+
+            let built = FedoraRelease::fedora(number, ContentType::Flatpak).unwrap().to_string();
+            let (num, ctype) = fedora::release_parse(&built).unwrap();
+            number == num && ctype == "F"
         }
 
-        let built = FedoraRelease::fedora(number, ContentType::Flatpak).unwrap().to_string();
-        let (num, ctype) = fedora::release_parse(&built).unwrap();
-        number == num && ctype == "F"
+        quickchecker().quickcheck(prop as fn(u32) -> bool)
     }
 
-    #[quickcheck]
-    fn check_fedora_module(number: u32) -> bool {
-        if number < fedora::MIN_RELEASE {
-            return true;
+    #[test]
+    fn check_fedora_module() {
+        fn prop(number: u32) -> bool {
+            if number < fedora::MIN_RELEASE {
+                return true;
+            }
+
+            let built = FedoraRelease::fedora(number, ContentType::Module).unwrap().to_string();
+            let (num, ctype) = fedora::release_parse(&built).unwrap();
+            number == num && ctype == "M"
         }
 
-        let built = FedoraRelease::fedora(number, ContentType::Module).unwrap().to_string();
-        let (num, ctype) = fedora::release_parse(&built).unwrap();
-        number == num && ctype == "M"
+        quickchecker().quickcheck(prop as fn(u32) -> bool)
     }
 
-    #[quickcheck]
-    fn check_epel(number: u32) -> bool {
-        if number < epel::MIN_RELEASE {
-            return true;
+    #[test]
+    fn check_epel() {
+        fn prop(number: u32) -> bool {
+            if number < epel::MIN_RELEASE {
+                return true;
+            }
+
+            let built = FedoraRelease::epel(number, ContentType::RPM, false)
+                .unwrap()
+                .to_string();
+            let num = if number < 7 {
+                el::release_parse(&built).unwrap()
+            } else {
+                let (num, ctype, next) = epel::release_parse(&built).unwrap();
+                assert!(ctype.is_empty());
+                assert!(!next);
+                num
+            };
+            number == num
         }
 
-        let built = FedoraRelease::epel(number, ContentType::RPM, false)
-            .unwrap()
-            .to_string();
-        let num = if number < 7 {
-            el::release_parse(&built).unwrap()
-        } else {
+        quickchecker().quickcheck(prop as fn(u32) -> bool)
+    }
+
+    #[test]
+    fn check_epel_modules() {
+        fn prop(number: u32) -> bool {
+            if number < epel::MIN_MODULE_RELEASE {
+                return true;
+            }
+
+            let built = FedoraRelease::epel(number, ContentType::Module, false)
+                .unwrap()
+                .to_string();
             let (num, ctype, next) = epel::release_parse(&built).unwrap();
-            assert!(ctype.is_empty());
-            assert!(!next);
-            num
-        };
-        number == num
-    }
-
-    #[quickcheck]
-    fn check_epel_modules(number: u32) -> bool {
-        if number < epel::MIN_MODULE_RELEASE {
-            return true;
+            number == num && ctype == "M" && !next
         }
 
-        let built = FedoraRelease::epel(number, ContentType::Module, false)
-            .unwrap()
-            .to_string();
-        let (num, ctype, next) = epel::release_parse(&built).unwrap();
-        number == num && ctype == "M" && !next
+        quickchecker().quickcheck(prop as fn(u32) -> bool)
     }
 
-    #[quickcheck]
-    fn check_epel_next(number: u32) -> bool {
-        if number < epel::MIN_NEXT_RELEASE {
-            return true;
+    #[test]
+    fn check_epel_next() {
+        fn prop(number: u32) -> bool {
+            if number < epel::MIN_NEXT_RELEASE {
+                return true;
+            }
+
+            let built = FedoraRelease::epel(number, ContentType::RPM, true).unwrap().to_string();
+            let (num, ctype, next) = epel::release_parse(&built).unwrap();
+            number == num && ctype.is_empty() && next
         }
 
-        let built = FedoraRelease::epel(number, ContentType::RPM, true).unwrap().to_string();
-        let (num, ctype, next) = epel::release_parse(&built).unwrap();
-        number == num && ctype.is_empty() && next
+        quickchecker().quickcheck(prop as fn(u32) -> bool)
     }
 
-    #[quickcheck]
-    fn check_epel_container(number: u32, next: bool) -> bool {
-        FedoraRelease::epel(number, ContentType::Container, next).is_err()
-    }
-
-    #[quickcheck]
-    fn check_epel_flatpak(number: u32, next: bool) -> bool {
-        FedoraRelease::epel(number, ContentType::Flatpak, next).is_err()
-    }
-
-    #[quickcheck]
-    fn check_epel_combo(number: u32, ctype: ContentType) -> bool {
-        if number < epel::MIN_RELEASE {
-            return true;
+    #[test]
+    fn check_epel_container() {
+        fn prop(number: u32, next: bool) -> bool {
+            FedoraRelease::epel(number, ContentType::Container, next).is_err()
         }
 
-        (ctype == ContentType::RPM) != FedoraRelease::epel(number, ctype, true).is_err()
+        quickchecker().quickcheck(prop as fn(u32, bool) -> bool)
+    }
+
+    #[test]
+    fn check_epel_flatpak() {
+        fn prop(number: u32, next: bool) -> bool {
+            FedoraRelease::epel(number, ContentType::Flatpak, next).is_err()
+        }
+
+        quickchecker().quickcheck(prop as fn(u32, bool) -> bool)
+    }
+
+    #[test]
+    fn check_epel_combo() {
+        fn prop(number: u32, ctype: ContentType) -> bool {
+            if number < epel::MIN_RELEASE {
+                return true;
+            }
+
+            (ctype == ContentType::RPM) != FedoraRelease::epel(number, ctype, true).is_err()
+        }
+
+        quickchecker().quickcheck(prop as fn(u32, ContentType) -> bool)
     }
 }

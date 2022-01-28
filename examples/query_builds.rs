@@ -3,7 +3,7 @@ use std::io::Write;
 use bodhi::{BodhiClientBuilder, BuildQuery};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), String> {
     // construct bodhi client for the production instance
     let bodhi = BodhiClientBuilder::default().build().await.unwrap();
 
@@ -22,8 +22,13 @@ async fn main() {
         .updates(&["FEDORA-2021-165f1e7af4"])
         .callback(progressbar);
 
-    let builds = bodhi.paginated_request(&query).await.unwrap();
+    let builds = bodhi
+        .paginated_request(&query)
+        .await
+        .map_err(|error| error.to_string())?;
 
     println!("Update builds:");
     println!("{:#?}", builds);
+
+    Ok(())
 }

@@ -1,7 +1,7 @@
 use std::convert::TryFrom;
 use std::io::{stdin, stdout, Write};
 
-use bodhi::{BodhiClientBuilder, BodhiDate, OverrideCreator};
+use bodhi::{BodhiClientBuilder, BodhiDate, NewOverride, OverrideCreator};
 
 fn read_username() -> String {
     print!("FAS username: ");
@@ -37,11 +37,11 @@ async fn main() -> Result<(), String> {
 
     let response = bodhi.request(&new_override).await;
 
-    match response {
-        Ok(value) => {
-            println!("{:#?}", value);
-            Ok(())
-        },
-        Err(error) => Err(format!("{:#?}", error)),
-    }
+    // check the response whether creating the override was successful
+    let new_override: NewOverride = response.map_err(|error| error.to_string())?;
+
+    println!("New override created:");
+    println!("{:#?}", new_override);
+
+    Ok(())
 }

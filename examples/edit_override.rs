@@ -1,6 +1,6 @@
 use std::io::{stdin, stdout, Write};
 
-use bodhi::{BodhiClientBuilder, OverrideEditor, OverrideNVRQuery};
+use bodhi::{BodhiClientBuilder, EditedOverride, OverrideEditor, OverrideNVRQuery};
 
 fn read_username() -> String {
     print!("FAS username: ");
@@ -35,11 +35,11 @@ async fn main() -> Result<(), String> {
 
     let response = bodhi.request(&override_edit).await;
 
-    match response {
-        Ok(value) => {
-            println!("{:#?}", value);
-            Ok(())
-        },
-        Err(error) => Err(format!("{:#?}", error)),
-    }
+    // check the response whether editing the override was successful
+    let edited_override: EditedOverride = response.map_err(|error| error.to_string())?;
+
+    println!("Override edited:");
+    println!("{:#?}", edited_override);
+
+    Ok(())
 }

@@ -63,10 +63,9 @@ impl<'a> SingleRequest<NewOverride, NewOverride> for OverrideCreator<'a> {
             csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        match serde_json::to_string(&new_override) {
-            Ok(result) => Ok(Some(result)),
-            Err(error) => Err(QueryError::SerializationError { error }),
-        }
+        Ok(Some(
+            serde_json::to_string(&new_override).map_err(|error| QueryError::SerializationError { error })?,
+        ))
     }
 
     fn parse(&self, string: &str) -> Result<NewOverride, QueryError> {

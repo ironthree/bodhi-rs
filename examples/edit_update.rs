@@ -1,7 +1,7 @@
 use std::io::{stdin, stdout, Write};
 use std::time::Duration;
 
-use bodhi::{BodhiClientBuilder, Update, UpdateEditor, UpdateIDQuery};
+use bodhi::{BodhiClientBuilder, EditedUpdate, Update, UpdateEditor, UpdateIDQuery};
 
 fn read_username() -> String {
     print!("FAS username: ");
@@ -37,11 +37,11 @@ async fn main() -> Result<(), String> {
 
     let response = bodhi.request(&update_editor).await;
 
-    match response {
-        Ok(edited_update) => {
-            println!("{:#?}", edited_update);
-            Ok(())
-        },
-        Err(error) => Err(format!("{:#?}", error)),
-    }
+    // check the response whether editing the update was successful
+    let edited_update: EditedUpdate = response.map_err(|error| error.to_string())?;
+
+    println!("Update edited:");
+    println!("{:#?}", edited_update);
+
+    Ok(())
 }

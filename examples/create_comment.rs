@@ -1,6 +1,6 @@
 use std::io::{stdin, stdout, Write};
 
-use bodhi::{BodhiClientBuilder, Karma, Update, UpdateIDQuery};
+use bodhi::{BodhiClientBuilder, Karma, NewComment, Update, UpdateIDQuery};
 
 fn read_username() -> String {
     print!("FAS username: ");
@@ -43,13 +43,10 @@ async fn main() -> Result<(), String> {
     let response = bodhi.request(&new_comment).await;
 
     // check the response whether creating the comment was successful
-    match response {
-        Ok(new_comment) => {
-            println!("New comment created:");
-            println!("{:#?}", new_comment);
-        },
-        Err(error) => return Err(error.to_string()),
-    }
+    let new_comment: NewComment = response.map_err(|error| error.to_string())?;
+
+    println!("New comment created:");
+    println!("{:#?}", new_comment);
 
     Ok(())
 }

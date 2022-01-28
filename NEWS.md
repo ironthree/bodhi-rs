@@ -1,4 +1,4 @@
-### Release 2.0.0-beta.1 "Modern Times" (January 20, 2022)
+### Release 2.0.0-beta.1 "Modern Times" (January 23, 2022)
 
 This version is an almost-complete rewrite of the entire crate, with
 numerous changes and improvements.

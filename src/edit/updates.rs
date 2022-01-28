@@ -220,37 +220,25 @@ impl<'a> SingleRequest<EditedUpdate, EditedUpdate> for UpdateEditor<'a> {
 
     fn body(&self, csrf_token: Option<String>) -> Result<Option<String>, QueryError> {
         // do some data sanity verification
-        if let Some(karma) = self.stable_karma {
-            if karma < 1 {
-                return Err(QueryError::InvalidDataError {
-                    error: String::from("Stable karma must be positive."),
-                });
-            }
-        }
-        if let Some(karma) = self.unstable_karma {
-            if karma > -1 {
-                return Err(QueryError::InvalidDataError {
-                    error: String::from("Unstable karma must be negative."),
-                });
-            }
+        if matches!(self.stable_karma, Some(karma) if karma < 1) {
+            return Err(QueryError::InvalidDataError {
+                error: String::from("Stable karma must be positive."),
+            });
         }
 
-        if let Some(update_type) = self.update_type {
-            if update_type == UpdateType::Security {
-                match self.severity {
-                    Some(value) if value == UpdateSeverity::Unspecified => {
-                        return Err(QueryError::InvalidDataError {
-                            error: String::from("For security updates, severity has to be specified."),
-                        });
-                    },
-                    None => {
-                        return Err(QueryError::InvalidDataError {
-                            error: String::from("For security updates, severity has to be specified."),
-                        });
-                    },
-                    _ => {},
-                }
-            }
+        if matches!(self.unstable_karma, Some(karma) if karma > -1) {
+            return Err(QueryError::InvalidDataError {
+                error: String::from("Unstable karma must be negative."),
+            });
+        }
+
+        if matches!(
+            (self.update_type, self.severity),
+            (Some(UpdateType::Security), Some(UpdateSeverity::Unspecified) | None)
+        ) {
+            return Err(QueryError::InvalidDataError {
+                error: String::from("For security updates, severity has to be specified."),
+            });
         }
 
         let bugs: Vec<String> = self.bugs.iter().map(|b| format!("{}", b)).collect();
@@ -285,10 +273,9 @@ impl<'a> SingleRequest<EditedUpdate, EditedUpdate> for UpdateEditor<'a> {
             csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        match serde_json::to_string(&update_edit) {
-            Ok(result) => Ok(Some(result)),
-            Err(error) => Err(QueryError::SerializationError { error }),
-        }
+        Ok(Some(
+            serde_json::to_string(&update_edit).map_err(|error| QueryError::SerializationError { error })?,
+        ))
     }
 
     fn parse(&self, string: &str) -> Result<EditedUpdate, QueryError> {
@@ -346,10 +333,9 @@ impl<'a> SingleRequest<RequestedUpdate, Update> for UpdateStatusRequester<'a> {
             csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        match serde_json::to_string(&request_edit) {
-            Ok(result) => Ok(Some(result)),
-            Err(error) => Err(QueryError::SerializationError { error }),
-        }
+        Ok(Some(
+            serde_json::to_string(&request_edit).map_err(|error| QueryError::SerializationError { error })?,
+        ))
     }
 
     fn parse(&self, string: &str) -> Result<RequestedUpdate, QueryError> {
@@ -421,10 +407,9 @@ impl<'a> SingleRequest<WaivedUpdate, Update> for UpdateTestResultWaiver<'a> {
             csrf_token: csrf_token.as_ref().unwrap_or_else(|| unreachable!()),
         };
 
-        match serde_json::to_string(&request_waiver) {
-            Ok(result) => Ok(Some(result)),
-            Err(error) => Err(QueryError::SerializationError { error }),
-        }
+        Ok(Some(
+            serde_json::to_string(&request_waiver).map_err(|error| QueryError::SerializationError { error })?,
+        ))
     }
 
     fn parse(&self, string: &str) -> Result<WaivedUpdate, QueryError> {
