@@ -75,21 +75,15 @@ ACTIVE_RELEASES = [
     "F34C",
     "F34F",
     "F34M",
-    "F33",
-    "F33C",
-    "F33F",
-    "F33M",
     "EPEL-9",
     "EPEL-9N",
     "EPEL-8",
     "EPEL-8M",
     "EPEL-8N",
     "EPEL-7",
-    "EL-6",
     "ELN",
 ]
 
-# change this to "ALL_RELEASES" regenerate data for archived releases as well
 RELEASES = ACTIVE_RELEASES
 
 
