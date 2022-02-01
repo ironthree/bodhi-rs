@@ -22,13 +22,11 @@
 //!
 //! 1. initialize a [`BodhiClient`] instance:
 //!
-//! ```
+//! ```ignore
 //! use bodhi::{BodhiClient, BodhiClientBuilder};
 //!
-//! # tokio_test::block_on( async {
 //! // initialize a service for interacting with the production instance of bodhi
 //! let bodhi: BodhiClient = BodhiClientBuilder::default().build().await.unwrap();
-//! # })
 //! ```
 //!
 //! 2. create a request, like a [`PackageQuery`] for packages named "rust":
@@ -42,16 +40,9 @@
 //!
 //! 3. pass the request to the service:
 //!
-//! ```
-//! # use bodhi::BodhiClientBuilder;
-//! # use bodhi::{Package, PackageQuery};
-//! # let bodhi = tokio_test::block_on( async { BodhiClientBuilder::default().build().await }).unwrap();
-//! # let package_query = PackageQuery::new().name("rust");
-//! # tokio_test::block_on( async {
+//! ```ignore
 //! // pass the query to bodhi, wait for the result, and don't do any error handling
-//! # #[cfg(feature = "online-tests")]
 //! let packages: Vec<Package> = bodhi.paginated_request(&package_query).await.unwrap();
-//! # })
 //! ```
 //!
 //! ## Building Requests
@@ -91,17 +82,12 @@
 //! Internally, paginated requests are handled as a stream of `SingleRequest` instances, one for
 //! each page of results.
 //!
-//! ```no_run
-//! # use bodhi::BodhiClientBuilder;
-//! # use bodhi::{NewUpdate, Release, ReleaseQuery, UpdateCreator};
-//! # let bodhi = tokio_test::block_on( async { BodhiClientBuilder::default().build().await }).unwrap();
+//! ```ignore
 //! let release_query = ReleaseQuery::new().exclude_archived(true);
 //! let update_creator = UpdateCreator::from_builds(&["rust-bodhi-1.1.1-2.fc36"], "Update for bodhi-rs 1.1.1.");
 //!
-//! # tokio_test::block_on( async {
 //! let releases: Vec<Release> = bodhi.paginated_request(&release_query).await.unwrap();
 //! let new_update: NewUpdate = bodhi.request(&update_creator).await.unwrap();
-//! # })
 //! ```
 //!
 //! ## Changing default session parameters
@@ -115,10 +101,9 @@
 //! - `User-Agent` header in HTTP requests (default: `bodhi-rs v$(CARGO_PKG_VERSION)`)
 //! - username and password for authenticated requests (default: unauthenticated)
 //!
-//! ```no_run
+//! ```ignore
 //! use bodhi::BodhiClientBuilder;
 //!
-//! # tokio_test::block_on( async {
 //! let bodhi = BodhiClientBuilder::staging()
 //!     .timeout(std::time::Duration::from_secs(3600))
 //!     .retries(1000)
@@ -127,7 +112,6 @@
 //!     .build()
 //!     .await
 //!     .unwrap();
-//! # })
 //! ```
 
 #![warn(missing_docs)]
