@@ -5,8 +5,12 @@ use std::fs::read_to_string;
 
 use bodhi::Override;
 
+const JSON_F37: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f37.json");
+const JSON_F37C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f37c.json");
 const JSON_F36: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f36.json");
 const JSON_F36C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f36c.json");
+const JSON_F36F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f36f.json");
+const JSON_F36M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f36m.json");
 const JSON_F35: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f35.json");
 const JSON_F35C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f35c.json");
 const JSON_F35F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/overrides_f35f.json");
@@ -59,6 +63,44 @@ const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/override
 
 #[cfg(feature = "data-tests")]
 #[test]
+fn overrides_dejson_f37() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F37).unwrap()).unwrap();
+
+    for o in &os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_f37c() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F37C).unwrap()).unwrap();
+
+    for o in &os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
 fn overrides_dejson_f36() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F36).unwrap()).unwrap();
 
@@ -80,6 +122,44 @@ fn overrides_dejson_f36() {
 #[test]
 fn overrides_dejson_f36c() {
     let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F36C).unwrap()).unwrap();
+
+    for o in &os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_f36f() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F36F).unwrap()).unwrap();
+
+    for o in &os {
+        if !o.extra.is_empty() {
+            println!("{:#?}", o.extra);
+        }
+
+        assert!(o.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !os.is_empty() {
+        assert!(!os.iter().all(|o| o.expired_date.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn overrides_dejson_f36m() {
+    let os: Vec<Override> = serde_json::from_str(&read_to_string(JSON_F36M).unwrap()).unwrap();
 
     for o in &os {
         if !o.extra.is_empty() {

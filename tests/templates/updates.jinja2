@@ -33,7 +33,7 @@ fn updates_dejson_{{ release.lower() }}() {
         assert!(!updates.iter().all(|u| u.date_submitted.is_none()));
         assert!(!updates.iter().all(|u| u.date_testing.is_none()));
         assert!(!updates.iter().all(|u| u.karma.is_none()));
-        assert!(!updates.iter().all(|u| u.requirements.is_none()));
+        {% if release in ignore_requirements %}//{% endif %}assert!(!updates.iter().all(|u| u.requirements.is_none()));
         assert!(!updates.iter().all(|u| u.stable_days.is_none()));
         assert!(!updates.iter().all(|u| u.stable_karma.is_none()));
         assert!(!updates.iter().all(|u| u.test_cases.is_none()));

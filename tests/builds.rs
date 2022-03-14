@@ -5,8 +5,12 @@ use std::fs::read_to_string;
 
 use bodhi::Build;
 
+const JSON_F37: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f37.json");
+const JSON_F37C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f37c.json");
 const JSON_F36: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f36.json");
 const JSON_F36C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f36c.json");
+const JSON_F36F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f36f.json");
+const JSON_F36M: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f36m.json");
 const JSON_F35: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f35.json");
 const JSON_F35C: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f35c.json");
 const JSON_F35F: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_f35f.json");
@@ -59,6 +63,44 @@ const JSON_ELN: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/data/builds_e
 
 #[cfg(feature = "data-tests")]
 #[test]
+fn builds_dejson_f37() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F37).unwrap()).unwrap();
+
+    for build in &builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_f37c() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F37C).unwrap()).unwrap();
+
+    for build in &builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
 fn builds_dejson_f36() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F36).unwrap()).unwrap();
 
@@ -80,6 +122,44 @@ fn builds_dejson_f36() {
 #[test]
 fn builds_dejson_f36c() {
     let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F36C).unwrap()).unwrap();
+
+    for build in &builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_f36f() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F36F).unwrap()).unwrap();
+
+    for build in &builds {
+        if !build.extra.is_empty() {
+            println!("{:#?}", build.extra);
+        }
+
+        assert!(build.extra.is_empty());
+    }
+
+    // check if an optional field is no longer present
+    if !builds.is_empty() {
+        assert!(!builds.iter().all(|b| b.release_id.is_none()));
+    }
+}
+
+#[cfg(feature = "data-tests")]
+#[test]
+fn builds_dejson_f36m() {
+    let builds: Vec<Build> = serde_json::from_str(&read_to_string(JSON_F36M).unwrap()).unwrap();
 
     for build in &builds {
         if !build.extra.is_empty() {
