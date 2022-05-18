@@ -3,7 +3,7 @@ name = "bodhi"
 description = "bodhi REST API client"
 license = "MIT OR Apache-2.0"
 
-version = "2.1.0-dev"
+version = "2.0.1-dev"
 edition = "2021"
 rust-version = "1.56.0"
 
@@ -25,8 +25,7 @@ data-tests = []
 
 [dependencies]
 chrono = { version = "0.4.19", features = ["serde"] }
-#fedora = "2.1.0"
-fedora = { path = "../fedora-rs" }
+fedora = "2.0.1"
 lazy_static = "1.4"
 log = "0.4.14"
 regex = "1.5.4"
