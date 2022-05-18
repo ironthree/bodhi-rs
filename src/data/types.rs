@@ -368,6 +368,11 @@ pub struct Release {
     /// flag to indicate whether this release is composed by bodhi itself
     pub composed_by_bodhi: bool,
     /// optional list of running composes for this release
+    #[deprecated(
+        since = "2.1.0",
+        note = "The `composes` field was dropped from serialized `Release` objects with bodhi server versions 6.0 and later. It is only kept for backwards compatibility, but will in the future always have a value of `None` when deserializing JSON server responses."
+    )]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub composes: Option<Vec<Compose>>,
     /// flag to indicate whether updates should automatically be created for this release
     pub create_automatic_updates: Option<bool>,
