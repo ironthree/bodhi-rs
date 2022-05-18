@@ -1,3 +1,30 @@
+### Release 2.0.1 "Adaptations" (May 18, 2022)
+
+This release contains a few small improvements and fixes for upcoming bodhi
+server behaviour changes:
+
+The OpenID endpoint for logging into bodhi servers will be deprecated with bodhi
+6.0 servers, but will remain available under a different URL for now. The
+primary method of authentication will be OpenID Connect, which is not going to
+be supported in the `fedora` crate anytime soon, as it does not look like it
+will support headless authentication, but will require the user to sign on via a
+web browser window to retrieve an authentication token.  With version 2.0.1 of
+this crate, the authentication method was changed to explicitly use the
+deprecated OpenID endpoint, until OpenID connect support can be implemented in a
+way that works for this crate and its users.
+
+Additionally, bodhi servers will no longer include the `composes` field when
+serializing `Release` objects. As a result, the struct field has been marked as
+`deprecated`, but otherwise it remains the same for backwards compatibility.
+However, because JSON server responses will no longer include this field, it
+will always contain a value of `None`, and should no longer be used.
+
+The changes since 2.0.0 also include additions to the test dataset and
+test suite that cover the latest Fedora releases:
+
+- remove Fedora 33 and EPEL-6 from the lists of active releases
+- add missing tests and test data for Fedora 36 and 37 releases
+
 ### Release 2.0.0 "Finally" (February 01, 2022)
 
 This release contains no code changes compared to the previous beta. The only
