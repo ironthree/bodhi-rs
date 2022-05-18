@@ -173,7 +173,7 @@ impl<'a> BodhiClientBuilder<'a> {
     /// well, calling this method will also attempt to authenticate via OpenID.
     pub async fn build(self) -> Result<BodhiClient, BuilderError> {
         let url = Url::parse(&self.url)?;
-        let login_url = url.join("/login")?;
+        let login_url = url.join("/login?method=openid")?;
 
         let timeout = self.timeout.unwrap_or(REQUEST_TIMEOUT);
         let retries = self.retries.unwrap_or(REQUEST_RETRIES);
@@ -264,8 +264,7 @@ async fn retry_get(session: &Client, url: Url, body: Option<String>, retries: us
                 Ok(result) => break Ok(result),
                 Err(error) => {
                     log::warn!("Retrying failed HTTP request: {}", error);
-                    // FIXME: this will block the async runtime
-                    std::thread::sleep(duration);
+                    tokio::time::sleep(duration).await;
                 },
             }
         } else {
@@ -403,29 +402,31 @@ impl BodhiClient {
         T: DeserializeOwned,
     {
         let mut results: Vec<T> = Vec::new();
+
+        // initialize progress callback with "zero progress"
         request.callback(0, 1);
 
         let first_request = request.page_request(1);
-
         let first_page = self.page_request_get(first_request.as_ref()).await?;
 
         let mut page = 2u32;
         let mut pages = first_page.pages();
 
+        // update progress callback with actual total pages
         request.callback(1, pages);
 
         results.extend(first_request.extract(first_page));
 
         while page <= pages {
             let page_request = request.page_request(page);
-
             let next_page = self.page_request_get(page_request.as_ref()).await?;
+
             request.callback(page, pages);
 
             page += 1;
             pages = next_page.pages();
 
-            results.extend(page_request.extract(next_page).into_iter());
+            results.extend(page_request.extract(next_page));
         }
 
         Ok(results)
