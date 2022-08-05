@@ -24,7 +24,7 @@ online-tests = []
 data-tests = []
 
 [dependencies]
-chrono = { version = "0.4.19", features = ["serde"] }
+chrono = { version = "0.4.19", features = ["std"], default-features = false }
 fedora = "2.0.1"
 lazy_static = "1.4"
 log = "0.4.14"
@@ -37,6 +37,7 @@ thiserror = "1.0.30"
 tokio = { version = "1.14", features = ["time"] }
 
 [dev-dependencies]
+chrono = { version = "0.4.19", features = ["std", "clock"], default-features = false }
 env_logger = "0.9"
 quickcheck = "1"
 rpassword = "5"
