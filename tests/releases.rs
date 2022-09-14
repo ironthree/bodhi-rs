@@ -1,5 +1,6 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
+#![allow(deprecated)]
 
 use std::fs::read_to_string;
 
