@@ -3,8 +3,12 @@
 import jinja2
 
 RELEASES = [
+    "F38",
+    "F38C",
     "F37",
     "F37C",
+    "F37F",
+    "F37M",
     "F36",
     "F36C",
     "F36F",

@@ -12,8 +12,12 @@ import requests
 API_URL = "https://bodhi.fedoraproject.org"
 
 ALL_RELEASES = [
+    "F38",
+    "F38C",
     "F37",
     "F37C",
+    "F37F",
+    "F37M",
     "F36",
     "F36C",
     "F36F",
@@ -69,8 +73,12 @@ ALL_RELEASES = [
 ]
 
 ACTIVE_RELEASES = [
+    "F38",
+    "F38C",
     "F37",
     "F37C",
+    "F37F",
+    "F37M",
     "F36",
     "F36C",
     "F36F",
@@ -79,10 +87,6 @@ ACTIVE_RELEASES = [
     "F35C",
     "F35F",
     "F35M",
-    "F34",
-    "F34C",
-    "F34F",
-    "F34M",
     "EPEL-9",
     "EPEL-9N",
     "EPEL-8",
