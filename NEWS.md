@@ -1,3 +1,10 @@
+### Unreleased
+
+- add new `eol` field to `Release`
+- fix `deprecated(since)` annotation for the `composes` field of `Release`
+- update tests for new Fedora releases
+- drop dependency on `time` v0.1 by disabling the `oldtime` feature of `chrono`
+
 ### Release 2.0.1 "Adaptations" (May 18, 2022)
 
 This release contains a few small improvements and fixes for upcoming bodhi

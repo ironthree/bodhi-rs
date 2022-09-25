@@ -369,7 +369,7 @@ pub struct Release {
     pub composed_by_bodhi: bool,
     /// optional list of running composes for this release
     #[deprecated(
-        since = "2.1.0",
+        since = "2.0.1",
         note = "The `composes` field was dropped from serialized `Release` objects with bodhi server versions 6.0 and later. It is only kept for backwards compatibility, but will in the future always have a value of `None` when deserializing JSON server responses."
     )]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -406,6 +406,8 @@ pub struct Release {
     pub testing_tag: String,
     /// Fedora version string corresponding to this release
     pub version: String,
+    /// end-of-life date of this release in the format `YYYY-MM-DD`
+    pub eol: Option<String>,
 
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
