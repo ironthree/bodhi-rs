@@ -13,7 +13,7 @@ use super::FedoraRelease;
 
 /// valid `request` values for composes
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum ComposeRequest {
     #[serde(rename = "stable")]
     Stable,
@@ -55,7 +55,7 @@ impl FromStr for ComposeRequest {
 
 /// valid `state` values for composes
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum ComposeState {
     #[serde(rename = "cleaning")]
     Cleaning,
@@ -132,7 +132,7 @@ impl FromStr for ComposeState {
 
 /// valid / known content types
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum ContentType {
     // tag for container image updates
     #[serde(rename = "container")]
@@ -218,7 +218,7 @@ impl FromStr for ContentType {
 ///
 /// This type uses (de)serializaion support from [`serde_repr`] for converting these three numeric
 /// values into the corresponding enum variants.
-#[derive(Clone, Copy, Debug, Deserialize_repr, PartialEq, Serialize_repr)]
+#[derive(Clone, Copy, Debug, Deserialize_repr, Eq, PartialEq, Serialize_repr)]
 #[repr(i8)]
 pub enum Karma {
     /// positive feedback
@@ -275,7 +275,7 @@ impl FromStr for Karma {
 ///
 /// Values of this type are used to print installation instructions for updates on the server.
 #[allow(missing_docs)]
-#[derive(Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum PackageManager {
     #[serde(rename = "dnf")]
     DNF,
@@ -319,7 +319,7 @@ impl FromStr for PackageManager {
 
 
 /// valid `state` values for releases
-#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub enum ReleaseState {
     /// release has been archived after it has reached its EOL
     #[serde(rename = "archived")]
@@ -378,7 +378,7 @@ impl FromStr for ReleaseState {
 
 /// valid `state` values for an update's gating tests
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Deserialize, Serialize)]
 pub enum TestGatingStatus {
     #[serde(rename = "failed")]
     Failed,
@@ -463,7 +463,7 @@ impl Display for UpdateID {
 
 
 /// valid `request` values for updates
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum UpdateRequest {
     /// request for an update to be marked as "obsolete" (usually when another update supersedes it)
     #[serde(rename = "obsolete")]
@@ -524,7 +524,7 @@ impl FromStr for UpdateRequest {
 ///
 /// This field is required to not be `Unspecified` for updates with type [`UpdateType::Security`].
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum UpdateSeverity {
     #[serde(rename = "high")]
     High,
@@ -583,7 +583,7 @@ impl FromStr for UpdateSeverity {
 
 
 /// valid `status` values for updates
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum UpdateStatus {
     /// status of updates that have been obsoleted by another update
     #[serde(rename = "obsolete")]
@@ -651,7 +651,7 @@ impl FromStr for UpdateStatus {
 
 
 /// valid `suggestion` values for updates
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum UpdateSuggestion {
     /// recommendation for logging out after this update has been installed
     #[serde(rename = "logout")]
@@ -705,7 +705,7 @@ impl FromStr for UpdateSuggestion {
 
 
 /// valid `type` values for updates
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum UpdateType {
     /// the update contains fixes for known bugs
     #[serde(rename = "bugfix")]

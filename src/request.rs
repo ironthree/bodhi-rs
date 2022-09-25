@@ -3,7 +3,7 @@ use crate::error::QueryError;
 use serde::de::DeserializeOwned;
 
 #[allow(clippy::upper_case_acronyms)]
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum RequestMethod {
     GET,
     POST,

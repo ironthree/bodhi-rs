@@ -188,7 +188,7 @@ mod el {
 /// - [`FedoraRelease::CURRENT`]
 /// - [`FedoraRelease::PENDING`]
 /// - [`FedoraRelease::ARCHIVED`]
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(transparent)]
 pub struct FedoraRelease {
     release: Cow<'static, str>,
