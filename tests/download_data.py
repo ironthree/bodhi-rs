@@ -162,6 +162,7 @@ def do_builds() -> int:
             pages = data["pages"]
             if page > pages:
                 break
+            time.sleep(1)
 
         with open(f"data/builds_{release.replace('-', '').lower()}.json", "w") as file:
             file.write(json.dumps(builds, indent=2))
@@ -256,6 +257,7 @@ def do_overrides() -> int:
             pages = data["pages"]
             if page > pages:
                 break
+            time.sleep(1)
 
         with open(f"data/overrides_{release.replace('-', '').lower()}.json", "w") as file:
             file.write(json.dumps(overrides, indent=2))
@@ -290,6 +292,7 @@ def do_packages() -> int:
         pages = data["pages"]
         if page > pages:
             break
+        time.sleep(1)
 
     with open(f"data/packages.json", "w") as file:
         file.write(json.dumps(packages, indent=2))
@@ -312,6 +315,7 @@ def do_releases() -> int:
         pages = data["pages"]
         if page > pages:
             break
+        time.sleep(1)
 
     with open(f"data/releases.json", "w") as file:
         file.write(json.dumps(releases, indent=2))
@@ -338,6 +342,7 @@ def do_updates() -> int:
             pages = data["pages"]
             if page > pages:
                 break
+            time.sleep(1)
 
         with open(f"data/updates_{release.replace('-', '').lower()}.json", "w") as file:
             file.write(json.dumps(updates, indent=2))
@@ -372,6 +377,7 @@ def do_users() -> int:
         pages = data["pages"]
         if page > pages:
             break
+        time.sleep(1)
 
     with open(f"data/users.json", "w") as file:
         file.write(json.dumps(users, indent=2))
@@ -409,8 +415,15 @@ def main() -> int:
     if action == "all":
         ret = 0
 
-        for fun in actions.values():
-            ret += fun()
+        threads = []
+        for name, fun in actions.items():
+            thread = threading.Thread(name=name, target=fun, args=())
+            threads.append(thread)
+            thread.start()
+            time.sleep(1)
+
+        for thread in threads:
+            thread.join()
 
         return ret
 
