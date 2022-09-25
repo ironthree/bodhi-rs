@@ -1,6 +1,5 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
-#![allow(deprecated)]
 
 use std::fs::read_to_string;
 
@@ -18,11 +17,11 @@ fn releases_dejson() {
             println!("{:#?}", release.extra);
         }
 
-        //assert!(release.extra.is_empty()); // fails for EPEL-9
+        assert!(release.extra.is_empty()); // fails for EPEL-9
     }
 
     // check if an optional field is no longer present
-    assert!(!releases.iter().all(|r| r.composes.is_none()));
+    // the Release.composes field is no longer present
     assert!(!releases.iter().all(|r| r.create_automatic_updates.is_none()));
     assert!(!releases.iter().all(|r| r.testing_repository.is_none()));
 }
