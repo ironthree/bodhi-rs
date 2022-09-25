@@ -258,7 +258,7 @@ async fn try_get(session: &Client, url: Url, body: Option<String>) -> Result<Res
 async fn retry_get(session: &Client, url: Url, body: Option<String>, retries: usize) -> Result<Response, QueryError> {
     let mut retries: Vec<Duration> = vec![Duration::from_secs(1); retries];
 
-    let result = loop {
+    loop {
         if let Some(duration) = retries.pop() {
             match try_get(session, url.clone(), body.clone()).await {
                 Ok(result) => break Ok(result),
@@ -273,9 +273,7 @@ async fn retry_get(session: &Client, url: Url, body: Option<String>, retries: us
                 Err(error) => break Err(error),
             }
         }
-    };
-
-    result
+    }
 }
 
 async fn try_post(session: &Client, url: Url, body: Option<String>) -> Result<Response, QueryError> {
