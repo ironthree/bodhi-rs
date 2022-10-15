@@ -1862,4 +1862,3 @@ fn updates_dejson_eln() {
         assert!(!updates.iter().all(|u| u.unstable_karma.is_none()));
     }
 }
-

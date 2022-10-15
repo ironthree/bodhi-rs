@@ -70,7 +70,8 @@
 //!
 //! ```
 //! use bodhi::UpdateCreator;
-//! let creator = UpdateCreator::from_builds(&["rust-bodhi-1.1.1-2.fc36"], "Update for bodhi-rs 1.1.1.");
+//! let creator =
+//!     UpdateCreator::from_builds(&["rust-bodhi-1.1.1-2.fc36"], "Update for bodhi-rs 1.1.1.");
 //! ```
 //!
 //! ## Making Requests
