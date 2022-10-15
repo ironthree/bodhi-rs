@@ -37,7 +37,7 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
           command: test
-          args: --workspace --verbose --all-features
+          args: --workspace --verbose --features online-tests -- --test-threads 1
 
   clippy:
     runs-on: ubuntu-latest
