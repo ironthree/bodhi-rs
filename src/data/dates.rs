@@ -8,11 +8,11 @@ use chrono::{DateTime, TimeZone, Utc};
 /// human-readable, non-standard date format used internally by bodhi servers
 pub const BODHI_DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 
-/// ## newtype wrapper around [`chrono::DateTime`] with custom conversion methods
+/// ## newtype wrapper around [`DateTime`] with custom conversion methods
 ///
 /// The bodhi server uses a nonstandard format for datetime values, both in responses and in request
-/// parameters. This type is a wrapper around [`chrono::DateTime`] with custom implementations for
-/// parsing values from strings, formatting values as strings, and (de)serializing values in JSON.
+/// parameters. This type is a wrapper around [`DateTime`] with custom implementations for parsing
+/// values from strings, formatting values as strings, and (de)serializing values in JSON.
 ///
 /// The format string corresponding to the nonstandard format is defined in
 /// [`BODHI_DATETIME_FORMAT`].
