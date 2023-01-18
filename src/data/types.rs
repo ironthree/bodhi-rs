@@ -492,6 +492,9 @@ pub struct Update {
     pub content_type: Option<ContentType>,
     /// flag to indicate whether this update contains packages from the "critical path"
     pub critpath: bool,
+    /// optional string containing a space-separated list of critical path groups
+    /// (present since bodhi-server v7.0.0)
+    pub critpath_groups: Option<String>,
     /// last date & time when this update has been approved
     #[deprecated(
         since = "2.0.0",
