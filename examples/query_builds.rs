@@ -28,7 +28,7 @@ async fn main() -> Result<(), String> {
         .map_err(|error| error.to_string())?;
 
     println!("Update builds:");
-    println!("{:#?}", builds);
+    println!("{builds:#?}");
 
     Ok(())
 }

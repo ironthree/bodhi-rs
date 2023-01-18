@@ -40,7 +40,7 @@ async fn main() -> Result<(), String> {
     let edited_update: Update = response.map_err(|error| error.to_string())?;
 
     println!("Update tests waived:");
-    println!("{:#?}", edited_update);
+    println!("{edited_update:#?}");
 
     Ok(())
 }

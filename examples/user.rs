@@ -31,7 +31,7 @@ async fn main() -> Result<(), String> {
             },
         };
 
-        println!("{}", user);
+        println!("{user}");
         println!();
     }
 

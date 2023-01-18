@@ -10,7 +10,7 @@ async fn main() -> Result<(), String> {
     let build = bodhi.request(&query).await.map_err(|error| error.to_string())?;
 
     println!("Build information:");
-    println!("{:?}", build);
+    println!("{build:?}");
 
     Ok(())
 }

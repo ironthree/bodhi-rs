@@ -41,7 +41,7 @@ async fn main() -> Result<(), String> {
     let edited_update: EditedUpdate = response.map_err(|error| error.to_string())?;
 
     println!("Update edited:");
-    println!("{:#?}", edited_update);
+    println!("{edited_update:#?}");
 
     Ok(())
 }

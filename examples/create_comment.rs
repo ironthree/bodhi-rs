@@ -46,7 +46,7 @@ async fn main() -> Result<(), String> {
     let new_comment: NewComment = response.map_err(|error| error.to_string())?;
 
     println!("New comment created:");
-    println!("{:#?}", new_comment);
+    println!("{new_comment:#?}");
 
     Ok(())
 }

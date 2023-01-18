@@ -9,7 +9,7 @@ async fn main() -> Result<(), String> {
 
     let token = bodhi.request(&query).await.map_err(|error| error.to_string())?;
 
-    println!("CSRF token: {}", token);
+    println!("CSRF token: {token}");
 
     Ok(())
 }

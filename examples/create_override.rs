@@ -41,7 +41,7 @@ async fn main() -> Result<(), String> {
     let new_override: NewOverride = response.map_err(|error| error.to_string())?;
 
     println!("New override created:");
-    println!("{:#?}", new_override);
+    println!("{new_override:#?}");
 
     Ok(())
 }

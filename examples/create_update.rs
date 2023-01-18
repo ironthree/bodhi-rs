@@ -39,7 +39,7 @@ async fn main() -> Result<(), String> {
     let new_update: NewUpdate = response.map_err(|error| error.to_string())?;
 
     println!("New update created:");
-    println!("{:#?}", new_update);
+    println!("{new_update:#?}");
 
     Ok(())
 }

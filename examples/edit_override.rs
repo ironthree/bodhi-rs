@@ -39,7 +39,7 @@ async fn main() -> Result<(), String> {
     let edited_override: EditedOverride = response.map_err(|error| error.to_string())?;
 
     println!("Override edited:");
-    println!("{:#?}", edited_override);
+    println!("{edited_override:#?}");
 
     Ok(())
 }
