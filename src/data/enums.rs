@@ -28,7 +28,7 @@ impl Display for ComposeRequest {
             ComposeRequest::Testing => "testing",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -97,7 +97,7 @@ impl Display for ComposeState {
             ComposeState::UpdateInfo => "updateinfo",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -170,7 +170,7 @@ impl ContentType {
             "M" => Ok(ContentType::Module),
             _ => Err(InvalidValueError::new(
                 "ContentType",
-                format!("Suffix '{}' is not valid.", suffix),
+                format!("Suffix '{suffix}' is not valid."),
             )),
         }
     }
@@ -185,7 +185,7 @@ impl Display for ContentType {
             ContentType::RPM => "rpm",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -293,7 +293,7 @@ impl Display for PackageManager {
             PackageManager::YUM => "yum",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -348,7 +348,7 @@ impl Display for ReleaseState {
             ReleaseState::Pending => "pending",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -408,7 +408,7 @@ impl Display for TestGatingStatus {
             TestGatingStatus::Waiting => "waiting",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -457,7 +457,7 @@ impl Display for UpdateID {
             UpdateID::Alias(string) => string.to_owned(),
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -492,7 +492,7 @@ impl Display for UpdateRequest {
             UpdateRequest::Unpush => "unpush",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -554,7 +554,7 @@ impl Display for UpdateSeverity {
             UpdateSeverity::Urgent => "urgent",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -620,7 +620,7 @@ impl Display for UpdateStatus {
             UpdateStatus::Unpushed => "unpushed",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -678,7 +678,7 @@ impl Display for UpdateSuggestion {
             UpdateSuggestion::Unspecified => "unspecified",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
@@ -740,7 +740,7 @@ impl Display for UpdateType {
             UpdateType::Unspecified => "unspecified",
         };
 
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 

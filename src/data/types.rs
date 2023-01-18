@@ -38,7 +38,7 @@ impl Display for Bug {
         };
 
         writeln!(f, "Bug {}:", self.bug_id)?;
-        writeln!(f, "Title: {}", title)?;
+        writeln!(f, "Title: {title}")?;
         writeln!(f, "URL:   {}", self.url())?;
 
         Ok(())
@@ -741,7 +741,7 @@ impl Display for User {
             .join(", ");
 
         writeln!(f, "User {}:", &self.name)?;
-        writeln!(f, "E-Mail: {}", email)?;
+        writeln!(f, "E-Mail: {email}")?;
         writeln!(f, "Groups: {}", &groups)?;
 
         Ok(())

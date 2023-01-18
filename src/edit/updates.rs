@@ -241,7 +241,7 @@ impl<'a> SingleRequest<EditedUpdate, EditedUpdate> for UpdateEditor<'a> {
             });
         }
 
-        let bugs: Vec<String> = self.bugs.iter().map(|b| format!("{}", b)).collect();
+        let bugs: Vec<String> = self.bugs.iter().map(|b| format!("{b}")).collect();
         let bug_refs: Vec<&str> = bugs.iter().map(|s| s.as_str()).collect();
 
         let update_edit = UpdateData {

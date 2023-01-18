@@ -23,7 +23,7 @@ pub struct BodhiError {
 
 impl std::fmt::Display for BodhiError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-        write!(f, "{:#?}", self)
+        write!(f, "{self:#?}")
     }
 }
 

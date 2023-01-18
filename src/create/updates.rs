@@ -283,7 +283,7 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
         let bugs: Option<Vec<String>> = self
             .bugs
             .as_ref()
-            .map(|bugs| bugs.iter().map(|b| format!("{}", b)).collect());
+            .map(|bugs| bugs.iter().map(|b| format!("{b}")).collect());
         let bug_refs: Option<Vec<&str>> = bugs.as_ref().map(|b| b.iter().map(|s| s.as_str()).collect());
 
         let csrf_token = csrf_token.as_ref().unwrap_or_else(|| unreachable!());

@@ -34,7 +34,7 @@ impl TryFrom<&str> for BodhiDate {
         // if the string is too short for the full format, pad it with 00:00:00 time.
 
         let string = if string.len() == 10 {
-            format!("{} 00:00:00", string)
+            format!("{string} 00:00:00")
         } else {
             string.to_owned()
         };

@@ -144,18 +144,18 @@ impl<'a> SingleRequest<NewComment, NewComment> for CommentCreator<'a> {
         // https://github.com/fedora-infra/bodhi/issues/3888#issuecomment-577793271
         if let Some(items) = &self.bug_feedback {
             for (pos, item) in items.iter().enumerate() {
-                feedback.insert(format!("bug_feedback.{}.bug_id", pos), item.bug_id.to_string());
-                feedback.insert(format!("bug_feedback.{}.karma", pos), karma_string(item.karma));
+                feedback.insert(format!("bug_feedback.{pos}.bug_id"), item.bug_id.to_string());
+                feedback.insert(format!("bug_feedback.{pos}.karma"), karma_string(item.karma));
             }
         };
 
         if let Some(items) = &self.testcase_feedback {
             for (pos, item) in items.iter().enumerate() {
                 feedback.insert(
-                    format!("testcase_feedback.{}.testcase_name", pos),
+                    format!("testcase_feedback.{pos}.testcase_name"),
                     item.testcase_name.to_string(),
                 );
-                feedback.insert(format!("testcase_feedback.{}.karma", pos), karma_string(item.karma));
+                feedback.insert(format!("testcase_feedback.{pos}.karma"), karma_string(item.karma));
             }
         };
 
