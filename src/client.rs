@@ -103,6 +103,7 @@ pub enum BuilderError {
 }
 
 impl<'a> BodhiClientBuilder<'a> {
+    #[allow(clippy::should_implement_trait)]
     /// constructor for [`BodhiClientBuilder`] for the default / production instance of bodhi
     pub fn default() -> Self {
         BodhiClientBuilder {
