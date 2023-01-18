@@ -328,7 +328,7 @@ def do_updates() -> int:
         while True:
             print(f"Updates: {release} page {page} / {pages}")
             data = try_request(
-                f"{API_URL}/updates/?releases={release}&rows_per_page=10&page={page}",
+                f"{API_URL}/updates/?releases={release}&rows_per_page=100&page={page}",
                 ["updates", "pages"]
             )
 
