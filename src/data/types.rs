@@ -10,6 +10,7 @@ use super::release::FedoraRelease;
 
 /// data type that represents a BugZilla bug that is associated with an update
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Bug {
     /// bug ID in the BugZilla system: <https://bugzilla.redhat.com/show_bug.cgi?id={bug_id}>
     pub bug_id: u32,
@@ -23,11 +24,6 @@ pub struct Bug {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for Bug {
@@ -56,6 +52,7 @@ impl Bug {
 
 /// data type that represents a feedback item for a bug that is associated with an update
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct BugFeedback {
     /// bug this feedback is associated with
     pub bug: Option<Bug>,
@@ -69,11 +66,6 @@ pub struct BugFeedback {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for BugFeedback {
@@ -85,6 +77,7 @@ impl Display for BugFeedback {
 
 /// data type that represents a koji build that is associated with an update
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Build {
     /// Epoch value of this build (`None` if unspecified)
     pub epoch: Option<u32>,
@@ -101,11 +94,6 @@ pub struct Build {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for Build {
@@ -127,6 +115,7 @@ impl Display for Build {
 
 /// data type that represents a comment on an update (including bug and test case feedback)
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Comment {
     // author of the comment (username), only provided for backwards compatibility
     #[deprecated(since = "2.0.0")]
@@ -163,11 +152,6 @@ pub struct Comment {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for Comment {
@@ -184,6 +168,7 @@ impl Display for Comment {
 
 /// data type that represents a (running) compose for an "updates" or "updates-testing" repository
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Compose {
     /// string of JSON-formatted checkpoint data for the compose
     pub checkpoints: String,
@@ -216,11 +201,6 @@ pub struct Compose {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for Compose {
@@ -249,6 +229,7 @@ impl Display for Compose {
 
 /// data type that represents a group of users in the fedora accounts system (FAS)
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Group {
     /// name of the group
     pub name: String,
@@ -256,11 +237,6 @@ pub struct Group {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for Group {
@@ -272,6 +248,7 @@ impl Display for Group {
 
 /// data type that represents a buildroot override and its associated koji build
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Override {
     /// koji build that is associated with this buildroot override
     pub build: Build,
@@ -299,11 +276,6 @@ pub struct Override {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for Override {
@@ -327,6 +299,7 @@ impl Display for Override {
 
 /// data type that represents a package (or other distributable content) known to bodhi
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Package {
     /// unique identifier of the (source) package (or container, flatpak, or module, as appropriate)
     pub name: String,
@@ -339,11 +312,6 @@ pub struct Package {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for Package {
@@ -360,6 +328,7 @@ impl Display for Package {
 
 /// data type that represents a release (or release variant, based on content type) known to bodhi
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Release {
     /// name of the dist-git branch that is associated with this release
     pub branch: String,
@@ -412,11 +381,6 @@ pub struct Release {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for Release {
@@ -439,6 +403,7 @@ impl Display for Release {
 
 /// data type that represents a test case that is associated with a package
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct TestCase {
     /// name of this test case
     pub name: String,
@@ -448,11 +413,6 @@ pub struct TestCase {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for TestCase {
@@ -485,6 +445,7 @@ impl TestCase {
 
 /// data type that represents a feedback item for a test case that is associated with an update
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct TestCaseFeedback {
     /// ID of the comment that this feedback is associated with
     pub comment_id: Option<u32>,
@@ -498,11 +459,6 @@ pub struct TestCaseFeedback {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for TestCaseFeedback {
@@ -514,6 +470,7 @@ impl Display for TestCaseFeedback {
 
 /// data type that represents an update
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Update {
     /// user-visible, human-readable update alias (`FEDORA-2019-1A2BB23E`)
     pub alias: String,
@@ -618,11 +575,6 @@ pub struct Update {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for Update {
@@ -681,16 +633,12 @@ impl Display for Update {
 
 /// data type that represents an update summary
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct UpdateSummary {
     /// update alias that uniquely identifies the update
     pub alias: String,
     /// user-defined or automatically generated update title
     pub title: String,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for UpdateSummary {
@@ -702,6 +650,7 @@ impl Display for UpdateSummary {
 
 /// data type that represents a user in the Fedora Accounts System (FAS) who is known to bodhi
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct User {
     /// URL of the [libravatar](https://www.libravatar.org/) avatar for this user
     pub avatar: Option<String>,
@@ -719,11 +668,6 @@ pub struct User {
     /// catch-all for fields that are not explicitly deserialized
     #[serde(flatten)]
     pub extra: HashMap<String, serde_json::Value>,
-
-    // private field that makes it impossible to construct values of this type outside this crate
-    #[serde(skip)]
-    #[allow(dead_code)]
-    pub(crate) private: (),
 }
 
 impl Display for User {
