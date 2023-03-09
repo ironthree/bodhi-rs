@@ -1,9 +1,26 @@
-### Unreleased
+### Release 2.1.0
 
-- add new `eol` field to `Release`
-- fix `deprecated(since)` annotation for the `composes` field of `Release`
-- update tests for new Fedora releases
-- drop dependency on `time` v0.1 by disabling the `oldtime` feature of `chrono`
+This release contains a few small improvements and updates to match
+changes in bodhi server code.
+
+Added:
+
+- added `eol` field to the `Release` struct
+- added `critpath_gtoups` field to the `Update` struct
+
+Changed:
+
+- dropped the `oldtime` feature of `chrono` to remove the dependency on the
+  obsolete version 0.1 of the `time` crate
+- adapted tests for new and out-of-date Fedora releases
+- mark structs with the `#[non_exhaustive]` attribute instead of using
+  private fields
+- ported from `lazy_static` to `once_cell`
+
+Fixed:
+
+- fixed the `deprecated(since)` annotation for the `composes` field of the
+  `Release` struct
 
 ### Release 2.0.1 "Adaptations" (May 18, 2022)
 
