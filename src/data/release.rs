@@ -7,15 +7,14 @@ use serde::{Deserialize, Serialize};
 use super::{ContentType, InvalidValueError};
 
 mod fedora {
-    use lazy_static::lazy_static;
+    use once_cell::sync::Lazy;
     use regex::Regex;
 
     use super::{ContentType, FedoraRelease, InvalidValueError};
 
-    lazy_static! {
-        pub static ref RELEASE_RE: Regex =
-            Regex::new("^F(?P<number>[1-9][0-9]*)(?P<ctype>[CFM]?)$").expect("Failed to compile hard-coded regex!");
-    }
+    static RELEASE_RE: Lazy<Regex> = Lazy::new(|| {
+        Regex::new("^F(?P<number>[1-9][0-9]*)(?P<ctype>[CFM]?)$").expect("Failed to compile hard-coded regex!")
+    });
 
     pub fn release_parse(release: &str) -> Result<(u32, String), InvalidValueError> {
         let invalid = || InvalidValueError::new("FedoraRelease", release.to_owned());
@@ -60,15 +59,15 @@ mod fedora {
 }
 
 mod epel {
-    use lazy_static::lazy_static;
+    use once_cell::sync::Lazy;
     use regex::Regex;
 
     use super::{ContentType, FedoraRelease, InvalidValueError};
 
-    lazy_static! {
-        pub static ref RELEASE_RE: Regex = Regex::new("^EPEL-(?P<number>[1-9][0-9]*)(?P<ctype>[CFM]?)(?P<next>[N]?)$")
-            .expect("Failed to compile hard-coded regex!");
-    }
+    static RELEASE_RE: Lazy<Regex> = Lazy::new(|| {
+        Regex::new("^EPEL-(?P<number>[1-9][0-9]*)(?P<ctype>[CFM]?)(?P<next>[N]?)$")
+            .expect("Failed to compile hard-coded regex!")
+    });
 
     pub fn release_parse(release: &str) -> Result<(u32, String, bool), InvalidValueError> {
         let invalid = || InvalidValueError::new("FedoraRelease", release.to_owned());
@@ -122,15 +121,13 @@ mod epel {
 }
 
 mod el {
-    use lazy_static::lazy_static;
+    use once_cell::sync::Lazy;
     use regex::Regex;
 
     use super::{FedoraRelease, InvalidValueError};
 
-    lazy_static! {
-        pub static ref RELEASE_RE: Regex =
-            Regex::new("^EL-(?P<number>[1-9][0-9]*)$").expect("Failed to compile hard-coded regex!");
-    }
+    static RELEASE_RE: Lazy<Regex> =
+        Lazy::new(|| Regex::new("^EL-(?P<number>[1-9][0-9]*)$").expect("Failed to compile hard-coded regex!"));
 
     pub fn release_parse(release: &str) -> Result<u32, InvalidValueError> {
         let invalid = || InvalidValueError::new("FedoraRelease", release.to_owned());
