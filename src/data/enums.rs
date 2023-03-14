@@ -218,21 +218,16 @@ impl FromStr for ContentType {
 ///
 /// This type uses (de)serializaion support from [`serde_repr`] for converting these three numeric
 /// values into the corresponding enum variants.
-#[derive(Clone, Copy, Debug, Deserialize_repr, Eq, PartialEq, Serialize_repr)]
+#[derive(Clone, Copy, Debug, Default, Deserialize_repr, Eq, PartialEq, Serialize_repr)]
 #[repr(i8)]
 pub enum Karma {
     /// positive feedback
     Positive = 1,
     /// neutral / informational feedback (default)
+    #[default]
     Neutral = 0,
     /// negative feedback
     Negative = -1,
-}
-
-impl Default for Karma {
-    fn default() -> Self {
-        Karma::Neutral
-    }
 }
 
 impl Display for Karma {
@@ -524,7 +519,7 @@ impl FromStr for UpdateRequest {
 ///
 /// This field is required to not be `Unspecified` for updates with type [`UpdateType::Security`].
 #[allow(missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum UpdateSeverity {
     #[serde(rename = "high")]
     High,
@@ -532,16 +527,11 @@ pub enum UpdateSeverity {
     Low,
     #[serde(rename = "medium")]
     Medium,
+    #[default]
     #[serde(rename = "unspecified")]
     Unspecified,
     #[serde(rename = "urgent")]
     Urgent,
-}
-
-impl Default for UpdateSeverity {
-    fn default() -> Self {
-        UpdateSeverity::Unspecified
-    }
 }
 
 impl Display for UpdateSeverity {
@@ -651,7 +641,7 @@ impl FromStr for UpdateStatus {
 
 
 /// valid `suggestion` values for updates
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum UpdateSuggestion {
     /// recommendation for logging out after this update has been installed
     #[serde(rename = "logout")]
@@ -660,14 +650,9 @@ pub enum UpdateSuggestion {
     #[serde(rename = "reboot")]
     Reboot,
     /// no recommendation (default)
+    #[default]
     #[serde(rename = "unspecified")]
     Unspecified,
-}
-
-impl Default for UpdateSuggestion {
-    fn default() -> Self {
-        UpdateSuggestion::Unspecified
-    }
 }
 
 impl Display for UpdateSuggestion {
@@ -705,7 +690,7 @@ impl FromStr for UpdateSuggestion {
 
 
 /// valid `type` values for updates
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub enum UpdateType {
     /// the update contains fixes for known bugs
     #[serde(rename = "bugfix")]
@@ -720,14 +705,9 @@ pub enum UpdateType {
     #[serde(rename = "security")]
     Security,
     /// unspecified type (default)
+    #[default]
     #[serde(rename = "unspecified")]
     Unspecified,
-}
-
-impl Default for UpdateType {
-    fn default() -> Self {
-        UpdateType::Unspecified
-    }
 }
 
 impl Display for UpdateType {
