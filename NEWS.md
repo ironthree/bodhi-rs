@@ -1,3 +1,8 @@
+### Release 2.1.1
+
+- Derive `Default` implementations for enums where possible.
+- Revert back to using rpassword v5 in example code for now.
+
 ### Release 2.1.0
 
 This release contains a few small improvements and updates to match
