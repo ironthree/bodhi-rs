@@ -67,7 +67,7 @@ impl PartialEq for BodhiDate {
 
 impl PartialOrd for BodhiDate {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.date.partial_cmp(&other.date)
+        Some(self.cmp(other))
     }
 }
 

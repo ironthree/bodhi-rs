@@ -265,7 +265,7 @@ impl<'a> SingleRequest<NewUpdate, NewUpdate> for UpdateCreator<'a> {
         if let Some(update_type) = self.update_type {
             if update_type == UpdateType::Security {
                 match self.severity {
-                    Some(value) if value == UpdateSeverity::Unspecified => {
+                    Some(UpdateSeverity::Unspecified) => {
                         return Err(QueryError::InvalidDataError {
                             error: String::from("For security updates, severity has to be specified."),
                         });
