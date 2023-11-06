@@ -40,7 +40,7 @@ tokio = { version = "1.14", features = ["time"] }
 chrono = { version = "0.4.19", features = ["std", "clock"], default-features = false }
 env_logger = "0.10"
 quickcheck = "1"
-rpassword = "5"
+rpassword = "7"
 tokio = { version = "1.14", features = ["macros", "rt-multi-thread"] }
 
 [profile.release]

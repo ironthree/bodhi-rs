@@ -18,7 +18,7 @@ async fn main() -> Result<(), String> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
 
     let username = read_username();
-    let password = rpassword::prompt_password_stdout("FAS password: ").unwrap();
+    let password = rpassword::prompt_password("FAS password: ").unwrap();
 
     // beware: it looks like the staging instance can't create buildroot overrides
     let bodhi = BodhiClientBuilder::staging()
