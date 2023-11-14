@@ -1,3 +1,9 @@
+### Release 2.1.2
+
+- Update various dependencies.
+- Applied code style fixes reported by clippy.
+- Update tests for new Fedora releases.
+
 ### Release 2.1.1
 
 - Derive `Default` implementations for enums where possible.
