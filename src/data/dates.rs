@@ -61,7 +61,7 @@ impl Display for BodhiDate {
 
 impl PartialEq for BodhiDate {
     fn eq(&self, other: &Self) -> bool {
-        self.date.eq(&other.date)
+        self.date == other.date
     }
 }
 
@@ -101,7 +101,7 @@ pub(crate) mod bodhi_date_format {
 
         match NaiveDateTime::parse_from_str(&string, super::BODHI_DATETIME_FORMAT) {
             Ok(result) => Ok(BodhiDate { date: result.and_utc() }),
-            Err(error) => Err(error).map_err(serde::de::Error::custom),
+            Err(error) => Err(serde::de::Error::custom(error)),
         }
     }
 }
