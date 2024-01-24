@@ -3,7 +3,7 @@ use std::convert::TryFrom;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 
 /// human-readable, non-standard date format used internally by bodhi servers
 pub const BODHI_DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
@@ -40,7 +40,7 @@ impl TryFrom<&str> for BodhiDate {
         };
 
         Ok(BodhiDate {
-            date: Utc.datetime_from_str(&string, BODHI_DATETIME_FORMAT)?,
+            date: NaiveDateTime::parse_from_str(&string, BODHI_DATETIME_FORMAT)?.and_utc(),
         })
     }
 }
@@ -82,7 +82,7 @@ impl Ord for BodhiDate {
 pub(crate) mod bodhi_date_format {
     use super::BodhiDate;
 
-    use chrono::{TimeZone, Utc};
+    use chrono::NaiveDateTime;
     use serde::{self, Deserialize, Deserializer, Serializer};
 
     pub fn serialize<S>(date: &BodhiDate, serializer: S) -> Result<S::Ok, S::Error>
@@ -99,8 +99,8 @@ pub(crate) mod bodhi_date_format {
     {
         let string = String::deserialize(deserializer)?;
 
-        match Utc.datetime_from_str(&string, super::BODHI_DATETIME_FORMAT) {
-            Ok(result) => Ok(BodhiDate { date: result }),
+        match NaiveDateTime::parse_from_str(&string, super::BODHI_DATETIME_FORMAT) {
+            Ok(result) => Ok(BodhiDate { date: result.and_utc() }),
             Err(error) => Err(error).map_err(serde::de::Error::custom),
         }
     }
