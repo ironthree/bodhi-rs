@@ -1,5 +1,4 @@
-use std::cmp::{Ord, Ordering};
-use std::convert::TryFrom;
+use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
@@ -83,7 +82,7 @@ pub(crate) mod bodhi_date_format {
     use super::BodhiDate;
 
     use chrono::NaiveDateTime;
-    use serde::{self, Deserialize, Deserializer, Serializer};
+    use serde::{Deserialize, Deserializer, Serializer};
 
     pub fn serialize<S>(date: &BodhiDate, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -111,7 +110,7 @@ pub(crate) mod bodhi_date_format {
 pub(crate) mod option_bodhi_date_format_ref {
     use super::BodhiDate;
 
-    use serde::{self, Deserialize, Deserializer, Serializer};
+    use serde::{Deserialize, Deserializer, Serializer};
 
     // this &Option reference is intentional, the API requires it
     #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -142,7 +141,7 @@ pub(crate) mod option_bodhi_date_format_ref {
 pub(crate) mod option_bodhi_date_format {
     use super::BodhiDate;
 
-    use serde::{self, Deserialize, Deserializer, Serializer};
+    use serde::{Deserialize, Deserializer, Serializer};
 
     // this &Option reference is intentional, the API requires it
     #[allow(clippy::trivially_copy_pass_by_ref)]

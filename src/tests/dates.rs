@@ -1,5 +1,4 @@
 use crate::BodhiDate;
-use std::convert::TryFrom;
 
 #[test]
 fn long_date() {
