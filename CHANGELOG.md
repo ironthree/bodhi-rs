@@ -1,6 +1,13 @@
+### Release 2.2.0
+
+- Updated various dependencies.
+- Applied code style fixes reported by rustc and clippy.
+- Replace calls of deprecated APIs of `chrono`.
+- MSRV is bumped to 1.71 to match dependencies.
+
 ### Release 2.1.2
 
-- Update various dependencies.
+- Updated various dependencies.
 - Applied code style fixes reported by clippy.
 - Update tests for new Fedora releases.
 
