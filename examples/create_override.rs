@@ -1,4 +1,3 @@
-use std::convert::TryFrom;
 use std::io::{stdin, stdout, Write};
 
 use bodhi::{BodhiClientBuilder, BodhiDate, NewOverride, OverrideCreator};

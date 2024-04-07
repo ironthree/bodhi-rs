@@ -115,6 +115,8 @@
 //!     .unwrap();
 //! ```
 
+// FIXME: the "fedora" crate is deprecated and needs to be replaced
+#![allow(deprecated)]
 #![warn(missing_docs)]
 #![warn(missing_debug_implementations)]
 #![warn(clippy::unwrap_used)]
