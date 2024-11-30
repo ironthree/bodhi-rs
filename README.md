@@ -1,4 +1,8 @@
-## bodhi REST API client
+## bodhi REST API client (DEPRECATED)
+
+> [!WARNING]
+> This application no longer works as of bodhi-server 8.0.0 due to breaking
+> changes to / removal of the OpenID authentication endpoint.
 
 [![crates.io](https://img.shields.io/crates/v/bodhi.svg)](https://crates.io/crates/bodhi/)
 [![crates.io](https://img.shields.io/crates/d/bodhi.svg)](https://crates.io/crates/bodhi/)
